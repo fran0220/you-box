@@ -1,0 +1,10 @@
+/* YouBox webfonts
+ * Loaded from the Google Fonts CDN. These three families ship to consumers.
+ * NOTE: fonts are referenced from fonts.gstatic.com rather than bundled as
+ * local binaries — see readme.md "Visual Foundations > Type" for the rationale
+ * and how to self-host if needed.
+ *   - Space Grotesk  → display / headings
+ *   - Hanken Grotesk → body / UI
+ *   - JetBrains Mono → code & technical labels
+ */
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA — screens</title>
+<link rel="stylesheet" href="ds/styles.css">
+<link rel="stylesheet" href="youbox-app.css">
+<style>body{margin:0;background:#16161D}
+  .qa{display:flex;flex-direction:column;align-items:center;gap:40px;padding:40px 0}
+  .qa figure{margin:0}
+  .qa figcaption{font-family:'JetBrains Mono',monospace;font-size:12px;color:#9A9AA4;margin:0 0 8px 4px}
+  .frame{width:1440px;box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;border-radius:8px}
+  .frame--narrow{width:1280px}
+</style>
+</head>
+<body>
+<div class="qa" id="qa"></div>
+<script src="screens-common.js"></script>
+<script src="screens-marketing.js"></script>
+<script src="screens-marketing2.js"></script>
+<script src="screens-auth.js"></script>
+<script src="screens-auth2.js"></script>
+<script src="screens-console.js"></script>
+<script src="screens-console2.js"></script>
+<script src="screens-admin.js"></script>
+<script src="screens-admin2.js"></script>
+<script>
+  const only = new URLSearchParams(location.search).get('only');
+  const theme = new URLSearchParams(location.search).get('theme');
+  if (theme === 'light') document.documentElement.setAttribute('data-theme','light');
+  const order = only ? only.split(',') : Object.keys(SCREENS);
+  const narrow = new Set(['signIn','signUp']);
+  const qa = document.getElementById('qa');
+  order.forEach(k => {
+    if (!SCREENS[k]) return;
+    const fig = document.createElement('figure');
+    const cap = document.createElement('figcaption'); cap.textContent = k;
+    const fr = document.createElement('div'); fr.className = 'frame' + (narrow.has(k)?' frame--narrow':'');
+    fr.innerHTML = SCREENS[k];
+    fig.appendChild(cap); fig.appendChild(fr); qa.appendChild(fig);
+  });
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>setTimeout(()=>window.lucide&&window.lucide.createIcons({attrs:{'stroke-width':1.75,width:18,height:18}}),200);</script>
+</body>
+</html>

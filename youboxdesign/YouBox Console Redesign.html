@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouBox — Console Redesign</title>
+<link rel="stylesheet" href="ds/styles.css">
+<link rel="stylesheet" href="youbox-app.css">
+<style>
+  html,body{margin:0;background:#0b0b0f}
+  /* floating toolbar (outside the canvas world, fixed) */
+  .ovr{position:fixed;top:16px;right:16px;z-index:9999;display:flex;align-items:center;gap:8px;
+    font-family:'Hanken Grotesk',system-ui,sans-serif}
+  .ovr__chip{display:flex;align-items:center;gap:9px;height:40px;padding:0 6px 0 14px;border-radius:999px;
+    background:rgba(20,20,26,.86);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);
+    color:#E8E8EB;font-size:13px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .ovr__chip b{font-family:'Space Grotesk',sans-serif;font-weight:700}
+  .ovr__chip b span{color:#FE6A35}
+  .ovr__seg{display:flex;background:rgba(255,255,255,.06);border-radius:999px;padding:3px}
+  .ovr__seg button{border:none;background:none;color:#9A9AA4;font:inherit;font-size:12px;font-weight:600;
+    padding:6px 13px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:6px}
+  .ovr__seg button.on{background:#FE6A35;color:#1A0E07}
+  .ovr__seg button svg{width:14px;height:14px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="screens-common.js"></script>
+<script src="screens-marketing.js"></script>
+<script src="screens-marketing2.js"></script>
+<script src="screens-auth.js"></script>
+<script src="screens-auth2.js"></script>
+<script src="screens-console.js"></script>
+<script src="screens-console2.js"></script>
+<script src="screens-admin.js"></script>
+<script src="screens-admin2.js"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const { useEffect } = React;
+
+// Inject a screen's HTML string into an artboard. `light` wraps it so the
+// subtree renders against the light theme regardless of the global theme.
+function Board({ html, light }) {
+  return <div data-theme={light ? 'light' : undefined} style={{ width: '100%', height: '100%', background: 'var(--bg)' }}
+    dangerouslySetInnerHTML={{ __html: html }} />;
+}
+
+const W = 1440;
+// NOTE: must return the DCArtboard ELEMENT directly (not wrapped in a
+// component) so DCSection's `type === DCArtboard` walk finds it. Called as a
+// plain function: {AB({...})}.
+function AB({ id, label, html, h, light, width }) {
+  return <DCArtboard key={id} id={id} label={label} width={width || W} height={h} style={{ background: light ? '#FAFAF8' : '#0B0B0F' }}>
+    <Board html={html} light={light} />
+  </DCArtboard>;
+}
+
+function renderIcons() {
+  if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75, width: 18, height: 18 } });
+}
+
+function App() {
+  const [theme, setTheme] = React.useState('dark');
+  useEffect(() => {
+    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    else document.documentElement.removeAttribute('data-theme');
+  }, [theme]);
+  useEffect(() => { renderIcons(); const t = setTimeout(renderIcons, 300); return () => clearTimeout(t); });
+
+  return (
+    <>
+      <DesignCanvas>
+        <DCSection id="hero" title="Landing — hero variations" subtitle="Three directions for the public homepage hero · OpenRouter-inspired">
+          {AB({ id: 'heroA', label: 'A · Split + code', html: SCREENS.heroA, h: 940 })}
+          {AB({ id: 'heroB', label: 'B · Centered search', html: SCREENS.heroB, h: 1000 })}
+          {AB({ id: 'heroC', label: 'C · Marketplace-forward', html: SCREENS.heroC, h: 900 })}
+        </DCSection>
+
+        <DCSection id="marketing" title="Marketing site" subtitle="Public, pre-login — landing, catalog, model detail, rankings, pricing, about, legal">
+          {AB({ id: 'landing', label: 'Landing (full)', html: SCREENS.landing, h: 2680 })}
+          {AB({ id: 'marketplace', label: 'Model marketplace', html: SCREENS.marketplace, h: 1660 })}
+          {AB({ id: 'modelDetail', label: 'Model detail', html: SCREENS.modelDetail, h: 1240 })}
+          {AB({ id: 'rankings', label: 'Rankings', html: SCREENS.rankings, h: 1240 })}
+          {AB({ id: 'pricing', label: 'Pricing plans', html: SCREENS.pricing, h: 1200 })}
+          {AB({ id: 'about', label: 'About', html: SCREENS.about, h: 1420 })}
+          {AB({ id: 'legal', label: 'Legal / privacy', html: SCREENS.legal, h: 1300 })}
+        </DCSection>
+
+        <DCSection id="auth" title="Authentication" subtitle="Sign in / sign up + recovery & 2FA flows">
+          {AB({ id: 'signIn', label: 'Sign in', width: 1280, html: SCREENS.signIn, h: 860 })}
+          {AB({ id: 'signUp', label: 'Sign up', width: 1280, html: SCREENS.signUp, h: 920 })}
+          {AB({ id: 'forgotPassword', label: 'Forgot password', width: 1280, html: SCREENS.forgotPassword, h: 760 })}
+          {AB({ id: 'resetPassword', label: 'Reset password', width: 1280, html: SCREENS.resetPassword, h: 760 })}
+          {AB({ id: 'otp', label: '2FA / OTP', width: 1280, html: SCREENS.otp, h: 760 })}
+        </DCSection>
+
+        <DCSection id="console" title="Console" subtitle="Authenticated app — lean top nav, no sidebar">
+          {AB({ id: 'dashboard', label: 'Dashboard', html: SCREENS.dashboard, h: 1200 })}
+          {AB({ id: 'chat', label: 'Chat', html: SCREENS.chat, h: 824 })}
+          {AB({ id: 'playground', label: 'Playground', html: SCREENS.playground, h: 830 })}
+          {AB({ id: 'keys', label: 'API keys', html: SCREENS.keys, h: 1000 })}
+          {AB({ id: 'usageLogs', label: 'Activity / logs', html: SCREENS.usageLogs, h: 1000 })}
+          {AB({ id: 'credits', label: 'Credits / top-up', html: SCREENS.credits, h: 900 })}
+          {AB({ id: 'subscriptions', label: 'Subscription', html: SCREENS.subscriptions, h: 940 })}
+          {AB({ id: 'redemption', label: 'Redeem code', html: SCREENS.redemption, h: 740 })}
+          {AB({ id: 'notifications', label: 'Notifications', html: SCREENS.notifications, h: 920 })}
+          {AB({ id: 'profile', label: 'Account', html: SCREENS.profile, h: 980 })}
+        </DCSection>
+
+        <DCSection id="admin" title="Admin" subtitle="Operator surfaces — channels, users, settings, performance, codes, setup">
+          {AB({ id: 'channels', label: 'Channels', html: SCREENS.channels, h: 960 })}
+          {AB({ id: 'users', label: 'Users', html: SCREENS.users, h: 980 })}
+          {AB({ id: 'settings', label: 'Settings · General', html: SCREENS.settings, h: 1220 })}
+          {AB({ id: 'settingsModels', label: 'Settings · Models', html: SCREENS.settingsModels, h: 1040 })}
+          {AB({ id: 'settingsSecurity', label: 'Settings · Security', html: SCREENS.settingsSecurity, h: 920 })}
+          {AB({ id: 'performance', label: 'Performance', html: SCREENS.performance, h: 1160 })}
+          {AB({ id: 'redemptionAdmin', label: 'Redemption codes', html: SCREENS.redemptionAdmin, h: 820 })}
+          {AB({ id: 'setup', label: 'Setup wizard', html: SCREENS.setup, h: 820 })}
+        </DCSection>
+
+        <DCSection id="errors" title="System / errors" subtitle="Error states">
+          {AB({ id: 'error404', label: '404', html: SCREENS.error404, h: 760 })}
+          {AB({ id: 'error500', label: '500', html: SCREENS.error500, h: 760 })}
+        </DCSection>
+
+        <DCSection id="light" title="Light theme" subtitle="Same components, light surfaces — the global toggle (top-right) flips everything else">
+          {AB({ id: 'landingL', label: 'Landing', html: SCREENS.landing, h: 2680, light: true })}
+          {AB({ id: 'marketplaceL', label: 'Marketplace', html: SCREENS.marketplace, h: 1660, light: true })}
+          {AB({ id: 'dashboardL', label: 'Dashboard', html: SCREENS.dashboard, h: 1200, light: true })}
+          {AB({ id: 'signInL', label: 'Sign in', width: 1280, html: SCREENS.signIn, h: 860, light: true })}
+        </DCSection>
+      </DesignCanvas>
+
+      <div className="ovr">
+        <span className="ovr__chip"><b>You<span>Box</span></b> · Console redesign</span>
+        <div className="ovr__chip" style={{ padding: 4 }}>
+          <div className="ovr__seg">
+            <button className={theme === 'dark' ? 'on' : ''} onClick={() => setTheme('dark')}><i data-lucide="moon"></i>Dark</button>
+            <button className={theme === 'light' ? 'on' : ''} onClick={() => setTheme('light')}><i data-lucide="sun"></i>Light</button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</body>
+</html>
