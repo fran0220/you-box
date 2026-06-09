@@ -67,11 +67,11 @@ interface PlaygroundInputProps {
 }
 
 const suggestions = [
-  { icon: BarChartIcon, text: 'Analyze data', color: '#76d0eb' },
-  { icon: BoxIcon, text: 'Surprise me', color: '#76d0eb' },
-  { icon: NotepadTextIcon, text: 'Summarize text', color: '#ea8444' },
-  { icon: CodeSquareIcon, text: 'Code', color: '#6c71ff' },
-  { icon: GraduationCapIcon, text: 'Get advice', color: '#76d0eb' },
+  { icon: BarChartIcon, text: 'Analyze data', color: 'var(--teal)' },
+  { icon: BoxIcon, text: 'Surprise me', color: 'var(--brand)' },
+  { icon: NotepadTextIcon, text: 'Summarize text', color: 'var(--warning)' },
+  { icon: CodeSquareIcon, text: 'Code', color: 'var(--info)' },
+  { icon: GraduationCapIcon, text: 'Get advice', color: 'var(--teal)' },
   { icon: null, text: 'More' },
 ]
 
