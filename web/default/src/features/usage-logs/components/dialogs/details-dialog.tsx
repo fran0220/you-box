@@ -63,9 +63,9 @@ import type { LogOtherData } from '../../types'
 function timingTextColorClass(
   variant: 'success' | 'warning' | 'danger'
 ): string {
-  if (variant === 'success') return 'text-emerald-600'
+  if (variant === 'success') return 'text-success'
   if (variant === 'warning') return 'text-amber-600'
-  return 'text-rose-600'
+  return 'text-destructive'
 }
 
 function DetailRow(props: {
@@ -873,9 +873,9 @@ export function DetailsDialog(props: DetailsDialogProps) {
                 value={
                   <span className='flex items-center gap-1'>
                     {other.admin_info.local_count_tokens ? (
-                      <Monitor className='size-3 text-blue-500' />
+                      <Monitor className='text-info size-3' />
                     ) : (
-                      <Cloud className='size-3 text-emerald-500' />
+                      <Cloud className='text-teal size-3' />
                     )}
                     <span className='text-xs'>
                       {other.admin_info.local_count_tokens

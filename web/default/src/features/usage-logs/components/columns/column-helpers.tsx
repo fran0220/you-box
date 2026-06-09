@@ -137,11 +137,11 @@ export function createDurationColumn<T>(config: {
 
       const durationBgMap: Record<string, string> = {
         success:
-          'border border-emerald-200/40 bg-emerald-50/35 dark:border-emerald-900/40 dark:bg-emerald-950/15',
+          'border-teal/20 bg-teal-subtle/50 border',
         warning:
           'border border-amber-200/45 bg-amber-50/35 dark:border-amber-900/40 dark:bg-amber-950/15',
         danger:
-          'border border-rose-200/50 bg-rose-50/35 dark:border-rose-900/40 dark:bg-rose-950/15',
+          'border-destructive/20 bg-[var(--danger-subtle)]/50 border',
       }
 
       return (
