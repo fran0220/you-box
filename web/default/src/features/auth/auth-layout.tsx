@@ -25,36 +25,86 @@ type AuthLayoutProps = {
   children: React.ReactNode
 }
 
+/**
+ * YouBox auth shell: split layout — form column on the left, brand side
+ * panel (surface-card, brand glow, value prop + platform stats) on the
+ * right. The side panel collapses below lg, leaving the single card.
+ */
 export function AuthLayout({ children }: AuthLayoutProps) {
   const { t } = useTranslation()
   const { systemName, logo, loading } = useSystemConfig()
 
-  return (
-    <div className='relative grid h-svh max-w-none'>
-      <Link
-        to='/'
-        className='absolute top-4 left-4 z-10 flex items-center gap-2 transition-opacity hover:opacity-80 sm:top-8 sm:left-8'
-      >
-        <div className='relative h-8 w-8'>
-          {loading ? (
-            <Skeleton className='absolute inset-0 rounded-full' />
-          ) : (
-            <img
-              src={logo}
-              alt={t('Logo')}
-              className='h-8 w-8 rounded-full object-cover'
-            />
-          )}
-        </div>
+  const brand = (
+    <Link
+      to='/'
+      className='flex items-center gap-2 transition-opacity hover:opacity-80'
+    >
+      <div className='bg-brand-subtle relative size-8 overflow-hidden rounded-[8px]'>
         {loading ? (
-          <Skeleton className='h-6 w-24' />
+          <Skeleton className='absolute inset-0' />
         ) : (
-          <h1 className='text-xl font-medium'>{systemName}</h1>
+          <img
+            src={logo}
+            alt={t('Logo')}
+            className='size-8 rounded-[8px] object-cover'
+          />
         )}
-      </Link>
-      <div className='container flex items-center pt-16 sm:pt-0'>
-        <div className='mx-auto flex w-full flex-col justify-center space-y-2 px-4 py-8 sm:w-[480px] sm:p-8'>
+      </div>
+      {loading ? (
+        <Skeleton className='h-6 w-24' />
+      ) : (
+        <h1 className='font-display text-lg font-bold tracking-[-0.02em]'>
+          {systemName}
+        </h1>
+      )}
+    </Link>
+  )
+
+  const stats: Array<[string, string]> = [
+    ['50+', t('upstream services integrated')],
+    ['100+', t('model billing support')],
+    ['50+', t('compatible API routes')],
+  ]
+
+  return (
+    <div className='grid h-svh grid-cols-1 lg:grid-cols-[1fr_0.85fr]'>
+      {/* Form column */}
+      <div className='relative flex items-center justify-center overflow-y-auto px-4 py-10 sm:px-8'>
+        <div className='absolute top-4 left-4 sm:top-8 sm:left-8'>{brand}</div>
+        <div className='mx-auto flex w-full max-w-[420px] flex-col justify-center space-y-2 pt-12 sm:pt-0'>
           {children}
+        </div>
+      </div>
+
+      {/* Brand side panel */}
+      <div className='bg-card border-border relative hidden flex-col justify-between overflow-hidden border-l p-14 lg:flex'>
+        <div
+          aria-hidden
+          className='pointer-events-none absolute -top-28 -right-28 size-[420px] rounded-full blur-[10px]'
+          style={{
+            background:
+              'radial-gradient(circle, rgba(254,106,53,0.16), transparent 62%)',
+          }}
+        />
+        <div className='relative'>{brand}</div>
+        <div className='relative'>
+          <p className='yb-eyebrow mb-4'>
+            {'// '}
+            {t('AI Application Infrastructure Foundation')}
+          </p>
+          <p className='font-display max-w-[18em] text-3xl leading-[1.25] font-semibold tracking-[-0.02em]'>
+            {t('Unified API Gateway for')} {t('Vast Range of AI Models')}
+          </p>
+        </div>
+        <div className='relative flex gap-8'>
+          {stats.map(([value, label]) => (
+            <div key={label}>
+              <div className='font-display text-2xl font-bold'>{value}</div>
+              <div className='text-muted-foreground mt-1 max-w-[12em] font-mono text-[11px] tracking-[0.06em] uppercase'>
+                {label}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
