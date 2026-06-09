@@ -277,7 +277,15 @@ export function SetupWizard() {
   }
 
   return (
-    <div className='bg-muted/40 relative min-h-svh py-10'>
+    <div className='bg-background relative min-h-svh overflow-hidden py-10'>
+      <div
+        aria-hidden
+        className='pointer-events-none absolute -top-40 left-1/2 size-[600px] -translate-x-1/2 rounded-full blur-[10px]'
+        style={{
+          background:
+            'radial-gradient(circle, rgba(254,106,53,0.14), transparent 62%)',
+        }}
+      />
       <div className='absolute top-4 right-4 sm:top-6 sm:right-6'>
         <LanguageSwitcher />
       </div>
@@ -297,7 +305,7 @@ export function SetupWizard() {
           {systemConfigLoading ? (
             <Skeleton className='h-7 w-40' />
           ) : (
-            <h1 className='text-2xl font-semibold tracking-tight'>
+            <h1 className='font-display text-[28px] font-bold tracking-[-0.025em]'>
               {t('Initialize')} {systemName}
             </h1>
           )}
@@ -310,7 +318,7 @@ export function SetupWizard() {
 
         <Card className='shadow-lg'>
           <CardHeader className='space-y-2'>
-            <CardTitle className='text-xl font-semibold'>
+            <CardTitle className='font-display text-xl font-semibold tracking-[-0.01em]'>
               {t('System setup wizard')}
             </CardTitle>
             <CardDescription>
@@ -338,7 +346,7 @@ export function SetupWizard() {
                     <div className='flex items-start gap-3'>
                       <span
                         className={cn(
-                          'flex size-6 items-center justify-center rounded-md border text-xs font-semibold',
+                          'flex size-6 items-center justify-center rounded-md border font-mono text-xs font-semibold',
                           isActive
                             ? 'border-primary bg-primary text-primary-foreground'
                             : isCompleted
