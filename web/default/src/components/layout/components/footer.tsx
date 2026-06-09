@@ -259,7 +259,7 @@ export function Footer(props: FooterProps) {
                 alt={displayName}
                 className='size-7 rounded-lg object-contain'
               />
-              <span className='text-sm font-semibold tracking-tight'>
+              <span className='font-display text-[15px] font-bold tracking-[-0.02em]'>
                 {displayName}
               </span>
             </Link>
@@ -273,7 +273,7 @@ export function Footer(props: FooterProps) {
             <div className='grid grid-cols-3 gap-8 md:gap-16'>
               {displayColumns.map((column, index) => (
                 <div key={index}>
-                  <p className='text-muted-foreground/50 mb-3 text-xs font-medium tracking-wider uppercase'>
+                  <p className='text-muted-foreground/60 mb-3 font-mono text-[11px] font-medium tracking-[0.08em] uppercase'>
                     {t(column.title)}
                   </p>
                   <ul className='space-y-2.5'>

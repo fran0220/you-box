@@ -136,19 +136,24 @@ export function LegalDocument({
     <PublicLayout>
       <div className='mx-auto max-w-4xl space-y-6 py-12'>
         <div className='space-y-2'>
-          <h1 className='text-3xl font-semibold tracking-tight'>{title}</h1>
+          <p className='yb-eyebrow'>{'// '}{t('Legal')}</p>
+          <h1 className='font-display text-3xl font-bold tracking-[-0.025em]'>
+            {title}
+          </h1>
         </div>
 
-        {isHtml ? (
-          <div
-            className='prose prose-neutral dark:prose-invert max-w-none'
-            dangerouslySetInnerHTML={{ __html: rawContent }}
-          />
-        ) : (
-          <Markdown className='prose-neutral dark:prose-invert max-w-none'>
-            {rawContent}
-          </Markdown>
-        )}
+        <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
+          {isHtml ? (
+            <div
+              className='prose prose-neutral dark:prose-invert max-w-none'
+              dangerouslySetInnerHTML={{ __html: rawContent }}
+            />
+          ) : (
+            <Markdown className='prose-neutral dark:prose-invert max-w-none'>
+              {rawContent}
+            </Markdown>
+          )}
+        </div>
       </div>
     </PublicLayout>
   )

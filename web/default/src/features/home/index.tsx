@@ -52,7 +52,9 @@ export function Home() {
             />
           ) : (
             <div className='container mx-auto py-8'>
-              <Markdown className='custom-home-content'>{content}</Markdown>
+              <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
+                <Markdown className='custom-home-content'>{content}</Markdown>
+              </div>
             </div>
           )}
         </main>

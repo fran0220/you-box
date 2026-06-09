@@ -170,16 +170,18 @@ export function About() {
   return (
     <PublicLayout>
       <div className='mx-auto max-w-6xl px-4 py-8'>
-        {isHtml ? (
-          <div
-            className='prose prose-neutral dark:prose-invert max-w-none'
-            dangerouslySetInnerHTML={{ __html: rawContent }}
-          />
-        ) : (
-          <Markdown className='prose-neutral dark:prose-invert max-w-none'>
-            {rawContent}
-          </Markdown>
-        )}
+        <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
+          {isHtml ? (
+            <div
+              className='prose prose-neutral dark:prose-invert max-w-none'
+              dangerouslySetInnerHTML={{ __html: rawContent }}
+            />
+          ) : (
+            <Markdown className='prose-neutral dark:prose-invert max-w-none'>
+              {rawContent}
+            </Markdown>
+          )}
+        </div>
       </div>
     </PublicLayout>
   )

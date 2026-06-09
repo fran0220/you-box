@@ -25,7 +25,7 @@ interface StatItemProps {
 }
 
 const GRADIENT_TEXT =
-  'from-foreground to-foreground/70 bg-gradient-to-r bg-clip-text font-bold text-transparent'
+  'font-display text-foreground font-bold'
 
 /**
  * Individual stat item with value, suffix, and description
