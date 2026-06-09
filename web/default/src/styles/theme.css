@@ -16,29 +16,38 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+/*
+ * YouBox theme foundation.
+ *
+ * Token source: youboxdesign/ds/tokens (colors, typography, spacing,
+ * effects). Dark-mode-first: the brand's home theme is the near-black warm
+ * ink canvas; light is the compatibility theme. The raw ramps live in
+ * `:root` and stay constant across themes — only the semantic aliases flip
+ * between `:root` (light) and `.dark`, matching the app's `.dark`-class
+ * theming convention.
+ */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Public Sans', sans-serif;
-  /* Editorial serif token — the body face used by the `serif` font axis
-   * and by presets that opt in (currently Anthropic). Lora carries only
-   * Latin glyphs, so the stack walks through CJK serifs (Noto / Source Han
-   * / Songti / SimSun) before the generic `serif` fallback. Without these
-   * explicit CJK fonts the browser's generic-serif pick on Windows is
-   * non-deterministic at small sizes and often appears sans-like. */
+  /* YouBox type system: Space Grotesk display, Hanken Grotesk UI/body,
+   * JetBrains Mono for code/eyebrows/numerics. */
+  --font-sans:
+    'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui,
+    -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei',
+    sans-serif;
+  --font-display:
+    'Space Grotesk Variable', 'Space Grotesk', 'Hanken Grotesk Variable',
+    ui-sans-serif, system-ui, 'PingFang SC', 'Noto Sans SC', sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono',
+    Menlo, Consolas, monospace;
+  /* Legacy font axes — kept resolvable so existing `font-serif` /
+   * `font-inter` / `font-manrope` utilities don't break; they all resolve
+   * to YouBox-approved stacks now. */
   --font-serif:
-    'Lora Variable', 'Lora', 'Source Serif Pro', 'Source Serif 4',
-    'Noto Serif SC', 'Noto Serif TC', 'Noto Serif JP', 'Noto Serif KR',
-    'Source Han Serif SC', 'Source Han Serif TC', 'Source Han Serif',
-    'Songti SC', 'STSong', 'STSongti-SC-Regular', 'PingFang SC', 'SimSun',
-    'NSimSun', '宋体', 'FangSong', '仿宋', 'KaiTi', '楷体', Georgia,
-    'Times New Roman', Cambria, 'Liberation Serif', serif;
-  --font-inter:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  --font-manrope:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    Georgia, 'Times New Roman', 'Noto Serif SC', 'Songti SC', serif;
+  --font-inter: var(--font-sans);
+  --font-manrope: var(--font-sans);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -81,111 +90,280 @@ For commercial licensing, please contact support@quantumnous.com
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* YouBox brand layer — orange is the only primary accent; teal is the
+   * data/status support color and must never compete with orange. */
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-active: var(--brand-active);
+  --color-brand-foreground: var(--brand-on);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-brand-border: var(--brand-border);
+  --color-teal: var(--teal);
+  --color-teal-subtle: var(--teal-subtle);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-inset: var(--surface-inset);
+  --color-field: var(--field-bg);
+  --color-field-border: var(--field-border);
+  --color-code: var(--code-bg);
+  --color-code-border: var(--code-border);
+
+  /* YouBox radius scale: xs 4 / sm 6 / md 10 / lg 14 / xl 20 / 2xl 28. */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-3xl: 32px;
+  --radius-4xl: 36px;
 }
 
 :root {
-  --radius: 1rem;
+  /* -------- YouBox raw ramps (theme-invariant) -------- */
+  --orange-50: #fff3ed;
+  --orange-100: #ffe2d2;
+  --orange-200: #ffc2a4;
+  --orange-300: #ff9e73;
+  --orange-400: #ff7f4d;
+  --orange-500: #fe6a35;
+  --orange-600: #ed5421;
+  --orange-700: #c53f15;
+  --orange-800: #9b3315;
+  --orange-900: #7c2c16;
+
+  --teal-50: #e6fbf6;
+  --teal-100: #c2f4e9;
+  --teal-200: #87e8d4;
+  --teal-300: #45d6bc;
+  --teal-400: #1fbea3;
+  --teal-500: #11a38c;
+  --teal-600: #0c8273;
+  --teal-700: #0c685d;
+
+  --ink-950: #0b0b0f;
+  --ink-900: #101015;
+  --ink-850: #16161d;
+  --ink-800: #1c1c24;
+  --ink-750: #23232c;
+  --ink-700: #2c2c36;
+  --ink-600: #3b3b47;
+  --ink-500: #565663;
+  --ink-400: #74747f;
+  --ink-300: #9a9aa4;
+  --ink-200: #c2c2c9;
+  --ink-150: #d9d9de;
+  --ink-100: #e8e8eb;
+  --ink-50: #f4f4f3;
+  --ink-25: #fafaf8;
+
+  --green-500: #34c759;
+  --green-600: #28a745;
+  --amber-500: #f0b429;
+  --amber-600: #d69a1a;
+  --red-500: #f5483b;
+  --red-600: #de3326;
+  --blue-500: #4d9fff;
+  --blue-600: #2d7fe0;
+
+  /* -------- Motion (YouBox effects tokens) -------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-instant: 80ms;
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 400ms;
+
+  /* -------- Layout -------- */
+  --radius: 14px;
   --app-header-height: 3rem;
+  --nav-height: 64px;
   /* Static build-channel fallback consumed when JS hasn't booted yet. */
   --app-rev: '2k6e8r7p';
-  /* Currently active body font. The font axis swaps this between
-   * `--font-sans` and `--font-serif` via `[data-theme-font='...']` blocks
-   * in theme-presets.css. Default mirrors `--font-sans` so behavior is
-   * identical when no font preference is set. */
+  /* Body face. The legacy font axis is frozen on the YouBox UI sans. */
   --font-body: var(--font-sans);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.13 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.95 0 0);
-  --secondary-foreground: oklch(0.145 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.49 0 0);
-  --accent: oklch(0.95 0 0);
-  --accent-foreground: oklch(0.145 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --success: oklch(0.596 0.145 163.225);
-  --success-foreground: oklch(0.985 0 0);
-  --warning: oklch(0.681 0.162 75.834);
-  --warning-foreground: oklch(0.145 0 0);
-  --info: oklch(0.588 0.158 241.966);
-  --info-foreground: oklch(0.985 0 0);
-  --neutral: oklch(0.708 0 0);
-  --neutral-foreground: oklch(0.145 0 0);
-  --border: oklch(0.93 0 0);
-  --input: oklch(0.93 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.975 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.13 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.92 0 0);
-  --sidebar-accent-foreground: oklch(0.145 0 0);
-  --sidebar-border: oklch(0.93 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --skeleton-base: oklch(0.97 0 0);
-  --skeleton-highlight: oklch(0.985 0 0);
+
+  /* ============================================================
+     Semantic aliases — light theme (compatibility theme)
+     ============================================================ */
+  --brand: var(--orange-600);
+  --brand-hover: var(--orange-500);
+  --brand-active: var(--orange-700);
+  --brand-subtle: rgba(254, 106, 53, 0.12);
+  --brand-border: rgba(254, 106, 53, 0.4);
+  --brand-on: #ffffff;
+  --brand-ring: rgba(254, 106, 53, 0.3);
+  --teal: var(--teal-600);
+  --teal-subtle: rgba(17, 163, 140, 0.12);
+
+  --background: var(--ink-25);
+  --foreground: var(--ink-900);
+  --surface: #ffffff;
+  --surface-2: var(--ink-50);
+  --surface-3: var(--ink-100);
+  --surface-hover: var(--ink-50);
+  --surface-inset: var(--ink-50);
+  --overlay: rgba(20, 20, 25, 0.45);
+  --card: #ffffff;
+  --card-foreground: var(--ink-900);
+  --popover: #ffffff;
+  --popover-foreground: var(--ink-900);
+
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-on);
+  --secondary: var(--ink-50);
+  --secondary-foreground: var(--ink-900);
+  --muted: var(--ink-50);
+  --muted-foreground: var(--ink-500);
+  --accent: var(--ink-50);
+  --accent-foreground: var(--ink-900);
+
+  --destructive: var(--red-600);
+  --destructive-foreground: #ffffff;
+  --success: var(--green-600);
+  --success-foreground: #ffffff;
+  --warning: var(--amber-600);
+  --warning-foreground: #ffffff;
+  --info: var(--blue-600);
+  --info-foreground: #ffffff;
+  --neutral: var(--ink-400);
+  --neutral-foreground: var(--ink-900);
+  --success-subtle: rgba(40, 167, 69, 0.12);
+  --warning-subtle: rgba(214, 154, 26, 0.14);
+  --danger-subtle: rgba(222, 51, 38, 0.1);
+  --info-subtle: rgba(45, 127, 224, 0.12);
+
+  --border: rgba(15, 15, 20, 0.1);
+  --border-strong: rgba(15, 15, 20, 0.18);
+  --border-faint: rgba(15, 15, 20, 0.05);
+  --divider: rgba(15, 15, 20, 0.08);
+  --input: rgba(15, 15, 20, 0.16);
+  --ring: var(--brand-ring);
+  --field-bg: #ffffff;
+  --field-border: rgba(15, 15, 20, 0.16);
+  --field-placeholder: var(--ink-300);
+  --code-bg: #f7f7f4;
+  --code-border: rgba(15, 15, 20, 0.1);
+
+  /* Charts: orange/teal lead; grid stays low-contrast. */
+  --chart-1: var(--orange-600);
+  --chart-2: var(--teal-600);
+  --chart-3: var(--blue-600);
+  --chart-4: var(--amber-600);
+  --chart-5: var(--ink-400);
+
+  --sidebar: var(--ink-25);
+  --sidebar-foreground: var(--ink-900);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-on);
+  --sidebar-accent: var(--ink-100);
+  --sidebar-accent-foreground: var(--ink-950);
+  --sidebar-border: rgba(15, 15, 20, 0.1);
+  --sidebar-ring: var(--brand-ring);
+
+  --skeleton-base: var(--ink-100);
+  --skeleton-highlight: var(--ink-50);
+
+  --shadow-xs: 0 1px 2px rgba(20, 20, 25, 0.06);
+  --shadow-sm: 0 2px 8px rgba(20, 20, 25, 0.08);
+  --shadow-md: 0 10px 30px rgba(20, 20, 25, 0.1);
+  --shadow-lg: 0 20px 50px rgba(20, 20, 25, 0.12);
+  --shadow-xl: 0 32px 80px rgba(20, 20, 25, 0.16);
+  --glow-brand:
+    0 0 0 1px var(--brand-border), 0 8px 24px rgba(254, 106, 53, 0.22);
+  --glow-soft: 0 0 40px rgba(254, 106, 53, 0.14);
 }
 
 .dark {
-  /* OpenAI-like dark mode: nearly black chrome, readable raised surfaces. */
-  --background: oklch(0.185 0 0);
-  --foreground: oklch(0.965 0 0);
-  --card: oklch(0.235 0 0);
-  --card-foreground: oklch(0.965 0 0);
-  --popover: oklch(0.255 0 0);
-  --popover-foreground: oklch(0.965 0 0);
-  --primary: oklch(0.965 0 0);
-  --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.285 0 0);
-  --secondary-foreground: oklch(0.965 0 0);
-  --muted: oklch(0.255 0 0);
-  --muted-foreground: oklch(0.76 0 0);
-  --accent: oklch(0.325 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --success: oklch(0.696 0.17 162.48);
-  --success-foreground: oklch(0.145 0 0);
-  --warning: oklch(0.769 0.188 70.08);
-  --warning-foreground: oklch(0.145 0 0);
-  --info: oklch(0.68 0.17 237.323);
-  --info-foreground: oklch(0.145 0 0);
-  --neutral: oklch(0.76 0 0);
-  --neutral-foreground: oklch(0.145 0 0);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.68 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.115 0 0);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.965 0 0);
-  --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(0.31 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.68 0 0);
-  --skeleton-base: oklch(0.285 0 0);
-  --skeleton-highlight: oklch(0.39 0 0);
+  /* ============================================================
+     Semantic aliases — dark theme (the brand's home)
+     ============================================================ */
+  --brand: var(--orange-500);
+  --brand-hover: var(--orange-400);
+  --brand-active: var(--orange-600);
+  --brand-subtle: rgba(254, 106, 53, 0.14);
+  --brand-border: rgba(254, 106, 53, 0.4);
+  --brand-on: #1a0e07;
+  --brand-ring: rgba(254, 106, 53, 0.35);
+  --teal: var(--teal-400);
+  --teal-subtle: rgba(31, 190, 163, 0.14);
+
+  --background: var(--ink-950);
+  --foreground: var(--ink-50);
+  --surface: var(--ink-850);
+  --surface-2: var(--ink-800);
+  --surface-3: var(--ink-750);
+  --surface-hover: var(--ink-800);
+  --surface-inset: var(--ink-900);
+  --overlay: rgba(7, 7, 10, 0.72);
+  --card: var(--ink-850);
+  --card-foreground: var(--ink-50);
+  --popover: var(--ink-800);
+  --popover-foreground: var(--ink-50);
+
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-on);
+  --secondary: var(--ink-800);
+  --secondary-foreground: var(--ink-100);
+  --muted: var(--ink-800);
+  --muted-foreground: var(--ink-300);
+  --accent: var(--ink-750);
+  --accent-foreground: var(--ink-100);
+
+  --destructive: var(--red-500);
+  --destructive-foreground: #ffffff;
+  --success: var(--green-500);
+  --success-foreground: #102015;
+  --warning: var(--amber-500);
+  --warning-foreground: #201a08;
+  --info: var(--blue-500);
+  --info-foreground: #0a1626;
+  --neutral: var(--ink-400);
+  --neutral-foreground: var(--ink-100);
+  --success-subtle: rgba(52, 199, 89, 0.15);
+  --warning-subtle: rgba(240, 180, 41, 0.15);
+  --danger-subtle: rgba(245, 72, 59, 0.15);
+  --info-subtle: rgba(77, 159, 255, 0.15);
+
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-faint: rgba(255, 255, 255, 0.05);
+  --divider: rgba(255, 255, 255, 0.07);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: var(--brand-ring);
+  --field-bg: var(--ink-900);
+  --field-border: rgba(255, 255, 255, 0.12);
+  --field-placeholder: var(--ink-500);
+  --code-bg: #0c0c11;
+  --code-border: rgba(255, 255, 255, 0.08);
+
+  --chart-1: var(--orange-500);
+  --chart-2: var(--teal-400);
+  --chart-3: var(--blue-500);
+  --chart-4: var(--amber-500);
+  --chart-5: var(--ink-400);
+
+  --sidebar: var(--ink-900);
+  --sidebar-foreground: var(--ink-50);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-on);
+  --sidebar-accent: var(--ink-800);
+  --sidebar-accent-foreground: var(--ink-100);
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-ring: var(--brand-ring);
+
+  --skeleton-base: var(--ink-800);
+  --skeleton-highlight: var(--ink-700);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 32px 80px rgba(0, 0, 0, 0.6);
+  --glow-brand:
+    0 0 0 1px var(--brand-border), 0 6px 24px rgba(254, 106, 53, 0.28);
+  --glow-soft: 0 0 40px rgba(254, 106, 53, 0.18);
 }

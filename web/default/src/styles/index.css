@@ -19,13 +19,11 @@ For commercial licensing, please contact support@quantumnous.com
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/public-sans';
-/* Editorial serif (Lora) backing the `serif` font axis and the Anthropic
- * preset's default typography. See `--font-serif` in theme.css for the
- * full Latin + CJK fallback stack and `theme-presets.css` for the cascade
- * that activates it. Loaded globally so font-switching is instantaneous
- * with no FOUT once the variable is fetched. */
-@import '@fontsource-variable/lora';
+/* YouBox type system — Space Grotesk (display), Hanken Grotesk (UI/body),
+ * JetBrains Mono (code, eyebrows, technical labels, numerics). */
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/hanken-grotesk';
+@import '@fontsource-variable/jetbrains-mono';
 
 @import './theme.css';
 @import './theme-presets.css';
@@ -60,6 +58,28 @@ For commercial licensing, please contact support@quantumnous.com
   /* Keep sticky headers stable while primitives lock body scrolling. */
   body[data-scroll-locked] {
     overflow: unset !important;
+  }
+
+  /* YouBox typographic defaults: headings run in the display face with
+   * tight negative tracking; selection carries the brand tint. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [data-slot='card-title'],
+  [data-slot='dialog-title'],
+  [data-slot='alert-dialog-title'],
+  [data-slot='sheet-title'],
+  [data-slot='drawer-title'] {
+    font-family: var(--font-display);
+    letter-spacing: -0.018em;
+  }
+
+  ::selection {
+    background: var(--brand-subtle);
+    color: var(--foreground);
   }
 
   /* Cursor pointer for buttons */
@@ -121,6 +141,17 @@ For commercial licensing, please contact support@quantumnous.com
     animation: none !important;
     background: var(--skeleton-base) !important;
   }
+}
+
+/* YouBox mono eyebrow — the recurring `// UPPERCASE` technical label.
+ * Content supplies its own `//` prefix text. */
+@utility yb-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand);
 }
 
 @utility container {
