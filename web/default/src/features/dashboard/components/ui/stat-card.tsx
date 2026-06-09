@@ -184,7 +184,7 @@ function StatCardDetails(props: { details: StatCardDetail[] }) {
           key={detail.label}
           className='bg-muted/40 rounded-lg border border-transparent px-2.5 py-2'
         >
-          <div className='text-muted-foreground truncate text-[11px] leading-none font-medium'>
+          <div className='text-muted-foreground truncate font-mono text-[11px] leading-none font-medium tracking-[0.06em] uppercase'>
             {detail.label}
           </div>
           <div
@@ -210,7 +210,7 @@ export function StatCard(props: StatCardProps) {
   return (
     <div className='group flex min-h-32 flex-col justify-between gap-3'>
       <div className='flex items-start justify-between gap-1'>
-        <div className='text-muted-foreground flex items-center gap-1.5 text-xs font-medium sm:gap-2'>
+        <div className='text-muted-foreground flex items-center gap-1.5 font-mono text-[11px] font-medium tracking-[0.06em] uppercase sm:gap-2'>
           <Icon
             className='text-muted-foreground/60 size-3.5 shrink-0'
             aria-hidden='true'
