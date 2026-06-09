@@ -100,6 +100,9 @@ For commercial licensing, please contact support@quantumnous.com
   --color-brand-border: var(--brand-border);
   --color-teal: var(--teal);
   --color-teal-subtle: var(--teal-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-border-faint: var(--border-faint);
+  --color-divider: var(--divider);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
