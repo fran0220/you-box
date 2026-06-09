@@ -1,4 +1,4 @@
-# Step 7 review — auth flows
+# Step 8 review — auth flows
 
 ## Summary of changes
 
@@ -18,7 +18,7 @@
 
 ## Browser review
 
-- `/sign-in` (`step-7/sign-in.png`): split layout, glass form fields, orange
+- `/sign-in` (`screenshots/step-08/sign-in.png`): split layout, glass form fields, orange
   CTA, side panel stats.
-- `/sign-up` (`step-7/sign-up.png`), `/forgot-password` (`step-7/forgot.png`).
-- Mobile 375px (`step-7/sign-in-mobile.png`): single-card fallback.
+- `/sign-up` (`screenshots/step-08/sign-up.png`), `/forgot-password` (`screenshots/step-08/forgot.png`).
+- Mobile 375px (`screenshots/step-08/sign-in-mobile.png`): single-card fallback.

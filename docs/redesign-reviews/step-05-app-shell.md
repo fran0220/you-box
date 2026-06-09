@@ -1,4 +1,4 @@
-# Step 4 review — app shell and navigation
+# Step 5 review — app shell and navigation
 
 ## Summary of changes
 
@@ -24,9 +24,9 @@
 
 ## Browser review
 
-- `/dashboard/overview` desktop (`step-4/dashboard.png`): glass header,
+- `/dashboard/overview` desktop (`screenshots/step-05/dashboard.png`): glass header,
   credit pill `$200` with teal dot, sidebar panels correct.
-- `/system-settings/site/identity` (`step-4/settings-site.png`).
-- `/` (`step-4/public-home-nav.png`): sticky glass marketing nav, active pill.
-- Mobile 375px (`step-4/public-home-mobile.png`, `dashboard-mobile.png`):
+- `/system-settings/site/identity` (`screenshots/step-05/settings-site.png`).
+- `/` (`screenshots/step-05/public-home-nav.png`): sticky glass marketing nav, active pill.
+- Mobile 375px (`screenshots/step-05/public-home-mobile.png`, `dashboard-mobile.png`):
   compact header, no overflow; nav drawer trigger present.

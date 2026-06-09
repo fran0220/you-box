@@ -1,4 +1,4 @@
-# Step 9 review — dashboard + data visualization
+# Step 10 review — dashboard + data visualization
 
 ## Summary of changes
 
@@ -18,12 +18,12 @@
 
 ## Browser review
 
-- `/dashboard/overview` (`step-9/overview.png`): getting-started panel,
+- `/dashboard/overview` (`screenshots/step-10/overview.png`): getting-started panel,
   summary stat cards, credit panel — all on YouBox surfaces.
-- `/dashboard/models` (`step-9/models.png`): mono uppercase stat labels,
+- `/dashboard/models` (`screenshots/step-10/models.png`): mono uppercase stat labels,
   mono values, low-contrast chart grid, pill chart-type tabs, empty
   performance state.
-- `/dashboard/users` (`step-9/users.png`): same shell and panels.
+- `/dashboard/users` (`screenshots/step-10/users.png`): same shell and panels.
 
 ## Known limitation
 

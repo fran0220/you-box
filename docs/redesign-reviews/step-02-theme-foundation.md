@@ -1,4 +1,4 @@
-# Step 1 review — YouBox tokens + global theme foundation
+# Step 2 review — YouBox tokens + global theme foundation
 
 ## Summary of changes
 
@@ -28,11 +28,11 @@
 
 ## Browser review
 
-- `/` (`step-1/home.png`): near-black warm ink canvas, orange primary CTAs.
+- `/` (`screenshots/step-02/home.png`): near-black warm ink canvas, orange primary CTAs.
   Hero's old purple gradient headline remains — Step 5 scope (home feature).
-- `/sign-in` (`step-1/sign-in.png`): dark canvas, orange submit, field
+- `/sign-in` (`screenshots/step-02/sign-in.png`): dark canvas, orange submit, field
   surfaces correct.
-- `/dashboard/overview` (`step-1/dashboard.png`): console renders without
+- `/dashboard/overview` (`screenshots/step-02/dashboard.png`): console renders without
   layout breakage; orange accents active.
 
 ## Known issues carried forward (by plan order)

@@ -1,4 +1,4 @@
-# Step 5 review — marketing home + public content pages
+# Step 6 review — marketing home + public content pages
 
 ## Summary of changes
 
@@ -25,6 +25,6 @@
 
 ## Browser review
 
-- `/` (`step-5/home.png`, `home-features.png`, `home-cta.png`): hero, stats,
+- `/` (`screenshots/step-06/home.png`, `home-features.png`, `home-cta.png`): hero, stats,
   features, how-it-works, footer all on the YouBox system.
-- `/about` (`step-5/about.png`), `/privacy-policy` (`step-5/privacy.png`).
+- `/about` (`screenshots/step-06/about.png`), `/privacy-policy` (`screenshots/step-06/privacy.png`).

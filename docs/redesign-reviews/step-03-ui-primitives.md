@@ -1,4 +1,4 @@
-# Step 2 review — base UI primitives
+# Step 3 review — base UI primitives
 
 ## Summary of changes (src/components/ui)
 
@@ -27,8 +27,8 @@
 
 ## Browser review
 
-- `/channels` dark (`step-2/channels-dark.png`): mono uppercase table header
+- `/channels` dark (`screenshots/step-03/channels-dark.png`): mono uppercase table header
   on surface-2 strip, orange create CTA, hairline panels, empty state intact.
-- `/profile` dark (`step-2/profile-dark.png`); `/profile` light
-  (`step-2/channels-light.png`): warm off-white canvas, white cards, orange
+- `/profile` dark (`screenshots/step-03/profile-dark.png`); `/profile` light
+  (`screenshots/step-03/channels-light.png`): warm off-white canvas, white cards, orange
   CTAs, pill tabs correct in both themes.

@@ -1,4 +1,4 @@
-# Step 17 review — global responsive / a11y / motion sweep
+# Step 18 review — global responsive / a11y / motion sweep
 
 ## Summary of changes
 
@@ -28,6 +28,6 @@
 
 ## Browser review
 
-- `/` at 375 / 768 / 1280 / 1536 px (`step-17/home-*.png`): hero, chips,
+- `/` at 375 / 768 / 1280 / 1536 px (`screenshots/step-18/home-*.png`): hero, chips,
   terminal demo reflow correctly; mobile nav compacts; no horizontal
   overflow.

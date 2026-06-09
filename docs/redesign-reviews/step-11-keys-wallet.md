@@ -1,4 +1,4 @@
-# Step 10 review — API keys + wallet
+# Step 11 review — API keys + wallet
 
 ## Summary of changes
 
@@ -16,10 +16,10 @@
 
 ## Browser review
 
-- `/keys` (`step-10/keys.png`) and create-key drawer
-  (`step-10/keys-create.png`): dark panel sheet, brand-focused name field,
+- `/keys` (`screenshots/step-11/keys.png`) and create-key drawer
+  (`screenshots/step-11/keys-create.png`): dark panel sheet, brand-focused name field,
   orange unlimited-quota switch, quick-expiry chip buttons.
-- `/wallet` (`step-10/wallet.png`): mono balance stats strip, add-funds
+- `/wallet` (`screenshots/step-11/wallet.png`): mono balance stats strip, add-funds
   panel with disabled-state notices, affiliate panel with mono link field.
 
 ## Known limitation

@@ -1,4 +1,4 @@
-# Step 6 review — pricing, model details, rankings
+# Step 7 review — pricing, model details, rankings
 
 ## Summary of changes
 
@@ -21,10 +21,10 @@
 
 ## Browser review
 
-- `/pricing?view=card` (`step-6/pricing-card.png`), `/pricing?view=table`
-  (`step-6/pricing-table.png`): header, sidebar filters, toolbar, empty
+- `/pricing?view=card` (`screenshots/step-07/pricing-card.png`), `/pricing?view=table`
+  (`screenshots/step-07/pricing-table.png`): header, sidebar filters, toolbar, empty
   states correct (no models seeded in dev DB).
-- `/rankings` (`step-6/rankings.png`): brand underline tabs, panel sections,
+- `/rankings` (`screenshots/step-07/rankings.png`): brand underline tabs, panel sections,
   mono unit labels, empty data states correct.
 
 ## Known limitation

@@ -1,4 +1,4 @@
-# Step 14 review — models admin pages
+# Step 15 review — models admin pages
 
 ## Summary
 
@@ -16,7 +16,7 @@
 
 ## Browser review
 
-- `/models/metadata` (`step-14/metadata.png`): pill tabs, filter chips,
+- `/models/metadata` (`screenshots/step-15/metadata.png`): pill tabs, filter chips,
   brand add-model CTA, mono table header, empty state.
-- `/models/deployments` (`step-14/deployments.png`): same shell; access
+- `/models/deployments` (`screenshots/step-15/deployments.png`): same shell; access
   guard renders for non-admin (not triggerable as root).

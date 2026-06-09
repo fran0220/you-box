@@ -45,7 +45,7 @@ Date: 2026-06-10
 ### Compatibility redirects
 - `/console/log` → `/usage-logs`, `/console/topup` → `/wallet?show_history=true`
 
-## Before screenshots (`docs/redesign-review/before/`)
+## Before screenshots (`docs/redesign-reviews/screenshots/screenshots/step-00/`)
 
 Public: home, about, pricing, rankings, sign-in, sign-up, forgot, privacy, notfound.
 Console: dashboard, keys, wallet, profile, playground, usage-logs, channels,

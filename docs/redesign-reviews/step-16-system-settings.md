@@ -1,4 +1,4 @@
-# Step 15 review — system settings (all groups)
+# Step 16 review — system settings (all groups)
 
 ## Summary of changes
 
@@ -18,7 +18,7 @@
 - `bun run typecheck` — pass.
 - `bun run i18n:sync` — clean.
 
-## Browser review (step-15/)
+## Browser review (screenshots/step-16/)
 
 - site (identity), auth (registration), billing (quota — danger-subtle
   compliance alert, orange switch, brand save), content (announcements),

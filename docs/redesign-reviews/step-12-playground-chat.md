@@ -1,4 +1,4 @@
-# Step 11 review — playground + chat + AI elements
+# Step 12 review — playground + chat + AI elements
 
 ## Summary of changes
 
@@ -18,9 +18,9 @@
 
 ## Browser review
 
-- `/playground` (`step-11/playground.png`): ink canvas, field-styled
+- `/playground` (`screenshots/step-12/playground.png`): ink canvas, field-styled
   composer, token-colored suggestion chips, model selector.
-- `/chat/0` (`step-11/chat.png`): chat container shell (no chat presets
+- `/chat/0` (`screenshots/step-12/chat.png`): chat container shell (no chat presets
   configured in dev — preset list empty, container/empty state correct).
 
 ## Known limitation

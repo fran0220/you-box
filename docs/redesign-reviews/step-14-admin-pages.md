@@ -1,4 +1,4 @@
-# Step 13 review — admin data pages
+# Step 14 review — admin data pages
 
 ## Summary of changes
 
@@ -17,9 +17,9 @@
 
 ## Browser review
 
-- `/channels` (`step-13/channels.png`) + create drawer
-  (`step-13/channel-create.png`): dark panel drawer, field surfaces, brand
+- `/channels` (`screenshots/step-14/channels.png`) + create drawer
+  (`screenshots/step-14/channel-create.png`): dark panel drawer, field surfaces, brand
   focus ring, orange enabled switch, section icon tiles.
-- `/users` (`step-13/users.png`), `/redemption-codes`
-  (`step-13/redemptions.png`), `/subscriptions`
-  (`step-13/subscriptions.png`): consistent table shells and empty states.
+- `/users` (`screenshots/step-14/users.png`), `/redemption-codes`
+  (`screenshots/step-14/redemptions.png`), `/subscriptions`
+  (`screenshots/step-14/subscriptions.png`): consistent table shells and empty states.

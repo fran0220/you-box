@@ -1,4 +1,4 @@
-# Step 3 review — overlays and interactive containers
+# Step 4 review — overlays and interactive containers
 
 ## Summary of changes
 
@@ -25,8 +25,8 @@
 
 ## Browser review
 
-- Command menu (`step-3/command-menu.png`): overlay scrim, dark panel,
+- Command menu (`screenshots/step-04/command-menu.png`): overlay scrim, dark panel,
   field-styled input, selected row highlight.
-- Config drawer (`step-3/config-drawer.png`): pruned sections, orange checks.
-- Notification popover (`step-3/notifications.png`): dark panel, pill tabs,
+- Config drawer (`screenshots/step-04/config-drawer.png`): pruned sections, orange checks.
+- Notification popover (`screenshots/step-04/notifications.png`): dark panel, pill tabs,
   empty state, brand action.

@@ -1,4 +1,4 @@
-# Step 16 review — profile + personal settings
+# Step 17 review — profile + personal settings
 
 ## Summary of changes
 
@@ -15,7 +15,7 @@
 
 ## Browser review
 
-- `/profile` desktop (`step-16/profile.png`) and mobile
-  (`step-16/profile-mobile.png`).
-- Profile dropdown (`step-16/profile-dropdown.png`): dark panel, hairline
+- `/profile` desktop (`screenshots/step-17/profile.png`) and mobile
+  (`screenshots/step-17/profile-mobile.png`).
+- Profile dropdown (`screenshots/step-17/profile-dropdown.png`): dark panel, hairline
   ring, danger sign-out item, credit pill in header.

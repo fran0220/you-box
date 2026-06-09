@@ -1,4 +1,4 @@
-# Step 12 review — usage logs, notifications, performance
+# Step 13 review — usage logs, notifications, performance
 
 ## Summary of changes
 
@@ -19,8 +19,8 @@
 
 ## Browser review
 
-- `/usage-logs/common` (`step-12/common.png`): filter bar field surfaces,
+- `/usage-logs/common` (`screenshots/step-13/common.png`): filter bar field surfaces,
   brand search button, mono uppercase table header, tokenized stat chips,
   empty state.
-- `/usage-logs/drawing` (`step-12/drawing.png`), `/usage-logs/task`
-  (`step-12/task.png`).
+- `/usage-logs/drawing` (`screenshots/step-13/drawing.png`), `/usage-logs/task`
+  (`screenshots/step-13/task.png`).

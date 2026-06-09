@@ -1,4 +1,4 @@
-# Step 8 review — setup wizard + error pages
+# Step 9 review — setup wizard + error pages
 
 ## Summary of changes
 
@@ -21,9 +21,9 @@
 
 ## Browser review
 
-- `/404` (`step-8/404.png`): glow, icon tile, display code — per
+- `/404` (`screenshots/step-09/404.png`): glow, icon tile, display code — per
   SCREENS.error404.
-- `/500` (`step-8/500.png`), unknown route fallback
-  (`step-8/route-notfound.png`).
+- `/500` (`screenshots/step-09/500.png`), unknown route fallback
+  (`screenshots/step-09/route-notfound.png`).
 - `/setup` not reachable (instance already initialized) — changes are
   class-level and typechecked; re-verify on a fresh DB if needed.

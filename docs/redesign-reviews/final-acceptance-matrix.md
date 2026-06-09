@@ -5,11 +5,11 @@ limits disabled for the sweep), Chromium 1440×900 (mobile spot-checks at
 375×812 in steps 4/7/16/17). Dark = default theme; Light verified in
 step-2 (`channels-light.png`). Keyboard: skip-to-main link, focus rings
 (brand), dialog/command/menu keyboard navigation verified during step 3.
-Screenshots: `docs/redesign-review/final/` unless otherwise noted.
+Screenshots: `docs/redesign-reviews/screenshots/step-19/` unless otherwise noted.
 
 | Route | Desktop | Mobile | Dark | Light | i18n | Keyboard | Loading/Error/Empty | Screenshot | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/` | ✓ | ✓ (step-17/home-375) | ✓ | ✓ (token-driven) | ✓ | ✓ | ✓ | final/home.png | pass |
+| `/` | ✓ | ✓ (screenshots/step-18/home-375) | ✓ | ✓ (token-driven) | ✓ | ✓ | ✓ | final/home.png | pass |
 | `/about/` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ empty-state | final/about.png | pass |
 | `/pricing/` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ empty catalog | final/pricing.png | pass |
 | `/pricing/$modelId/` | ✓ (shell + token audit; no models seeded) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | step-6 records | pass* |
@@ -26,7 +26,7 @@ Screenshots: `docs/redesign-review/final/` unless otherwise noted.
 | `/otp` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | final/auth-otp.png | pass |
 | `/oauth` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | final/auth-oauth.png | pass |
 | `/401` `/403` `/404` `/500` `/503` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | n/a | final/err*.png | pass |
-| route error/notFound fallbacks | ✓ (same shells) | ✓ | ✓ | ✓ | ✓ | ✓ | n/a | step-8/route-notfound.png | pass |
+| route error/notFound fallbacks | ✓ (same shells) | ✓ | ✓ | ✓ | ✓ | ✓ | n/a | screenshots/step-09/route-notfound.png | pass |
 | `/setup/` | class-level changes typechecked; instance already initialized | — | ✓ | ✓ | ✓ | ✓ | ✓ | step-8 record | pass* |
 | `/dashboard/$section` | ✓ ×3 | ✓ (step-4) | ✓ | ✓ | ✓ | ✓ | ✓ | final/dash-*.png | pass |
 | `/keys/` | ✓ + create drawer | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | final/keys.png, step-10 | pass |

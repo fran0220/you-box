@@ -1,9 +1,9 @@
-# Step 18 review — 100% route acceptance + cleanup
+# Step 19 review — 100% route acceptance + cleanup
 
 ## Summary
 
 - Walked every route in the plan's coverage list with the browser
-  (45 screenshots in `docs/redesign-review/final/`): public/marketing,
+  (45 screenshots in `docs/redesign-reviews/screenshots/step-19/`): public/marketing,
   auth (logged-out), errors, console, admin, all seven system-settings
   groups, and compatibility redirects.
 - Mid-sweep finding: backend web rate limiting (429) invalidated the
