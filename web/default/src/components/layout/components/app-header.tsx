@@ -16,6 +16,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { Link } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/auth-store'
+import { formatQuota } from '@/lib/format'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -109,6 +112,10 @@ export function AppHeader({
   // Notifications hook
   const notifications = useNotifications()
 
+  // Wallet credit pill (YouBox navApp): mono balance with teal status dot.
+  const user = useAuthStore((s) => s.auth.user)
+  const quota = user?.quota
+
   return (
     <>
       <Header>
@@ -126,6 +133,15 @@ export function AppHeader({
               </div>
             )}
             {showSearch && <Search />}
+            {typeof quota === 'number' && (
+              <Link
+                to='/wallet'
+                className='border-border bg-surface-2 hover:bg-surface-3 hidden h-7 items-center gap-1.5 rounded-full border px-3 font-mono text-xs font-medium transition-colors duration-[140ms] md:inline-flex'
+              >
+                <span aria-hidden='true' className='bg-teal size-1.5 rounded-full' />
+                {formatQuota(quota)}
+              </Link>
+            )}
             {showNotifications && (
               <NotificationPopover
                 open={notifications.popoverOpen}
