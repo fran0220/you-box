@@ -73,7 +73,7 @@ function GrowthChip(props: { value: number }) {
   const isUp = value > 0
   const isDown = value < 0
   const palette = isUp
-    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+    ? 'bg-[var(--success-subtle)] text-success'
     : isDown
       ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'
       : 'bg-muted text-muted-foreground'

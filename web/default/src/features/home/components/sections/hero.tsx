@@ -201,7 +201,7 @@ export function Hero(props: HeroProps) {
                 />
                 <span
                   style={{ display: 'none' }}
-                  className='size-6 shrink-0 items-center justify-center rounded-md bg-blue-500/10 text-[10px] font-bold text-blue-600 dark:bg-blue-400/10 dark:text-blue-400'
+                  className='bg-[var(--info-subtle)] text-info size-6 shrink-0 items-center justify-center rounded-md text-[10px] font-bold'
                 >
                   CC
                 </span>

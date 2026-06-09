@@ -564,7 +564,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                 value={
                   <span className='flex items-center gap-1'>
                     <Globe
-                      className='size-3 text-amber-500'
+                      className='text-warning size-3'
                       aria-hidden='true'
                     />
                     {props.log.ip}
@@ -717,7 +717,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                 />
               ))}
               {showLegacyTopupWarning && (
-                <div className='flex items-start gap-1.5 text-xs text-amber-600 dark:text-amber-400'>
+                <div className='text-warning flex items-start gap-1.5 text-xs'>
                   <Info
                     className='mt-0.5 size-3.5 shrink-0'
                     aria-hidden='true'

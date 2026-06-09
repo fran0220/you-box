@@ -516,7 +516,7 @@ function Flag(props: { children: ReactNode }) {
 
 function Key(props: { children: ReactNode }) {
   return (
-    <span className='text-sky-700 dark:text-sky-300'>{props.children}</span>
+    <span className='text-info'>{props.children}</span>
   )
 }
 

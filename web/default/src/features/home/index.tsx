@@ -47,7 +47,7 @@ export function Home() {
           {isUrl ? (
             <iframe
               src={content}
-              className='h-screen w-full border-none'
+              className='h-dvh w-full border-none'
               title={t('Custom Home Page')}
             />
           ) : (
