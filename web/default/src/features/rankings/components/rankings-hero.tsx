@@ -43,7 +43,7 @@ export function RankingsHero(props: RankingsHeroProps) {
   return (
     <section className='space-y-5'>
       <div className='space-y-2'>
-        <h1 className='text-[clamp(1.75rem,4vw,2.5rem)] leading-[1.15] font-bold tracking-tight'>
+        <h1 className='font-display text-[clamp(1.75rem,4vw,2.5rem)] leading-[1.1] font-bold tracking-[-0.025em]'>
           {t('Rankings')}
         </h1>
         <p className='text-muted-foreground/80 max-w-2xl text-sm'>
@@ -79,7 +79,7 @@ export function RankingsHero(props: RankingsHeroProps) {
               <span
                 aria-hidden
                 className={cn(
-                  'bg-foreground absolute inset-x-3 -bottom-px h-[2px] rounded-full transition-opacity',
+                  'bg-brand absolute inset-x-3 -bottom-px h-[2px] rounded-full transition-opacity',
                   isActive ? 'opacity-100' : 'opacity-0'
                 )}
               />

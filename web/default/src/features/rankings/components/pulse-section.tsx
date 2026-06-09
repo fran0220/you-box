@@ -44,7 +44,7 @@ export function PulseSection(props: PulseSectionProps) {
       <PulseCard
         title={t('Trending up')}
         description={t('Models climbing the leaderboard')}
-        icon={<TrendingUp className='size-4 text-emerald-500' />}
+        icon={<TrendingUp className='size-4 text-success' />}
       >
         {props.movers.length === 0 ? (
           <PulseEmpty label={t('No notable climbers right now')} />

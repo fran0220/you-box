@@ -90,8 +90,8 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   return (
     <div
       className={cn(
-        'group relative flex flex-col rounded-xl border p-3 transition-colors sm:p-5',
-        'hover:bg-muted/20'
+        'group bg-card border-border relative flex flex-col rounded-lg border p-3 transition-all duration-[220ms] ease-[cubic-bezier(0.16,1,0.3,1)] sm:p-5',
+        'hover:border-brand-border hover:shadow-[var(--glow-brand)] motion-safe:hover:-translate-y-0.5'
       )}
     >
       {/* Header: icon + name + price + actions */}
@@ -112,7 +112,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
               {dynamicSummary ? (
                 dynamicSummary.isSpecialExpression ? (
                   <span className='min-w-0'>
-                    <span className='text-amber-700 dark:text-amber-300'>
+                    <span className='text-warning'>
                       {t('Special billing expression')}
                     </span>
                     <code className='text-muted-foreground/70 mt-0.5 line-clamp-1 block font-mono text-[11px] break-all'>

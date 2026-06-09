@@ -266,14 +266,14 @@ export function DynamicPricingBreakdown({
                   <div className='mb-1.5 flex flex-wrap items-center gap-1.5'>
                     <Badge
                       variant='secondary'
-                      className='bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
+                      className='bg-[var(--info-subtle)] text-info'
                     >
                       {tier.label || t('Default')}
                     </Badge>
                     {isMatched && (
                       <Badge
                         variant='secondary'
-                        className='bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                        className='bg-teal-subtle text-teal'
                       >
                         {t('Matched')}
                       </Badge>
@@ -343,14 +343,14 @@ export function DynamicPricingBreakdown({
                         <div className='flex flex-wrap items-center gap-1.5'>
                           <Badge
                             variant='secondary'
-                            className='bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
+                            className='bg-[var(--info-subtle)] text-info'
                           >
                             {tier.label || t('Default')}
                           </Badge>
                           {isMatched && (
                             <Badge
                               variant='secondary'
-                              className='bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                              className='bg-teal-subtle text-teal'
                             >
                               {t('Matched')}
                             </Badge>
