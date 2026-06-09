@@ -36,10 +36,20 @@ was executed retroactively with an equivalent result:
 
 ## Verification
 
-- `bun run typecheck` (web/default): pass — recorded below in this step's
-  follow-up verification run.
-- `bun run build` (web/default): pass — reference directory absent from
-  build graph.
+All commands run in `web/default/` after adding the reference directory:
+
+- `bun run typecheck`: pass.
+- `bun run build`: pass — reference directory absent from build graph
+  (rspack inputs all under `web/default/`).
+- `bun run copyright:check`: pass after running `bun run copyright`
+  (3 headers added, 4 normalized — pre-existing gaps unrelated to the
+  reference migration; headers add the protected QuantumNous attribution,
+  nothing removed).
+- `bun run lint`: 99 errors / 6 warnings, all the pre-existing
+  `react-hooks/set-state-in-effect`-class behavioral findings already
+  documented and accepted in `step-18-global-sweep.md` /
+  `step-19-final-acceptance.md`; zero introduced by this step (it touches
+  no `web/default` source).
 
 ## Browser threshold
 
