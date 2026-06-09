@@ -73,7 +73,7 @@ export function WalletStatsCard(props: WalletStatsCardProps) {
           <div key={item.label} className='px-3 py-3 sm:px-5 sm:py-4'>
             <div className='flex items-center gap-2'>
               <item.icon className='text-muted-foreground/60 size-3.5 shrink-0' />
-              <div className='text-muted-foreground truncate text-xs font-medium tracking-wider uppercase'>
+              <div className='text-muted-foreground truncate font-mono text-[11px] font-medium tracking-[0.06em] uppercase'>
                 {item.label}
               </div>
             </div>
