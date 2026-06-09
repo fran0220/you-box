@@ -19,6 +19,58 @@
 5. **品牌保护规则**：不得删除或替换项目策略保护的既有版权、许可、归属、包名、导入路径、元信息。YouBox 视觉重构只作用于 `web/default` 前端体验，不改后端品牌/许可/项目归属信息。
 6. **i18n 规则**：所有用户可见文案继续走 `useTranslation()` / `t()`，新增文案同步 locale 与 static keys。
 7. **组件规则**：保持 Base UI / shadcn 当前 primitive 体系，不混用新的交互 primitive；重做视觉封装而不是手写键盘/焦点行为。
+8. **参考目录规则**：实施时必须先将现有 `web/default/` 前端整体迁移到参考目录（建议 `web/reference/default-before-youbox/`），新的 `web/default/` 作为重构目标目录重新建立；后续所有页面都必须对照参考目录逐功能重构，不能因为旧页面被移动而遗漏功能。
+9. **功能等价规则**：重构不是删除旧功能。每个旧页面、表格列、筛选条件、搜索参数、弹窗、抽屉、表单校验、权限守卫、loading/error/empty 状态、导入导出/复制/删除/保存流程都必须在新实现中找到对应实现或在 review 记录中说明等价替代。
+
+## 实施命令与工作目录
+
+所有前端命令默认在 `web/default/` 执行：
+
+```bash
+bun run typecheck
+bun run lint
+bun run format:check
+bun run build
+bun run build:check
+bun run i18n:sync
+bun run copyright:check
+```
+
+使用规则：
+
+- 每个步骤至少执行 `bun run typecheck`。
+- 触及 TS/TSX 大范围组件时执行 `bun run lint` 与 `bun run format:check`。
+- 触及全局样式、路由、布局、懒加载、构建配置、字体或包依赖时执行 `bun run build` 或 `bun run build:check`。
+- 触及用户可见文案时执行 `bun run i18n:sync` 并检查所有 locale。
+- 新增文件或移动文件时执行 `bun run copyright:check`，必要时补齐版权头；不得改动受保护项目归属信息。
+- 每步 review 通过前不得 push；每步 push 后再进入下一步。
+
+## 实施产物目录约定
+
+重构过程中需保留可追溯审查产物：
+
+```text
+docs/redesign-reviews/
+  step-00-baseline.md
+  step-01-reference-migration.md
+  step-02-theme-foundation.md
+  ...
+  step-19-final-acceptance.md
+docs/redesign-reviews/screenshots/
+  step-00/
+  step-01/
+  ...
+```
+
+每个 `step-*.md` 必须包含：
+
+- commit hash / branch / push ref
+- 改动范围
+- 验证命令与结果
+- 浏览器审查 URL 清单
+- 截图路径
+- review 结论：`pass` 或需修复项
+- 若有修复项，必须记录对应 follow-up commit
 
 ## YouBox 设计基准
 
@@ -118,6 +170,44 @@
 - `/console/topup` → `/wallet?show_history=true`
 - 各 index redirect 路由：`dashboard`、`models`、`usage-logs`、`system-settings/*`
 
+### 原前端参考目录要求
+
+实施开始后，当前 `web/default/` 不能继续作为“边修边改”的旧实现。必须执行以下目录策略：
+
+```text
+web/default/                         # 新 YouBox 前端实现目录，供实际构建与运行使用
+web/reference/default-before-youbox/  # 原前端完整参考目录，只读对照，不参与构建
+docs/redesign-reviews/               # 每步审查记录、截图、功能对照表
+```
+
+迁移要求：
+
+- 用 `git mv web/default web/reference/default-before-youbox` 保留历史与可追溯性。
+- 重新创建新的 `web/default/`，保留项目需要的构建入口、package scripts、Rsbuild/Tailwind/TypeScript/shadcn 配置，并按 YouBox 体系重建源码。
+- `web/reference/default-before-youbox/` 只作为只读参考，不允许在后续步骤中修旧代码来“完成”重构。
+- 每个 feature 重构步骤必须建立功能对照表：`旧文件/旧功能 → 新文件/新功能 → 验收路由/交互`。
+- 如果某个旧功能被合并、改名或交互路径变化，必须在对应 step review 中说明原因、用户入口与验收方法。
+- 最终验收前必须确认 `web/reference/default-before-youbox/` 中所有页面级功能都已在新 `web/default/` 找到对应实现。
+
+### 动态 section 展开清单
+
+动态 `$section` 页面必须按真实 section registry 全量验收，不能只验收默认页。
+
+| 路由族 | 必须覆盖的 section |
+| --- | --- |
+| `/dashboard/$section` | `overview`、`models`、`users` |
+| `/usage-logs/$section` | `common`、`drawing`、`task` |
+| `/models/$section` | `metadata`、`deployments` |
+| `/system-settings/site/$section` | `system-info`、`notice`、`header-navigation`、`sidebar-modules` |
+| `/system-settings/auth/$section` | `basic-auth`、`oauth`、`passkey`、`bot-protection`、`custom-oauth` |
+| `/system-settings/billing/$section` | `quota`、`currency`、`model-pricing`、`group-pricing`、`payment`、`checkin` |
+| `/system-settings/content/$section` | `dashboard`、`announcements`、`api-info`、`faq`、`uptime-kuma`、`chat`、`drawing` |
+| `/system-settings/models/$section` | `global`、`gemini`、`claude`、`grok`、`channel-affinity`、`model-deployment` |
+| `/system-settings/operations/$section` | `behavior`、`monitoring`、`email`、`worker`、`logs`、`performance`、`update-checker` |
+| `/system-settings/security/$section` | `rate-limit`、`sensitive-words`、`ssrf` |
+
+实施时每个 section 都要检查：默认数据、空数据、保存成功、保存失败、dirty guard、表单重置、权限重定向与移动端布局。
+
 ### 共享组件
 
 必须全部审查并按 YouBox 体系重构：
@@ -131,6 +221,30 @@
 ### 业务组件
 
 所有 `src/features/*/components` 内组件纳入重构，包括表格列、drawer、dialog、filter、cards、charts、forms、section registry 输出页面。
+
+### 设计系统适配层边界
+
+为避免每个页面重复发明样式，实施时必须先建立或明确以下适配层，再逐页消费：
+
+- **Token bridge**：`src/styles/theme.css` / `src/styles/index.css` 将 YouBox token 映射到 Tailwind 与 shadcn semantic variables。
+- **Primitive bridge**：`src/components/ui/*` 统一 Button、Card、Input、Badge、Tabs、Table、Dialog 等视觉，不在页面内重复写一次性 class。
+- **Layout bridge**：`src/components/layout/*` 统一 Public/App shell、page header、actions、content gutter、sidebar/nav。
+- **Data surface bridge**：DataTable、StatCard、Metric、ChartCard、CodeBlock、ModelCard、StatusBadge 形成可复用模式。
+- **Feedback bridge**：Loading、Empty、Error、Toast、Confirm、Risk acknowledgement、Form error 统一模式。
+
+页面重构时如果发现需要新视觉模式，先判断是否属于上述 bridge；能复用则不得新建一次性样式。
+
+### 浏览器审查标准
+
+每个浏览器审查节点都必须覆盖：
+
+- 断点：375px、768px、1280px、1536px。
+- 主题：dark 默认主题、light 兼容主题。
+- 操作：hover、focus、active/pressed、disabled、loading、error、empty、success。
+- 键盘：Tab 顺序、Escape 关闭弹层、Enter/Space 激活控件、焦点回收。
+- 可访问性：icon-only button `aria-label`、表单 label/error 关联、语义区域、正文对比度。
+- 动画：只使用 transform/opacity，交互反馈不超过 200ms，reduced motion 下可用。
+- 数据密度：表格横向溢出、移动端 card/list fallback、数值 tabular/mono。
 
 ## 顺序执行计划
 
@@ -150,9 +264,33 @@
 - `bun run typecheck` 有明确结果。
 - commit → review → push。
 
-### Step 1 — 导入 YouBox token 并替换全局主题源头
+### Step 1 — 迁移原前端到参考目录并创建新实现骨架
 
-**改动范围**：`src/styles/*`、字体配置、Tailwind theme bridge。
+**改动范围**：`web/default/`、`web/reference/default-before-youbox/`、前端构建配置。
+
+**交付内容**：
+
+- 使用 `git mv web/default web/reference/default-before-youbox` 将原前端完整迁移为只读参考目录。
+- 重新创建 `web/default/` 作为新的 YouBox 前端实现目录。
+- 从参考目录按需复制并重新整理构建必需文件：`package.json` scripts、`rsbuild.config.ts`、`tsconfig*.json`、`components.json`、`index.html`、`src/main` 入口、i18n 初始化、路由入口等；复制后必须立即改造成 YouBox 架构，不保留旧视觉页面实现作为运行代码。
+- 建立 `docs/redesign-reviews/feature-parity-index.md`，列出参考目录中的每个 route/feature/component 与新实现目标位置。
+- 确认仓库根脚本、Docker/构建流程仍指向新的 `web/default/`。
+
+**浏览器门槛**：
+
+- 新 `web/default` 能启动基础空壳页面。
+- 参考目录不参与构建，访问实际页面时不会加载 `web/reference/default-before-youbox` 的运行代码。
+
+**完成门槛**：
+
+- `bun run typecheck`（在新 `web/default/`，允许因尚未迁移页面产生的缺口必须在本 step review 记录，并在 Step 2 前补齐基础壳）
+- `bun run build` 或记录无法构建的明确原因与下一步修复点
+- `docs/redesign-reviews/step-01-reference-migration.md` 完成
+- commit → review → push。
+
+### Step 2 — 导入 YouBox token 并替换全局主题源头
+
+**改动范围**：新 `web/default/src/styles/*`、字体配置、Tailwind theme bridge。
 
 **交付内容**：
 
@@ -172,7 +310,7 @@
 - `bun run build`
 - commit → review → push。
 
-### Step 2 — 重构基础 UI primitives
+### Step 3 — 重构基础 UI primitives
 
 **改动范围**：`src/components/ui/*` 中基础视觉组件。
 
@@ -196,7 +334,7 @@
 - 组件相关 lint/test（如存在）
 - commit → review → push。
 
-### Step 3 — 重构 Overlay 与交互容器
+### Step 4 — 重构 Overlay 与交互容器
 
 **改动范围**：Dialog、AlertDialog、Sheet、Drawer、Dropdown、Popover、Tooltip、Command、Sonner、Confirm/Risk dialogs。
 
@@ -218,7 +356,7 @@
 - 相关交互手动审查记录
 - commit → review → push。
 
-### Step 4 — 重构 App Shell 与导航系统
+### Step 5 — 重构 App Shell 与导航系统
 
 **改动范围**：已登录布局与公共导航。
 
@@ -242,7 +380,7 @@
 - `bun run build`
 - commit → review → push。
 
-### Step 5 — 重构营销首页与公共内容页
+### Step 6 — 重构营销首页与公共内容页
 
 **改动范围**：`home`、`about`、`legal`、公共 Footer。
 
@@ -264,7 +402,7 @@
 - `bun run i18n:sync`
 - commit → review → push。
 
-### Step 6 — 重构模型市场、模型详情、价格页、排行榜
+### Step 7 — 重构模型市场、模型详情、价格页、排行榜
 
 **改动范围**：`pricing`、`rankings`、model card/table/detail components。
 
@@ -287,7 +425,7 @@
 - `bun run i18n:sync`
 - commit → review → push。
 
-### Step 7 — 重构认证与安全登录流程
+### Step 8 — 重构认证与安全登录流程
 
 **改动范围**：`auth` feature 全部页面与组件。
 
@@ -310,7 +448,7 @@
 - auth 相关测试/手动流程记录
 - commit → review → push。
 
-### Step 8 — 重构安装向导与错误页面
+### Step 9 — 重构安装向导与错误页面
 
 **改动范围**：`setup`、`errors`、root error boundaries。
 
@@ -331,7 +469,7 @@
 - `bun run i18n:sync`
 - commit → review → push。
 
-### Step 9 — 重构 Dashboard 与数据可视化
+### Step 10 — 重构 Dashboard 与数据可视化
 
 **改动范围**：`dashboard` feature、chart cards、overview/model/user analytics。
 
@@ -353,7 +491,7 @@
 - chart/section 手动审查记录
 - commit → review → push。
 
-### Step 10 — 重构 API Keys 与 Wallet/Credits
+### Step 11 — 重构 API Keys 与 Wallet/Credits
 
 **改动范围**：`keys`、`wallet` features。
 
@@ -375,7 +513,7 @@
 - payment/key 手动流程记录
 - commit → review → push。
 
-### Step 11 — 重构 Playground 与 Chat 体验
+### Step 12 — 重构 Playground 与 Chat 体验
 
 **改动范围**：`playground`、`chat`、`components/ai-elements/*`。
 
@@ -397,7 +535,7 @@
 - chat/playground 交互审查记录
 - commit → review → push。
 
-### Step 12 — 重构 Usage Logs、Notifications、Performance 类页面
+### Step 13 — 重构 Usage Logs、Notifications、Performance 类页面
 
 **改动范围**：`usage-logs`、notification popover/page-like states、performance metrics 相关展示。
 
@@ -418,7 +556,7 @@
 - `bun run typecheck`
 - commit → review → push。
 
-### Step 13 — 重构 Admin 数据管理页
+### Step 14 — 重构 Admin 数据管理页
 
 **改动范围**：`channels`、`users`、`redemption-codes`、`subscriptions`、admin tables/dialogs。
 
@@ -441,7 +579,7 @@
 - admin CRUD 手动流程记录
 - commit → review → push。
 
-### Step 14 — 重构 Models 管理页
+### Step 15 — 重构 Models 管理页
 
 **改动范围**：`models` feature。
 
@@ -461,7 +599,7 @@
 - `bun run typecheck`
 - commit → review → push。
 
-### Step 15 — 重构 System Settings 全部分区
+### Step 16 — 重构 System Settings 全部分区
 
 **改动范围**：`system-settings` 下全部子 feature。
 
@@ -488,7 +626,7 @@
 - `bun run i18n:sync`
 - commit → review → push。
 
-### Step 16 — 重构 Profile 与用户个人设置
+### Step 17 — 重构 Profile 与用户个人设置
 
 **改动范围**：`profile` feature、profile dropdown。
 
@@ -508,7 +646,7 @@
 - `bun run typecheck`
 - commit → review → push。
 
-### Step 17 — 全局响应式、可访问性、动画与状态收口
+### Step 18 — 全局响应式、可访问性、动画与状态收口
 
 **改动范围**：全前端。
 
@@ -533,7 +671,7 @@
 - `bun run build`
 - commit → review → push。
 
-### Step 18 — 100% 路由验收与视觉一致性审查
+### Step 19 — 100% 路由验收与视觉一致性审查
 
 **改动范围**：仅修复审查发现的问题。
 
@@ -575,6 +713,7 @@
 建议 commit 主题：
 
 ```text
+chore(frontend): move current web app to redesign reference
 feat(ui): apply YouBox tokens and theme foundation
 feat(ui): redesign core primitives for YouBox system
 feat(auth): redesign authentication flows with YouBox system
@@ -599,4 +738,5 @@ feat(dashboard): redesign analytics surfaces with YouBox system
 3. 全量 `typecheck`、`lint`、`build` 通过。
 4. i18n 同步完成，无新增未翻译用户文案。
 5. 无旧主题视觉残留、无未审查页面、无临时文件。
-6. 最终 review 通过并 push。
+6. `docs/redesign-reviews/feature-parity-index.md` 中所有参考目录功能均标记为已实现并有验收证据。
+7. 最终 review 通过并 push。
