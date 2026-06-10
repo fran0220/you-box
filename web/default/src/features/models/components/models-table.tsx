@@ -50,6 +50,10 @@ export function ModelsTable() {
   // Table state
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    // icon + name_rule info now lives in the model_name CellFlex
+    // (r2-B11 §1); both columns stay available via View Options.
+    icon: false,
+    name_rule: false,
     description: false,
     bound_channels: false,
     quota_types: false,

@@ -17,12 +17,28 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { type ColumnDef } from '@tanstack/react-table'
-import { Eye, Info, Pencil, Settings2, Timer, Trash2 } from 'lucide-react'
+import {
+  Eye,
+  Info,
+  MoreHorizontal,
+  Pencil,
+  Settings2,
+  Timer,
+  Trash2,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatTimestampToDate } from '@/lib/format'
-import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { MonoCell, RowActionButton, RowActions } from '@/components/data-table'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
-import { StatusBadge } from '@/components/status-badge'
+import { StatusBadge, statusVariantFor } from '@/components/status-badge'
 import { TableId } from '@/components/table-id'
 import { getDeploymentStatusConfig } from '../constants'
 import {
@@ -82,17 +98,22 @@ export function useDeploymentsColumns(opts: {
       meta: { label: t('Status'), mobileBadge: true },
       header: t('Status'),
       cell: ({ row }) => {
+        // Soft status pill (r2-B11 §2): the existing status map keeps
+        // the running=success / failed=danger / requested=warning
+        // vocabulary; unknown raw statuses fall back to the shared
+        // statusVariantFor() vocabulary instead of plain neutral.
         const raw = row.original.status
         const key = normalizeDeploymentStatus(raw)
         const config = STATUS[key] || {
           label:
             typeof raw === 'string' && raw.trim() ? raw.trim() : t('Unknown'),
-          variant: 'neutral' as const,
+          variant: statusVariantFor(key),
         }
         return (
           <StatusBadge
             label={config.label}
             variant={config.variant}
+            appearance='soft'
             size='sm'
             copyable={false}
           />
@@ -159,9 +180,12 @@ export function useDeploymentsColumns(opts: {
             ? null
             : Math.max(0, Math.min(100, 100 - percentUsed))
 
+        // MonoCell keeps the remaining-time value right-aligned and
+        // tabular (r2-B11 §2); the running-percent badge and the
+        // approximate line are preserved.
         return (
-          <div className='flex flex-col gap-1 text-sm'>
-            <div className='flex flex-wrap items-center gap-2'>
+          <MonoCell className='flex flex-col items-end gap-1'>
+            <div className='flex flex-wrap items-center justify-end gap-2'>
               <span className='font-medium'>{remainingText}</span>
               {status === 'running' && percentRemain !== null ? (
                 <StatusBadge
@@ -177,7 +201,7 @@ export function useDeploymentsColumns(opts: {
                 {t('Approx.')} {remainingHuman}
               </div>
             ) : null}
-          </div>
+          </MonoCell>
         )
       },
       minSize: 220,
@@ -210,7 +234,9 @@ export function useDeploymentsColumns(opts: {
               size='sm'
             />
             {qty !== null ? (
-              <span className='text-muted-foreground text-xs'>×{qty}</span>
+              <span className='text-muted-foreground font-mono text-xs tabular-nums'>
+                ×{qty}
+              </span>
             ) : null}
           </div>
         )
@@ -232,9 +258,9 @@ export function useDeploymentsColumns(opts: {
               ? Number(row.original.created_at)
               : undefined
         return (
-          <div className='min-w-[140px] font-mono text-sm'>
+          <MonoCell className='min-w-[140px]' muted>
             {formatTimestampToDate(ts)}
-          </div>
+          </MonoCell>
         )
       },
       size: 180,
@@ -251,60 +277,73 @@ export function useDeploymentsColumns(opts: {
           row.original.name ||
           ''
 
+        // Row actions (r2-B11 §2): the six standalone icon buttons are
+        // folded into a hover-revealed More menu (logs / details /
+        // config / extend / rename / delete).
         return (
-          <div className='flex items-center gap-1'>
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={() => opts.onViewLogs(id)}
-              title={t('View logs')}
-            >
-              <Eye className='h-4 w-4' />
-            </Button>
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={() => opts.onViewDetails(id)}
-              title={t('View details')}
-            >
-              <Info className='h-4 w-4' />
-            </Button>
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={() => opts.onUpdateConfig(id)}
-              title={t('Update configuration')}
-            >
-              <Settings2 className='h-4 w-4' />
-            </Button>
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={() => opts.onExtend(id)}
-              title={t('Extend deployment')}
-            >
-              <Timer className='h-4 w-4' />
-            </Button>
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={() => opts.onRename(id, String(currentName))}
-              title={t('Rename deployment')}
-            >
-              <Pencil className='h-4 w-4' />
-            </Button>
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={() => opts.onDelete(row.original)}
-              title={t('Delete')}
-            >
-              <Trash2 className='h-4 w-4 text-red-500' />
-            </Button>
-          </div>
+          <RowActions>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <RowActionButton
+                    label={t('Open menu')}
+                    className='data-popup-open:bg-muted'
+                  />
+                }
+              >
+                <MoreHorizontal className='size-4' />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end' className='w-56'>
+                <DropdownMenuItem onClick={() => opts.onViewLogs(id)}>
+                  {t('View logs')}
+                  <DropdownMenuShortcut>
+                    <Eye size={16} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => opts.onViewDetails(id)}>
+                  {t('View details')}
+                  <DropdownMenuShortcut>
+                    <Info size={16} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => opts.onUpdateConfig(id)}>
+                  {t('Update configuration')}
+                  <DropdownMenuShortcut>
+                    <Settings2 size={16} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => opts.onExtend(id)}>
+                  {t('Extend deployment')}
+                  <DropdownMenuShortcut>
+                    <Timer size={16} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => opts.onRename(id, String(currentName))}
+                >
+                  {t('Rename deployment')}
+                  <DropdownMenuShortcut>
+                    <Pencil size={16} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  onClick={() => opts.onDelete(row.original)}
+                  className='text-destructive focus:text-destructive'
+                >
+                  {t('Delete')}
+                  <DropdownMenuShortcut>
+                    <Trash2 size={16} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </RowActions>
         )
       },
-      size: 180,
+      size: 64,
     },
   ]
 }

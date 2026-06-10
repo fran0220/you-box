@@ -21,7 +21,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { type Row } from '@tanstack/react-table'
 import { MoreHorizontal, Pencil, Power, PowerOff, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { RowActionButton, RowActions } from '@/components/data-table'
 import {
   handleDeleteModel,
   handleToggleModelStatus,
@@ -61,65 +61,74 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     handleToggleModelStatus(model.id, model.status, queryClient)
   }
 
+  // Row actions (r2-B11 §1): Edit is a hover-revealed icon button; the
+  // original dropdown items (Edit / Enable-Disable / Delete) stay in
+  // the More menu. Enable/disable is also available as the inline
+  // status Switch in the status column.
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant='ghost'
-            className='data-popup-open:bg-muted flex h-8 w-8 p-0'
-          />
-        }
-      >
-        <MoreHorizontal className='h-4 w-4' />
-        <span className='sr-only'>{t('Open menu')}</span>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='end' className='w-48'>
-        {/* Edit */}
-        <DropdownMenuItem onClick={handleEdit}>
-          {t('Edit')}
-          <DropdownMenuShortcut>
-            <Pencil size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+    <RowActions>
+      <RowActionButton label={t('Edit')} onClick={handleEdit}>
+        <Pencil className='size-4' />
+      </RowActionButton>
 
-        <DropdownMenuSeparator />
-
-        {/* Enable/Disable */}
-        <DropdownMenuItem onClick={handleToggleStatus}>
-          {isEnabled ? (
-            <>
-              {t('Disable')}
-              <DropdownMenuShortcut>
-                <PowerOff size={16} />
-              </DropdownMenuShortcut>
-            </>
-          ) : (
-            <>
-              {t('Enable')}
-              <DropdownMenuShortcut>
-                <Power size={16} />
-              </DropdownMenuShortcut>
-            </>
-          )}
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
-        {/* Delete */}
-        <DropdownMenuItem
-          onSelect={(e) => {
-            e.preventDefault()
-            setDeleteConfirmOpen(true)
-          }}
-          className='text-destructive focus:text-destructive'
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <RowActionButton
+              label={t('Open menu')}
+              className='data-popup-open:bg-muted'
+            />
+          }
         >
-          {t('Delete')}
-          <DropdownMenuShortcut>
-            <Trash2 size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
+          <MoreHorizontal className='size-4' />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='w-48'>
+          {/* Edit */}
+          <DropdownMenuItem onClick={handleEdit}>
+            {t('Edit')}
+            <DropdownMenuShortcut>
+              <Pencil size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          {/* Enable/Disable */}
+          <DropdownMenuItem onClick={handleToggleStatus}>
+            {isEnabled ? (
+              <>
+                {t('Disable')}
+                <DropdownMenuShortcut>
+                  <PowerOff size={16} />
+                </DropdownMenuShortcut>
+              </>
+            ) : (
+              <>
+                {t('Enable')}
+                <DropdownMenuShortcut>
+                  <Power size={16} />
+                </DropdownMenuShortcut>
+              </>
+            )}
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          {/* Delete */}
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault()
+              setDeleteConfirmOpen(true)
+            }}
+            className='text-destructive focus:text-destructive'
+          >
+            {t('Delete')}
+            <DropdownMenuShortcut>
+              <Trash2 size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <ConfirmDialog
         open={deleteConfirmOpen}
@@ -133,6 +142,6 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           setDeleteConfirmOpen(false)
         }}
       />
-    </DropdownMenu>
+    </RowActions>
   )
 }

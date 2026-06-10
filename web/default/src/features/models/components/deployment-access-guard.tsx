@@ -18,19 +18,11 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import {
-  AlertCircle,
-  CheckCircle2,
-  Circle,
-  Loader2,
-  Server,
-  Settings,
-  WifiOff,
-} from 'lucide-react'
+import { CheckCircle2, Circle, Loader2, Settings } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { InlineAlert } from '@/components/patterns'
 
 type LoadingPhase = 'idle' | 'settings' | 'connection' | 'done'
 type StepStatus = 'pending' | 'loading' | 'done'
@@ -135,65 +127,50 @@ export function DeploymentAccessGuard({
     )
   }
 
-  // Disabled state
+  // Disabled state — InlineAlert warning + Go to settings (r2-B11 §4)
   if (!isEnabled) {
     return (
-      <div className='mx-auto mt-8 max-w-md'>
-        <div className='text-center'>
-          <div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center bg-[var(--warning-subtle)] rounded-2xl'>
-            <Server className='h-8 w-8 text-warning' />
-          </div>
-          <h3 className='mb-6 text-xl font-semibold'>
-            {t('Model deployment service is disabled')}
-          </h3>
-        </div>
-        <div className='space-y-4'>
-          <Alert variant='default'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertTitle>{t('Configuration required')}</AlertTitle>
-            <AlertDescription>
-              {t(
-                'Please enable io.net model deployment service and configure an API key in System Settings.'
-              )}
-            </AlertDescription>
-          </Alert>
-          <Button onClick={handleGoToSettings} className='w-full'>
-            <Settings className='mr-2 h-4 w-4' />
-            {t('Go to settings')}
-          </Button>
-        </div>
+      <div className='mx-auto mt-8 max-w-2xl'>
+        <InlineAlert
+          tone='warning'
+          title={t('Model deployment service is disabled')}
+          actions={
+            <Button size='sm' onClick={handleGoToSettings}>
+              <Settings className='mr-2 h-4 w-4' />
+              {t('Go to settings')}
+            </Button>
+          }
+        >
+          {t(
+            'Please enable io.net model deployment service and configure an API key in System Settings.'
+          )}
+        </InlineAlert>
       </div>
     )
   }
 
-  // Connection error state
+  // Connection error state — InlineAlert danger + Retry / Go to settings
+  // (r2-B11 §4)
   if (connectionOk === false && connectionError) {
     return (
-      <div className='mx-auto mt-8 max-w-md'>
-        <div className='text-center'>
-          <div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-100 dark:bg-red-900/20'>
-            <WifiOff className='h-8 w-8 text-red-600 dark:text-red-400' />
-          </div>
-          <h3 className='mb-6 text-xl font-semibold'>
-            {t('Connection failed')}
-          </h3>
-        </div>
-        <div className='space-y-4'>
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertTitle>{t('Connection error')}</AlertTitle>
-            <AlertDescription>{t(connectionError)}</AlertDescription>
-          </Alert>
-          <div className='flex gap-2'>
-            <Button variant='outline' onClick={onRetry} className='flex-1'>
-              {t('Retry')}
-            </Button>
-            <Button onClick={handleGoToSettings} className='flex-1'>
-              <Settings className='mr-2 h-4 w-4' />
-              {t('Go to settings')}
-            </Button>
-          </div>
-        </div>
+      <div className='mx-auto mt-8 max-w-2xl'>
+        <InlineAlert
+          tone='danger'
+          title={t('Connection failed')}
+          actions={
+            <>
+              <Button size='sm' variant='outline' onClick={onRetry}>
+                {t('Retry')}
+              </Button>
+              <Button size='sm' onClick={handleGoToSettings}>
+                <Settings className='mr-2 h-4 w-4' />
+                {t('Go to settings')}
+              </Button>
+            </>
+          }
+        >
+          {t(connectionError)}
+        </InlineAlert>
       </div>
     )
   }

@@ -16,27 +16,33 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+/* eslint-disable react-refresh/only-export-components */
+import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { type ColumnDef } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
 import { formatTimestampToDate } from '@/lib/format'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { CellFlex } from '@/components/data-table'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { GroupBadge } from '@/components/group-badge'
 import { StatusBadge, StatusBadgeList } from '@/components/status-badge'
 import { TableId } from '@/components/table-id'
+import { getNameRuleConfig, getQuotaTypeConfig } from '../constants'
 import {
-  getModelStatusConfig,
-  getNameRuleConfig,
-  getQuotaTypeConfig,
-} from '../constants'
-import { parseModelTags, formatEndpointsDisplay } from '../lib'
+  handleToggleModelStatus,
+  isModelEnabled,
+  parseModelTags,
+  formatEndpointsDisplay,
+} from '../lib'
 import type { Model, Vendor } from '../types'
 import { DataTableRowActions } from './data-table-row-actions'
 import { DescriptionCell } from './description-cell'
@@ -58,6 +64,48 @@ function renderLimitedItems(
 }
 
 /**
+ * Status cell — inline enable/disable Switch (r2-B11 §1). Reuses the
+ * same status-only toggle as the row-action dropdown (`updateModelStatus`
+ * via `handleToggleModelStatus`: server update + list invalidation, no
+ * optimistic write). The tooltip carries the status label.
+ */
+function ModelStatusCell({ model }: { model: Model }) {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const [isToggling, setIsToggling] = useState(false)
+
+  const isEnabled = isModelEnabled(model)
+  const label = isEnabled ? t('Enabled') : t('Disabled')
+
+  const handleToggle = async () => {
+    if (isToggling) return
+    setIsToggling(true)
+    try {
+      await handleToggleModelStatus(model.id, model.status, queryClient)
+    } finally {
+      setIsToggling(false)
+    }
+  }
+
+  return (
+    <TooltipProvider delay={100}>
+      <Tooltip>
+        <TooltipTrigger render={<span className='inline-flex' />}>
+          <Switch
+            size='sm'
+            checked={isEnabled}
+            onCheckedChange={handleToggle}
+            disabled={isToggling}
+            aria-label={isEnabled ? t('Disable') : t('Enable')}
+          />
+        </TooltipTrigger>
+        <TooltipContent side='top'>{label}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
+/**
  * Generate models columns configuration
  */
 export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
@@ -65,7 +113,6 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
 
   // Get translated configs
   const NAME_RULE_CONFIG = getNameRuleConfig(t)
-  const MODEL_STATUS_CONFIG = getModelStatusConfig(t)
   const QUOTA_TYPE_CONFIG = getQuotaTypeConfig(t)
 
   const vendorMap: Record<number, Vendor> = {}
@@ -139,14 +186,66 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
         <DataTableColumnHeader column={column} title={t('Model Name')} />
       ),
       cell: ({ row }) => {
+        const model = row.original
         const name = row.getValue('model_name') as string
+
+        // Identity CellFlex (r2-B11 §1): model/vendor icon as leading,
+        // mono model name as primary line, match-rule type (+ matched
+        // count) as the mono secondary line. The standalone icon and
+        // match-type columns stay available via View Options.
+        const iconKey =
+          model.icon ||
+          vendorMap[model.vendor_id || 0]?.icon ||
+          model.model_name?.[0] ||
+          'N'
+        const icon = getLobeIcon(iconKey, 16)
+
+        const rule = (model.name_rule ?? 0) as 0 | 1 | 2 | 3
+        const ruleConfig = NAME_RULE_CONFIG[rule]
+        let ruleLabel = ruleConfig?.label || ''
+        if (rule !== 0 && model.matched_count) {
+          ruleLabel = `${ruleLabel} (${model.matched_count})`
+        }
+
+        // Non-exact rules keep the matched-models tooltip on the
+        // secondary line (previously on the match-type column badge).
+        const secondary =
+          rule !== 0 &&
+          model.matched_models &&
+          model.matched_models.length > 0 ? (
+            <TooltipProvider delay={200}>
+              <Tooltip>
+                <TooltipTrigger render={<span />}>{ruleLabel}</TooltipTrigger>
+                <TooltipContent
+                  side='bottom'
+                  className='border-border bg-popover max-h-48 max-w-[320px] overflow-y-auto p-2'
+                >
+                  <div className='flex flex-wrap gap-1'>
+                    {model.matched_models.map((m, idx) => (
+                      <StatusBadge
+                        key={idx}
+                        label={m}
+                        autoColor={m}
+                        size='sm'
+                      />
+                    ))}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            ruleLabel
+          )
+
         return (
-          <StatusBadge
-            label={name}
-            variant='neutral'
-            copyText={name}
-            size='sm'
-            className='font-mono'
+          <CellFlex
+            leading={
+              <span className='border-border bg-muted flex size-7 items-center justify-center rounded-md border'>
+                {icon}
+              </span>
+            }
+            primary={<span className='font-mono'>{name}</span>}
+            secondary={secondary}
           />
         )
       },
@@ -222,18 +321,9 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
       meta: { label: t('Status'), mobileBadge: true },
       header: t('Status'),
       cell: ({ row }) => {
-        const status = row.getValue('status') as number
-        const config =
-          MODEL_STATUS_CONFIG[status as 0 | 1] || MODEL_STATUS_CONFIG[0]
-
-        return (
-          <StatusBadge
-            label={config.label}
-            variant={config.variant}
-            size='sm'
-            copyable={false}
-          />
-        )
+        // Inline enable/disable Switch (r2-B11 §1); the column filter
+        // keeps reading the raw status value.
+        return <ModelStatusCell model={row.original} />
       },
       filterFn: (row, id, value) => {
         if (!value || value.length === 0 || value.includes('all')) return true

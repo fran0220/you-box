@@ -52,13 +52,13 @@ import {
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  SideDrawerSection,
   sideDrawerContentClassName,
   sideDrawerFooterClassName,
   sideDrawerFormClassName,
   sideDrawerHeaderClassName,
 } from '@/components/drawer-layout'
 import { MultiSelect } from '@/components/multi-select'
+import { SettingsPanel } from '@/components/settings'
 import {
   checkClusterNameAvailability,
   createDeployment,
@@ -398,295 +398,93 @@ export function CreateDeploymentDrawer({
             )}
             className={sideDrawerFormClassName()}
           >
-            {/* Basic Configuration */}
-            <SideDrawerSection>
-              <h3 className='text-sm font-medium'>
-                {t('Basic Configuration')}
-              </h3>
+            {/* Basic Configuration — SettingsPanel container (r2-B11 §5);
+                fields and validation are untouched. */}
+            <SettingsPanel
+              eyebrow={t('basic')}
+              title={t('Basic Configuration')}
+            >
+              <div className='flex flex-col gap-4 py-3'>
+                <FormField
+                  control={form.control}
+                  name='resource_private_name'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Container name')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder={t('Enter a name')} {...field} />
+                      </FormControl>
+                      {open && field.value?.trim() ? (
+                        <div className='text-muted-foreground text-xs'>
+                          {isCheckingName
+                            ? t('Checking name...')
+                            : nameAvailable === true
+                              ? t('Name is available')
+                              : nameAvailable === false
+                                ? t('Name is not available')
+                                : ''}
+                        </div>
+                      ) : null}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name='resource_private_name'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Container name')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('Enter a name')} {...field} />
-                    </FormControl>
-                    {open && field.value?.trim() ? (
-                      <div className='text-muted-foreground text-xs'>
-                        {isCheckingName
-                          ? t('Checking name...')
-                          : nameAvailable === true
-                            ? t('Name is available')
-                            : nameAvailable === false
-                              ? t('Name is not available')
-                              : ''}
-                      </div>
-                    ) : null}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='image_url'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Image')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </SideDrawerSection>
+                <FormField
+                  control={form.control}
+                  name='image_url'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Image')}</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </SettingsPanel>
 
             {/* Resource Configuration */}
-            <SideDrawerSection>
-              <h3 className='text-sm font-medium'>
-                {t('Resource Configuration')}
-              </h3>
-
-              <div className='grid gap-4 sm:grid-cols-2'>
-                <FormField
-                  control={form.control}
-                  name='hardware_id'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Hardware type')}</FormLabel>
-                      <Select
-                        items={[
-                          ...hardwareOptions.map((opt) => ({
-                            value: opt.value,
-                            label: opt.label,
-                          })),
-                        ]}
-                        value={field.value}
-                        onValueChange={(v) => field.onChange(v)}
-                        disabled={isLoadingHardware}
-                      >
-                        <FormControl>
-                          <SelectTrigger className='w-full'>
-                            <SelectValue placeholder={t('Select')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent alignItemWithTrigger={false}>
-                          <SelectGroup>
-                            {hardwareOptions.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name='location_ids'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Deployment location')}</FormLabel>
-                    <FormControl>
-                      <MultiSelect
-                        options={locationOptions}
-                        selected={(field.value || []) as string[]}
-                        onChange={(vals) => {
-                          if (isLoadingReplicas || !hardwareId) return
-                          field.onChange(vals)
-                        }}
-                        placeholder={
-                          isLoadingReplicas
-                            ? t('Loading...')
-                            : t('Select locations')
-                        }
-                        className={
-                          isLoadingReplicas || !hardwareId
-                            ? 'pointer-events-none opacity-60'
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className='grid gap-4 sm:grid-cols-2'>
-                <FormField
-                  control={form.control}
-                  name='gpus_per_container'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('GPU count')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          value={toNumber(field.value, gpuCount)}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value === '' ? 0 : Number(e.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='replica_count'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Replica count')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          value={toNumber(field.value, replicaCount)}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value === '' ? 0 : Number(e.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className='grid gap-4 sm:grid-cols-2'>
-                <FormField
-                  control={form.control}
-                  name='duration_hours'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Duration (hours)')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          value={toNumber(field.value, durationHours)}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value === '' ? 0 : Number(e.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='traffic_port'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Port')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          value={toNumber(field.value, trafficPort)}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value === '' ? 0 : Number(e.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </SideDrawerSection>
-
-            {/* Price Estimation */}
-            <SideDrawerSection>
-              <h3 className='text-sm font-medium'>{t('Price estimation')}</h3>
-              <p className='text-muted-foreground text-xs'>
-                {t('Price estimation description')}
-              </p>
-
-              <FormField
-                control={form.control}
-                name='currency'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Billing currency')}</FormLabel>
-                    <Select
-                      items={[
-                        { value: 'usdc', label: 'USDC' },
-                        { value: 'iocoin', label: 'IOCOIN' },
-                      ]}
-                      value={field.value || 'usdc'}
-                      onValueChange={(v) => field.onChange(v)}
-                    >
-                      <FormControl>
-                        <SelectTrigger className='w-full'>
-                          <SelectValue placeholder={t('Select')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent alignItemWithTrigger={false}>
-                        <SelectGroup>
-                          <SelectItem value='usdc'>USDC</SelectItem>
-                          <SelectItem value='iocoin'>IOCOIN</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-            </SideDrawerSection>
-
-            {/* Advanced Configuration */}
-            <SideDrawerSection>
-              <h3 className='text-sm font-medium'>
-                {t('Advanced Configuration')}
-              </h3>
-              <p className='text-muted-foreground text-xs'>
-                {t('Optional settings for advanced container configuration.')}
-              </p>
-
-              <div className='flex flex-col gap-4'>
+            <SettingsPanel
+              eyebrow={t('hardware')}
+              title={t('Resource Configuration')}
+            >
+              <div className='flex flex-col gap-4 py-3'>
                 <div className='grid gap-4 sm:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name='entrypoint'
+                    name='hardware_id'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
-                          {t('Entrypoint (space separated)')}
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder='bash -lc' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name='args'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('Args (space separated)')}</FormLabel>
-                        <FormControl>
-                          <Input placeholder='--foo bar' {...field} />
-                        </FormControl>
+                        <FormLabel>{t('Hardware type')}</FormLabel>
+                        <Select
+                          items={[
+                            ...hardwareOptions.map((opt) => ({
+                              value: opt.value,
+                              label: opt.label,
+                            })),
+                          ]}
+                          value={field.value}
+                          onValueChange={(v) => field.onChange(v)}
+                          disabled={isLoadingHardware}
+                        >
+                          <FormControl>
+                            <SelectTrigger className='w-full'>
+                              <SelectValue placeholder={t('Select')} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent alignItemWithTrigger={false}>
+                            <SelectGroup>
+                              {hardwareOptions.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -695,35 +493,28 @@ export function CreateDeploymentDrawer({
 
                 <FormField
                   control={form.control}
-                  name='env_json'
+                  name='location_ids'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('Environment variables (JSON)')}</FormLabel>
+                      <FormLabel>{t('Deployment location')}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          className='min-h-24 font-mono text-xs'
-                          placeholder='{"KEY":"VALUE"}'
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='secret_env_json'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {t('Secret environment variables (JSON)')}
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          className='min-h-24 font-mono text-xs'
-                          placeholder='{"SECRET":"VALUE"}'
-                          {...field}
+                        <MultiSelect
+                          options={locationOptions}
+                          selected={(field.value || []) as string[]}
+                          onChange={(vals) => {
+                            if (isLoadingReplicas || !hardwareId) return
+                            field.onChange(vals)
+                          }}
+                          placeholder={
+                            isLoadingReplicas
+                              ? t('Loading...')
+                              : t('Select locations')
+                          }
+                          className={
+                            isLoadingReplicas || !hardwareId
+                              ? 'pointer-events-none opacity-60'
+                              : ''
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -734,12 +525,22 @@ export function CreateDeploymentDrawer({
                 <div className='grid gap-4 sm:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name='registry_username'
+                    name='gpus_per_container'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('Registry username')}</FormLabel>
+                        <FormLabel>{t('GPU count')}</FormLabel>
                         <FormControl>
-                          <Input autoComplete='off' {...field} />
+                          <Input
+                            type='number'
+                            value={toNumber(field.value, gpuCount)}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === ''
+                                  ? 0
+                                  : Number(e.target.value)
+                              )
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -748,15 +549,71 @@ export function CreateDeploymentDrawer({
 
                   <FormField
                     control={form.control}
-                    name='registry_secret'
+                    name='replica_count'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('Registry secret')}</FormLabel>
+                        <FormLabel>{t('Replica count')}</FormLabel>
                         <FormControl>
                           <Input
-                            type='password'
-                            autoComplete='off'
-                            {...field}
+                            type='number'
+                            value={toNumber(field.value, replicaCount)}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === ''
+                                  ? 0
+                                  : Number(e.target.value)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className='grid gap-4 sm:grid-cols-2'>
+                  <FormField
+                    control={form.control}
+                    name='duration_hours'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('Duration (hours)')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            value={toNumber(field.value, durationHours)}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === ''
+                                  ? 0
+                                  : Number(e.target.value)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='traffic_port'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('Port')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            value={toNumber(field.value, trafficPort)}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === ''
+                                  ? 0
+                                  : Number(e.target.value)
+                              )
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -765,7 +622,169 @@ export function CreateDeploymentDrawer({
                   />
                 </div>
               </div>
-            </SideDrawerSection>
+            </SettingsPanel>
+
+            {/* Price Estimation */}
+            <SettingsPanel
+              eyebrow={t('duration')}
+              title={t('Price estimation')}
+            >
+              <div className='flex flex-col gap-4 py-3'>
+                <p className='text-muted-foreground text-xs'>
+                  {t('Price estimation description')}
+                </p>
+
+                <FormField
+                  control={form.control}
+                  name='currency'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Billing currency')}</FormLabel>
+                      <Select
+                        items={[
+                          { value: 'usdc', label: 'USDC' },
+                          { value: 'iocoin', label: 'IOCOIN' },
+                        ]}
+                        value={field.value || 'usdc'}
+                        onValueChange={(v) => field.onChange(v)}
+                      >
+                        <FormControl>
+                          <SelectTrigger className='w-full'>
+                            <SelectValue placeholder={t('Select')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            <SelectItem value='usdc'>USDC</SelectItem>
+                            <SelectItem value='iocoin'>IOCOIN</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </SettingsPanel>
+
+            {/* Advanced Configuration */}
+            <SettingsPanel
+              eyebrow={t('advanced')}
+              title={t('Advanced Configuration')}
+            >
+              <div className='flex flex-col gap-4 py-3'>
+                <p className='text-muted-foreground text-xs'>
+                  {t('Optional settings for advanced container configuration.')}
+                </p>
+
+                <div className='flex flex-col gap-4'>
+                  <div className='grid gap-4 sm:grid-cols-2'>
+                    <FormField
+                      control={form.control}
+                      name='entrypoint'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {t('Entrypoint (space separated)')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder='bash -lc' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='args'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Args (space separated)')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder='--foo bar' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name='env_json'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {t('Environment variables (JSON)')}
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className='min-h-24 font-mono text-xs'
+                            placeholder='{"KEY":"VALUE"}'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='secret_env_json'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {t('Secret environment variables (JSON)')}
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className='min-h-24 font-mono text-xs'
+                            placeholder='{"SECRET":"VALUE"}'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className='grid gap-4 sm:grid-cols-2'>
+                    <FormField
+                      control={form.control}
+                      name='registry_username'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Registry username')}</FormLabel>
+                          <FormControl>
+                            <Input autoComplete='off' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='registry_secret'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Registry secret')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type='password'
+                              autoComplete='off'
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </SettingsPanel>
           </form>
         </Form>
 
