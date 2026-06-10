@@ -34,13 +34,16 @@ import { useMediaQuery } from '@/hooks'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
+import { Input } from '@/components/ui/input'
 import {
   DISABLED_ROW_DESKTOP,
   DISABLED_ROW_MOBILE,
   DataTablePage,
+  FilterTabs,
 } from '@/components/data-table'
 import { getUsers, searchUsers } from '../api'
 import {
+  USER_ROLE,
   USER_STATUS,
   getUserStatusOptions,
   getUserRoleOptions,
@@ -50,6 +53,10 @@ import type { User } from '../types'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { useUsersColumns } from './users-columns'
 import { useUsers } from './users-provider'
+import { UsersStatCards } from './users-stat-cards'
+
+/** Quick filter tab values mapped onto the role/status column filters. */
+type UserQuickTab = 'all' | 'admins' | 'banned'
 
 const route = getRouteApi('/_authenticated/users/')
 
@@ -60,7 +67,7 @@ function isDisabledUserRow(user: User) {
 export function UsersTable() {
   const { t } = useTranslation()
   const columns = useUsersColumns()
-  const { refreshTrigger } = useUsers()
+  const { refreshTrigger, setTotal } = useUsers()
   const isMobile = useMediaQuery('(max-width: 640px)')
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
@@ -97,7 +104,10 @@ export function UsersTable() {
     (columnFilters.find((filter) => filter.id === 'group')?.value as string) ??
     ''
 
-  // Fetch data with React Query
+  // Fetch data with React Query. The queryKey carries the whole filter
+  // arrays, which covers the `statusFilter[0]` / `roleFilter[0]` accesses
+  // the exhaustive-deps rule flags (same pattern as channels-table).
+  // eslint-disable-next-line @tanstack/query/exhaustive-deps
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [
       'users',
@@ -145,6 +155,13 @@ export function UsersTable() {
   })
 
   const users = data?.items || []
+  const total = data?.total ?? null
+
+  // Report the API total to the provider so the page header subtitle
+  // (`N registered users`, r2-B8 §1) can render outside the table.
+  useEffect(() => {
+    setTotal(total)
+  }, [total, setTotal])
 
   const table = useReactTable({
     data: users,
@@ -192,6 +209,36 @@ export function UsersTable() {
     ensurePageInRange(pageCount)
   }, [pageCount, ensurePageInRange])
 
+  // Quick tabs share the same role/status column filters (and URL state)
+  // as the faceted Role/Status chips, so the two stay in sync (r2-B8 §3).
+  // Backend role filtering is exact single-value (`role = ?`), so the
+  // Admins tab maps to role=10 only — Root stays reachable through the
+  // faceted Role chip. Banned maps to status=2 (disabled).
+  const quickTab: UserQuickTab = statusFilter.includes(
+    String(USER_STATUS.DISABLED)
+  )
+    ? 'banned'
+    : roleFilter.includes(String(USER_ROLE.ADMIN))
+      ? 'admins'
+      : 'all'
+
+  const handleQuickTabChange = (value: UserQuickTab) => {
+    onColumnFiltersChange((prev) => {
+      // Tabs are mutually exclusive views: switching one clears the other.
+      const rest = prev.filter((f) => f.id !== 'role' && f.id !== 'status')
+      if (value === 'admins') {
+        return [...rest, { id: 'role', value: [String(USER_ROLE.ADMIN)] }]
+      }
+      if (value === 'banned') {
+        return [
+          ...rest,
+          { id: 'status', value: [String(USER_STATUS.DISABLED)] },
+        ]
+      }
+      return rest
+    })
+  }
+
   return (
     <DataTablePage
       table={table}
@@ -203,8 +250,39 @@ export function UsersTable() {
         'No users available. Try adjusting your search or filters.'
       )}
       skeletonKeyPrefix='users-skeleton'
+      applyHeaderSize
+      statHeader={
+        // Admins / Banned / Total balance aggregate over the currently
+        // loaded page (no global user-stats endpoint); Total uses the API
+        // pagination total (r2-B8 §2).
+        <UsersStatCards
+          users={users}
+          total={data?.total || 0}
+          loading={isLoading}
+        />
+      }
       toolbarProps={{
         searchPlaceholder: t('Filter by username, name or email...'),
+        customSearch: (
+          <>
+            <FilterTabs<UserQuickTab>
+              label={t('Filter by role or status')}
+              value={quickTab}
+              onValueChange={handleQuickTabChange}
+              items={[
+                { value: 'all', label: t('All') },
+                { value: 'admins', label: t('Admins') },
+                { value: 'banned', label: t('Banned') },
+              ]}
+            />
+            <Input
+              placeholder={t('Filter by username, name or email...')}
+              value={globalFilter ?? ''}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              className='w-full sm:w-[200px] lg:w-[240px]'
+            />
+          </>
+        ),
         filters: [
           {
             columnId: 'status',

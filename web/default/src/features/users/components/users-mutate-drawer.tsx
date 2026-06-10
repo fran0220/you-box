@@ -56,12 +56,12 @@ import {
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  SideDrawerSection,
   sideDrawerContentClassName,
   sideDrawerFooterClassName,
   sideDrawerFormClassName,
   sideDrawerHeaderClassName,
 } from '@/components/drawer-layout'
+import { SettingsPanel } from '@/components/settings'
 import { createUser, updateUser, getUser, getGroups } from '../api'
 import { BINDING_FIELDS, ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants'
 import {
@@ -208,244 +208,255 @@ export function UsersMutateDrawer({
               onSubmit={form.handleSubmit(onSubmit)}
               className={sideDrawerFormClassName()}
             >
-              {/* Basic Information */}
-              <SideDrawerSection>
-                <h3 className='text-sm font-medium'>
-                  {t('Basic Information')}
-                </h3>
-
-                <FormField
-                  control={form.control}
-                  name='username'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Username')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder={t('Enter username')}
-                          disabled={isUpdate}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {!isUpdate && (
+              {/* Basic Information — SettingsPanel container (r2-B8 §5);
+                  fields and validation are untouched. */}
+              <SettingsPanel
+                eyebrow={t('basic')}
+                title={t('Basic Information')}
+              >
+                <div className='flex flex-col gap-4 py-3'>
                   <FormField
                     control={form.control}
-                    name='role'
+                    name='username'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('Role')}</FormLabel>
-                        <Select
-                          items={[
-                            { value: '1', label: t('Common User') },
-                            { value: '10', label: t('Admin') },
-                          ]}
-                          onValueChange={(value) =>
-                            value !== null && field.onChange(parseInt(value))
-                          }
-                          value={String(field.value)}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t('Select a role')} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent alignItemWithTrigger={false}>
-                            <SelectGroup>
-                              <SelectItem value='1'>
-                                {t('Common User')}
-                              </SelectItem>
-                              <SelectItem value='10'>{t('Admin')}</SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          {t("Set the user's role (cannot be Root)")}
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-
-                <FormField
-                  control={form.control}
-                  name='display_name'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Display Name')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder={t('Enter display name')}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t('Leave empty to use username')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='password'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Password')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type='password'
-                          placeholder={
-                            isUpdate
-                              ? t('Leave empty to keep unchanged')
-                              : t('Enter password (min 8 characters)')
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </SideDrawerSection>
-
-              {/* Group & Quota Settings (Update only) */}
-              {isUpdate && (
-                <SideDrawerSection>
-                  <h3 className='text-sm font-medium'>{t('Group & Quota')}</h3>
-
-                  <FormField
-                    control={form.control}
-                    name='group'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('Group')}</FormLabel>
-                        <Select
-                          items={[
-                            ...groups.map((group) => ({
-                              value: group,
-                              label: group,
-                            })),
-                          ]}
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t('Select a group')} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent alignItemWithTrigger={false}>
-                            <SelectGroup>
-                              {groups.map((group) => (
-                                <SelectItem key={group} value={group}>
-                                  {group}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name='quota_dollars'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          {t('Remaining Quota ({{currency}})', {
-                            currency: currencyLabel,
-                          })}
-                        </FormLabel>
-                        <div className='flex gap-2'>
-                          <FormControl>
-                            <Input
-                              value={
-                                tokensOnly
-                                  ? String(field.value || 0)
-                                  : (field.value || 0).toFixed(6)
-                              }
-                              readOnly
-                              className='flex-1'
-                            />
-                          </FormControl>
-                          <Button
-                            type='button'
-                            variant='outline'
-                            onClick={() => setQuotaDialogOpen(true)}
-                          >
-                            <Pencil className='mr-1 h-4 w-4' />
-                            {t('Adjust Quota')}
-                          </Button>
-                        </div>
-                        <FormDescription>
-                          {formatQuota(parseQuotaFromDollars(field.value || 0))}
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name='remark'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('Remark')}</FormLabel>
+                        <FormLabel>{t('Username')}</FormLabel>
                         <FormControl>
-                          <Textarea
+                          <Input
                             {...field}
-                            placeholder={t(
-                              'Admin notes (only visible to admins)'
-                            )}
-                            rows={3}
+                            placeholder={t('Enter username')}
+                            disabled={isUpdate}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </SideDrawerSection>
+
+                  {!isUpdate && (
+                    <FormField
+                      control={form.control}
+                      name='role'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Role')}</FormLabel>
+                          <Select
+                            items={[
+                              { value: '1', label: t('Common User') },
+                              { value: '10', label: t('Admin') },
+                            ]}
+                            onValueChange={(value) =>
+                              value !== null && field.onChange(parseInt(value))
+                            }
+                            value={String(field.value)}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t('Select a role')} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent alignItemWithTrigger={false}>
+                              <SelectGroup>
+                                <SelectItem value='1'>
+                                  {t('Common User')}
+                                </SelectItem>
+                                <SelectItem value='10'>{t('Admin')}</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            {t("Set the user's role (cannot be Root)")}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  <FormField
+                    control={form.control}
+                    name='display_name'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('Display Name')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={t('Enter display name')}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          {t('Leave empty to use username')}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='password'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('Password')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type='password'
+                            placeholder={
+                              isUpdate
+                                ? t('Leave empty to keep unchanged')
+                                : t('Enter password (min 8 characters)')
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </SettingsPanel>
+
+              {/* Group & Quota Settings (Update only) */}
+              {isUpdate && (
+                <SettingsPanel
+                  eyebrow={t('group & quota')}
+                  title={t('Group & Quota')}
+                >
+                  <div className='flex flex-col gap-4 py-3'>
+                    <FormField
+                      control={form.control}
+                      name='group'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Group')}</FormLabel>
+                          <Select
+                            items={[
+                              ...groups.map((group) => ({
+                                value: group,
+                                label: group,
+                              })),
+                            ]}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue
+                                  placeholder={t('Select a group')}
+                                />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent alignItemWithTrigger={false}>
+                              <SelectGroup>
+                                {groups.map((group) => (
+                                  <SelectItem key={group} value={group}>
+                                    {group}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='quota_dollars'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {t('Remaining Quota ({{currency}})', {
+                              currency: currencyLabel,
+                            })}
+                          </FormLabel>
+                          <div className='flex gap-2'>
+                            <FormControl>
+                              <Input
+                                value={
+                                  tokensOnly
+                                    ? String(field.value || 0)
+                                    : (field.value || 0).toFixed(6)
+                                }
+                                readOnly
+                                className='flex-1'
+                              />
+                            </FormControl>
+                            <Button
+                              type='button'
+                              variant='outline'
+                              onClick={() => setQuotaDialogOpen(true)}
+                            >
+                              <Pencil className='mr-1 h-4 w-4' />
+                              {t('Adjust Quota')}
+                            </Button>
+                          </div>
+                          <FormDescription>
+                            {formatQuota(
+                              parseQuotaFromDollars(field.value || 0)
+                            )}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='remark'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Remark')}</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              placeholder={t(
+                                'Admin notes (only visible to admins)'
+                              )}
+                              rows={3}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </SettingsPanel>
               )}
 
               {/* Binding Information (Read-only) */}
               {isUpdate && (
-                <SideDrawerSection>
-                  <h3 className='text-sm font-medium'>
-                    {t('Binding Information')}
-                  </h3>
-                  <p className='text-muted-foreground text-xs'>
-                    {t(
-                      'Third-party account bindings (read-only, managed by user in profile settings)'
-                    )}
-                  </p>
+                <SettingsPanel
+                  eyebrow={t('bindings')}
+                  title={t('Binding Information')}
+                >
+                  <div className='flex flex-col gap-4 py-3'>
+                    <p className='text-muted-foreground text-xs'>
+                      {t(
+                        'Third-party account bindings (read-only, managed by user in profile settings)'
+                      )}
+                    </p>
 
-                  <div className='flex flex-col gap-3'>
-                    {BINDING_FIELDS.map(({ key, label }) => (
-                      <div key={key}>
-                        <Label className='text-muted-foreground text-xs'>
-                          {t(label)}
-                        </Label>
-                        <Input
-                          value={
-                            (currentRow?.[key as keyof User] as string) || '-'
-                          }
-                          disabled
-                          className='mt-1'
-                        />
-                      </div>
-                    ))}
+                    <div className='flex flex-col gap-3'>
+                      {BINDING_FIELDS.map(({ key, label }) => (
+                        <div key={key}>
+                          <Label className='text-muted-foreground text-xs'>
+                            {t(label)}
+                          </Label>
+                          <Input
+                            value={
+                              (currentRow?.[key as keyof User] as string) || '-'
+                            }
+                            disabled
+                            className='mt-1'
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </SideDrawerSection>
+                </SettingsPanel>
               )}
             </form>
           </Form>

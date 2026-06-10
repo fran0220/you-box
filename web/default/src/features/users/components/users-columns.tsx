@@ -20,6 +20,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
 import { formatQuota, formatTimestamp } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Progress } from '@/components/ui/progress'
 import {
@@ -27,7 +28,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { DataTableColumnHeader } from '@/components/data-table'
+import { CellFlex, DataTableColumnHeader } from '@/components/data-table'
 import { GroupBadge } from '@/components/group-badge'
 import { LongText } from '@/components/long-text'
 import { StatusBadge } from '@/components/status-badge'
@@ -37,7 +38,8 @@ import { type User } from '../types'
 import { DataTableRowActions } from './data-table-row-actions'
 
 function getQuotaProgressColor(percentage: number): string {
-  if (percentage <= 10) return '[&_[data-slot=progress-indicator]]:bg-destructive'
+  if (percentage <= 10)
+    return '[&_[data-slot=progress-indicator]]:bg-destructive'
   if (percentage <= 30) return '[&_[data-slot=progress-indicator]]:bg-amber-500'
   return '[&_[data-slot=progress-indicator]]:bg-success'
 }
@@ -86,35 +88,48 @@ export function useUsersColumns(): ColumnDef<User>[] {
         <DataTableColumnHeader column={column} title={t('Username')} />
       ),
       cell: ({ row }) => {
+        // Identity CellFlex (r2-B8 §4): avatar initials as leading, display
+        // name (or username) as primary line, mono email (or username) as
+        // secondary line. The admin remark tag stays on the primary line.
         const username = row.getValue('username') as string
         const displayName = row.original.display_name
+        const email = row.original.email
         const remark = row.original.remark
+        const primaryName = displayName || username
 
         return (
-          <div className='flex min-w-[160px] flex-col gap-1'>
-            <div className='flex items-center gap-2'>
-              <LongText className='max-w-[140px] font-medium'>
-                {username}
-              </LongText>
-              {remark && (
-                <Tooltip>
-                  <TooltipTrigger
-                    render={<StatusBadge variant='success' copyable={false} />}
-                  >
-                    <LongText className='max-w-[80px]'>{remark}</LongText>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className='text-xs'>{remark}</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </div>
-            {displayName && displayName !== username && (
-              <LongText className='text-muted-foreground max-w-[180px] text-xs'>
-                {displayName}
-              </LongText>
-            )}
-          </div>
+          <CellFlex
+            className='min-w-[180px]'
+            leading={
+              <Avatar className='size-7'>
+                <AvatarFallback className='font-display text-[10px] font-semibold uppercase'>
+                  {primaryName.slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+            }
+            primary={
+              <div className='flex items-center gap-2'>
+                <LongText className='max-w-[140px] font-medium'>
+                  {primaryName}
+                </LongText>
+                {remark && (
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <StatusBadge variant='success' copyable={false} />
+                      }
+                    >
+                      <LongText className='max-w-[80px]'>{remark}</LongText>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className='text-xs'>{remark}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
+            }
+            secondary={email || username}
+          />
         )
       },
       enableHiding: false,
@@ -143,6 +158,7 @@ export function useUsersColumns(): ColumnDef<User>[] {
               <StatusBadge
                 label={t(statusConfig.labelKey)}
                 variant={statusConfig.variant}
+                appearance='soft'
                 copyable={false}
               />
             </TooltipTrigger>
@@ -178,6 +194,7 @@ export function useUsersColumns(): ColumnDef<User>[] {
             <StatusBadge
               label={t('No Quota')}
               variant='neutral'
+              appearance='soft'
               copyable={false}
             />
           )
@@ -251,13 +268,15 @@ export function useUsersColumns(): ColumnDef<User>[] {
           return null
         }
 
+        // Soft role badge (r2-B8 §4): Root = info, Admin = brand,
+        // User = neutral.
         return (
-          <div className='flex items-center gap-x-2'>
-            {roleConfig.icon && (
-              <roleConfig.icon size={16} className='text-muted-foreground' />
-            )}
-            <span className='text-sm'>{t(roleConfig.labelKey)}</span>
-          </div>
+          <StatusBadge
+            label={t(roleConfig.labelKey)}
+            variant={roleConfig.variant}
+            appearance='soft'
+            copyable={false}
+          />
         )
       },
       filterFn: (row, id, value) => {

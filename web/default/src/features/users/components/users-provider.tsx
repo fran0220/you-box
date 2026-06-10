@@ -27,6 +27,9 @@ type UsersContextType = {
   setCurrentRow: React.Dispatch<React.SetStateAction<User | null>>
   refreshTrigger: number
   triggerRefresh: () => void
+  /** API pagination total reported by the table query; null until loaded. */
+  total: number | null
+  setTotal: React.Dispatch<React.SetStateAction<number | null>>
 }
 
 const UsersContext = React.createContext<UsersContextType | null>(null)
@@ -35,6 +38,7 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<UsersDialogType>(null)
   const [currentRow, setCurrentRow] = useState<User | null>(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [total, setTotal] = useState<number | null>(null)
 
   const triggerRefresh = () => setRefreshTrigger((prev) => prev + 1)
 
@@ -47,6 +51,8 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
         setCurrentRow,
         refreshTrigger,
         triggerRefresh,
+        total,
+        setTotal,
       }}
     >
       {children}

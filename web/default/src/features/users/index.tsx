@@ -26,7 +26,7 @@ import { UsersTable } from './components/users-table'
 
 function UsersContent() {
   const { t } = useTranslation()
-  const { open, setOpen, currentRow } = useUsers()
+  const { open, setOpen, currentRow, total } = useUsers()
 
   return (
     <>
@@ -36,7 +36,16 @@ function UsersContent() {
           <UsersPrimaryButtons />
         </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <UsersTable />
+          <div className='space-y-3'>
+            <p className='text-muted-foreground text-sm'>
+              {/* Count comes from the table query's pagination total; until
+                  it loads we fall back to the fixed subtitle (r2-B8 §1). */}
+              {total != null
+                ? t('{{count}} registered users', { count: total })
+                : t('Registered users')}
+            </p>
+            <UsersTable />
+          </div>
         </SectionPageLayout.Content>
       </SectionPageLayout>
 

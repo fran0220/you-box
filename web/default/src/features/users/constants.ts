@@ -43,8 +43,9 @@ export const USER_STATUSES = {
     value: USER_STATUS.ENABLED,
   },
   [USER_STATUS.DISABLED]: {
+    // Banned reads as danger per the shared status vocabulary (R2-A4).
     labelKey: 'Disabled',
-    variant: 'neutral' as const,
+    variant: 'danger' as const,
     value: USER_STATUS.DISABLED,
   },
   DELETED: {
@@ -69,21 +70,25 @@ export const USER_ROLE = {
   ROOT: 100,
 } as const
 
+/** Role badge tones (r2-B8 §4): Root = info, Admin = brand, User = neutral. */
 export const USER_ROLES = {
   [USER_ROLE.USER]: {
     labelKey: 'User',
     value: USER_ROLE.USER,
     icon: User,
+    variant: 'neutral' as const,
   },
   [USER_ROLE.ADMIN]: {
     labelKey: 'Admin',
     value: USER_ROLE.ADMIN,
     icon: Users,
+    variant: 'brand' as const,
   },
   [USER_ROLE.ROOT]: {
     labelKey: 'Root',
     value: USER_ROLE.ROOT,
     icon: Shield,
+    variant: 'info' as const,
   },
 } as const
 

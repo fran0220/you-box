@@ -33,7 +33,6 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +42,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { RowActionButton, RowActions } from '@/components/data-table'
 import { UserSubscriptionsDialog } from '@/features/subscriptions/components/dialogs/user-subscriptions-dialog'
 import { manageUser, resetUserPasskey, resetUserTwoFA } from '../api'
 import {
@@ -135,19 +135,24 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     return null
   }
 
+  // Row actions (r2-B8 §4): Edit is a hover-revealed icon button; every
+  // other action stays in the More dropdown.
   return (
-    <>
+    <RowActions>
+      <RowActionButton label={t('Edit')} onClick={handleEdit}>
+        <Pencil className='size-4' />
+      </RowActionButton>
+
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button
-              variant='ghost'
-              className='data-popup-open:bg-muted flex h-8 w-8 p-0'
+            <RowActionButton
+              label={t('Open menu')}
+              className='data-popup-open:bg-muted'
             />
           }
         >
-          <MoreHorizontal className='h-4 w-4' />
-          <span className='sr-only'>{t('Open menu')}</span>
+          <MoreHorizontal className='size-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-[180px]'>
           <DropdownMenuItem onClick={handleEdit}>
@@ -294,6 +299,6 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         user={{ id: user.id, username: user.username }}
         onSuccess={triggerRefresh}
       />
-    </>
+    </RowActions>
   )
 }

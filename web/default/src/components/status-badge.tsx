@@ -29,6 +29,7 @@ export const dotColorMap = {
   danger: 'bg-destructive',
   info: 'bg-info',
   neutral: 'bg-neutral',
+  brand: 'bg-brand',
   purple: 'bg-chart-4',
   amber: 'bg-warning',
   blue: 'bg-chart-1',
@@ -53,6 +54,7 @@ export const textColorMap = {
   danger: 'text-destructive',
   info: 'text-info',
   neutral: 'text-muted-foreground',
+  brand: 'text-brand',
   purple: 'text-chart-4',
   amber: 'text-warning',
   blue: 'text-chart-1',
@@ -81,6 +83,7 @@ const softColorMap: Partial<Record<StatusVariant, string>> = {
   info: 'bg-[var(--info-subtle)]',
   neutral: 'bg-surface-3',
   grey: 'bg-surface-3',
+  brand: 'bg-[var(--brand-subtle)]',
 }
 
 const solidColorMap: Partial<Record<StatusVariant, string>> = {
@@ -91,6 +94,7 @@ const solidColorMap: Partial<Record<StatusVariant, string>> = {
   info: 'bg-info text-white',
   neutral: 'bg-neutral text-background',
   grey: 'bg-neutral text-background',
+  brand: 'bg-brand text-brand-foreground',
 }
 
 /**
@@ -130,7 +134,6 @@ export function statusVariantFor(term: string | number): StatusVariant {
       return 'neutral'
   }
 }
-
 
 const sizeMap = {
   sm: 'h-5 gap-1 px-1.5 text-xs leading-none',
@@ -200,7 +203,7 @@ export function StatusBadge({
         sizeMap[size ?? 'sm'],
         appearance === 'solid'
           ? (solidColorMap[computedVariant] ??
-            cn('bg-surface-3', textColorMap[computedVariant]))
+              cn('bg-surface-3', textColorMap[computedVariant]))
           : textColorMap[computedVariant],
         appearance === 'soft' &&
           cn('font-mono', softColorMap[computedVariant] ?? 'bg-surface-3'),
