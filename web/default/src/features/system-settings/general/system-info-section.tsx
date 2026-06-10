@@ -42,6 +42,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
   SettingsFormGrid,
   SettingsFormGridItem,
@@ -153,50 +155,49 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
               isResetDisabled={!isDirty}
             />
             <FormDirtyIndicator isDirty={isDirty} />
-            <SettingsFormGrid>
+            <SettingRowGroup>
               <FormField
                 control={form.control}
                 name='theme.frontend'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Frontend Theme')}</FormLabel>
-                    <Select
-                      items={[
-                        {
-                          value: 'default',
-                          label: t('Default (New Frontend)'),
-                        },
-                        {
-                          value: 'classic',
-                          label: t('Classic (Legacy Frontend)'),
-                        },
-                      ]}
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className='w-full'>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent alignItemWithTrigger={false}>
-                        <SelectGroup>
-                          <SelectItem value='default'>
-                            {t('Default (New Frontend)')}
-                          </SelectItem>
-                          <SelectItem value='classic'>
-                            {t('Classic (Legacy Frontend)')}
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      {t(
-                        'Switch between the new frontend and the classic frontend. Changes take effect after page reload.'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Frontend Theme')}
+                    description={t(
+                      'Switch between the new frontend and the classic frontend. Changes take effect after page reload.'
+                    )}
+                    control={
+                      <Select
+                        items={[
+                          {
+                            value: 'default',
+                            label: t('Default (New Frontend)'),
+                          },
+                          {
+                            value: 'classic',
+                            label: t('Classic (Legacy Frontend)'),
+                          },
+                        ]}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className='w-56'>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            <SelectItem value='default'>
+                              {t('Default (New Frontend)')}
+                            </SelectItem>
+                            <SelectItem value='classic'>
+                              {t('Classic (Legacy Frontend)')}
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    }
+                  />
                 )}
               />
 
@@ -204,16 +205,19 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                 control={form.control}
                 name='SystemName'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('System Name')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('New API')} {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      {t('The name displayed across the application')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('System Name')}
+                    description={t('The name displayed across the application')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-60'
+                          placeholder={t('New API')}
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -221,18 +225,21 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                 control={form.control}
                 name='ServerAddress'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Server Address')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder='https://yourdomain.com' {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'The public URL of your server, used for OAuth callbacks, webhooks, and other external integrations'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Server Address')}
+                    description={t(
+                      'The public URL of your server, used for OAuth callbacks, webhooks, and other external integrations'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          placeholder='https://yourdomain.com'
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -240,22 +247,24 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                 control={form.control}
                 name='Logo'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Logo URL')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('https://example.com/logo.png')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('URL to your logo image (optional)')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Logo URL')}
+                    description={t('URL to your logo image (optional)')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          placeholder={t('https://example.com/logo.png')}
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
+            </SettingRowGroup>
 
+            <SettingsFormGrid>
               <FormField
                 control={form.control}
                 name='Footer'

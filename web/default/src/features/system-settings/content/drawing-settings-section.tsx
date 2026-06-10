@@ -21,19 +21,12 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -136,30 +129,29 @@ export function DrawingSettingsSection({
             isSaving={updateOption.isPending}
             saveLabel='Save drawing settings'
           />
-          <div className='space-y-4'>
+          <SettingRowGroup>
             {switches.map((item) => (
               <FormField
                 key={item.name}
                 control={form.control}
                 name={item.name}
                 render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{item.label}</FormLabel>
-                      <FormDescription>{item.description}</FormDescription>
-                    </SettingsSwitchContent>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </SettingsSwitchItem>
+                  <SettingRowFormItem
+                    label={item.label}
+                    description={item.description}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
             ))}
-          </div>
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>

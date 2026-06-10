@@ -18,9 +18,15 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { FormItem } from '@/components/ui/form'
+import {
+  FormDescription,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { SettingRow } from '@/components/settings'
 
 type SettingsFormGridProps = {
   children: ReactNode
@@ -158,6 +164,78 @@ export function SettingsControlChildren({
   return (
     <div
       className={cn('border-border/70 ml-2 min-w-0 border-l pl-3', className)}
+      {...props}
+    />
+  )
+}
+
+type SettingRowFormItemProps = {
+  label: ReactNode
+  description?: ReactNode
+  /** Dims the whole row; pair with `disabled` on the control itself. */
+  disabled?: boolean
+  /**
+   * Right-aligned control, passed exactly as it was rendered inside the
+   * old FormItem tree (keep the existing `FormControl` wrapper so the
+   * aria/id wiring is unchanged).
+   */
+  control: ReactNode
+  className?: string
+}
+
+/**
+ * A3 SettingRow wrapped in a FormItem (r2-B12b): layout container only.
+ * Must be rendered inside a FormField — label/description/message keep
+ * the useFormField wiring; field names, validation, and submit logic
+ * stay untouched. Stack several inside `SettingRowGroup` so the
+ * between-row dividers resolve correctly.
+ */
+export function SettingRowFormItem({
+  label,
+  description,
+  disabled,
+  control,
+  className,
+}: SettingRowFormItemProps) {
+  return (
+    <FormItem
+      data-settings-form-span='full'
+      className={cn(
+        'border-divider block border-b last:border-b-0',
+        className
+      )}
+    >
+      <SettingRow
+        className='border-b-0'
+        disabled={disabled}
+        label={<FormLabel>{label}</FormLabel>}
+        description={
+          description != null ? (
+            <FormDescription className='text-[13px] leading-normal'>
+              {description}
+            </FormDescription>
+          ) : undefined
+        }
+        control={
+          <div className='flex min-w-0 flex-col items-end gap-1'>
+            {control}
+            <FormMessage />
+          </div>
+        }
+      />
+    </FormItem>
+  )
+}
+
+/** Full-width stack of SettingRowFormItems (no grid gaps between rows). */
+export function SettingRowGroup({
+  className,
+  ...props
+}: ComponentProps<'div'>) {
+  return (
+    <div
+      data-settings-form-span='full'
+      className={cn('flex min-w-0 flex-col', className)}
       {...props}
     />
   )

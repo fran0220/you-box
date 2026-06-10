@@ -21,15 +21,7 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -41,9 +33,9 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -102,46 +94,49 @@ export function DashboardSection({ defaultValues }: DashboardSectionProps) {
             onSave={form.handleSubmit(onSubmit)}
             isSaving={updateOption.isPending}
           />
-          <FormField
-            control={form.control}
-            name='DataExportEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Enable Data Dashboard')}</FormLabel>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='DataExportEnabled'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Enable Data Dashboard')}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <div className='grid gap-6 sm:grid-cols-2'>
             <FormField
               control={form.control}
               name='DataExportInterval'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Refresh interval (minutes)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={1}
-                      max={1440}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                      disabled={!isEnabled}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Keep this above 1 minute to avoid heavy database load')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Refresh interval (minutes)')}
+                  description={t(
+                    'Keep this above 1 minute to avoid heavy database load'
+                  )}
+                  disabled={!isEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-28'
+                        type='number'
+                        min={1}
+                        max={1440}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                        disabled={!isEnabled}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -149,44 +144,44 @@ export function DashboardSection({ defaultValues }: DashboardSectionProps) {
               control={form.control}
               name='DataExportDefaultTime'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Default time granularity')}</FormLabel>
-                  <Select
-                    items={[
-                      ...granularityOptions.map((option) => ({
-                        value: option.value,
-                        label: t(option.label),
-                      })),
-                    ]}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={!isEnabled}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('Select granularity')} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent alignItemWithTrigger={false}>
-                      <SelectGroup>
-                        {granularityOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {t(option.label)}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    {t(
-                      'UI granularity only — data is still aggregated hourly'
-                    )}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Default time granularity')}
+                  description={t(
+                    'UI granularity only — data is still aggregated hourly'
+                  )}
+                  disabled={!isEnabled}
+                  control={
+                    <Select
+                      items={[
+                        ...granularityOptions.map((option) => ({
+                          value: option.value,
+                          label: t(option.label),
+                        })),
+                      ]}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={!isEnabled}
+                    >
+                      <FormControl>
+                        <SelectTrigger className='w-44'>
+                          <SelectValue placeholder={t('Select granularity')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent alignItemWithTrigger={false}>
+                        <SelectGroup>
+                          {granularityOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {t(option.label)}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  }
+                />
               )}
             />
-          </div>
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>
