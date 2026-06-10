@@ -33,9 +33,9 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -87,27 +87,25 @@ export function SensitiveWordsSection({
             isSaving={updateOption.isPending}
             saveLabel='Save sensitive words'
           />
-          <div className='space-y-4'>
+          <SettingRowGroup>
             <FormField
               control={form.control}
               name='CheckSensitiveEnabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Enable filtering')}</FormLabel>
-                    <FormDescription>
-                      {t(
-                        'Blocks messages when sensitive keywords are detected.'
-                      )}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Enable filtering')}
+                  description={t(
+                    'Blocks messages when sensitive keywords are detected.'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -115,25 +113,23 @@ export function SensitiveWordsSection({
               control={form.control}
               name='CheckSensitiveOnPromptEnabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Inspect user prompts')}</FormLabel>
-                    <FormDescription>
-                      {t(
-                        'When enabled, prompts are scanned before reaching upstream models.'
-                      )}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Inspect user prompts')}
+                  description={t(
+                    'When enabled, prompts are scanned before reaching upstream models.'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
+          </SettingRowGroup>
 
           <FormField
             control={form.control}

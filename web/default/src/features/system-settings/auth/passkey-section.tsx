@@ -43,9 +43,9 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -192,189 +192,190 @@ export function PasskeySection(props: PasskeySectionProps) {
             onSave={form.handleSubmit(onSubmit)}
             isSaving={updateOption.isPending}
           />
-          <FormField
-            control={form.control}
-            name='passkey.enabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Enable Passkey')}</FormLabel>
-                  <FormDescription>
-                    {t(
-                      'Allow users to register and sign in with Passkey (WebAuthn)'
-                    )}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='passkey.enabled'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Enable Passkey')}
+                  description={t(
+                    'Allow users to register and sign in with Passkey (WebAuthn)'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='passkey.rp_display_name'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Relying Party Display Name')}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t('e.g. New API Console')}
-                    value={field.value ?? ''}
-                    onChange={(event) => field.onChange(event.target.value)}
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    ref={field.ref}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t(
+            <FormField
+              control={form.control}
+              name='passkey.rp_display_name'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Relying Party Display Name')}
+                  description={t(
                     'Human-readable name shown to users during Passkey prompts.'
                   )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-60 max-w-full'
+                        placeholder={t('e.g. New API Console')}
+                        value={field.value ?? ''}
+                        onChange={(event) => field.onChange(event.target.value)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='passkey.rp_id'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Relying Party ID')}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t('e.g. example.com')}
-                    value={field.value ?? ''}
-                    onChange={(event) => field.onChange(event.target.value)}
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    ref={field.ref}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t(
+            <FormField
+              control={form.control}
+              name='passkey.rp_id'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Relying Party ID')}
+                  description={t(
                     'The effective domain for Passkey registration. Must match the current domain or be its parent domain.'
                   )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-60 max-w-full'
+                        placeholder={t('e.g. example.com')}
+                        value={field.value ?? ''}
+                        onChange={(event) => field.onChange(event.target.value)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='passkey.user_verification'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('User Verification')}</FormLabel>
-                <FormControl>
-                  <Select
-                    items={[
-                      { value: 'required', label: t('Required') },
-                      { value: 'preferred', label: t('Recommended') },
-                      { value: 'discouraged', label: t('Discouraged') },
-                    ]}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('Select requirement')} />
-                    </SelectTrigger>
-                    <SelectContent alignItemWithTrigger={false}>
-                      <SelectGroup>
-                        <SelectItem value='required'>
-                          {t('Required')}
-                        </SelectItem>
-                        <SelectItem value='preferred'>
-                          {t('Recommended')}
-                        </SelectItem>
-                        <SelectItem value='discouraged'>
-                          {t('Discouraged')}
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormDescription>
-                  {t(
+            <FormField
+              control={form.control}
+              name='passkey.user_verification'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('User Verification')}
+                  description={t(
                     'Controls whether user verification (biometrics/PIN) is required during Passkey flows.'
                   )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  control={
+                    <FormControl>
+                      <Select
+                        items={[
+                          { value: 'required', label: t('Required') },
+                          { value: 'preferred', label: t('Recommended') },
+                          { value: 'discouraged', label: t('Discouraged') },
+                        ]}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className='w-44'>
+                          <SelectValue placeholder={t('Select requirement')} />
+                        </SelectTrigger>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            <SelectItem value='required'>
+                              {t('Required')}
+                            </SelectItem>
+                            <SelectItem value='preferred'>
+                              {t('Recommended')}
+                            </SelectItem>
+                            <SelectItem value='discouraged'>
+                              {t('Discouraged')}
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='passkey.attachment_preference'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Device Type Preference')}</FormLabel>
-                <FormControl>
-                  <Select
-                    items={[
-                      { value: 'none', label: t('Unlimited') },
-                      { value: 'platform', label: t('Built-in Device') },
-                      { value: 'cross-platform', label: t('External Device') },
-                    ]}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('No preference')} />
-                    </SelectTrigger>
-                    <SelectContent alignItemWithTrigger={false}>
-                      <SelectGroup>
-                        <SelectItem value='none'>{t('Unlimited')}</SelectItem>
-                        <SelectItem value='platform'>
-                          {t('Built-in Device')}
-                        </SelectItem>
-                        <SelectItem value='cross-platform'>
-                          {t('External Device')}
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormDescription>
-                  {t(
+            <FormField
+              control={form.control}
+              name='passkey.attachment_preference'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Device Type Preference')}
+                  description={t(
                     'Built-in: phone fingerprint/face, or Windows Hello; External: USB security key'
                   )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  control={
+                    <FormControl>
+                      <Select
+                        items={[
+                          { value: 'none', label: t('Unlimited') },
+                          { value: 'platform', label: t('Built-in Device') },
+                          {
+                            value: 'cross-platform',
+                            label: t('External Device'),
+                          },
+                        ]}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className='w-44'>
+                          <SelectValue placeholder={t('No preference')} />
+                        </SelectTrigger>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            <SelectItem value='none'>
+                              {t('Unlimited')}
+                            </SelectItem>
+                            <SelectItem value='platform'>
+                              {t('Built-in Device')}
+                            </SelectItem>
+                            <SelectItem value='cross-platform'>
+                              {t('External Device')}
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='passkey.allow_insecure_origin'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Allow Insecure Origins')}</FormLabel>
-                  <FormDescription>
-                    {t(
-                      'Permit Passkey registration on non-HTTPS origins (only recommended for development)'
-                    )}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name='passkey.allow_insecure_origin'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Allow Insecure Origins')}
+                  description={t(
+                    'Permit Passkey registration on non-HTTPS origins (only recommended for development)'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
+          </SettingRowGroup>
 
           <FormField
             control={form.control}
