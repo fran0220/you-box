@@ -18,11 +18,16 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { SectionPageLayout } from '@/components/layout'
+import { GeneratorCard } from './components/generator-card'
 import { RedemptionsDialogs } from './components/redemptions-dialogs'
-import { RedemptionsPrimaryButtons } from './components/redemptions-primary-buttons'
 import { RedemptionsProvider } from './components/redemptions-provider'
 import { RedemptionsTable } from './components/redemptions-table'
 
+/**
+ * /redemption-codes (r2-B9): two-column layout — the always-visible
+ * generator Panel on the left (sticky on lg+, replaces the drawer's
+ * create branch), stat header + codes table on the right.
+ */
 export function Redemptions() {
   const { t } = useTranslation()
   return (
@@ -31,11 +36,15 @@ export function Redemptions() {
         <SectionPageLayout.Title>
           {t('Redemption Codes')}
         </SectionPageLayout.Title>
-        <SectionPageLayout.Actions>
-          <RedemptionsPrimaryButtons />
-        </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <RedemptionsTable />
+          <div className='flex flex-col gap-4 lg:flex-row'>
+            <div className='w-full shrink-0 self-start lg:sticky lg:top-0 lg:w-[340px]'>
+              <GeneratorCard />
+            </div>
+            <div className='min-w-0 flex-1'>
+              <RedemptionsTable />
+            </div>
+          </div>
         </SectionPageLayout.Content>
       </SectionPageLayout>
 

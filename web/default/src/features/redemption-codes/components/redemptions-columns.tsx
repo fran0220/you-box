@@ -25,7 +25,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { DataTableColumnHeader } from '@/components/data-table'
+import { DataTableColumnHeader, MonoCell } from '@/components/data-table'
 import { MaskedValueDisplay } from '@/components/masked-value-display'
 import { StatusBadge } from '@/components/status-badge'
 import { TableId } from '@/components/table-id'
@@ -102,6 +102,7 @@ export function useRedemptionsColumns(): ColumnDef<Redemption>[] {
             <StatusBadge
               label={t('Expired')}
               variant='warning'
+              appearance='soft'
               copyable={false}
             />
           )
@@ -117,6 +118,7 @@ export function useRedemptionsColumns(): ColumnDef<Redemption>[] {
           <StatusBadge
             label={t(statusConfig.labelKey)}
             variant={statusConfig.variant}
+            appearance='soft'
             copyable={false}
           />
         )
@@ -168,13 +170,7 @@ export function useRedemptionsColumns(): ColumnDef<Redemption>[] {
       ),
       cell: ({ row }) => {
         const quota = row.getValue('quota') as number
-        return (
-          <StatusBadge
-            label={formatQuota(quota)}
-            variant='neutral'
-            copyable={false}
-          />
-        )
+        return <MonoCell align='left'>{formatQuota(quota)}</MonoCell>
       },
     },
     {

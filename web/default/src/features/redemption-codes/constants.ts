@@ -46,9 +46,10 @@ export const REDEMPTION_STATUSES: Record<
     variant: 'success',
     value: REDEMPTION_STATUS.ENABLED,
   },
+  // Disabled reads as danger per the shared table badge vocabulary (r2-B9 §3)
   [REDEMPTION_STATUS.DISABLED]: {
     labelKey: 'Disabled',
-    variant: 'neutral',
+    variant: 'danger',
     value: REDEMPTION_STATUS.DISABLED,
   },
   [REDEMPTION_STATUS.USED]: {

@@ -26,8 +26,9 @@ export function RedemptionsDialogs() {
 
   return (
     <>
+      {/* Drawer is edit-only; creation lives in the generator card (r2-B9 §1) */}
       <RedemptionsMutateDrawer
-        open={open === 'create' || isUpdate}
+        open={isUpdate}
         onOpenChange={(isOpen) => !isOpen && setOpen(null)}
         currentRow={isUpdate ? currentRow || undefined : undefined}
       />

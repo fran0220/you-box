@@ -45,6 +45,7 @@ import type { Redemption } from '../types'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { useRedemptionsColumns } from './redemptions-columns'
 import { useRedemptions } from './redemptions-provider'
+import { RedemptionsStatCards } from './redemptions-stat-cards'
 
 const route = getRouteApi('/_authenticated/redemption-codes/')
 
@@ -166,6 +167,16 @@ export function RedemptionsTable() {
         'No redemption codes available. Create your first redemption code to get started.'
       )}
       skeletonKeyPrefix='redemptions-skeleton'
+      statHeader={
+        // Unused / Redeemed value aggregate over the currently loaded
+        // page (no global redemption-stats endpoint); Codes issued uses
+        // the API pagination total (r2-B9 §2).
+        <RedemptionsStatCards
+          redemptions={redemptions}
+          total={data?.total || 0}
+          loading={isLoading}
+        />
+      }
       toolbarProps={{
         searchPlaceholder: t('Filter by name or ID...'),
         filters: [

@@ -82,4 +82,6 @@ export interface RedemptionFormData {
 // Dialog Types
 // ============================================================================
 
-export type RedemptionsDialogType = 'create' | 'update' | 'delete' | 'view'
+// 'create' moved to the always-visible generator card (r2-B9 §1);
+// the mutate drawer only opens for 'update' now.
+export type RedemptionsDialogType = 'update' | 'delete' | 'view'
