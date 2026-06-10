@@ -16,28 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { lazy, type ComponentType, type LazyExoticComponent } from 'react'
-
-export type DesignLabGroup = {
-  id: string
-  title: string
-  component: LazyExoticComponent<ComponentType>
-}
-
-/**
- * Design Lab group registry. Each Phase A step registers its demo module
- * here; the gallery shell renders every group as an anchored section.
- * Dev-only: this module is only reachable behind import.meta.env.DEV.
- */
-export const DESIGN_LAB_GROUPS: DesignLabGroup[] = [
-  {
-    id: 'foundations',
-    title: 'Foundations',
-    component: lazy(() => import('./demos/foundations')),
-  },
-  {
-    id: 'data-display',
-    title: 'Data display',
-    component: lazy(() => import('./demos/data-display')),
-  },
-]
+export { DeltaBadge } from './delta-badge'
+export { Eyebrow } from './eyebrow'
+export { Metric } from './metric'
+export { Panel, PanelBody, PanelHeader } from './panel'
+export { ProgressBar } from './progress-bar'
+export { Sparkline } from './sparkline'
+export { StatCard, StatCardRow, type StatCardDelta } from './stat-card'

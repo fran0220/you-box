@@ -202,6 +202,11 @@ function StatCardDetails(props: { details: StatCardDetail[] }) {
   )
 }
 
+/**
+ * @deprecated Dashboard-private stat tile. Use the unified
+ * `StatCard` from `@/components/patterns` (R2-A1); this implementation
+ * is removed when R2-B1 lands.
+ */
 export function StatCard(props: StatCardProps) {
   const Icon = props.icon
   const tone = props.tone ?? 'gray'
