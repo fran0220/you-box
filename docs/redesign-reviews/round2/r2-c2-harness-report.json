@@ -1,0 +1,808 @@
+[
+ {
+  "name": "pub-home",
+  "route": "/",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/",
+  "textLen": 2443,
+  "flags": []
+ },
+ {
+  "name": "pub-about",
+  "route": "/about",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/about",
+  "textLen": 451,
+  "flags": []
+ },
+ {
+  "name": "pub-pricing-card",
+  "route": "/pricing?view=card",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/pricing?view=card",
+  "textLen": 1118,
+  "flags": []
+ },
+ {
+  "name": "pub-pricing-table",
+  "route": "/pricing?view=table",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/pricing?view=table",
+  "textLen": 1143,
+  "flags": []
+ },
+ {
+  "name": "pub-model-details",
+  "route": "/pricing/gpt-4o",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/pricing/gpt-4o",
+  "textLen": 860,
+  "flags": []
+ },
+ {
+  "name": "pub-rankings",
+  "route": "/rankings",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/rankings",
+  "textLen": 774,
+  "flags": []
+ },
+ {
+  "name": "pub-privacy-policy",
+  "route": "/privacy-policy",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/privacy-policy",
+  "textLen": 184,
+  "flags": []
+ },
+ {
+  "name": "pub-user-agreement",
+  "route": "/user-agreement",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/user-agreement",
+  "textLen": 184,
+  "flags": []
+ },
+ {
+  "name": "pub-sign-in",
+  "route": "/sign-in",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/sign-in",
+  "textLen": 308,
+  "flags": []
+ },
+ {
+  "name": "pub-sign-up",
+  "route": "/sign-up",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/sign-up",
+  "textLen": 318,
+  "flags": []
+ },
+ {
+  "name": "pub-register",
+  "route": "/register",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/sign-up",
+  "textLen": 318,
+  "flags": []
+ },
+ {
+  "name": "pub-forgot-password",
+  "route": "/forgot-password",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/forgot-password",
+  "textLen": 368,
+  "flags": []
+ },
+ {
+  "name": "pub-reset",
+  "route": "/reset",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/reset",
+  "textLen": 384,
+  "flags": []
+ },
+ {
+  "name": "pub-user-reset",
+  "route": "/user/reset",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/user/reset",
+  "textLen": 384,
+  "flags": []
+ },
+ {
+  "name": "pub-otp",
+  "route": "/otp",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/otp",
+  "textLen": 423,
+  "flags": []
+ },
+ {
+  "name": "pub-oauth",
+  "route": "/oauth",
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+  ],
+  "pageErrors": [],
+  "failedRequests": [
+   "401 /api/user/self"
+  ],
+  "finalPath": "/sign-in",
+  "textLen": 334,
+  "flags": []
+ },
+ {
+  "name": "pub-err-401",
+  "route": "/401",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/401",
+  "textLen": 136,
+  "flags": []
+ },
+ {
+  "name": "pub-err-403",
+  "route": "/403",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/403",
+  "textLen": 120,
+  "flags": []
+ },
+ {
+  "name": "pub-err-404",
+  "route": "/404",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/404",
+  "textLen": 151,
+  "flags": []
+ },
+ {
+  "name": "pub-err-500",
+  "route": "/500",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/500",
+  "textLen": 211,
+  "flags": [
+   "ERROR_BOUNDARY"
+  ]
+ },
+ {
+  "name": "pub-err-503",
+  "route": "/503",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/503",
+  "textLen": 135,
+  "flags": []
+ },
+ {
+  "name": "pub-route-notfound",
+  "route": "/this-route-does-not-exist",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/this-route-does-not-exist",
+  "textLen": 151,
+  "flags": []
+ },
+ {
+  "name": "auth-dashboard-overview",
+  "route": "/dashboard/overview",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/dashboard/overview",
+  "textLen": 2172,
+  "flags": []
+ },
+ {
+  "name": "auth-dashboard-models",
+  "route": "/dashboard/models",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/dashboard/models",
+  "textLen": 777,
+  "flags": []
+ },
+ {
+  "name": "auth-dashboard-users",
+  "route": "/dashboard/users",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/dashboard/users",
+  "textLen": 548,
+  "flags": []
+ },
+ {
+  "name": "auth-keys",
+  "route": "/keys",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/keys",
+  "textLen": 780,
+  "flags": []
+ },
+ {
+  "name": "auth-wallet",
+  "route": "/wallet",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/wallet",
+  "textLen": 951,
+  "flags": []
+ },
+ {
+  "name": "auth-profile",
+  "route": "/profile",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/profile",
+  "textLen": 1384,
+  "flags": []
+ },
+ {
+  "name": "auth-playground",
+  "route": "/playground",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/playground",
+  "textLen": 572,
+  "flags": []
+ },
+ {
+  "name": "auth-chat-0",
+  "route": "/chat/0",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/chat/0",
+  "textLen": 626,
+  "flags": []
+ },
+ {
+  "name": "auth-usage-logs-common",
+  "route": "/usage-logs/common",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/usage-logs/common",
+  "textLen": 748,
+  "flags": []
+ },
+ {
+  "name": "auth-usage-logs-drawing",
+  "route": "/usage-logs/drawing",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/usage-logs/drawing",
+  "textLen": 768,
+  "flags": []
+ },
+ {
+  "name": "auth-usage-logs-task",
+  "route": "/usage-logs/task",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/usage-logs/task",
+  "textLen": 740,
+  "flags": []
+ },
+ {
+  "name": "auth-channels",
+  "route": "/channels",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/channels",
+  "textLen": 737,
+  "flags": []
+ },
+ {
+  "name": "auth-users",
+  "route": "/users",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/users",
+  "textLen": 755,
+  "flags": []
+ },
+ {
+  "name": "auth-redemption-codes",
+  "route": "/redemption-codes",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/redemption-codes",
+  "textLen": 705,
+  "flags": []
+ },
+ {
+  "name": "auth-subscriptions",
+  "route": "/subscriptions",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/subscriptions",
+  "textLen": 940,
+  "flags": []
+ },
+ {
+  "name": "auth-models-metadata",
+  "route": "/models/metadata",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/models/metadata",
+  "textLen": 752,
+  "flags": []
+ },
+ {
+  "name": "auth-models-deployments",
+  "route": "/models/deployments",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/models/deployments",
+  "textLen": 586,
+  "flags": []
+ },
+ {
+  "name": "auth-console-log",
+  "route": "/console/log",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/usage-logs/common",
+  "textLen": 748,
+  "flags": []
+ },
+ {
+  "name": "auth-console-topup",
+  "route": "/console/topup",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/wallet",
+  "textLen": 1111,
+  "flags": []
+ },
+ {
+  "name": "auth-setup-after-init",
+  "route": "/setup",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/",
+  "textLen": 2268,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-site-system-info",
+  "route": "/system-settings/site/system-info",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/site/system-info",
+  "textLen": 1321,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-site-notice",
+  "route": "/system-settings/site/notice",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/site/notice",
+  "textLen": 447,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-site-header-navigation",
+  "route": "/system-settings/site/header-navigation",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/site/header-navigation",
+  "textLen": 938,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-site-sidebar-modules",
+  "route": "/system-settings/site/sidebar-modules",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/site/sidebar-modules",
+  "textLen": 1503,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-auth-basic-auth",
+  "route": "/system-settings/auth/basic-auth",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/auth/basic-auth",
+  "textLen": 913,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-auth-oauth",
+  "route": "/system-settings/auth/oauth",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/auth/oauth",
+  "textLen": 587,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-auth-passkey",
+  "route": "/system-settings/auth/passkey",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/auth/passkey",
+  "textLen": 1189,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-auth-bot-protection",
+  "route": "/system-settings/auth/bot-protection",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/auth/bot-protection",
+  "textLen": 548,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-auth-custom-oauth",
+  "route": "/system-settings/auth/custom-oauth",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/auth/custom-oauth",
+  "textLen": 548,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-billing-quota",
+  "route": "/system-settings/billing/quota",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/billing/quota",
+  "textLen": 973,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-billing-currency",
+  "route": "/system-settings/billing/currency",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/billing/currency",
+  "textLen": 678,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-billing-model-pricing",
+  "route": "/system-settings/billing/model-pricing",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/billing/model-pricing",
+  "textLen": 2453,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-billing-group-pricing",
+  "route": "/system-settings/billing/group-pricing",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/billing/group-pricing",
+  "textLen": 1357,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-billing-payment",
+  "route": "/system-settings/billing/payment",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/billing/payment",
+  "textLen": 6912,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-billing-checkin",
+  "route": "/system-settings/billing/checkin",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/billing/checkin",
+  "textLen": 549,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-content-dashboard",
+  "route": "/system-settings/content/dashboard",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/content/dashboard",
+  "textLen": 632,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-content-announcements",
+  "route": "/system-settings/content/announcements",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/content/announcements",
+  "textLen": 580,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-content-api-info",
+  "route": "/system-settings/content/api-info",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/content/api-info",
+  "textLen": 556,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-content-faq",
+  "route": "/system-settings/content/faq",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/content/faq",
+  "textLen": 534,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-content-uptime-kuma",
+  "route": "/system-settings/content/uptime-kuma",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/content/uptime-kuma",
+  "textLen": 584,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-content-chat",
+  "route": "/system-settings/content/chat",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/content/chat",
+  "textLen": 1131,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-content-drawing",
+  "route": "/system-settings/content/drawing",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/content/drawing",
+  "textLen": 1085,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-models-global",
+  "route": "/system-settings/models/global",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/models/global",
+  "textLen": 1137,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-models-gemini",
+  "route": "/system-settings/models/gemini",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/models/gemini",
+  "textLen": 1457,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-models-claude",
+  "route": "/system-settings/models/claude",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/models/claude",
+  "textLen": 959,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-models-grok",
+  "route": "/system-settings/models/grok",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/models/grok",
+  "textLen": 641,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-models-channel-affinity",
+  "route": "/system-settings/models/channel-affinity",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/models/channel-affinity",
+  "textLen": 1280,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-models-model-deployment",
+  "route": "/system-settings/models/model-deployment",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/models/model-deployment",
+  "textLen": 529,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-operations-behavior",
+  "route": "/system-settings/operations/behavior",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/operations/behavior",
+  "textLen": 728,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-operations-monitoring",
+  "route": "/system-settings/operations/monitoring",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/operations/monitoring",
+  "textLen": 1308,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-operations-email",
+  "route": "/system-settings/operations/email",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/operations/email",
+  "textLen": 891,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-operations-worker",
+  "route": "/system-settings/operations/worker",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/operations/worker",
+  "textLen": 759,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-operations-logs",
+  "route": "/system-settings/operations/logs",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/operations/logs",
+  "textLen": 737,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-operations-performance",
+  "route": "/system-settings/operations/performance",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/operations/performance",
+  "textLen": 2213,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-operations-update-checker",
+  "route": "/system-settings/operations/update-checker",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/operations/update-checker",
+  "textLen": 533,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-security-rate-limit",
+  "route": "/system-settings/security/rate-limit",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/security/rate-limit",
+  "textLen": 866,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-security-sensitive-words",
+  "route": "/system-settings/security/sensitive-words",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/security/sensitive-words",
+  "textLen": 692,
+  "flags": []
+ },
+ {
+  "name": "auth-settings-security-ssrf",
+  "route": "/system-settings/security/ssrf",
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "finalPath": "/system-settings/security/ssrf",
+  "textLen": 1010,
+  "flags": []
+ }
+]
