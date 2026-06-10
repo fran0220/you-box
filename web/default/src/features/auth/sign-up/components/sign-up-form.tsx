@@ -42,6 +42,7 @@ import { Turnstile } from '@/components/turnstile'
 import { register, wechatLoginByCode } from '@/features/auth/api'
 import { LegalConsent } from '@/features/auth/components/legal-consent'
 import { OAuthProviders } from '@/features/auth/components/oauth-providers'
+import { PasswordStrength } from '@/features/auth/components/password-strength'
 import { registerFormSchema } from '@/features/auth/constants'
 import { useAuthRedirect } from '@/features/auth/hooks/use-auth-redirect'
 import { useEmailVerification } from '@/features/auth/hooks/use-email-verification'
@@ -257,6 +258,7 @@ export function SignUpForm({
                   {...field}
                 />
               </FormControl>
+              <PasswordStrength password={field.value} className='mt-1' />
               <FormMessage />
             </FormItem>
           )}

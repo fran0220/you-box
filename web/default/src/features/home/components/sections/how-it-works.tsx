@@ -18,7 +18,26 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { Settings, Zap, BarChart3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { CodeBlock } from '@/components/ai-elements/code-block'
 import { AnimateInView } from '@/components/animate-in-view'
+
+// Quickstart snippet rendered with the unified CodeBlock chrome
+// (three dots + mono filename + copy) — R2-B15 gap closure.
+function buildQuickstartCode() {
+  const origin =
+    typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : 'https://your-gateway.example.com'
+  return [
+    `curl -X POST "${origin}/v1/chat/completions" \\`,
+    '  -H "Authorization: Bearer $YOUR_API_KEY" \\',
+    '  -H "Content-Type: application/json" \\',
+    `  -d '{`,
+    '    "model": "gpt-4o",',
+    '    "messages": [{ "role": "user", "content": "Hello!" }]',
+    `  }'`,
+  ].join('\n')
+}
 
 export function HowItWorks() {
   const { t } = useTranslation()
@@ -84,6 +103,18 @@ export function HowItWorks() {
             </AnimateInView>
           ))}
         </div>
+
+        <AnimateInView
+          delay={450}
+          animation='fade-up'
+          className='mx-auto mt-16 max-w-2xl'
+        >
+          <CodeBlock
+            code={buildQuickstartCode()}
+            language='bash'
+            title='quickstart.sh'
+          />
+        </AnimateInView>
       </div>
     </section>
   )

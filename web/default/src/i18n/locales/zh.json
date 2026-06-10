@@ -4613,7 +4613,14 @@
     "External": "外部",
     "Verified": "已验证",
     "Backup codes let you sign in when your authenticator is unavailable": "备份码可在无法使用验证器时用于登录",
-    "Your account will no longer require a verification code at sign-in": "您的账户登录时将不再需要验证码"
+    "Your account will no longer require a verification code at sign-in": "您的账户登录时将不再需要验证码",
+    "On this page": "本页目录",
+    "Weak password": "密码强度：弱",
+    "Fair password": "密码强度：一般",
+    "Good password": "密码强度：良好",
+    "Strong password": "密码强度：强",
+    "Use 8+ characters with upper & lower case, numbers and symbols": "请使用 8 位以上字符，包含大小写字母、数字和符号",
+    "connected": "已连接"
   },
   "Favorites": "收藏",
   "Add to favorites": "加入收藏",

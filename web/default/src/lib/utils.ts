@@ -90,6 +90,19 @@ export function getPageNumbers(currentPage: number, totalPages: number) {
 }
 
 /**
+ * Slugify a heading title into a URL-safe anchor id (legal TOC, R2-B15).
+ * GitHub-style: lowercase, letters/numbers kept (incl. CJK), spaces become
+ * hyphens, other punctuation is stripped.
+ */
+export function slugifyHeading(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .replace(/\s+/g, '-')
+}
+
+/**
  * Truncate text to a maximum length with ellipsis
  */
 export function truncateText(text: string, maxLength: number): string {

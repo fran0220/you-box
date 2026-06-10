@@ -4613,7 +4613,14 @@
     "External": "External",
     "Verified": "Verified",
     "Backup codes let you sign in when your authenticator is unavailable": "Backup codes let you sign in when your authenticator is unavailable",
-    "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in"
+    "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in",
+    "On this page": "On this page",
+    "Weak password": "Weak password",
+    "Fair password": "Fair password",
+    "Good password": "Good password",
+    "Strong password": "Strong password",
+    "Use 8+ characters with upper & lower case, numbers and symbols": "Use 8+ characters with upper & lower case, numbers and symbols",
+    "connected": "connected"
   },
   "Favorites": "Favorites",
   "Add to favorites": "Add to favorites",

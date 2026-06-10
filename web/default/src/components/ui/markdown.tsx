@@ -16,17 +16,58 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import ReactMarkdown from 'react-markdown'
+import { Children, isValidElement, type ReactNode } from 'react'
+import ReactMarkdown, { type Components } from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
-import { cn } from '@/lib/utils'
+import { cn, slugifyHeading } from '@/lib/utils'
 
 interface MarkdownProps {
   children: string
   className?: string
+  /**
+   * Add slugified `id` attributes to h2/h3 headings so anchor links
+   * (e.g. the legal document TOC rail) can target them. (R2-B15)
+   */
+  withHeadingIds?: boolean
 }
 
-export function Markdown({ children, className }: MarkdownProps) {
+function headingText(children: ReactNode): string {
+  return Children.toArray(children)
+    .map((child) => {
+      if (typeof child === 'string' || typeof child === 'number') {
+        return String(child)
+      }
+      if (isValidElement(child)) {
+        return headingText((child.props as { children?: ReactNode }).children)
+      }
+      return ''
+    })
+    .join('')
+}
+
+const headingIdComponents: Components = {
+  h2: ({ node: _node, children, ...props }) => (
+    <h2
+      id={slugifyHeading(headingText(children))}
+      className='scroll-mt-24'
+      {...props}
+    >
+      {children}
+    </h2>
+  ),
+  h3: ({ node: _node, children, ...props }) => (
+    <h3
+      id={slugifyHeading(headingText(children))}
+      className='scroll-mt-24'
+      {...props}
+    >
+      {children}
+    </h3>
+  ),
+}
+
+export function Markdown({ children, className, withHeadingIds }: MarkdownProps) {
   return (
     <div
       className={cn(
@@ -55,6 +96,7 @@ export function Markdown({ children, className }: MarkdownProps) {
           a: ({ node, ...props }) => (
             <a {...props} target='_blank' rel='noopener noreferrer' />
           ),
+          ...(withHeadingIds ? headingIdComponents : {}),
         }}
       >
         {children}

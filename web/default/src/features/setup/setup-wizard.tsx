@@ -22,7 +22,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import {
   Card,
@@ -35,6 +35,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ErrorState } from '@/components/error-state'
+import { StepIndicator } from '@/components/patterns'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { LoadingState } from '@/components/loading-state'
 import { buildSetupPayload, getSetupStatus, submitSetup } from './api'
@@ -76,6 +77,7 @@ export function SetupWizard() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { systemName, logo, loading: systemConfigLoading } = useSystemConfig()
+  const { status: systemStatus } = useStatus()
 
   const [currentStep, setCurrentStep] = useState(0)
   const [setupStatus, setSetupStatus] = useState<SetupStatus | undefined>()
@@ -327,48 +329,10 @@ export function SetupWizard() {
           </CardHeader>
 
           <CardContent className='space-y-6'>
-            <ol className='grid gap-3 sm:grid-cols-4'>
-              {STEPS.map((step, index) => {
-                const isActive = currentStep === index
-                const isCompleted = currentStep > index
-                return (
-                  <li
-                    key={step.titleKey}
-                    className={cn(
-                      'rounded-xl border p-3',
-                      isActive
-                        ? 'border-primary ring-primary/20 ring-2'
-                        : isCompleted
-                          ? 'border-primary/40 bg-primary/5'
-                          : 'border-muted bg-card'
-                    )}
-                  >
-                    <div className='flex items-start gap-3'>
-                      <span
-                        className={cn(
-                          'flex size-6 items-center justify-center rounded-md border font-mono text-xs font-semibold',
-                          isActive
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : isCompleted
-                              ? 'border-primary bg-primary text-primary-foreground'
-                              : 'border-muted-foreground/40 text-muted-foreground'
-                        )}
-                      >
-                        {index + 1}
-                      </span>
-                      <div className='space-y-1'>
-                        <p className='text-sm font-semibold'>
-                          {t(step.titleKey)}
-                        </p>
-                        <p className='text-muted-foreground text-xs'>
-                          {t(step.descriptionKey)}
-                        </p>
-                      </div>
-                    </div>
-                  </li>
-                )
-              })}
-            </ol>
+            <StepIndicator
+              steps={STEPS.map((step) => ({ label: t(step.titleKey) }))}
+              current={currentStep}
+            />
 
             {isLoading ? (
               <LoadingState message={t('Loading setup status…')} />
@@ -383,6 +347,11 @@ export function SetupWizard() {
                   className='space-y-6'
                   onSubmit={(event) => event.preventDefault()}
                 >
+                  {/* Step description moved here from the old step-card
+                      grid so no information is lost (R2-B15). */}
+                  <p className='text-muted-foreground text-sm'>
+                    {t(STEPS[currentStep].descriptionKey)}
+                  </p>
                   {currentStepComponent}
                 </form>
               </Form>
@@ -402,6 +371,21 @@ export function SetupWizard() {
             </CardFooter>
           )}
         </Card>
+
+        {/* Bottom mono status line (R2-B15): system name + version (from
+            /api/status) + database type (from setup status). */}
+        {!systemConfigLoading && (
+          <p className='text-muted-foreground/70 text-center font-mono text-xs'>
+            {[
+              [systemName, systemStatus?.version].filter(Boolean).join(' '),
+              setupStatus?.database_type
+                ? `${setupStatus.database_type} ${t('connected')}`
+                : null,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+        )}
       </div>
     </div>
   )

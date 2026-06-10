@@ -16,9 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { FileWarning } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { cn, slugifyHeading } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Markdown } from '@/components/ui/markdown'
@@ -46,6 +48,39 @@ function isLikelyHtml(value: string) {
   return /<\/?[a-z][\s\S]*>/i.test(value)
 }
 
+type TocEntry = {
+  id: string
+  text: string
+  level: 2 | 3
+}
+
+// Extract h2/h3 headings from raw Markdown for the sticky TOC rail
+// (R2-B15). Ids must match the slugs produced by <Markdown withHeadingIds>.
+function extractMarkdownToc(markdown: string): TocEntry[] {
+  const entries: TocEntry[] = []
+  let inFence = false
+  for (const line of markdown.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      inFence = !inFence
+      continue
+    }
+    if (inFence) continue
+    const match = /^(#{2,3})\s+(.+?)\s*#*\s*$/.exec(line)
+    if (!match) continue
+    const text = match[2]
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // links -> link text
+      .replace(/[*_`~]/g, '') // strip inline emphasis markers
+      .trim()
+    if (!text) continue
+    entries.push({
+      id: slugifyHeading(text),
+      text,
+      level: match[1].length as 2 | 3,
+    })
+  }
+  return entries
+}
+
 export function LegalDocument({
   title,
   queryKey,
@@ -64,6 +99,14 @@ export function LegalDocument({
   const isUrl = hasContent && isValidUrl(rawContent)
   const isHtml = hasContent && !isUrl && isLikelyHtml(rawContent)
   const success = data?.success ?? false
+
+  // TOC rail only for Markdown content; iframe/HTML documents render as-is.
+  const tocEntries = useMemo(
+    () =>
+      hasContent && !isUrl && !isHtml ? extractMarkdownToc(rawContent) : [],
+    [hasContent, isUrl, isHtml, rawContent]
+  )
+  const showToc = tocEntries.length > 0
 
   if (isLoading) {
     return (
@@ -134,7 +177,12 @@ export function LegalDocument({
 
   return (
     <PublicLayout>
-      <div className='mx-auto max-w-4xl space-y-6 py-12'>
+      <div
+        className={cn(
+          'mx-auto space-y-6 py-12',
+          showToc ? 'max-w-5xl' : 'max-w-4xl'
+        )}
+      >
         <div className='space-y-2'>
           <p className='yb-eyebrow'>{'// '}{t('Legal')}</p>
           <h1 className='font-display text-3xl font-bold tracking-[-0.025em]'>
@@ -142,18 +190,56 @@ export function LegalDocument({
           </h1>
         </div>
 
-        <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
-          {isHtml ? (
-            <div
-              className='prose prose-neutral dark:prose-invert max-w-none'
-              dangerouslySetInnerHTML={{ __html: rawContent }}
-            />
-          ) : (
-            <Markdown className='prose-neutral dark:prose-invert max-w-none'>
-              {rawContent}
-            </Markdown>
+        <div
+          className={cn(
+            showToc &&
+              'lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-8'
           )}
+        >
+          {showToc && (
+            <nav
+              aria-label={t('On this page')}
+              className='hidden lg:sticky lg:top-24 lg:block'
+            >
+              <p className='text-muted-foreground/70 mb-3 font-mono text-[11px] tracking-wider uppercase'>
+                {t('On this page')}
+              </p>
+              <ul className='border-border space-y-1.5 border-l pl-3'>
+                {tocEntries.map((entry, index) => (
+                  <li key={`${entry.id}-${index}`}>
+                    <a
+                      href={`#${entry.id}`}
+                      className={cn(
+                        'text-muted-foreground hover:text-foreground block truncate text-[13px] leading-snug transition-colors',
+                        entry.level === 3 && 'pl-3'
+                      )}
+                    >
+                      {entry.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+
+          <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
+            {isHtml ? (
+              <div
+                className='prose prose-neutral dark:prose-invert max-w-none'
+                dangerouslySetInnerHTML={{ __html: rawContent }}
+              />
+            ) : (
+              <Markdown
+                withHeadingIds
+                className='prose-neutral dark:prose-invert max-w-none'
+              >
+                {rawContent}
+              </Markdown>
+            )}
+          </div>
         </div>
+        {/* "Last updated" mono footer intentionally omitted (R2-B15
+            adaptation): LegalDocumentResponse exposes no timestamp. */}
       </div>
     </PublicLayout>
   )
