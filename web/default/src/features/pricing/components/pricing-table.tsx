@@ -92,7 +92,9 @@ export function PricingTable(props: PricingTableProps) {
   )
 
   return (
-    <div className='space-y-4'>
+    // @container/content gives DataTablePagination its responsive context
+    // (normally provided by the authenticated layout) on this public page
+    <div className='@container/content space-y-4'>
       <div className='overflow-hidden rounded-lg border'>
         <Table>
           <TableHeader>

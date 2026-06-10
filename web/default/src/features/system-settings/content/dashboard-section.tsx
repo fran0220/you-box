@@ -179,7 +179,7 @@ export function DashboardSection({ defaultValues }: DashboardSectionProps) {
                   </Select>
                   <FormDescription>
                     {t(
-                      'UI granularity only &mdash; data is still aggregated hourly'
+                      'UI granularity only — data is still aggregated hourly'
                     )}
                   </FormDescription>
                   <FormMessage />

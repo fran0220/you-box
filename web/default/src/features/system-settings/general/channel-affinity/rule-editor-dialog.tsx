@@ -394,7 +394,7 @@ export function RuleEditorDialog(props: Props) {
               <Label>{t('User-Agent include (one per line)')}</Label>
               <Textarea
                 rows={3}
-                placeholder='curl&#10;PostmanRuntime'
+                placeholder={'curl\nPostmanRuntime'}
                 {...form.register('user_agent_include_text')}
               />
             </div>

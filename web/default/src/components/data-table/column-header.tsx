@@ -58,7 +58,7 @@ export function DataTableColumnHeader<TData, TValue>({
             <Button
               variant='ghost'
               size='sm'
-              className='data-popup-open:bg-accent -ms-3 h-8'
+              className='data-popup-open:bg-accent text-muted-foreground -ms-3 h-8 font-mono text-[11px] font-medium tracking-[0.06em] uppercase'
             />
           }
         >

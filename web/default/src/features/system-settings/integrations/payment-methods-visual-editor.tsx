@@ -50,7 +50,7 @@ const PAYMENT_TEMPLATES = [
   {
     name: 'Alipay',
     template: {
-      color: 'rgba(var(--semi-blue-5), 1)',
+      color: '#1677FF',
       name: '支付宝',
       type: 'alipay',
     },
@@ -58,7 +58,7 @@ const PAYMENT_TEMPLATES = [
   {
     name: 'WeChat Pay',
     template: {
-      color: 'rgba(var(--semi-green-5), 1)',
+      color: '#07C160',
       name: '微信',
       type: 'wxpay',
     },
@@ -66,7 +66,7 @@ const PAYMENT_TEMPLATES = [
   {
     name: 'Stripe',
     template: {
-      color: 'rgba(var(--semi-green-5), 1)',
+      color: '#635BFF',
       name: 'Stripe',
       type: 'stripe',
     },
@@ -210,7 +210,22 @@ export function PaymentMethodsVisualEditor({
   }
 
   const getColorPreview = (color: string) => {
-    // For CSS variables, show a placeholder
+    // Legacy values stored by the previous frontend reference Semi Design
+    // CSS variables that no longer exist — map them to their hex equivalents
+    // so the swatch still previews.
+    const legacy = /var\((--semi-[a-z]+-\d+)\)/.exec(color)
+    if (legacy) {
+      const LEGACY_SEMI_COLORS: Record<string, string> = {
+        '--semi-blue-5': '#1677FF',
+        '--semi-green-5': '#07C160',
+        '--semi-red-5': '#F5222D',
+        '--semi-orange-5': '#FA8C16',
+        '--semi-yellow-5': '#FADB14',
+        '--semi-purple-5': '#722ED1',
+        '--semi-cyan-5': '#13C2C2',
+      }
+      return LEGACY_SEMI_COLORS[legacy[1]] ?? null
+    }
     if (color.includes('var(--')) {
       return null
     }

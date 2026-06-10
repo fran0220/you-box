@@ -17,6 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo, useState } from 'react'
+import { MessagesSquare } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -80,6 +82,7 @@ export function PlaygroundChat({
   onCancelEdit,
   onSaveEditAndSubmit,
 }: PlaygroundChatProps) {
+  const { t } = useTranslation()
   const [editText, setEditText] = useState('')
   const [originalText, setOriginalText] = useState('')
 
@@ -104,6 +107,21 @@ export function PlaygroundChat({
       {/* Remove outer padding; apply padding to inner centered container to align with input */}
       <ConversationContent className='p-0'>
         <div className='mx-auto w-full max-w-4xl px-4 py-4'>
+          {messages.length === 0 && !isGenerating && (
+            <div className='flex min-h-[50vh] flex-col items-center justify-center gap-4 p-6 text-center'>
+              <MessagesSquare className='text-muted-foreground h-12 w-12' />
+              <div className='space-y-1'>
+                <h2 className='text-lg font-semibold'>
+                  {t('Start a conversation')}
+                </h2>
+                <p className='text-muted-foreground'>
+                  {t(
+                    'Pick a model, tune the parameters, and send a message below — responses stream here.'
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
           {messages.map((message, messageIndex) => {
             const { versions = [] } = message
             const isLastAssistantMessage =

@@ -25,7 +25,7 @@ function Table({ className, ...props }: React.ComponentProps<'table'>) {
   return (
     <div
       data-slot='table-container'
-      className='relative w-full overflow-x-auto overflow-y-hidden'
+      className='@container relative w-full overflow-x-auto overflow-y-hidden'
     >
       <table
         data-slot='table'

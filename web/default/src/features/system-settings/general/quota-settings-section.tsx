@@ -105,7 +105,7 @@ export function QuotaSettingsSection({
       <FormNavigationGuard when={isDirty} />
 
       {!complianceConfirmed ? (
-        <Alert variant='destructive'>
+        <Alert variant='warning'>
           <AlertDescription>
             {t(
               'Non-zero invitation rewards require compliance confirmation in Payment Gateway settings.'
