@@ -124,7 +124,10 @@ export const Reasoning = memo(
         value={{ isStreaming, isOpen, setIsOpen, duration }}
       >
         <Collapsible
-          className={cn('not-prose mb-4', className)}
+          className={cn(
+            'not-prose bg-card/60 mb-4 rounded-md border px-3 py-2',
+            className
+          )}
           onOpenChange={handleOpenChange}
           open={isOpen}
           {...props}

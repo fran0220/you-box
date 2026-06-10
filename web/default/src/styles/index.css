@@ -112,6 +112,18 @@ For commercial licensing, please contact support@quantumnous.com
   animation: skeleton-shimmer 1.8s ease-in-out infinite;
 }
 
+/* R2-A5: streaming caret blink (ai-elements StreamingCursor) */
+@keyframes yb-blink {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+
 @keyframes skeleton-shimmer {
   0% {
     background-position: 100% 50%;

@@ -41,6 +41,12 @@ type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
   code: string
   language: BundledLanguage
   showLineNumbers?: boolean
+  /**
+   * Chrome-bar title (R2-A5): renders the unified window bar —
+   * three dots + mono filename + copy-with-feedback — shared by
+   * quickstart, model detail and chat code blocks.
+   */
+  title?: string
 }
 
 type CodeBlockContextType = {
@@ -95,6 +101,7 @@ export const CodeBlock = ({
   code,
   language,
   showLineNumbers = false,
+  title,
   className,
   children,
   ...props
@@ -122,6 +129,22 @@ export const CodeBlock = ({
         )}
         {...props}
       >
+        {title != null && (
+          <div className='border-divider flex items-center gap-2 border-b px-3.5 py-2'>
+            <span aria-hidden='true' className='flex items-center gap-1.5'>
+              <i className='bg-surface-3 size-2.5 rounded-full' />
+              <i className='bg-surface-3 size-2.5 rounded-full' />
+              <i className='bg-surface-3 size-2.5 rounded-full' />
+            </span>
+            <span className='text-muted-foreground ms-1 truncate font-mono text-xs'>
+              {title}
+            </span>
+            <CodeBlockCopyButton
+              size='icon-xs'
+              className='text-muted-foreground hover:text-foreground ms-auto'
+            />
+          </div>
+        )}
         <div className='relative'>
           <div
             className='[&>pre]:bg-background! [&>pre]:text-foreground! overflow-hidden [&_code]:font-mono [&_code]:text-sm [&>pre]:m-0 [&>pre]:p-4 [&>pre]:text-sm'

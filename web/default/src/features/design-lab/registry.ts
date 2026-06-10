@@ -55,4 +55,9 @@ export const DESIGN_LAB_GROUPS: DesignLabGroup[] = [
     title: 'Feedback & status',
     component: lazy(() => import('./demos/feedback')),
   },
+  {
+    id: 'ai-code',
+    title: 'AI & code',
+    component: lazy(() => import('./demos/ai-code')),
+  },
 ]
