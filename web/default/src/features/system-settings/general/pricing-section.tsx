@@ -21,15 +21,7 @@ import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { DEFAULT_CURRENCY_CONFIG } from '@/stores/system-config-store'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -43,9 +35,9 @@ import { Switch } from '@/components/ui/switch'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -156,216 +148,221 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
               isResetDisabled={!isDirty}
             />
             <FormDirtyIndicator isDirty={isDirty} />
-            {showQuotaPerUnit && (
+            <SettingRowGroup>
+              {showQuotaPerUnit && (
+                <FormField
+                  control={form.control}
+                  name='QuotaPerUnit'
+                  render={({ field }) => (
+                    <SettingRowFormItem
+                      label={t('Quota Per Unit')}
+                      description={t('Number of tokens per unit quota')}
+                      control={
+                        <FormControl>
+                          <Input
+                            className='w-32'
+                            type='number'
+                            step='0.01'
+                            value={field.value as number}
+                            disabled
+                            name={field.name}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                          />
+                        </FormControl>
+                      }
+                    />
+                  )}
+                />
+              )}
+
               <FormField
                 control={form.control}
-                name='QuotaPerUnit'
+                name='general_setting.quota_display_type'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Quota Per Unit')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        step='0.01'
-                        value={field.value as number}
-                        disabled
-                        name={field.name}
-                        onBlur={field.onBlur}
-                        ref={field.ref}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Number of tokens per unit quota')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Display Mode')}
+                    description={t(
+                      'Choose how quota values are shown to users'
+                    )}
+                    control={
+                      <Select
+                        items={[
+                          { value: 'USD', label: t('USD') },
+                          { value: 'CNY', label: t('CNY') },
+                          { value: 'CUSTOM', label: t('Custom Currency') },
+                          { value: 'TOKENS', label: t('Tokens Only') },
+                        ]}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger className='w-56'>
+                            <SelectValue
+                              placeholder={t('Select display mode')}
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            <SelectItem value='USD'>{t('USD')}</SelectItem>
+                            <SelectItem value='CNY'>{t('CNY')}</SelectItem>
+                            <SelectItem value='CUSTOM'>
+                              {t('Custom Currency')}
+                            </SelectItem>
+                            {showTokensOnlyOption && (
+                              <SelectItem value='TOKENS'>
+                                {t('Tokens Only')}
+                              </SelectItem>
+                            )}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    }
+                  />
                 )}
               />
-            )}
 
-            <FormField
-              control={form.control}
-              name='general_setting.quota_display_type'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Display Mode')}</FormLabel>
-                  <Select
-                    items={[
-                      { value: 'USD', label: t('USD') },
-                      { value: 'CNY', label: t('CNY') },
-                      { value: 'CUSTOM', label: t('Custom Currency') },
-                      { value: 'TOKENS', label: t('Tokens Only') },
-                    ]}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('Select display mode')} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent alignItemWithTrigger={false}>
-                      <SelectGroup>
-                        <SelectItem value='USD'>{t('USD')}</SelectItem>
-                        <SelectItem value='CNY'>{t('CNY')}</SelectItem>
-                        <SelectItem value='CUSTOM'>
-                          {t('Custom Currency')}
-                        </SelectItem>
-                        {showTokensOnlyOption && (
-                          <SelectItem value='TOKENS'>
-                            {t('Tokens Only')}
-                          </SelectItem>
-                        )}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    {t('Choose how quota values are shown to users')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {displayType !== 'TOKENS' && (
-              <FormField
-                control={form.control}
-                name='USDExchangeRate'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {displayType === 'CNY'
-                        ? t('CNY per USD')
-                        : displayType === 'USD'
-                          ? t('USD Exchange Rate')
-                          : t('USD Exchange Rate')}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        step='0.01'
-                        {...safeNumberFieldProps(field)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
+              {displayType !== 'TOKENS' && (
+                <FormField
+                  control={form.control}
+                  name='USDExchangeRate'
+                  render={({ field }) => (
+                    <SettingRowFormItem
+                      label={
+                        displayType === 'CNY'
+                          ? t('CNY per USD')
+                          : displayType === 'USD'
+                            ? t('USD Exchange Rate')
+                            : t('USD Exchange Rate')
+                      }
+                      description={t(
                         'Real exchange rate between USD and your payment gateway currency'
                       )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {displayType === 'CUSTOM' && (
-              <div className='grid gap-4 sm:grid-cols-2'>
-                <FormField
-                  control={form.control}
-                  name='general_setting.custom_currency_symbol'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Custom Currency Symbol')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='text'
-                          value={field.value ?? ''}
-                          onChange={field.onChange}
-                          name={field.name}
-                          onBlur={field.onBlur}
-                          ref={field.ref}
-                          maxLength={8}
-                          placeholder={t('e.g. ¥ or HK$')}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t('Prefix used when displaying prices')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
+                      control={
+                        <FormControl>
+                          <Input
+                            className='w-32'
+                            type='number'
+                            step='0.01'
+                            {...safeNumberFieldProps(field)}
+                          />
+                        </FormControl>
+                      }
+                    />
                   )}
                 />
+              )}
+
+              {displayType === 'CUSTOM' && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name='general_setting.custom_currency_symbol'
+                    render={({ field }) => (
+                      <SettingRowFormItem
+                        label={t('Custom Currency Symbol')}
+                        description={t('Prefix used when displaying prices')}
+                        control={
+                          <FormControl>
+                            <Input
+                              className='w-32'
+                              type='text'
+                              value={field.value ?? ''}
+                              onChange={field.onChange}
+                              name={field.name}
+                              onBlur={field.onBlur}
+                              ref={field.ref}
+                              maxLength={8}
+                              placeholder={t('e.g. ¥ or HK$')}
+                            />
+                          </FormControl>
+                        }
+                      />
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='general_setting.custom_currency_exchange_rate'
+                    render={({ field }) => (
+                      <SettingRowFormItem
+                        label={t('Units per USD')}
+                        description={t(
+                          'Conversion rate from USD to your custom currency'
+                        )}
+                        control={
+                          <FormControl>
+                            <Input
+                              className='w-44'
+                              type='number'
+                              step='0.01'
+                              value={field.value ?? ''}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value === ''
+                                    ? undefined
+                                    : e.target.valueAsNumber
+                                )
+                              }
+                              name={field.name}
+                              onBlur={field.onBlur}
+                              ref={field.ref}
+                              placeholder={t('e.g. 8 means 1 USD = 8 units')}
+                            />
+                          </FormControl>
+                        }
+                      />
+                    )}
+                  />
+                </>
+              )}
+
+              {showDisplayInCurrencyOption && (
                 <FormField
                   control={form.control}
-                  name='general_setting.custom_currency_exchange_rate'
+                  name='DisplayInCurrencyEnabled'
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Units per USD')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          step='0.01'
-                          value={field.value ?? ''}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value === ''
-                                ? undefined
-                                : e.target.valueAsNumber
-                            )
-                          }
-                          name={field.name}
-                          onBlur={field.onBlur}
-                          ref={field.ref}
-                          placeholder={t('e.g. 8 means 1 USD = 8 units')}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t('Conversion rate from USD to your custom currency')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
-
-            {showDisplayInCurrencyOption && (
-              <FormField
-                control={form.control}
-                name='DisplayInCurrencyEnabled'
-                render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{t('Display in Currency')}</FormLabel>
-                      <FormDescription>
-                        {displayType === 'TOKENS'
+                    <SettingRowFormItem
+                      label={t('Display in Currency')}
+                      description={
+                        displayType === 'TOKENS'
                           ? t(
                               'Tokens-only mode will show raw quota values regardless of this toggle.'
                             )
-                          : t('Show prices in currency instead of quota.')}
-                      </FormDescription>
-                    </SettingsSwitchContent>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </SettingsSwitchItem>
+                          : t('Show prices in currency instead of quota.')
+                      }
+                      control={
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      }
+                    />
+                  )}
+                />
+              )}
+
+              <FormField
+                control={form.control}
+                name='DisplayTokenStatEnabled'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Display Token Statistics')}
+                    description={t('Show token usage statistics in the UI')}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
-            )}
-
-            <FormField
-              control={form.control}
-              name='DisplayTokenStatEnabled'
-              render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Display Token Statistics')}</FormLabel>
-                    <FormDescription>
-                      {t('Show token usage statistics in the UI')}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
-              )}
-            />
+            </SettingRowGroup>
           </SettingsForm>
         </Form>
       </SettingsSection>

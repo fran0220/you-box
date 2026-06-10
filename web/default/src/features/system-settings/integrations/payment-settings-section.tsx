@@ -48,9 +48,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { RiskAcknowledgementDialog } from '@/components/risk-acknowledgement-dialog'
 import { confirmPaymentCompliance } from '../api'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -865,28 +865,28 @@ export function PaymentSettingsSection({
               </p>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <SettingRowGroup>
               <FormField
                 control={form.control}
                 name='Price'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Price (local currency / USD)')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        step='0.01'
-                        min={0}
-                        {...safeNumberFieldProps(field)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'How much to charge for each US dollar of balance (Epay)'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Price (local currency / USD)')}
+                    description={t(
+                      'How much to charge for each US dollar of balance (Epay)'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-32'
+                          type='number'
+                          step='0.01'
+                          min={0}
+                          {...safeNumberFieldProps(field)}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -894,24 +894,26 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='MinTopUp'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Minimum top-up (USD)')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        step='0.01'
-                        min={0}
-                        {...safeNumberFieldProps(field)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Smallest USD amount users can recharge (Epay)')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Minimum top-up (USD)')}
+                    description={t(
+                      'Smallest USD amount users can recharge (Epay)'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-32'
+                          type='number'
+                          step='0.01'
+                          min={0}
+                          {...safeNumberFieldProps(field)}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
-            </div>
+            </SettingRowGroup>
 
             <FormField
               control={form.control}
@@ -1090,25 +1092,29 @@ export function PaymentSettingsSection({
               </p>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <SettingRowGroup>
               <FormField
                 control={form.control}
                 name='PayAddress'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Epay endpoint')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('https://pay.example.com')}
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Base address provided by your Epay service')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Epay endpoint')}
+                    description={t(
+                      'Base address provided by your Epay service'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          placeholder={t('https://pay.example.com')}
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -1116,43 +1122,47 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='CustomCallbackAddress'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Callback address')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('https://gateway.example.com')}
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Optional callback override. Leave blank to use server address'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Callback address')}
+                    description={t(
+                      'Optional callback override. Leave blank to use server address'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          placeholder={t('https://gateway.example.com')}
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
-            </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
               <FormField
                 control={form.control}
                 name='EpayId'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Epay merchant ID')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='10001'
-                        autoComplete='off'
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Epay merchant ID')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-60 max-w-full'
+                          placeholder='10001'
+                          autoComplete='off'
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -1160,25 +1170,27 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='EpayKey'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Epay secret key')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='password'
-                        placeholder={t('Enter new key to update')}
-                        autoComplete='new-password'
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Leave blank unless rotating the secret')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Epay secret key')}
+                    description={t('Leave blank unless rotating the secret')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          type='password'
+                          placeholder={t('Enter new key to update')}
+                          autoComplete='new-password'
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
-            </div>
+            </SettingRowGroup>
           </div>
 
           <Separator />
@@ -1191,7 +1203,7 @@ export function PaymentSettingsSection({
               </p>
             </div>
 
-            <div className='bg-[var(--info-subtle)] text-info rounded-md p-4 text-sm'>
+            <div className='text-info rounded-md bg-[var(--info-subtle)] p-4 text-sm'>
               <p className='mb-2 font-medium'>{t('Webhook Configuration:')}</p>
               <ul className='list-inside list-disc space-y-1'>
                 <li>
@@ -1224,27 +1236,31 @@ export function PaymentSettingsSection({
               </ul>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-3'>
+            <SettingRowGroup>
               <FormField
                 control={form.control}
                 name='StripeApiSecret'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('API secret')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='password'
-                        placeholder={t('sk_xxx or rk_xxx')}
-                        autoComplete='new-password'
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Stripe API key (leave blank unless updating)')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('API secret')}
+                    description={t(
+                      'Stripe API key (leave blank unless updating)'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          type='password'
+                          placeholder={t('sk_xxx or rk_xxx')}
+                          autoComplete='new-password'
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -1252,24 +1268,26 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='StripeWebhookSecret'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Webhook secret')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='password'
-                        placeholder={t('whsec_xxx')}
-                        autoComplete='new-password'
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Webhook signing secret (leave blank unless updating)'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Webhook secret')}
+                    description={t(
+                      'Webhook signing secret (leave blank unless updating)'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          type='password'
+                          placeholder={t('whsec_xxx')}
+                          autoComplete='new-password'
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -1277,46 +1295,44 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='StripePriceId'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Price ID')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('price_xxx')}
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Stripe product price ID')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Price ID')}
+                    description={t('Stripe product price ID')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-60 max-w-full'
+                          placeholder={t('price_xxx')}
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
-            </div>
 
-            <div className='grid gap-6 md:grid-cols-3'>
               <FormField
                 control={form.control}
                 name='StripeUnitPrice'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {t('Unit price (local currency / USD)')}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        step='0.01'
-                        min={0}
-                        {...safeNumberFieldProps(field)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('e.g., 8 means 8 local currency per USD')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Unit price (local currency / USD)')}
+                    description={t('e.g., 8 means 8 local currency per USD')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-32'
+                          type='number'
+                          step='0.01'
+                          min={0}
+                          {...safeNumberFieldProps(field)}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -1324,21 +1340,21 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='StripeMinTopUp'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Minimum top-up (USD)')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        step='0.01'
-                        min={0}
-                        {...safeNumberFieldProps(field)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Minimum recharge amount in USD')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Minimum top-up (USD)')}
+                    description={t('Minimum recharge amount in USD')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-32'
+                          type='number'
+                          step='0.01'
+                          min={0}
+                          {...safeNumberFieldProps(field)}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -1346,23 +1362,21 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='StripePromotionCodesEnabled'
                 render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{t('Promotion codes')}</FormLabel>
-                      <FormDescription>
-                        {t('Allow users to enter promo codes')}
-                      </FormDescription>
-                    </SettingsSwitchContent>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </SettingsSwitchItem>
+                  <SettingRowFormItem
+                    label={t('Promotion codes')}
+                    description={t('Allow users to enter promo codes')}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
-            </div>
+            </SettingRowGroup>
           </div>
 
           <Separator />
@@ -1375,7 +1389,7 @@ export function PaymentSettingsSection({
               </p>
             </div>
 
-            <div className='bg-[var(--info-subtle)] text-info rounded-md p-4 text-sm'>
+            <div className='text-info rounded-md bg-[var(--info-subtle)] p-4 text-sm'>
               <p className='mb-2 font-medium'>{t('Webhook Configuration:')}</p>
               <ul className='list-inside list-disc space-y-1'>
                 <li>
@@ -1388,27 +1402,31 @@ export function PaymentSettingsSection({
               </ul>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <SettingRowGroup>
               <FormField
                 control={form.control}
                 name='CreemApiKey'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('API Key')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='password'
-                        placeholder={t('Enter Creem API key')}
-                        autoComplete='new-password'
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Creem API key (leave blank unless updating)')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('API Key')}
+                    description={t(
+                      'Creem API key (leave blank unless updating)'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          type='password'
+                          placeholder={t('Enter Creem API key')}
+                          autoComplete='new-password'
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
 
@@ -1416,48 +1434,48 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='CreemWebhookSecret'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Webhook Secret')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='password'
-                        placeholder={t('Enter webhook secret')}
-                        autoComplete='new-password'
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Webhook signing secret (leave blank unless updating)'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                  <SettingRowFormItem
+                    label={t('Webhook Secret')}
+                    description={t(
+                      'Webhook signing secret (leave blank unless updating)'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          type='password'
+                          placeholder={t('Enter webhook secret')}
+                          autoComplete='new-password'
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
                 )}
               />
-            </div>
 
-            <FormField
-              control={form.control}
-              name='CreemTestMode'
-              render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Test Mode')}</FormLabel>
-                    <FormDescription>
-                      {t('Enable test mode for Creem payments')}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='CreemTestMode'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Test Mode')}
+                    description={t('Enable test mode for Creem payments')}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+            </SettingRowGroup>
 
             <FormField
               control={form.control}

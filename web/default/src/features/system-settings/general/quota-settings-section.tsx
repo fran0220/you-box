@@ -22,25 +22,15 @@ import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
-  SettingsFormGrid,
-  SettingsFormGridItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -121,28 +111,28 @@ export function QuotaSettingsSection({
             isSaving={updateOption.isPending || isSubmitting}
           />
           <FormDirtyIndicator isDirty={isDirty} />
-          <SettingsFormGrid>
+          <SettingRowGroup>
             <FormField
               control={form.control}
               name='QuotaForNewUser'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('New User Quota')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field.onChange)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Initial quota given to new users')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('New User Quota')}
+                  description={t('Initial quota given to new users')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field.onChange)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -150,23 +140,23 @@ export function QuotaSettingsSection({
               control={form.control}
               name='PreConsumedQuota'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Pre-Consumed Quota')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field.onChange)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Quota consumed before charging users')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Pre-Consumed Quota')}
+                  description={t('Quota consumed before charging users')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field.onChange)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -174,23 +164,23 @@ export function QuotaSettingsSection({
               control={form.control}
               name='QuotaForInviter'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Inviter Reward')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field.onChange)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Quota given to users who invite others')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Inviter Reward')}
+                  description={t('Quota given to users who invite others')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field.onChange)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -198,40 +188,36 @@ export function QuotaSettingsSection({
               control={form.control}
               name='QuotaForInvitee'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Invitee Reward')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field.onChange)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Quota given to invited users')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Invitee Reward')}
+                  description={t('Quota given to invited users')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field.onChange)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
-            <SettingsFormGridItem span='full'>
-              <FormField
-                control={form.control}
-                name='quota_setting.enable_free_model_pre_consume'
-                render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{t('Pre-Consume for Free Models')}</FormLabel>
-                      <FormDescription>
-                        {t(
-                          'When enabled, zero-cost models also pre-consume quota before final settlement.'
-                        )}
-                      </FormDescription>
-                    </SettingsSwitchContent>
+            <FormField
+              control={form.control}
+              name='quota_setting.enable_free_model_pre_consume'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Pre-Consume for Free Models')}
+                  description={t(
+                    'When enabled, zero-cost models also pre-consume quota before final settlement.'
+                  )}
+                  control={
                     <FormControl>
                       <Switch
                         checked={field.value}
@@ -239,28 +225,28 @@ export function QuotaSettingsSection({
                         disabled={updateOption.isPending}
                       />
                     </FormControl>
-                  </SettingsSwitchItem>
-                )}
-              />
-            </SettingsFormGridItem>
+                  }
+                />
+              )}
+            />
 
             <FormField
               control={form.control}
               name='TopUpLink'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Top-Up Link')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t('https://example.com/topup')}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('External link for users to purchase quota')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Top-Up Link')}
+                  description={t('External link for users to purchase quota')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        placeholder={t('https://example.com/topup')}
+                        {...field}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -268,22 +254,22 @@ export function QuotaSettingsSection({
               control={form.control}
               name='general_setting.docs_link'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Documentation Link')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t('https://docs.example.com')}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Link to your documentation site')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Documentation Link')}
+                  description={t('Link to your documentation site')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        placeholder={t('https://docs.example.com')}
+                        {...field}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </SettingsFormGrid>
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>

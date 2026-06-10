@@ -21,21 +21,13 @@ import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -119,77 +111,77 @@ export function CheckinSettingsSection({
             isSaveDisabled={!isDirty}
             saveLabel='Save check-in settings'
           />
-          <FormField
-            control={form.control}
-            name='enabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Enable check-in feature')}</FormLabel>
-                  <FormDescription>
-                    {t(
-                      'Allow users to check in daily for random quota rewards'
-                    )}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={updateOption.isPending || isSubmitting}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='enabled'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Enable check-in feature')}
+                  description={t(
+                    'Allow users to check in daily for random quota rewards'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={updateOption.isPending || isSubmitting}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          {enabled && (
-            <div className='grid gap-6 sm:grid-cols-2'>
-              <FormField
-                control={form.control}
-                name='minQuota'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Minimum check-in quota')}</FormLabel>
+            <FormField
+              control={form.control}
+              name='minQuota'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  disabled={!enabled}
+                  label={t('Minimum check-in quota')}
+                  description={t('Minimum quota amount awarded for check-in')}
+                  control={
                     <FormControl>
                       <Input
+                        className='w-32'
                         type='number'
                         min={0}
                         placeholder={t('1000')}
+                        disabled={!enabled}
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      {t('Minimum quota amount awarded for check-in')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  }
+                />
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name='maxQuota'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Maximum check-in quota')}</FormLabel>
+            <FormField
+              control={form.control}
+              name='maxQuota'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  disabled={!enabled}
+                  label={t('Maximum check-in quota')}
+                  description={t('Maximum quota amount awarded for check-in')}
+                  control={
                     <FormControl>
                       <Input
+                        className='w-32'
                         type='number'
                         min={0}
                         placeholder={t('10000')}
+                        disabled={!enabled}
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      {t('Maximum quota amount awarded for check-in')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
+                  }
+                />
+              )}
+            />
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>
