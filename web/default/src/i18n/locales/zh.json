@@ -4552,6 +4552,25 @@
     "Pay with": "支付方式",
     "Minimum {{amount}}": "最低 {{amount}}",
     "Add {{amount}}": "添加 {{amount}}",
-    "Redeem code": "兑换码"
+    "Redeem code": "兑换码",
+    "Send a message…": "发送消息…",
+    "to send": "发送",
+    "Reset conversation": "重置对话",
+    "This will clear all messages in the current session. This action cannot be undone.": "这将清空当前会话中的所有消息,且无法撤销。",
+    "Tune model parameters for this session": "调整本次会话的模型参数",
+    "This session": "本次会话",
+    "Temperature": "温度",
+    "Top P": "Top P",
+    "Max tokens": "最大 Token 数",
+    "Frequency penalty": "频率惩罚",
+    "Presence penalty": "存在惩罚",
+    "Seed": "随机种子",
+    "Enable {{parameter}}": "启用 {{parameter}}",
+    "Stream response": "流式响应",
+    "Render tokens as they are generated": "生成时实时渲染 Token",
+    "You": "你",
+    "Assistant": "助手",
+    "Save & Submit": "保存并提交",
+    "Responding...": "响应中..."
   }
 }

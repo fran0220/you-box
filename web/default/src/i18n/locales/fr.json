@@ -4552,6 +4552,25 @@
     "Pay with": "Payer avec",
     "Minimum {{amount}}": "Minimum {{amount}}",
     "Add {{amount}}": "Ajouter {{amount}}",
-    "Redeem code": "Code de rachat"
+    "Redeem code": "Code de rachat",
+    "Send a message…": "Envoyer un message…",
+    "to send": "pour envoyer",
+    "Reset conversation": "Réinitialiser la conversation",
+    "This will clear all messages in the current session. This action cannot be undone.": "Cela effacera tous les messages de la session en cours. Cette action est irréversible.",
+    "Tune model parameters for this session": "Ajuster les paramètres du modèle pour cette session",
+    "This session": "Cette session",
+    "Temperature": "Température",
+    "Top P": "Top P",
+    "Max tokens": "Tokens max",
+    "Frequency penalty": "Pénalité de fréquence",
+    "Presence penalty": "Pénalité de présence",
+    "Seed": "Graine",
+    "Enable {{parameter}}": "Activer {{parameter}}",
+    "Stream response": "Réponse en continu",
+    "Render tokens as they are generated": "Afficher les tokens au fur et à mesure de leur génération",
+    "You": "Vous",
+    "Assistant": "Assistant",
+    "Save & Submit": "Enregistrer et soumettre",
+    "Responding...": "Réponse en cours..."
   }
 }

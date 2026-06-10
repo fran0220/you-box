@@ -4552,6 +4552,25 @@
     "Pay with": "Pay with",
     "Minimum {{amount}}": "Minimum {{amount}}",
     "Add {{amount}}": "Add {{amount}}",
-    "Redeem code": "Redeem code"
+    "Redeem code": "Redeem code",
+    "Send a message…": "Send a message…",
+    "to send": "to send",
+    "Reset conversation": "Reset conversation",
+    "This will clear all messages in the current session. This action cannot be undone.": "This will clear all messages in the current session. This action cannot be undone.",
+    "Tune model parameters for this session": "Tune model parameters for this session",
+    "This session": "This session",
+    "Temperature": "Temperature",
+    "Top P": "Top P",
+    "Max tokens": "Max tokens",
+    "Frequency penalty": "Frequency penalty",
+    "Presence penalty": "Presence penalty",
+    "Seed": "Seed",
+    "Enable {{parameter}}": "Enable {{parameter}}",
+    "Stream response": "Stream response",
+    "Render tokens as they are generated": "Render tokens as they are generated",
+    "You": "You",
+    "Assistant": "Assistant",
+    "Save & Submit": "Save & Submit",
+    "Responding...": "Responding..."
   }
 }

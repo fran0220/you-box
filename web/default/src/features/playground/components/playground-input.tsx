@@ -40,6 +40,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import {
   PromptInput,
   PromptInputButton,
@@ -49,22 +50,17 @@ import {
   type PromptInputMessage,
 } from '@/components/ai-elements/prompt-input'
 import { Suggestion, Suggestions } from '@/components/ai-elements/suggestion'
-import { ModelGroupSelector } from '@/components/model-group-selector'
-import type { ModelOption, GroupOption } from '../types'
 
 interface PlaygroundInputProps {
   onSubmit: (text: string) => void
   onStop?: () => void
   disabled?: boolean
   isGenerating?: boolean
-  models: ModelOption[]
-  modelValue: string
-  onModelChange: (value: string) => void
-  isModelLoading?: boolean
-  groups: GroupOption[]
-  groupValue: string
-  onGroupChange: (value: string) => void
 }
+
+const isMacPlatform = () =>
+  typeof navigator !== 'undefined' &&
+  /mac/i.test(navigator.platform || navigator.userAgent)
 
 const suggestions = [
   { icon: BarChartIcon, text: 'Analyze data', color: 'var(--teal)' },
@@ -80,20 +76,10 @@ export function PlaygroundInput({
   onStop,
   disabled,
   isGenerating,
-  models,
-  modelValue,
-  onModelChange,
-  isModelLoading = false,
-  groups,
-  groupValue,
-  onGroupChange,
 }: PlaygroundInputProps) {
   const { t } = useTranslation()
   const [text, setText] = useState('')
-
-  const isModelSelectDisabled =
-    disabled || isModelLoading || models.length === 0
-  const isGroupSelectDisabled = disabled || groups.length === 0
+  const isMac = isMacPlatform()
 
   const handleSubmit = (message: PromptInputMessage) => {
     if (!message.text?.trim() || disabled) return
@@ -122,7 +108,7 @@ export function PlaygroundInput({
           className='px-5 md:text-base'
           disabled={disabled}
           onChange={(event) => setText(event.target.value)}
-          placeholder={t('Ask anything')}
+          placeholder={t('Send a message…')}
           value={text}
         />
 
@@ -183,15 +169,14 @@ export function PlaygroundInput({
           </PromptInputTools>
 
           <div className='flex items-center gap-1.5 md:gap-2'>
-            <ModelGroupSelector
-              selectedModel={modelValue}
-              models={models}
-              onModelChange={onModelChange}
-              selectedGroup={groupValue}
-              groups={groups}
-              onGroupChange={onGroupChange}
-              disabled={isModelSelectDisabled || isGroupSelectDisabled}
-            />
+            {/* Enter and mod+Enter both submit (Shift+Enter inserts a newline) */}
+            <span className='text-muted-foreground hidden items-center gap-1.5 text-xs sm:flex'>
+              <KbdGroup>
+                <Kbd>{isMac ? '⌘' : 'Ctrl'}</Kbd>
+                <Kbd>↵</Kbd>
+              </KbdGroup>
+              {t('to send')}
+            </span>
 
             {isGenerating && onStop ? (
               <PromptInputButton

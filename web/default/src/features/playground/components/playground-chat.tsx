@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useEffect, useMemo, useState } from 'react'
 import { MessagesSquare } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -36,7 +37,10 @@ import {
   ConversationScrollButton,
 } from '@/components/ai-elements/conversation'
 import { Loader } from '@/components/ai-elements/loader'
-import { Message, MessageContent } from '@/components/ai-elements/message'
+import {
+  MessageContent,
+  SpeakerMessage,
+} from '@/components/ai-elements/message'
 import {
   Reasoning,
   ReasoningContent,
@@ -50,6 +54,7 @@ import {
   SourcesContent,
   SourcesTrigger,
 } from '@/components/ai-elements/sources'
+import { StreamingCursor } from '@/components/ai-elements/streaming-cursor'
 import { MESSAGE_ROLES } from '../constants'
 import { getMessageContentStyles } from '../lib/message-styles'
 import { parseThinkTags } from '../lib/message-utils'
@@ -59,6 +64,8 @@ import { MessageError } from './message-error'
 
 interface PlaygroundChatProps {
   messages: MessageType[]
+  /** Display name of the currently selected model (assistant speaker label). */
+  modelLabel?: string
   onCopyMessage?: (message: MessageType) => void
   onRegenerateMessage?: (message: MessageType) => void
   onEditMessage?: (message: MessageType) => void
@@ -72,6 +79,7 @@ interface PlaygroundChatProps {
 
 export function PlaygroundChat({
   messages,
+  modelLabel,
   onCopyMessage,
   onRegenerateMessage,
   onEditMessage,
@@ -83,8 +91,12 @@ export function PlaygroundChat({
   onSaveEditAndSubmit,
 }: PlaygroundChatProps) {
   const { t } = useTranslation()
+  const user = useAuthStore((state) => state.auth.user)
   const [editText, setEditText] = useState('')
   const [originalText, setOriginalText] = useState('')
+
+  // Role tile: first two characters of the username, uppercased.
+  const userInitials = (user?.username || '').slice(0, 2).toUpperCase() || 'ME'
 
   useEffect(() => {
     if (!editingKey) return
@@ -106,7 +118,7 @@ export function PlaygroundChat({
     <Conversation>
       {/* Remove outer padding; apply padding to inner centered container to align with input */}
       <ConversationContent className='p-0'>
-        <div className='mx-auto w-full max-w-4xl px-4 py-4'>
+        <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-4'>
           {messages.length === 0 && !isGenerating && (
             <div className='flex min-h-[50vh] flex-col items-center justify-center gap-4 p-6 text-center'>
               <MessagesSquare className='text-muted-foreground h-12 w-12' />
@@ -131,12 +143,19 @@ export function PlaygroundChat({
               <Branch defaultBranch={0} key={message.key}>
                 <BranchMessages>
                   {versions.map((version, versionIndex) => (
-                    <Message
-                      className='group flex-row-reverse'
+                    <SpeakerMessage
                       from={message.from}
+                      tile={
+                        message.from === MESSAGE_ROLES.USER ? userInitials : '✦'
+                      }
+                      speaker={
+                        message.from === MESSAGE_ROLES.USER
+                          ? t('You')
+                          : modelLabel || t('Assistant')
+                      }
                       key={`${message.key}-${version.id}-${versionIndex}`}
                     >
-                      <div className='w-full min-w-0 flex-1 basis-full py-1'>
+                      <div className='w-full min-w-0'>
                         {isEditing(message.key) ? (
                           <div className='space-y-2'>
                             <Textarea
@@ -155,7 +174,7 @@ export function PlaygroundChat({
                                   }
                                   disabled={isEmpty || !isChanged}
                                 >
-                                  Save & Submit
+                                  {t('Save & Submit')}
                                 </Button>
                               )}
                               <Button
@@ -163,14 +182,14 @@ export function PlaygroundChat({
                                 onClick={() => onSaveEdit?.(editText)}
                                 disabled={isEmpty || !isChanged}
                               >
-                                Save
+                                {t('Save')}
                               </Button>
                               <Button
                                 size='sm'
                                 variant='outline'
                                 onClick={() => onCancelEdit?.(false)}
                               >
-                                Cancel
+                                {t('Cancel')}
                               </Button>
                             </div>
                           </div>
@@ -251,7 +270,7 @@ export function PlaygroundChat({
                                     <div className='flex items-center gap-2 py-2'>
                                       <Loader />
                                       <Shimmer className='text-sm' duration={1}>
-                                        Responding...
+                                        {t('Responding...')}
                                       </Shimmer>
                                     </div>
                                   )}
@@ -275,6 +294,10 @@ export function PlaygroundChat({
                                           )}
                                         >
                                           <Response>{displayContent}</Response>
+                                          {isGenerating &&
+                                            isLastAssistantMessage && (
+                                              <StreamingCursor />
+                                            )}
                                         </MessageContent>
                                         {actions}
                                       </>
@@ -286,7 +309,7 @@ export function PlaygroundChat({
                           </>
                         )}
                       </div>
-                    </Message>
+                    </SpeakerMessage>
                   ))}
                 </BranchMessages>
 

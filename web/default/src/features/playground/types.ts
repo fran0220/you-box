@@ -26,6 +26,12 @@ export interface MessageVersion {
   content: string
 }
 
+export interface TokenUsage {
+  prompt_tokens: number
+  completion_tokens: number
+  total_tokens: number
+}
+
 export interface Message {
   key: string
   from: MessageRole
@@ -40,6 +46,14 @@ export interface Message {
   isContentComplete?: boolean
   status?: MessageStatus
   errorCode?: string | null
+  /**
+   * Token usage reported by the API. Only available on non-streaming
+   * responses today — the streaming path does not request
+   * `stream_options.include_usage`, so usage chunks are never emitted.
+   */
+  usage?: TokenUsage
+  /** Wall-clock latency (ms) of the request that produced this message. */
+  latencyMs?: number
 }
 
 // API payload types
@@ -99,11 +113,7 @@ export interface ChatCompletionResponse {
     }
     finish_reason: string
   }>
-  usage?: {
-    prompt_tokens: number
-    completion_tokens: number
-    total_tokens: number
-  }
+  usage?: TokenUsage
 }
 
 // Configuration types

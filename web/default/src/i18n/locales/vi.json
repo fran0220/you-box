@@ -4552,6 +4552,25 @@
     "Pay with": "Thanh toán bằng",
     "Minimum {{amount}}": "Tối thiểu {{amount}}",
     "Add {{amount}}": "Thêm {{amount}}",
-    "Redeem code": "Mã đổi thưởng"
+    "Redeem code": "Mã đổi thưởng",
+    "Send a message…": "Gửi tin nhắn…",
+    "to send": "để gửi",
+    "Reset conversation": "Đặt lại cuộc trò chuyện",
+    "This will clear all messages in the current session. This action cannot be undone.": "Thao tác này sẽ xóa tất cả tin nhắn trong phiên hiện tại và không thể hoàn tác.",
+    "Tune model parameters for this session": "Điều chỉnh tham số mô hình cho phiên này",
+    "This session": "Phiên này",
+    "Temperature": "Nhiệt độ",
+    "Top P": "Top P",
+    "Max tokens": "Số token tối đa",
+    "Frequency penalty": "Phạt tần suất",
+    "Presence penalty": "Phạt hiện diện",
+    "Seed": "Seed",
+    "Enable {{parameter}}": "Bật {{parameter}}",
+    "Stream response": "Phản hồi luồng",
+    "Render tokens as they are generated": "Hiển thị token ngay khi được tạo",
+    "You": "Bạn",
+    "Assistant": "Trợ lý",
+    "Save & Submit": "Lưu & Gửi",
+    "Responding...": "Đang phản hồi..."
   }
 }

@@ -4552,6 +4552,25 @@
     "Pay with": "支払い方法",
     "Minimum {{amount}}": "最低 {{amount}}",
     "Add {{amount}}": "{{amount}} を追加",
-    "Redeem code": "引き換えコード"
+    "Redeem code": "引き換えコード",
+    "Send a message…": "メッセージを送信…",
+    "to send": "で送信",
+    "Reset conversation": "会話をリセット",
+    "This will clear all messages in the current session. This action cannot be undone.": "現在のセッションのすべてのメッセージが削除されます。この操作は元に戻せません。",
+    "Tune model parameters for this session": "このセッションのモデルパラメータを調整",
+    "This session": "このセッション",
+    "Temperature": "温度",
+    "Top P": "Top P",
+    "Max tokens": "最大トークン数",
+    "Frequency penalty": "頻度ペナルティ",
+    "Presence penalty": "存在ペナルティ",
+    "Seed": "シード",
+    "Enable {{parameter}}": "{{parameter}}を有効化",
+    "Stream response": "ストリーミング応答",
+    "Render tokens as they are generated": "生成と同時にトークンを表示",
+    "You": "あなた",
+    "Assistant": "アシスタント",
+    "Save & Submit": "保存して送信",
+    "Responding...": "応答中..."
   }
 }

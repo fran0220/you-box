@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { toast } from 'sonner'
 import { sendChatCompletion } from '../api'
 import { MESSAGE_STATUS, ERROR_MESSAGES } from '../constants'
@@ -45,6 +45,10 @@ export function useChatHandler({
   onMessageUpdate,
 }: UseChatHandlerOptions) {
   const { sendStreamRequest, stopStream, isStreaming } = useStreamRequest()
+
+  // Wall-clock start of the in-flight request, used to derive per-response
+  // latency for the session stats rail.
+  const requestStartRef = useRef<number | null>(null)
 
   // Handle stream update
   const handleStreamUpdate = useCallback(
@@ -78,13 +82,23 @@ export function useChatHandler({
   )
 
   // Handle stream complete
+  // NOTE: streaming responses carry no token usage today — the payload does
+  // not request `stream_options.include_usage`, so only latency is recorded
+  // here. Usage stays undefined until backend usage passthrough lands.
   const handleStreamComplete = useCallback(() => {
+    const startedAt = requestStartRef.current
+    const latencyMs = startedAt != null ? Date.now() - startedAt : undefined
+    requestStartRef.current = null
     onMessageUpdate((prev) =>
       updateLastAssistantMessage(prev, (message) =>
         message.status === MESSAGE_STATUS.COMPLETE ||
         message.status === MESSAGE_STATUS.ERROR
           ? message
-          : { ...finalizeMessage(message), status: MESSAGE_STATUS.COMPLETE }
+          : {
+              ...finalizeMessage(message),
+              status: MESSAGE_STATUS.COMPLETE,
+              latencyMs,
+            }
       )
     )
   }, [onMessageUpdate])
@@ -108,6 +122,7 @@ export function useChatHandler({
         config,
         parameterEnabled
       )
+      requestStartRef.current = Date.now()
       sendStreamRequest(
         payload,
         handleStreamUpdate,
@@ -134,8 +149,10 @@ export function useChatHandler({
         parameterEnabled
       )
 
+      const startedAt = Date.now()
       try {
         const response = await sendChatCompletion(payload)
+        const latencyMs = Date.now() - startedAt
         const choice = response.choices?.[0]
         if (!choice) return
 
@@ -154,6 +171,8 @@ export function useChatHandler({
               choice.message?.reasoning_content
             ),
             status: MESSAGE_STATUS.COMPLETE,
+            usage: response.usage,
+            latencyMs,
           }))
         )
       } catch (error: unknown) {
@@ -189,6 +208,7 @@ export function useChatHandler({
   // Stop generation
   const stopGeneration = useCallback(() => {
     stopStream()
+    requestStartRef.current = null
     onMessageUpdate((prev) =>
       updateLastAssistantMessage(prev, (message) =>
         message.status === MESSAGE_STATUS.LOADING ||

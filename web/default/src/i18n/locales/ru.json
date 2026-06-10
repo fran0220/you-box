@@ -4552,6 +4552,25 @@
     "Pay with": "Способ оплаты",
     "Minimum {{amount}}": "Минимум {{amount}}",
     "Add {{amount}}": "Пополнить на {{amount}}",
-    "Redeem code": "Код активации"
+    "Redeem code": "Код активации",
+    "Send a message…": "Отправить сообщение…",
+    "to send": "для отправки",
+    "Reset conversation": "Сбросить диалог",
+    "This will clear all messages in the current session. This action cannot be undone.": "Все сообщения текущей сессии будут удалены. Это действие нельзя отменить.",
+    "Tune model parameters for this session": "Настройте параметры модели для этой сессии",
+    "This session": "Эта сессия",
+    "Temperature": "Температура",
+    "Top P": "Top P",
+    "Max tokens": "Макс. токенов",
+    "Frequency penalty": "Штраф за частоту",
+    "Presence penalty": "Штраф за присутствие",
+    "Seed": "Сид",
+    "Enable {{parameter}}": "Включить {{parameter}}",
+    "Stream response": "Потоковый ответ",
+    "Render tokens as they are generated": "Отображать токены по мере генерации",
+    "You": "Вы",
+    "Assistant": "Ассистент",
+    "Save & Submit": "Сохранить и отправить",
+    "Responding...": "Отвечает..."
   }
 }

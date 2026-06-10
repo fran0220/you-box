@@ -16,13 +16,29 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { RotateCcw, SlidersHorizontal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import {
+  ModelMetaTag,
+  ModelSelectorHeader,
+} from '@/components/ai-elements/model-selector-header'
+import { ConfirmDialog } from '@/components/confirm-dialog'
+import { ModelGroupSelector } from '@/components/model-group-selector'
 import { getUserModels, getUserGroups } from './api'
 import { PlaygroundChat } from './components/playground-chat'
 import { PlaygroundInput } from './components/playground-input'
+import { PlaygroundParameters } from './components/playground-parameters'
 import { usePlaygroundState, useChatHandler } from './hooks'
 import { createUserMessage, createLoadingAssistantMessage } from './lib'
 import type { Message as MessageType } from './types'
@@ -39,6 +55,8 @@ export function Playground() {
     setModels,
     setGroups,
     updateConfig,
+    updateParameterEnabled,
+    clearMessages,
   } = usePlaygroundState()
 
   const { sendChat, stopGeneration, isGenerating } = useChatHandler({
@@ -51,6 +69,10 @@ export function Playground() {
   const [editingMessageKey, setEditingMessageKey] = useState<string | null>(
     null
   )
+
+  // Reset-conversation confirm + mobile parameters sheet
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false)
+  const [parametersSheetOpen, setParametersSheetOpen] = useState(false)
 
   // Load models
   const { data: modelsData, isLoading: isLoadingModels } = useQuery({
@@ -188,40 +210,155 @@ export function Playground() {
     updateMessages(newMessages)
   }
 
+  const handleResetConfirm = () => {
+    clearMessages()
+    setResetConfirmOpen(false)
+  }
+
+  const selectedGroup = useMemo(
+    () => groups.find((g) => g.value === config.group),
+    [groups, config.group]
+  )
+  const selectedModelLabel = useMemo(
+    () => models.find((m) => m.value === config.model)?.label || config.model,
+    [models, config.model]
+  )
+
+  const isSelectorDisabled =
+    isGenerating ||
+    isLoadingModels ||
+    models.length === 0 ||
+    groups.length === 0
+
+  const parametersPanel = (
+    <PlaygroundParameters
+      config={config}
+      parameterEnabled={parameterEnabled}
+      onConfigChange={updateConfig}
+      onParameterEnabledChange={updateParameterEnabled}
+      messages={messages}
+    />
+  )
+
   return (
     <div className='relative flex size-full flex-col overflow-hidden'>
-      {/* Full-width scroll container: scrolling works even over side whitespace */}
-      <div className='flex flex-1 flex-col overflow-hidden'>
-        <PlaygroundChat
-          messages={messages}
-          onCopyMessage={handleCopyMessage}
-          onRegenerateMessage={handleRegenerateMessage}
-          onEditMessage={handleEditMessage}
-          onDeleteMessage={handleDeleteMessage}
-          isGenerating={isGenerating}
-          editingKey={editingMessageKey}
-          onCancelEdit={handleEditOpenChange}
-          onSaveEdit={(newContent) => applyEdit(newContent, false)}
-          onSaveEditAndSubmit={(newContent) => applyEdit(newContent, true)}
-        />
+      {/* Header: model/group picker + meta tags + reset / mobile parameters */}
+      <ModelSelectorHeader
+        trigger={
+          <ModelGroupSelector
+            selectedModel={config.model}
+            models={models}
+            onModelChange={(value) => updateConfig('model', value)}
+            selectedGroup={config.group}
+            groups={groups}
+            onGroupChange={(value) => updateConfig('group', value)}
+            disabled={isSelectorDisabled}
+          />
+        }
+        tags={
+          selectedGroup && (selectedGroup.ratio || selectedGroup.desc) ? (
+            <>
+              {selectedGroup.ratio ? (
+                <ModelMetaTag>
+                  {t('Ratio: {{value}}', { value: selectedGroup.ratio })}
+                </ModelMetaTag>
+              ) : null}
+              {selectedGroup.desc ? (
+                <ModelMetaTag>{selectedGroup.desc}</ModelMetaTag>
+              ) : null}
+            </>
+          ) : undefined
+        }
+        actions={
+          <>
+            <Button
+              variant='ghost'
+              size='icon-sm'
+              aria-label={t('Reset conversation')}
+              title={t('Reset conversation')}
+              disabled={isGenerating || messages.length === 0}
+              onClick={() => setResetConfirmOpen(true)}
+            >
+              <RotateCcw className='size-4' />
+            </Button>
+            <Button
+              variant='ghost'
+              size='icon-sm'
+              className='lg:hidden'
+              aria-label={t('Parameters')}
+              title={t('Parameters')}
+              onClick={() => setParametersSheetOpen(true)}
+            >
+              <SlidersHorizontal className='size-4' />
+            </Button>
+          </>
+        }
+      />
+
+      {/* Body: conversation column + 320px parameter rail (rail collapses below lg) */}
+      <div className='grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_320px]'>
+        <div className='flex min-h-0 min-w-0 flex-col overflow-hidden'>
+          {/* Full-width scroll container: scrolling works even over side whitespace */}
+          <div className='flex flex-1 flex-col overflow-hidden'>
+            <PlaygroundChat
+              messages={messages}
+              modelLabel={selectedModelLabel}
+              onCopyMessage={handleCopyMessage}
+              onRegenerateMessage={handleRegenerateMessage}
+              onEditMessage={handleEditMessage}
+              onDeleteMessage={handleDeleteMessage}
+              isGenerating={isGenerating}
+              editingKey={editingMessageKey}
+              onCancelEdit={handleEditOpenChange}
+              onSaveEdit={(newContent) => applyEdit(newContent, false)}
+              onSaveEditAndSubmit={(newContent) => applyEdit(newContent, true)}
+            />
+          </div>
+
+          {/* Input area: center content and constrain to the same container width */}
+          <div className='mx-auto w-full max-w-4xl'>
+            <PlaygroundInput
+              disabled={isGenerating}
+              isGenerating={isGenerating}
+              onStop={stopGeneration}
+              onSubmit={handleSendMessage}
+            />
+          </div>
+        </div>
+
+        {/* Desktop parameter rail */}
+        <aside className='bg-surface hidden min-h-0 flex-col overflow-y-auto border-l lg:flex'>
+          {parametersPanel}
+        </aside>
       </div>
 
-      {/* Input area: center content and constrain to the same container width */}
-      <div className='mx-auto w-full max-w-4xl'>
-        <PlaygroundInput
-          disabled={isGenerating}
-          groups={groups}
-          groupValue={config.group}
-          isGenerating={isGenerating}
-          isModelLoading={isLoadingModels}
-          modelValue={config.model}
-          models={models}
-          onGroupChange={(value) => updateConfig('group', value)}
-          onModelChange={(value) => updateConfig('model', value)}
-          onStop={stopGeneration}
-          onSubmit={handleSendMessage}
-        />
-      </div>
+      {/* Mobile (<lg) parameter sheet — same panel component as the rail */}
+      <Sheet open={parametersSheetOpen} onOpenChange={setParametersSheetOpen}>
+        <SheetContent side='right' className='gap-0'>
+          <SheetHeader className='border-b'>
+            <SheetTitle>{t('Parameters')}</SheetTitle>
+            <SheetDescription className='sr-only'>
+              {t('Tune model parameters for this session')}
+            </SheetDescription>
+          </SheetHeader>
+          <div className='min-h-0 flex-1 overflow-y-auto'>
+            {parametersPanel}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Reset conversation confirm */}
+      <ConfirmDialog
+        open={resetConfirmOpen}
+        onOpenChange={setResetConfirmOpen}
+        destructive
+        title={t('Reset conversation')}
+        desc={t(
+          'This will clear all messages in the current session. This action cannot be undone.'
+        )}
+        confirmText={t('Reset')}
+        handleConfirm={handleResetConfirm}
+      />
     </div>
   )
 }
