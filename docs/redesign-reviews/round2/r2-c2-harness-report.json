@@ -6,7 +6,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/",
-  "textLen": 2443,
+  "textLen": 2697,
   "flags": []
  },
  {
@@ -16,7 +16,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/about",
-  "textLen": 451,
+  "textLen": 453,
   "flags": []
  },
  {
@@ -26,7 +26,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/pricing?view=card",
-  "textLen": 1118,
+  "textLen": 914,
   "flags": []
  },
  {
@@ -36,7 +36,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/pricing?view=table",
-  "textLen": 1143,
+  "textLen": 997,
   "flags": []
  },
  {
@@ -46,7 +46,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/pricing/gpt-4o",
-  "textLen": 860,
+  "textLen": 871,
   "flags": []
  },
  {
@@ -56,7 +56,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/rankings",
-  "textLen": 774,
+  "textLen": 776,
   "flags": []
  },
  {
@@ -66,7 +66,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/privacy-policy",
-  "textLen": 184,
+  "textLen": 186,
   "flags": []
  },
  {
@@ -76,7 +76,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/user-agreement",
-  "textLen": 184,
+  "textLen": 186,
   "flags": []
  },
  {
@@ -86,7 +86,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/sign-in",
-  "textLen": 308,
+  "textLen": 274,
   "flags": []
  },
  {
@@ -96,7 +96,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/sign-up",
-  "textLen": 318,
+  "textLen": 383,
   "flags": []
  },
  {
@@ -106,7 +106,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/sign-up",
-  "textLen": 318,
+  "textLen": 383,
   "flags": []
  },
  {
@@ -160,7 +160,7 @@
    "401 /api/user/self"
   ],
   "finalPath": "/sign-in",
-  "textLen": 334,
+  "textLen": 300,
   "flags": []
  },
  {
@@ -232,7 +232,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/dashboard/overview",
-  "textLen": 2172,
+  "textLen": 2283,
   "flags": []
  },
  {
@@ -242,7 +242,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/dashboard/models",
-  "textLen": 777,
+  "textLen": 780,
   "flags": []
  },
  {
@@ -252,7 +252,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/dashboard/users",
-  "textLen": 548,
+  "textLen": 550,
   "flags": []
  },
  {
@@ -262,7 +262,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/keys",
-  "textLen": 780,
+  "textLen": 905,
   "flags": []
  },
  {
@@ -272,7 +272,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/wallet",
-  "textLen": 951,
+  "textLen": 1124,
   "flags": []
  },
  {
@@ -282,7 +282,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/profile",
-  "textLen": 1384,
+  "textLen": 1092,
   "flags": []
  },
  {
@@ -292,7 +292,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/playground",
-  "textLen": 572,
+  "textLen": 797,
   "flags": []
  },
  {
@@ -302,7 +302,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/chat/0",
-  "textLen": 626,
+  "textLen": 505,
   "flags": []
  },
  {
@@ -312,7 +312,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/usage-logs/common",
-  "textLen": 748,
+  "textLen": 829,
   "flags": []
  },
  {
@@ -322,7 +322,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/usage-logs/drawing",
-  "textLen": 768,
+  "textLen": 849,
   "flags": []
  },
  {
@@ -332,7 +332,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/usage-logs/task",
-  "textLen": 740,
+  "textLen": 821,
   "flags": []
  },
  {
@@ -342,7 +342,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/channels",
-  "textLen": 737,
+  "textLen": 916,
   "flags": []
  },
  {
@@ -352,7 +352,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/users",
-  "textLen": 755,
+  "textLen": 964,
   "flags": []
  },
  {
@@ -362,7 +362,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/redemption-codes",
-  "textLen": 705,
+  "textLen": 1171,
   "flags": []
  },
  {
@@ -372,7 +372,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/subscriptions",
-  "textLen": 940,
+  "textLen": 910,
   "flags": []
  },
  {
@@ -382,7 +382,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/models/metadata",
-  "textLen": 752,
+  "textLen": 764,
   "flags": []
  },
  {
@@ -392,7 +392,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/models/deployments",
-  "textLen": 586,
+  "textLen": 565,
   "flags": []
  },
  {
@@ -402,7 +402,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/usage-logs/common",
-  "textLen": 748,
+  "textLen": 829,
   "flags": []
  },
  {
@@ -412,7 +412,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/wallet",
-  "textLen": 1111,
+  "textLen": 1284,
   "flags": []
  },
  {
@@ -422,7 +422,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/",
-  "textLen": 2268,
+  "textLen": 2522,
   "flags": []
  },
  {
@@ -432,7 +432,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/site/system-info",
-  "textLen": 1321,
+  "textLen": 1522,
   "flags": []
  },
  {
@@ -442,7 +442,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/site/notice",
-  "textLen": 447,
+  "textLen": 650,
   "flags": []
  },
  {
@@ -452,7 +452,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/site/header-navigation",
-  "textLen": 938,
+  "textLen": 1124,
   "flags": []
  },
  {
@@ -462,7 +462,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/site/sidebar-modules",
-  "textLen": 1503,
+  "textLen": 1682,
   "flags": []
  },
  {
@@ -472,7 +472,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/auth/basic-auth",
-  "textLen": 913,
+  "textLen": 1145,
   "flags": []
  },
  {
@@ -482,7 +482,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/auth/oauth",
-  "textLen": 587,
+  "textLen": 811,
   "flags": []
  },
  {
@@ -492,7 +492,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/auth/passkey",
-  "textLen": 1189,
+  "textLen": 1423,
   "flags": []
  },
  {
@@ -502,7 +502,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/auth/bot-protection",
-  "textLen": 548,
+  "textLen": 774,
   "flags": []
  },
  {
@@ -512,7 +512,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/auth/custom-oauth",
-  "textLen": 548,
+  "textLen": 795,
   "flags": []
  },
  {
@@ -522,7 +522,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/billing/quota",
-  "textLen": 973,
+  "textLen": 1117,
   "flags": []
  },
  {
@@ -532,7 +532,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/billing/currency",
-  "textLen": 678,
+  "textLen": 908,
   "flags": []
  },
  {
@@ -542,7 +542,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/billing/model-pricing",
-  "textLen": 2453,
+  "textLen": 2698,
   "flags": []
  },
  {
@@ -552,7 +552,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/billing/group-pricing",
-  "textLen": 1357,
+  "textLen": 1602,
   "flags": []
  },
  {
@@ -562,7 +562,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/billing/payment",
-  "textLen": 6912,
+  "textLen": 5658,
   "flags": []
  },
  {
@@ -572,7 +572,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/billing/checkin",
-  "textLen": 549,
+  "textLen": 909,
   "flags": []
  },
  {
@@ -582,7 +582,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/content/dashboard",
-  "textLen": 632,
+  "textLen": 848,
   "flags": []
  },
  {
@@ -592,7 +592,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/content/announcements",
-  "textLen": 580,
+  "textLen": 808,
   "flags": []
  },
  {
@@ -602,7 +602,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/content/api-info",
-  "textLen": 556,
+  "textLen": 784,
   "flags": []
  },
  {
@@ -612,7 +612,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/content/faq",
-  "textLen": 534,
+  "textLen": 752,
   "flags": []
  },
  {
@@ -622,7 +622,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/content/uptime-kuma",
-  "textLen": 584,
+  "textLen": 810,
   "flags": []
  },
  {
@@ -632,7 +632,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/content/chat",
-  "textLen": 1131,
+  "textLen": 792,
   "flags": []
  },
  {
@@ -642,7 +642,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/content/drawing",
-  "textLen": 1085,
+  "textLen": 1285,
   "flags": []
  },
  {
@@ -652,7 +652,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/models/global",
-  "textLen": 1137,
+  "textLen": 1366,
   "flags": []
  },
  {
@@ -662,7 +662,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/models/gemini",
-  "textLen": 1457,
+  "textLen": 1666,
   "flags": []
  },
  {
@@ -672,7 +672,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/models/claude",
-  "textLen": 959,
+  "textLen": 1168,
   "flags": []
  },
  {
@@ -682,7 +682,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/models/grok",
-  "textLen": 641,
+  "textLen": 857,
   "flags": []
  },
  {
@@ -692,7 +692,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/models/channel-affinity",
-  "textLen": 1280,
+  "textLen": 1508,
   "flags": []
  },
  {
@@ -702,7 +702,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/models/model-deployment",
-  "textLen": 529,
+  "textLen": 742,
   "flags": []
  },
  {
@@ -712,7 +712,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/operations/behavior",
-  "textLen": 728,
+  "textLen": 967,
   "flags": []
  },
  {
@@ -722,7 +722,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/operations/monitoring",
-  "textLen": 1308,
+  "textLen": 1542,
   "flags": []
  },
  {
@@ -732,7 +732,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/operations/email",
-  "textLen": 891,
+  "textLen": 1119,
   "flags": []
  },
  {
@@ -742,7 +742,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/operations/worker",
-  "textLen": 759,
+  "textLen": 987,
   "flags": []
  },
  {
@@ -752,7 +752,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/operations/logs",
-  "textLen": 737,
+  "textLen": 971,
   "flags": []
  },
  {
@@ -762,7 +762,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/operations/performance",
-  "textLen": 2213,
+  "textLen": 2455,
   "flags": []
  },
  {
@@ -772,7 +772,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/operations/update-checker",
-  "textLen": 533,
+  "textLen": 788,
   "flags": []
  },
  {
@@ -782,7 +782,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/security/rate-limit",
-  "textLen": 866,
+  "textLen": 1045,
   "flags": []
  },
  {
@@ -792,7 +792,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/security/sensitive-words",
-  "textLen": 692,
+  "textLen": 869,
   "flags": []
  },
  {
@@ -802,7 +802,7 @@
   "pageErrors": [],
   "failedRequests": [],
   "finalPath": "/system-settings/security/ssrf",
-  "textLen": 1010,
+  "textLen": 1189,
   "flags": []
  }
 ]

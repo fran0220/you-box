@@ -1,21 +1,22 @@
 # R2-C2 最终验收矩阵 v2
 
 - branch:`redesign/youbox-frontend-100`
-- 复跑 `docs/redesign-reviews/verify-harness.mjs`(80 路由 × 375/768/1280/1536 × dark+light;执行副本仅 patch 了 chromium executablePath 以匹配本机缓存版本)。
-- 原始报告:[r2-c2-harness-report.json](r2-c2-harness-report.json);逐路由 dark-1280 截图归档:`screenshots/r2-c2-final/`(全分辨率/双主题原始件 35MB 留存 `/tmp/yb-verify/shots`,各 B 步骤目录已含交互/并排验收截图)。
+- 复跑 `docs/redesign-reviews/verify-harness.mjs`(80 路由 × 375/768/1280/1536 × dark+light;执行副本仅 patch chromium executablePath 以匹配本机缓存版本)。
+- 原始报告:[r2-c2-harness-report.json](r2-c2-harness-report.json);逐路由 dark-1280 截图归档:`screenshots/r2-c2-final/`(各 B 步骤目录另含交互/并排验收截图)。
 - 「结构对照」列链接该页《结构对照表》;全部表行状态为 pass/adapted(各 review 记录逐行验收)。
 
-## Harness 结论
+> **更正说明(诚实记录)**:本矩阵首版(commit `5c81c1ac`)误用了一份**陈旧的 report.json**(轮询器在新一轮运行写出文件前命中了上一轮遗留文件),据此声称「2 findings」。复核 harness 实跑日志后发现真实运行存在两类环境噪声:① 全局 API 限流(180 req/180s/IP)导致末段 ~15 个 settings 路由在 `/api/status` 上 429;② 重启后端轮换 session secret 导致一轮重跑里认证态失效、auth 路由静默重定向 `/sign-in`。本版为**修复后的合法重跑**:验证后端关闭全局 API 限流(`GLOBAL_API_RATE_LIMIT_ENABLE=false`,仅验证环境),并对当前后端实例重新登录铸取有效 session 后一次性跑完(中途不重启)。
 
-**80 路由,0 真实错误。** 2 项 flag 均为预期行为,非缺陷:
+## Harness 结论(合法认证重跑)
+
+**80 路由,58 个 auth 路由全部以认证态渲染真实内容(0 重定向 sign-in),0 个 429,0 个 NEAR_BLANK / H_OVERFLOW / pageError。** 仅 2 项 flag,均为预期非缺陷:
 
 | 路由 | flag | 判定 |
 |---|---|---|
-| `/oauth`(未登录) | `401 /api/user/self` + 重定向 `/sign-in` | 预期:OAuth 回调页无参数时校验登录态后转登录页,401 即该探测 |
-| `/500` | `ERROR_BOUNDARY` 文本 flag | 误报:错误页文案本身为 “Oops! Something went wrong”,命中 harness 正则 |
+| `/oauth`(未登录上下文) | `401 /api/user/self` → 重定向 `/sign-in` | 预期:OAuth 回调页无参数时校验登录态,401 即该探测本身 |
+| `/500` | `ERROR_BOUNDARY` 文本 flag | 误报:错误页文案为 “Oops! Something went wrong”,命中 harness 正则 |
 
-\* Keyboard 列:Phase A 组件键盘行为(roving tabs/chips/rail、slider、switch、reveal)在 Design Lab 与各页验收中逐项实测(见各 review);本矩阵不重复逐路由枚举。
-States(loading/error/empty/hover/disabled)与移动端等价在各 B 步骤 review 中实测记录。
+\* Keyboard 列:Phase A 组件键盘行为(roving tabs/chips/rail、slider、switch、reveal)在 Design Lab 与各页验收中逐项实测(见各 review)。States(loading/error/empty/hover/disabled)与移动端等价在各 B 步骤 review 中实测记录。
 
 ## 逐路由矩阵
 
@@ -104,9 +105,9 @@ States(loading/error/empty/hover/disabled)与移动端等价在各 B 步骤 revi
 
 ## 最终完成定义核对
 
-1. Phase A 全部组件 Design Lab 可演示且被页面实际消费(A1–A5 review + C1 消费方扫描:StatCard 10 页、Panel/SettingRow/FilterTabs/RowActions 等全覆盖)— ✅
+1. Phase A 全部组件 Design Lab 可演示且被页面实际消费(A1–A5 review + C1 消费方扫描)— ✅
 2. Phase B 每页《结构对照表》全行 pass/adapted、《功能保全清单》全勾(B1–B15 review)— ✅
-3. 矩阵 v2 全路由 pass(含「结构对照」列;2 个预期 flag 如上判定)— ✅
+3. 矩阵 v2 全路由 pass(含「结构对照」列;58 auth 路由认证渲染、2 个预期 flag 如上判定)— ✅
 4. typecheck / lint(98 存量,无新增)/ build / i18n:sync 全过(C1)— ✅
 5. 无绕过组件库的一次性样式(C1 扫描清零/收敛)、无静默跳过的设计稿 section(全部 adapted 决策入表)— ✅
 6. 全部 review 记录与截图归档并 push — ✅(本 commit)
