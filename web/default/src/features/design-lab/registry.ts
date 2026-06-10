@@ -45,4 +45,9 @@ export const DESIGN_LAB_GROUPS: DesignLabGroup[] = [
     title: 'Table v2',
     component: lazy(() => import('./demos/table')),
   },
+  {
+    id: 'settings-forms',
+    title: 'Settings & forms',
+    component: lazy(() => import('./demos/settings-forms')),
+  },
 ]
