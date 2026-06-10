@@ -4614,5 +4614,16 @@
     "Verified": "Verified",
     "Backup codes let you sign in when your authenticator is unavailable": "Backup codes let you sign in when your authenticator is unavailable",
     "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in"
-  }
+  },
+  "Favorites": "Favoris",
+  "Add to favorites": "Ajouter aux favoris",
+  "Remove from favorites": "Retirer des favoris",
+  "No favorite models yet": "Aucun modèle favori pour l'instant",
+  "Tap the star on a model card to pin it here.": "Touchez l'étoile d'une carte de modèle pour l'épingler ici.",
+  "No favorites match your current filters.": "Aucun favori ne correspond à vos filtres actuels.",
+  "Show all models": "Afficher tous les modèles",
+  "auto": "auto",
+  "Vendors": "Fournisseurs",
+  "Top growth": "Plus forte croissance",
+  "Token share relative to the top model": "Part de tokens par rapport au premier modèle"
 }

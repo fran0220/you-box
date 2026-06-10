@@ -41,10 +41,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  CodeBlock,
-  CodeBlockCopyButton,
-} from '@/components/ai-elements/code-block'
+import { CodeBlock } from '@/components/ai-elements/code-block'
 import {
   buildRateLimits,
   buildSupportedParameters,
@@ -78,6 +75,15 @@ const LANG_HIGHLIGHT: Record<Lang, BundledLanguage> = {
   python: 'python',
   typescript: 'typescript',
   javascript: 'javascript',
+}
+
+// Chrome-bar filename shown in the CodeBlock title bar (R2-B14 #5); the
+// built-in copy button in the bar replaces the old floating copy control.
+const LANG_TITLES: Record<Lang, string> = {
+  curl: 'curl',
+  python: 'main.py',
+  typescript: 'client.ts',
+  javascript: 'client.js',
 }
 
 type SampleContext = {
@@ -538,9 +544,11 @@ function CodeSamplesSection(props: {
       </div>
 
       <div className='mt-3'>
-        <CodeBlock code={code} language={LANG_HIGHLIGHT[lang]}>
-          <CodeBlockCopyButton />
-        </CodeBlock>
+        <CodeBlock
+          code={code}
+          language={LANG_HIGHLIGHT[lang]}
+          title={LANG_TITLES[lang]}
+        />
       </div>
 
       <p className='text-muted-foreground mt-2 text-xs'>

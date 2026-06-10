@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router'
-import { ArrowLeft, Code2, HeartPulse, Info, Timer } from 'lucide-react'
+import { ArrowLeft, Code2, HeartPulse, Info } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
@@ -45,6 +45,7 @@ import { CopyButton } from '@/components/copy-button'
 import { sideDrawerContentClassName } from '@/components/drawer-layout'
 import { GroupBadge } from '@/components/group-badge'
 import { PublicLayout } from '@/components/layout'
+import { Panel, PanelBody } from '@/components/patterns'
 import { getPerfMetrics } from '@/features/performance-metrics/api'
 import {
   formatLatency,
@@ -169,37 +170,45 @@ function ModelSignalsSection(props: {
   )
 }
 
-function OverviewMetric(props: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
+// ----------------------------------------------------------------------------
+// Spec card (R2-B14 #3) — display-font key numbers at the top of Overview.
+// Replaces the previous OverviewSummaryGrid (its TPS / latency / success-rate
+// metrics live on as spec items, so no information is lost) and adds the
+// base Input/Output (or per-request) price. Context window / max output are
+// not available from the pricing API, so only obtainable items render; a
+// separate "uptime" figure does not exist either — the 24h success rate is
+// the availability signal (recorded adaptation in r2-b14).
+function SpecItem(props: {
+  label: React.ReactNode
   value: React.ReactNode
   intent?: 'default' | 'warning' | 'success'
 }) {
-  const Icon = props.icon
   const intent = props.intent ?? 'default'
-
   return (
-    <div className='flex min-w-0 items-center gap-2 px-3 py-2'>
-      <Icon className='text-muted-foreground/70 size-3.5 shrink-0' />
-      <div className='min-w-0 flex-1'>
-        <div className='text-muted-foreground truncate text-[10px] font-medium tracking-wider uppercase'>
-          {props.label}
-        </div>
-        <div
-          className={cn(
-            'text-foreground truncate font-mono text-sm font-semibold tabular-nums',
-            intent === 'warning' && 'text-amber-600 dark:text-amber-400',
-            intent === 'success' && 'text-success'
-          )}
-        >
-          {props.value}
-        </div>
+    <div className='min-w-0'>
+      <div className='text-muted-foreground truncate font-mono text-[9px] tracking-[0.06em] uppercase'>
+        {props.label}
+      </div>
+      <div
+        className={cn(
+          'font-display text-foreground mt-1 truncate text-xl font-bold tracking-[-0.02em] tabular-nums',
+          intent === 'warning' && 'text-amber-600 dark:text-amber-400',
+          intent === 'success' && 'text-success'
+        )}
+      >
+        {props.value}
       </div>
     </div>
   )
 }
 
-function OverviewSummaryGrid(props: { model: PricingModel }) {
+function ModelSpecCard(props: {
+  model: PricingModel
+  priceRate: number
+  usdExchangeRate: number
+  tokenUnit: TokenUnit
+  showRechargePrice: boolean
+}) {
   const { t } = useTranslation()
   const metricsQuery = useQuery({
     queryKey: ['perf-metrics', props.model.model_name],
@@ -207,57 +216,149 @@ function OverviewSummaryGrid(props: { model: PricingModel }) {
     staleTime: 60 * 1000,
   })
 
-  const groups = metricsQuery.data?.data.groups ?? []
-  const successRates = groups
-    .map((group) => group.success_rate)
-    .filter((rate) => Number.isFinite(rate))
-  const successRate =
-    successRates.length > 0
-      ? successRates.reduce((sum, rate) => sum + rate, 0) / successRates.length
-      : Number.NaN
-  let successIntent: 'default' | 'warning' | 'success' = 'warning'
-  if (successRate >= 99.9) {
-    successIntent = 'success'
-  } else if (successRate >= 99) {
-    successIntent = 'default'
+  const tokenUnitLabel = props.tokenUnit === 'K' ? '1K' : '1M'
+  const baseGroupKey = '_base'
+  const baseGroupRatioMap = { [baseGroupKey]: 1 }
+  const isTokenBased = isTokenBasedModel(props.model)
+  const dynamicSummary = getDynamicPricingSummary(props.model, {
+    tokenUnit: props.tokenUnit,
+    showRechargePrice: props.showRechargePrice,
+    priceRate: props.priceRate,
+    usdExchangeRate: props.usdExchangeRate,
+    groupRatioMultiplier: 1,
+  })
+
+  const items: {
+    key: string
+    label: React.ReactNode
+    value: React.ReactNode
+    intent?: 'default' | 'warning' | 'success'
+  }[] = []
+
+  if (dynamicSummary) {
+    if (!dynamicSummary.isSpecialExpression) {
+      for (const entry of dynamicSummary.primaryEntries.slice(0, 2)) {
+        items.push({
+          key: `price-${entry.key}`,
+          label: `${t(entry.shortLabel)} / ${tokenUnitLabel}`,
+          value: entry.formatted,
+        })
+      }
+    }
+  } else if (isTokenBased) {
+    items.push(
+      {
+        key: 'price-input',
+        label: `${t('Input')} / ${tokenUnitLabel}`,
+        value: formatGroupPrice(
+          props.model,
+          baseGroupKey,
+          'input',
+          props.tokenUnit,
+          props.showRechargePrice,
+          props.priceRate,
+          props.usdExchangeRate,
+          baseGroupRatioMap
+        ),
+      },
+      {
+        key: 'price-output',
+        label: `${t('Output')} / ${tokenUnitLabel}`,
+        value: formatGroupPrice(
+          props.model,
+          baseGroupKey,
+          'output',
+          props.tokenUnit,
+          props.showRechargePrice,
+          props.priceRate,
+          props.usdExchangeRate,
+          baseGroupRatioMap
+        ),
+      }
+    )
+  } else {
+    items.push({
+      key: 'price-request',
+      label: t('Per request'),
+      value: formatFixedPrice(
+        props.model,
+        baseGroupKey,
+        props.showRechargePrice,
+        props.priceRate,
+        props.usdExchangeRate,
+        baseGroupRatioMap
+      ),
+    })
   }
-  const tpsValues = groups
-    .map((group) => group.avg_tps)
-    .filter((value) => value > 0)
-  const avgTps =
-    tpsValues.length > 0
-      ? tpsValues.reduce((sum, value) => sum + value, 0) / tpsValues.length
-      : 0
-  const latencyValues = groups
-    .map((group) => group.avg_latency_ms)
-    .filter((value) => value > 0)
-  const avgLatency =
-    latencyValues.length > 0
-      ? Math.round(
-          latencyValues.reduce((sum, value) => sum + value, 0) /
-            latencyValues.length
-        )
-      : 0
+
+  const groups = metricsQuery.data?.data.groups ?? []
+  if (groups.length > 0) {
+    const tpsValues = groups
+      .map((group) => group.avg_tps)
+      .filter((value) => value > 0)
+    const avgTps =
+      tpsValues.length > 0
+        ? tpsValues.reduce((sum, value) => sum + value, 0) / tpsValues.length
+        : 0
+    const latencyValues = groups
+      .map((group) => group.avg_latency_ms)
+      .filter((value) => value > 0)
+    const avgLatency =
+      latencyValues.length > 0
+        ? Math.round(
+            latencyValues.reduce((sum, value) => sum + value, 0) /
+              latencyValues.length
+          )
+        : 0
+    const successRates = groups
+      .map((group) => group.success_rate)
+      .filter((rate) => Number.isFinite(rate))
+    const successRate =
+      successRates.length > 0
+        ? successRates.reduce((sum, rate) => sum + rate, 0) /
+          successRates.length
+        : Number.NaN
+
+    items.push(
+      { key: 'tps', label: 'TPS', value: formatThroughput(avgTps) },
+      {
+        key: 'latency',
+        label: t('Average latency'),
+        value: formatLatency(avgLatency),
+      }
+    )
+
+    if (Number.isFinite(successRate)) {
+      let successIntent: 'default' | 'warning' | 'success' = 'warning'
+      if (successRate >= 99.9) {
+        successIntent = 'success'
+      } else if (successRate >= 99) {
+        successIntent = 'default'
+      }
+      items.push({
+        key: 'success',
+        label: t('Success rate'),
+        value: formatUptimePct(successRate),
+        intent: successIntent,
+      })
+    }
+  }
+
+  if (items.length === 0) return null
 
   return (
-    <div className='bg-muted/20 grid overflow-hidden rounded-lg border sm:grid-cols-3 sm:divide-x'>
-      <OverviewMetric
-        icon={Timer}
-        label='TPS'
-        value={formatThroughput(avgTps)}
-      />
-      <OverviewMetric
-        icon={Timer}
-        label={t('Average latency')}
-        value={formatLatency(avgLatency)}
-      />
-      <OverviewMetric
-        icon={HeartPulse}
-        label={t('Success rate')}
-        value={formatUptimePct(successRate)}
-        intent={successIntent}
-      />
-    </div>
+    <Panel>
+      <PanelBody className='grid grid-cols-2 gap-4 sm:grid-cols-3'>
+        {items.map((item) => (
+          <SpecItem
+            key={item.key}
+            label={item.label}
+            value={item.value}
+            intent={item.intent}
+          />
+        ))}
+      </PanelBody>
+    </Panel>
   )
 }
 
@@ -269,9 +370,7 @@ function ModelHeader(props: { model: PricingModel }) {
   const { t } = useTranslation()
   const model = props.model
   const modelIconKey = model.icon || model.vendor_icon
-  const modelIcon = modelIconKey
-    ? getLobeIcon(modelIconKey, 20)
-    : null
+  const modelIcon = modelIconKey ? getLobeIcon(modelIconKey, 20) : null
   const description = model.description || model.vendor_description || null
   const tags = parseTags(model.tags)
   const isSpecialExpression =
@@ -308,7 +407,7 @@ function ModelHeader(props: { model: PricingModel }) {
         {model.billing_mode === 'tiered_expr' && model.billing_expr && (
           <>
             <span className='text-muted-foreground/30'>·</span>
-            <span className='bg-[var(--warning-subtle)] text-warning rounded px-1.5 py-0.5 text-[10px] font-medium'>
+            <span className='text-warning rounded bg-[var(--warning-subtle)] px-1.5 py-0.5 text-[10px] font-medium'>
               {isSpecialExpression
                 ? t('Special billing expression')
                 : t('Dynamic Pricing')}
@@ -404,7 +503,7 @@ function PriceSection(props: {
       return (
         <section>
           <SectionTitle>{t('Base Price')}</SectionTitle>
-          <div className='border-warning/30 bg-[var(--warning-subtle)] rounded-lg border p-3'>
+          <div className='border-warning/30 rounded-lg border bg-[var(--warning-subtle)] p-3'>
             <div className='text-warning text-sm font-medium'>
               {t('Special billing expression')}
             </div>
@@ -654,7 +753,7 @@ function GroupPricingSection(props: {
         <section>
           <SectionTitle>{t('Pricing by Group')}</SectionTitle>
           <AutoGroupChain model={props.model} autoGroups={props.autoGroups} />
-          <div className='border-warning/30 bg-[var(--warning-subtle)] rounded-lg border p-3'>
+          <div className='border-warning/30 rounded-lg border bg-[var(--warning-subtle)] p-3'>
             <div className='text-warning text-sm font-medium'>
               {t('Special billing expression')}
             </div>
@@ -939,7 +1038,13 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
         </TabsList>
 
         <TabsContent value='overview' className='space-y-6 outline-none'>
-          <OverviewSummaryGrid model={props.model} />
+          <ModelSpecCard
+            model={props.model}
+            priceRate={props.priceRate}
+            usdExchangeRate={props.usdExchangeRate}
+            tokenUnit={props.tokenUnit}
+            showRechargePrice={showRechargePrice}
+          />
 
           <section className='bg-card/60 space-y-5 rounded-xl border p-4 shadow-sm'>
             <SectionTitle>{t('Pricing')}</SectionTitle>

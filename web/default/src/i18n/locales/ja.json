@@ -4614,5 +4614,16 @@
     "Verified": "Verified",
     "Backup codes let you sign in when your authenticator is unavailable": "Backup codes let you sign in when your authenticator is unavailable",
     "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in"
-  }
+  },
+  "Favorites": "お気に入り",
+  "Add to favorites": "お気に入りに追加",
+  "Remove from favorites": "お気に入りから削除",
+  "No favorite models yet": "お気に入りのモデルはまだありません",
+  "Tap the star on a model card to pin it here.": "モデルカードの星をタップするとここに固定されます。",
+  "No favorites match your current filters.": "現在のフィルターに一致するお気に入りはありません。",
+  "Show all models": "すべてのモデルを表示",
+  "auto": "自動",
+  "Vendors": "ベンダー",
+  "Top growth": "最高成長",
+  "Token share relative to the top model": "トップモデルに対するトークンシェア"
 }

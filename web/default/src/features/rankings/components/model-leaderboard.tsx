@@ -18,10 +18,10 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
+import { DeltaBadge, ProgressBar } from '@/components/patterns'
 import { formatTokens } from '../lib/format'
 import type { ModelRanking } from '../types'
 import { ModelLink, VendorLink } from './entity-links'
-import { GrowthText } from './growth-text'
 
 type ModelLeaderboardProps = {
   rows: ModelRanking[]
@@ -38,6 +38,9 @@ type ModelLeaderboardProps = {
  * `rows` evenly between the two columns so the visual rhythm matches a
  * single ranked list rather than two independent lists.
  *
+ * Each row carries a share ProgressBar scaled against the leader's token
+ * volume, and growth renders as a DeltaBadge (R2-B14 #8).
+ *
  * Both the model name and vendor name are clickable: model jumps to
  * `/pricing/{modelName}` and vendor jumps to `/pricing?vendor={vendor}`.
  */
@@ -47,6 +50,10 @@ export function ModelLeaderboard(props: ModelLeaderboardProps) {
   const left = limited.slice(0, half)
   const right = limited.slice(half)
   const variant = props.variant ?? 'default'
+  const maxTokens = limited.reduce(
+    (max, row) => Math.max(max, row.total_tokens),
+    0
+  )
 
   if (limited.length === 0) {
     return null
@@ -54,15 +61,33 @@ export function ModelLeaderboard(props: ModelLeaderboardProps) {
 
   return (
     <div className='grid grid-cols-1 gap-x-8 md:grid-cols-2'>
-      <ModelList rows={left} variant={variant} />
-      {right.length > 0 && <ModelList rows={right} variant={variant} />}
+      <ModelList rows={left} variant={variant} maxTokens={maxTokens} />
+      {right.length > 0 && (
+        <ModelList rows={right} variant={variant} maxTokens={maxTokens} />
+      )}
     </div>
+  )
+}
+
+function GrowthBadge(props: { value: number; className?: string }) {
+  const v = props.value
+  const finite = Number.isFinite(v)
+  const direction = !finite || v === 0 ? 'flat' : v > 0 ? 'up' : 'down'
+  const text = finite
+    ? `${Math.abs(v).toFixed(Math.abs(v) >= 100 ? 0 : 1)}%`
+    : '0%'
+  return (
+    <DeltaBadge direction={direction} className={props.className}>
+      {text}
+    </DeltaBadge>
   )
 }
 
 function ModelList(props: {
   rows: ModelRanking[]
   variant: 'default' | 'compact'
+  /** Leader's token volume — every row's share bar is scaled against it. */
+  maxTokens: number
 }) {
   const { t } = useTranslation()
   const compact = props.variant === 'compact'
@@ -106,6 +131,12 @@ function ModelList(props: {
                 {row.vendor.toLowerCase()}
               </VendorLink>
             </p>
+            <ProgressBar
+              value={row.total_tokens}
+              max={props.maxTokens}
+              label={t('Token share relative to the top model')}
+              className={compact ? 'mt-1 h-1 max-w-40' : 'mt-1.5 h-1 max-w-56'}
+            />
           </div>
           <div className='shrink-0 text-right'>
             <div
@@ -125,9 +156,9 @@ function ModelList(props: {
                 </>
               )}
             </div>
-            <GrowthText
+            <GrowthBadge
               value={row.growth_pct}
-              className={compact ? 'text-[10px]' : 'text-[11px]'}
+              className={compact ? 'text-[10px] [&>svg]:size-3' : 'text-[11px]'}
             />
           </div>
         </li>

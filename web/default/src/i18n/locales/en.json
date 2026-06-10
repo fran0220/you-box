@@ -4614,5 +4614,16 @@
     "Verified": "Verified",
     "Backup codes let you sign in when your authenticator is unavailable": "Backup codes let you sign in when your authenticator is unavailable",
     "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in"
-  }
+  },
+  "Favorites": "Favorites",
+  "Add to favorites": "Add to favorites",
+  "Remove from favorites": "Remove from favorites",
+  "No favorite models yet": "No favorite models yet",
+  "Tap the star on a model card to pin it here.": "Tap the star on a model card to pin it here.",
+  "No favorites match your current filters.": "No favorites match your current filters.",
+  "Show all models": "Show all models",
+  "auto": "auto",
+  "Vendors": "Vendors",
+  "Top growth": "Top growth",
+  "Token share relative to the top model": "Token share relative to the top model"
 }

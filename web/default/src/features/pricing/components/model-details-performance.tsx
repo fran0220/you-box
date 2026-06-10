@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, HeartPulse, Timer } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -278,28 +279,42 @@ export function ModelDetailsPerformance(props: { model: PricingModel }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {performances.map((perf) => (
-                <TableRow key={perf.group}>
-                  <TableCell className='py-2.5'>
-                    <GroupBadge group={perf.group} size='sm' />
-                  </TableCell>
-                  <TableCell className='py-2.5 text-right font-mono'>
-                    {formatThroughput(perf.avg_tps)}
-                  </TableCell>
-                  <TableCell className='py-2.5 text-right font-mono'>
-                    {formatLatency(perf.avg_ttft_ms)}
-                  </TableCell>
-                  <TableCell className='text-muted-foreground py-2.5 text-right font-mono'>
-                    {formatLatency(perf.avg_latency_ms)}
-                  </TableCell>
-                  <TableCell className='py-2.5'>
-                    <UptimeSparkline
-                      size='sm'
-                      series={uptimeByGroup[perf.group] ?? []}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
+              {performances.map((perf) => {
+                // R2-B14 #6: the gateway routes unscoped requests through
+                // the site default group — the closest equivalent of the
+                // design's "YouBox Auto" provider row (recorded adaptation).
+                const isAutoGroup = perf.group === 'default'
+                return (
+                  <TableRow
+                    key={perf.group}
+                    className={cn(
+                      isAutoGroup && 'bg-brand-subtle hover:bg-brand-subtle'
+                    )}
+                  >
+                    <TableCell className='py-2.5'>
+                      <GroupBadge group={perf.group} size='sm' />
+                    </TableCell>
+                    <TableCell className='py-2.5 text-right font-mono'>
+                      {formatThroughput(perf.avg_tps)}
+                    </TableCell>
+                    <TableCell className='py-2.5 text-right font-mono'>
+                      {formatLatency(perf.avg_ttft_ms)}
+                    </TableCell>
+                    <TableCell className='text-muted-foreground py-2.5 text-right font-mono'>
+                      {formatLatency(perf.avg_latency_ms)}
+                    </TableCell>
+                    <TableCell className='py-2.5'>
+                      <div className='flex items-center justify-between gap-2'>
+                        <UptimeSparkline
+                          size='sm'
+                          series={uptimeByGroup[perf.group] ?? []}
+                        />
+                        {isAutoGroup && <Badge>{t('auto')}</Badge>}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         </div>

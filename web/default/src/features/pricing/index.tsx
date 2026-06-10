@@ -17,7 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useMemo, useState } from 'react'
+import { Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import {
@@ -31,6 +33,7 @@ import {
   ModelDetailsDrawer,
 } from './components'
 import { EXCLUDED_GROUPS, VIEW_MODES } from './constants'
+import { useFavorites } from './hooks/use-favorites'
 import { useFilters } from './hooks/use-filters'
 import { usePricingData } from './hooks/use-pricing-data'
 
@@ -39,6 +42,12 @@ export function Pricing() {
   const [selectedModelName, setSelectedModelName] = useState<string | null>(
     null
   )
+  // Favorites filter (R2-B14 #1): local-only star set; the toggle lives in
+  // the toolbar and narrows whatever the regular filters produced. Table
+  // view intentionally has no per-row star (cards are the favoriting
+  // surface; the table stays a dense comparison grid).
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
+  const { favorites, isFavorite } = useFavorites()
 
   const {
     models,
@@ -108,7 +117,38 @@ export function Pricing() {
     clearSearch()
   }, [clearFilters, clearSearch])
 
+  const displayedModels = useMemo(
+    () =>
+      showFavoritesOnly
+        ? filteredModels.filter((model) => isFavorite(model.model_name))
+        : filteredModels,
+    [filteredModels, isFavorite, showFavoritesOnly]
+  )
+
   const renderPricingContent = () => {
+    if (showFavoritesOnly && displayedModels.length === 0) {
+      return (
+        <div className='flex min-h-[320px] flex-col items-center justify-center rounded-lg border border-dashed px-6 py-12 text-center'>
+          <Star className='text-muted-foreground/40 mb-3 size-10' />
+          <h3 className='text-foreground mb-1 text-base font-semibold'>
+            {t('No favorite models yet')}
+          </h3>
+          <p className='text-muted-foreground mb-5 max-w-xs text-sm'>
+            {favorites.size === 0
+              ? t('Tap the star on a model card to pin it here.')
+              : t('No favorites match your current filters.')}
+          </p>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => setShowFavoritesOnly(false)}
+          >
+            {t('Show all models')}
+          </Button>
+        </div>
+      )
+    }
+
     if (filteredModels.length === 0) {
       return (
         <EmptyState
@@ -122,7 +162,7 @@ export function Pricing() {
     if (viewMode === VIEW_MODES.CARD) {
       return (
         <ModelCardGrid
-          models={filteredModels}
+          models={displayedModels}
           onModelClick={handleModelClick}
           priceRate={priceRate}
           usdExchangeRate={usdExchangeRate}
@@ -134,7 +174,7 @@ export function Pricing() {
 
     return (
       <PricingTable
-        models={filteredModels}
+        models={displayedModels}
         priceRate={priceRate}
         usdExchangeRate={usdExchangeRate}
         tokenUnit={tokenUnit}
@@ -216,8 +256,10 @@ export function Pricing() {
 
             <main className='min-w-0 space-y-4'>
               <PricingToolbar
-                filteredCount={filteredModels.length}
+                filteredCount={displayedModels.length}
                 totalCount={models?.length}
+                showFavoritesOnly={showFavoritesOnly}
+                onShowFavoritesOnlyChange={setShowFavoritesOnly}
                 sortBy={sortBy}
                 onSortChange={setSortBy}
                 tokenUnit={tokenUnit}

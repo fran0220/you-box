@@ -4614,5 +4614,16 @@
     "Verified": "已验证",
     "Backup codes let you sign in when your authenticator is unavailable": "备份码可在无法使用验证器时用于登录",
     "Your account will no longer require a verification code at sign-in": "您的账户登录时将不再需要验证码"
-  }
+  },
+  "Favorites": "收藏",
+  "Add to favorites": "加入收藏",
+  "Remove from favorites": "取消收藏",
+  "No favorite models yet": "暂无收藏的模型",
+  "Tap the star on a model card to pin it here.": "点击模型卡片上的星标即可收藏到这里。",
+  "No favorites match your current filters.": "没有符合当前筛选条件的收藏模型。",
+  "Show all models": "显示全部模型",
+  "auto": "自动",
+  "Vendors": "供应商",
+  "Top growth": "增长最快",
+  "Token share relative to the top model": "相对榜首模型的 Token 份额"
 }

@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useState } from 'react'
-import { ArrowUpDown, Check, Filter, Grid2X2, Table2 } from 'lucide-react'
+import { ArrowUpDown, Check, Filter, Grid2X2, Star, Table2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -64,6 +64,9 @@ type SegmentOption = {
 export interface PricingToolbarProps {
   filteredCount: number
   totalCount?: number
+  /** Favorites-only filter (R2-B14 #1, localStorage-backed). */
+  showFavoritesOnly: boolean
+  onShowFavoritesOnlyChange: (value: boolean) => void
   sortBy: string
   onSortChange: (value: string) => void
   tokenUnit: TokenUnit
@@ -183,16 +186,40 @@ export function PricingToolbar(props: PricingToolbarProps) {
             )}
           </Button>
 
+          <button
+            type='button'
+            onClick={() =>
+              props.onShowFavoritesOnlyChange(!props.showFavoritesOnly)
+            }
+            aria-pressed={props.showFavoritesOnly}
+            className={cn(
+              'inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors',
+              props.showFavoritesOnly
+                ? 'border-brand-border/50 bg-brand-subtle text-brand'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted bg-muted/60'
+            )}
+          >
+            <Star
+              className={cn(
+                'size-3.5',
+                props.showFavoritesOnly && 'fill-current'
+              )}
+              aria-hidden='true'
+            />
+            {t('Favorites')}
+          </button>
+
           <div className='text-muted-foreground flex items-baseline gap-1 text-sm'>
             <span className='text-foreground font-semibold tabular-nums'>
               {props.filteredCount.toLocaleString()}
             </span>
             <span>{props.filteredCount === 1 ? t('model') : t('models')}</span>
-            {props.hasActiveFilters && props.totalCount && (
-              <span className='text-muted-foreground/60 text-xs'>
-                / {props.totalCount.toLocaleString()}
-              </span>
-            )}
+            {(props.hasActiveFilters || props.showFavoritesOnly) &&
+              props.totalCount && (
+                <span className='text-muted-foreground/60 text-xs'>
+                  / {props.totalCount.toLocaleString()}
+                </span>
+              )}
           </div>
         </div>
 

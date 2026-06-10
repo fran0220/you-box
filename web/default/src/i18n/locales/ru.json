@@ -4614,5 +4614,16 @@
     "Verified": "Verified",
     "Backup codes let you sign in when your authenticator is unavailable": "Backup codes let you sign in when your authenticator is unavailable",
     "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in"
-  }
+  },
+  "Favorites": "Избранное",
+  "Add to favorites": "Добавить в избранное",
+  "Remove from favorites": "Убрать из избранного",
+  "No favorite models yet": "Пока нет избранных моделей",
+  "Tap the star on a model card to pin it here.": "Нажмите на звёздочку на карточке модели, чтобы закрепить её здесь.",
+  "No favorites match your current filters.": "Нет избранных, соответствующих текущим фильтрам.",
+  "Show all models": "Показать все модели",
+  "auto": "авто",
+  "Vendors": "Поставщики",
+  "Top growth": "Лидер роста",
+  "Token share relative to the top model": "Доля токенов относительно лидера"
 }

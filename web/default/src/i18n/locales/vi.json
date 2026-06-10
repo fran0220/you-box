@@ -4614,5 +4614,16 @@
     "Verified": "Verified",
     "Backup codes let you sign in when your authenticator is unavailable": "Backup codes let you sign in when your authenticator is unavailable",
     "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in"
-  }
+  },
+  "Favorites": "Yêu thích",
+  "Add to favorites": "Thêm vào yêu thích",
+  "Remove from favorites": "Bỏ khỏi yêu thích",
+  "No favorite models yet": "Chưa có mô hình yêu thích nào",
+  "Tap the star on a model card to pin it here.": "Nhấn vào ngôi sao trên thẻ mô hình để ghim vào đây.",
+  "No favorites match your current filters.": "Không có mục yêu thích nào khớp với bộ lọc hiện tại.",
+  "Show all models": "Hiển thị tất cả mô hình",
+  "auto": "tự động",
+  "Vendors": "Nhà cung cấp",
+  "Top growth": "Tăng trưởng cao nhất",
+  "Token share relative to the top model": "Tỷ lệ token so với mô hình đứng đầu"
 }
