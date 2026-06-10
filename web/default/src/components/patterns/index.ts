@@ -33,3 +33,7 @@ export { NotificationGroup, NotificationItem } from './notification-item'
 export { FilterChips, type FilterChipItem } from './filter-chips'
 export { PlanCard } from './plan-card'
 export { InvoiceRow, TransactionRow } from './ledger-rows'
+export {
+  SegmentedControl,
+  type SegmentedControlOption,
+} from './segmented-control'

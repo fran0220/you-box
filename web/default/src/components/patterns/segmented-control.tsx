@@ -1,0 +1,93 @@
+/*
+Copyright (C) 2023-2026 QuantumNous
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+For commercial licensing, please contact support@quantumnous.com
+*/
+import { cn } from '@/lib/utils'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+
+export type SegmentedControlOption = {
+  value: string
+  label?: string
+  icon?: React.ComponentType<{ className?: string }>
+  tooltip?: string
+}
+
+export type SegmentedControlProps = {
+  options: SegmentedControlOption[]
+  value: string
+  onChange: (value: string) => void
+  ariaLabel: string
+  className?: string
+}
+
+/**
+ * SegmentedControl — compact toggle group of mutually exclusive options
+ * (role=group + aria-pressed buttons). Options render a text label, an
+ * icon, or both; icon-only options can attach a tooltip.
+ */
+export function SegmentedControl(props: SegmentedControlProps) {
+  return (
+    <div
+      role='group'
+      aria-label={props.ariaLabel}
+      className={cn(
+        'bg-muted/60 inline-flex h-8 items-center rounded-lg border p-0.5',
+        props.className
+      )}
+    >
+      {props.options.map((option) => {
+        const Icon = option.icon
+        const isActive = option.value === props.value
+        const button = (
+          <button
+            key={option.value}
+            type='button'
+            onClick={() => props.onChange(option.value)}
+            aria-pressed={isActive}
+            className={cn(
+              'inline-flex h-full items-center justify-center rounded-md text-xs font-medium transition-all',
+              Icon && !option.label ? 'w-7' : 'gap-1.5 px-3',
+              isActive
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            {Icon && <Icon className='size-3.5' />}
+            {option.label}
+          </button>
+        )
+
+        if (!option.tooltip) {
+          return button
+        }
+
+        return (
+          <Tooltip key={option.value}>
+            <TooltipTrigger render={button}></TooltipTrigger>
+            <TooltipContent side='bottom' className='text-xs'>
+              {option.tooltip}
+            </TooltipContent>
+          </Tooltip>
+        )
+      })}
+    </div>
+  )
+}

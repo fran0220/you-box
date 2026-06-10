@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { Suspense, useEffect, useState } from 'react'
 import { FlaskConical } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Eyebrow } from '@/components/patterns'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { DESIGN_LAB_GROUPS } from './registry'
 
@@ -95,16 +96,13 @@ export default function DesignLab() {
                 className='scroll-mt-20'
                 aria-label={group.title}
               >
-                <p className='text-brand mb-1 font-mono text-[10px] font-medium tracking-[0.1em] uppercase'>
-                  {'// '}
-                  {group.id}
-                </p>
+                <Eyebrow className='mb-1'>{group.id}</Eyebrow>
                 <h2 className='font-display mb-4 text-xl font-bold tracking-[-0.02em]'>
                   {group.title}
                 </h2>
                 <Suspense
                   fallback={
-                    <div className='bg-surface-2 h-32 animate-pulse rounded-lg' />
+                    <div className='bg-surface-2 h-32 rounded-lg motion-safe:animate-pulse' />
                   }
                 >
                   <Demos />

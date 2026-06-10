@@ -208,7 +208,7 @@ export function StatusBadge({
         appearance === 'soft' &&
           cn('font-mono', softColorMap[computedVariant] ?? 'bg-surface-3'),
         appearance === 'solid' && 'font-mono',
-        pulse && 'animate-pulse',
+        pulse && 'motion-safe:animate-pulse',
         copyable &&
           'cursor-copy hover:brightness-95 active:scale-95 dark:hover:brightness-110',
         className

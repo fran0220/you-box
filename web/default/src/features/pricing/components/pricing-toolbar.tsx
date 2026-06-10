@@ -35,11 +35,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { SegmentedControl } from '@/components/patterns'
 import {
   sideDrawerContentClassName,
   sideDrawerFormClassName,
@@ -53,13 +49,6 @@ import {
 } from '../constants'
 import type { PricingModel, PricingVendor, TokenUnit } from '../types'
 import { PricingSidebar } from './pricing-sidebar'
-
-type SegmentOption = {
-  value: string
-  label?: string
-  icon?: React.ComponentType<{ className?: string }>
-  tooltip?: string
-}
 
 export interface PricingToolbarProps {
   filteredCount: number
@@ -93,57 +82,6 @@ export interface PricingToolbarProps {
   hasActiveFilters: boolean
   activeFilterCount: number
   onClearFilters: () => void
-}
-
-function SegmentedControl(props: {
-  options: SegmentOption[]
-  value: string
-  onChange: (value: string) => void
-  ariaLabel: string
-}) {
-  return (
-    <div
-      role='group'
-      aria-label={props.ariaLabel}
-      className='bg-muted/60 inline-flex h-8 items-center rounded-lg border p-0.5'
-    >
-      {props.options.map((option) => {
-        const Icon = option.icon
-        const isActive = option.value === props.value
-        const button = (
-          <button
-            key={option.value}
-            type='button'
-            onClick={() => props.onChange(option.value)}
-            aria-pressed={isActive}
-            className={cn(
-              'inline-flex h-full items-center justify-center rounded-md text-xs font-medium transition-all',
-              Icon && !option.label ? 'w-7' : 'gap-1.5 px-3',
-              isActive
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            {Icon && <Icon className='size-3.5' />}
-            {option.label}
-          </button>
-        )
-
-        if (!option.tooltip) {
-          return button
-        }
-
-        return (
-          <Tooltip key={option.value}>
-            <TooltipTrigger render={button}></TooltipTrigger>
-            <TooltipContent side='bottom' className='text-xs'>
-              {option.tooltip}
-            </TooltipContent>
-          </Tooltip>
-        )
-      })}
-    </div>
-  )
 }
 
 export function PricingToolbar(props: PricingToolbarProps) {

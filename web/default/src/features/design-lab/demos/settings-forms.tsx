@@ -21,10 +21,12 @@ import {
   Bell,
   Box,
   CreditCard,
+  Grid2X2,
   Landmark,
   Lock,
   Settings,
   Shield,
+  Table2,
   Wallet,
 } from 'lucide-react'
 import {
@@ -33,6 +35,7 @@ import {
   CurrencyInput,
   MonoInput,
   ParameterSlider,
+  SegmentedControl,
   ThresholdInput,
 } from '@/components/patterns'
 import { Button } from '@/components/ui/button'
@@ -72,6 +75,8 @@ export default function SettingsFormsDemos() {
   const [filters, setFilters] = useState<string[]>(['billing'])
   const [temperature, setTemperature] = useState(0.7)
   const [maxTokens, setMaxTokens] = useState(4096)
+  const [priceMode, setPriceMode] = useState('standard')
+  const [viewMode, setViewMode] = useState('card')
 
   return (
     <div className='flex flex-col gap-4'>
@@ -222,6 +227,34 @@ export default function SettingsFormsDemos() {
             <Chip value='system'>System</Chip>
             <Chip value='usage'>Usage</Chip>
           </ChipGroup>
+        </DemoRow>
+      </DemoBlock>
+
+      <DemoBlock
+        title='SegmentedControl'
+        description='role=group + aria-pressed toggle buttons; text options or icon-only options with tooltips'
+      >
+        <DemoRow label='text options — price display mode'>
+          <SegmentedControl
+            options={[
+              { value: 'standard', label: 'Standard' },
+              { value: 'recharge', label: 'Recharge' },
+            ]}
+            value={priceMode}
+            onChange={setPriceMode}
+            ariaLabel='Price display mode'
+          />
+        </DemoRow>
+        <DemoRow label='icon options + tooltips — view mode'>
+          <SegmentedControl
+            options={[
+              { value: 'card', icon: Grid2X2, tooltip: 'Card view' },
+              { value: 'table', icon: Table2, tooltip: 'Table view' },
+            ]}
+            value={viewMode}
+            onChange={setViewMode}
+            ariaLabel='View mode'
+          />
         </DemoRow>
       </DemoBlock>
 

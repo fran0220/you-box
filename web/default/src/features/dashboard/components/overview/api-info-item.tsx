@@ -71,7 +71,7 @@ export function ApiInfoItemComponent(props: ApiInfoItemProps) {
             <StatusBadge
               label={t('Testing...')}
               variant='warning'
-              className='animate-pulse'
+              className='motion-safe:animate-pulse'
               copyable={false}
             />
           )}
@@ -101,7 +101,10 @@ export function ApiInfoItemComponent(props: ApiInfoItemProps) {
             title={t('Test Latency')}
           >
             <Zap
-              className={cn('size-3.5', status.testing && 'animate-pulse')}
+              className={cn(
+                'size-3.5',
+                status.testing && 'motion-safe:animate-pulse'
+              )}
             />
           </Button>
 

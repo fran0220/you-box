@@ -351,7 +351,7 @@ export function OverviewInsights() {
           />
           <PanelBody>
             {loading ? (
-              <div className='bg-surface-2 h-[170px] animate-pulse rounded-md' />
+              <div className='bg-surface-2 h-[170px] rounded-md motion-safe:animate-pulse' />
             ) : (
               <Sparkline data={chartSeries} height={170} />
             )}
