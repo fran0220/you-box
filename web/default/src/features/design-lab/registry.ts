@@ -40,4 +40,9 @@ export const DESIGN_LAB_GROUPS: DesignLabGroup[] = [
     title: 'Data display',
     component: lazy(() => import('./demos/data-display')),
   },
+  {
+    id: 'table',
+    title: 'Table v2',
+    component: lazy(() => import('./demos/table')),
+  },
 ]

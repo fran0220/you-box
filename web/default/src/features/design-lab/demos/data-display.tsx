@@ -17,6 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Activity, Coins, Timer, Zap } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   DeltaBadge,
   Eyebrow,
@@ -29,8 +31,6 @@ import {
   StatCard,
   StatCardRow,
 } from '@/components/patterns'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { DemoBlock, DemoRow } from '../components/demo-block'
 
 const TREND = [42, 55, 48, 70, 62, 88, 76, 95, 84, 110, 102, 128]
@@ -132,7 +132,10 @@ export default function DataDisplayDemos() {
         </DemoRow>
       </DemoBlock>
 
-      <DemoBlock title='Eyebrow' description='mono uppercase brand section label'>
+      <DemoBlock
+        title='Eyebrow'
+        description='mono uppercase brand section label'
+      >
         <DemoRow label='default / plain'>
           <Eyebrow>balance</Eyebrow>
           <Eyebrow plain>pay with</Eyebrow>
@@ -169,7 +172,10 @@ export default function DataDisplayDemos() {
           <ProgressBar value={48} tone='warning' label='warning' />
           <ProgressBar value={15} tone='danger' label='danger' />
         </DemoRow>
-        <DemoRow label='value of max (182.4 of 300)' className='max-w-md flex-col'>
+        <DemoRow
+          label='value of max (182.4 of 300)'
+          className='max-w-md flex-col'
+        >
           <ProgressBar value={182.4} max={300} label='spend of limit' />
         </DemoRow>
       </DemoBlock>
@@ -178,7 +184,10 @@ export default function DataDisplayDemos() {
         title='Sparkline'
         description='area microchart; fill toggle; custom color'
       >
-        <DemoRow label='brand fill / teal line-only / danger' className='max-w-2xl'>
+        <DemoRow
+          label='brand fill / teal line-only / danger'
+          className='max-w-2xl'
+        >
           <div className='w-40'>
             <Sparkline data={TREND} />
           </div>
@@ -205,7 +214,10 @@ export default function DataDisplayDemos() {
         </DemoRow>
         <DemoRow label='inside badge context'>
           <Badge variant='secondary'>
-            7d <DeltaBadge direction='up' className='text-[10px]'>+9%</DeltaBadge>
+            7d{' '}
+            <DeltaBadge direction='up' className='text-[10px]'>
+              +9%
+            </DeltaBadge>
           </Badge>
         </DemoRow>
       </DemoBlock>

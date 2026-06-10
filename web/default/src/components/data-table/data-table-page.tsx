@@ -91,6 +91,12 @@ export type DataTablePageProps<TData> = {
   emptyAction?: React.ReactNode
 
   /**
+   * Stat header slot — typically a {@link StatCardRow} of StatCards
+   * rendered above the toolbar (table v2 anatomy: stats → filters → table).
+   */
+  statHeader?: React.ReactNode
+
+  /**
    * Custom toolbar node — fully replaces the default {@link DataTableToolbar}.
    * Useful for layouts like "primary buttons + toolbar" or feature-specific filter cards.
    * If provided, `toolbarProps` is ignored.
@@ -226,6 +232,7 @@ export function DataTablePage<TData>(props: DataTablePageProps<TData>) {
   return (
     <>
       <div className={cn('space-y-2.5 sm:space-y-3', props.className)}>
+        {props.statHeader}
         {toolbarNode}
         {mobileNode}
         {desktopNode}
@@ -378,7 +385,7 @@ function DefaultRow<TData>({
   return (
     <TableRow
       data-state={row.getIsSelected() && 'selected'}
-      className={className}
+      className={cn('group/row', className)}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>

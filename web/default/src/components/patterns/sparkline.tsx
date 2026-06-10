@@ -78,7 +78,10 @@ export function Sparkline({
               <stop offset='1' stopColor={color} stopOpacity='0' />
             </linearGradient>
           </defs>
-          <polygon points={`0,${h} ${points} ${w},${h}`} fill={`url(#${gradientId})`} />
+          <polygon
+            points={`0,${h} ${points} ${w},${h}`}
+            fill={`url(#${gradientId})`}
+          />
         </>
       )}
       <polyline

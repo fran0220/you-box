@@ -30,7 +30,12 @@ type EyebrowProps = ComponentProps<'p'> & {
  *
  * Anatomy: `// ` prefix (decorative, aria-hidden) + uppercase label.
  */
-export function Eyebrow({ plain, className, children, ...props }: EyebrowProps) {
+export function Eyebrow({
+  plain,
+  className,
+  children,
+  ...props
+}: EyebrowProps) {
   return (
     <p
       data-slot='eyebrow'

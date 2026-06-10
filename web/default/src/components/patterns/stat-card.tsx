@@ -112,7 +112,11 @@ export function StatCard({
       )}
       {sparkline != null && sparkline.length > 0 && !loading && (
         <div className='mt-3'>
-          <Sparkline data={sparkline} color={sparklineColor} height={sm ? 24 : 34} />
+          <Sparkline
+            data={sparkline}
+            color={sparklineColor}
+            height={sm ? 24 : 34}
+          />
         </div>
       )}
       {delta != null && !loading && (
@@ -149,7 +153,11 @@ export function StatCardRow({
   return (
     <div
       data-slot='stat-card-row'
-      className={cn('grid grid-cols-1 gap-3 sm:gap-4', COLUMN_CLASS[columns], className)}
+      className={cn(
+        'grid grid-cols-1 gap-3 sm:gap-4',
+        COLUMN_CLASS[columns],
+        className
+      )}
       {...props}
     />
   )

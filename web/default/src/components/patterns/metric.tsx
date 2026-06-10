@@ -32,7 +32,13 @@ type MetricProps = ComponentProps<'div'> & {
  * Metric — compact k/v pair (label over mono value) used in card
  * footers, account cards and session stats.
  */
-export function Metric({ k, v, align = 'start', className, ...props }: MetricProps) {
+export function Metric({
+  k,
+  v,
+  align = 'start',
+  className,
+  ...props
+}: MetricProps) {
   return (
     <div
       data-slot='metric'
@@ -46,7 +52,7 @@ export function Metric({ k, v, align = 'start', className, ...props }: MetricPro
       <span className='text-muted-foreground font-mono text-[9px] tracking-[0.06em] uppercase'>
         {k}
       </span>
-      <span className='text-foreground font-mono text-sm font-medium [&_b]:font-medium [&_b]:text-brand'>
+      <span className='text-foreground [&_b]:text-brand font-mono text-sm font-medium [&_b]:font-medium'>
         {v}
       </span>
     </div>
