@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useState } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
-import { CircleAlert, Sparkles, KeyRound } from 'lucide-react'
+import { CircleAlert, Sparkles, KeyRound, Route } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getUserAvatarFallback, getUserAvatarStyle } from '@/lib/avatar'
 import { formatBillingCurrencyFromUSD } from '@/lib/currency'
@@ -28,14 +28,24 @@ import {
   formatTimestampToDate,
 } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { DataTableColumnHeader } from '@/components/data-table'
+import {
+  CellFlex,
+  DataTableColumnHeader,
+  MonoCell,
+} from '@/components/data-table'
 import { StatusBadge, type StatusBadgeProps } from '@/components/status-badge'
 import { LOG_TYPE_ALL_VALUE } from '../../constants'
 import type { UsageLog } from '../../data/schema'
@@ -56,13 +66,33 @@ import {
 } from '../../lib/utils'
 import type { LogOtherData } from '../../types'
 import { DetailsDialog } from '../dialogs/details-dialog'
-import { ModelBadge } from '../model-badge'
 import { useUsageLogsContext } from '../usage-logs-provider'
 
 interface DetailSegment {
   text: string
   muted?: boolean
   danger?: boolean
+}
+
+/**
+ * Map LOG_TYPES legacy palette colors to semantic StatusBadge variants for
+ * the soft appearance: Consume→success, Error→danger, Top-up/Refund→info,
+ * Manage→warning, System→purple.
+ */
+const LOG_TYPE_SOFT_VARIANT: Record<string, StatusBadgeProps['variant']> = {
+  green: 'success',
+  red: 'danger',
+  cyan: 'info',
+  blue: 'info',
+  orange: 'warning',
+  purple: 'purple',
+  default: 'neutral',
+}
+
+/** First two alphanumeric characters of the model name, uppercased. */
+function getModelInitials(name: string): string {
+  const cleaned = name.replace(/[^a-zA-Z0-9]/g, '')
+  return (cleaned.slice(0, 2) || '?').toUpperCase()
 }
 
 function formatRatioCompact(ratio: number | undefined): string {
@@ -88,12 +118,6 @@ function getGroupRatioText(other: LogOtherData | null): string | null {
   }
 
   return null
-}
-
-function splitQuotaDisplay(value: string): { prefix: string; amount: string } {
-  const match = value.match(/^([^0-9+\-.,\s]+)(.+)$/)
-  if (!match) return { prefix: '', amount: value }
-  return { prefix: match[1], amount: match[2] }
 }
 
 function buildDetailSegments(
@@ -272,18 +296,27 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
         const log = row.original
         const timestamp = row.getValue('created_at') as number
         const config = getLogTypeConfig(log.type)
+        const formatted = formatTimestampToDate(timestamp)
+        const [datePart, timePart] = formatted.includes(' ')
+          ? formatted.split(' ')
+          : ['', formatted]
 
         return (
-          <div className='flex flex-col gap-0.5'>
-            <span className='font-mono text-xs tabular-nums'>
-              {formatTimestampToDate(timestamp)}
-            </span>
+          <div className='flex items-center gap-2'>
+            <div className='flex flex-col gap-0.5'>
+              <MonoCell align='left'>{timePart}</MonoCell>
+              {datePart && (
+                <span className='text-muted-foreground font-mono text-xs tabular-nums'>
+                  {datePart}
+                </span>
+              )}
+            </div>
             <StatusBadge
               label={t(config.label)}
-              variant={config.color as StatusBadgeProps['variant']}
+              variant={LOG_TYPE_SOFT_VARIANT[config.color] ?? 'neutral'}
+              appearance='soft'
               size='sm'
               copyable={false}
-              className='!text-xs [&_span]:!text-xs'
             />
           </div>
         )
@@ -530,18 +563,72 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
         <DataTableColumnHeader column={column} title={t('Model')} />
       ),
       cell: function ModelCell({ row }) {
+        const { copyToClipboard } = useCopyToClipboard()
         const log = row.original
         if (!isDisplayableLogType(log.type)) return null
 
         const modelInfo = formatModelName(log)
+        if (!modelInfo.name) return null
 
         return (
-          <div className='flex w-fit flex-col gap-0.5'>
-            <ModelBadge
-              modelName={modelInfo.name}
-              actualModel={modelInfo.actualModel}
-            />
-          </div>
+          <CellFlex
+            leading={
+              <Avatar className='ring-border/60 size-7 ring-1'>
+                <AvatarFallback className='bg-muted text-muted-foreground text-[10px] font-semibold'>
+                  {getModelInitials(modelInfo.name)}
+                </AvatarFallback>
+              </Avatar>
+            }
+            primary={
+              <span className='flex min-w-0 items-center gap-1'>
+                <span
+                  className='cursor-copy truncate hover:underline'
+                  title={`Click to copy: ${modelInfo.name}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    copyToClipboard(modelInfo.name)
+                  }}
+                >
+                  {modelInfo.name}
+                </span>
+                {modelInfo.actualModel && (
+                  <Popover>
+                    <PopoverTrigger
+                      render={
+                        <button
+                          type='button'
+                          className='inline-flex shrink-0 items-center'
+                          aria-label={t('Actual Model:')}
+                        />
+                      }
+                    >
+                      <Route className='text-muted-foreground size-3 shrink-0' />
+                    </PopoverTrigger>
+                    <PopoverContent className='w-72'>
+                      <div className='space-y-2'>
+                        <div className='flex items-start justify-between gap-3'>
+                          <span className='text-muted-foreground text-xs'>
+                            {t('Request Model:')}
+                          </span>
+                          <span className='truncate font-mono text-xs font-medium'>
+                            {modelInfo.name}
+                          </span>
+                        </div>
+                        <div className='flex items-start justify-between gap-3'>
+                          <span className='text-muted-foreground text-xs'>
+                            {t('Actual Model:')}
+                          </span>
+                          <span className='truncate font-mono text-xs font-medium'>
+                            {modelInfo.actualModel}
+                          </span>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </span>
+            }
+          />
         )
       },
       meta: { label: t('Model'), mobileTitle: true },
@@ -569,12 +656,10 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
           : 'neutral'
 
         const timingBgMap: Record<string, string> = {
-          success:
-            'border-teal/20 bg-teal-subtle/50 border',
+          success: 'border-teal/20 bg-teal-subtle/50 border',
           warning:
             'border border-amber-200/45 bg-amber-50/35 dark:border-amber-900/40 dark:bg-amber-950/15',
-          danger:
-            'border-destructive/20 bg-[var(--danger-subtle)]/50 border',
+          danger: 'border-destructive/20 bg-[var(--danger-subtle)]/50 border',
           neutral:
             'border border-border/60 bg-muted/30 dark:border-border/40 dark:bg-muted/20',
         }
@@ -661,7 +746,11 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
     {
       accessorKey: 'prompt_tokens',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Tokens' />
+        <DataTableColumnHeader
+          column={column}
+          title='Tokens'
+          className='justify-end text-right'
+        />
       ),
       cell: ({ row }) => {
         const log = row.original
@@ -672,7 +761,7 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
         const promptTokens = log.prompt_tokens || 0
         const completionTokens = log.completion_tokens || 0
         if (promptTokens === 0 && completionTokens === 0) {
-          return <span className='text-muted-foreground text-xs'>-</span>
+          return <MonoCell muted>-</MonoCell>
         }
 
         const cacheReadTokens = other?.cache_tokens || 0
@@ -684,13 +773,13 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
           : other?.cache_creation_tokens || 0
 
         return (
-          <div className='flex flex-col gap-0.5'>
-            <span className='font-mono text-xs font-medium tabular-nums'>
+          <MonoCell className='flex flex-col items-end gap-0.5'>
+            <span className='font-medium'>
               {promptTokens.toLocaleString()} /{' '}
               {completionTokens.toLocaleString()}
             </span>
             {(cacheReadTokens > 0 || cacheWriteTokens > 0) && (
-              <div className='flex items-center gap-1 text-[11px]'>
+              <span className='flex items-center justify-end gap-1 text-[11px]'>
                 {cacheReadTokens > 0 && (
                   <span className='text-muted-foreground/60'>
                     {t('Cache')}↓ {cacheReadTokens.toLocaleString()}
@@ -701,9 +790,9 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
                     ↑ {cacheWriteTokens.toLocaleString()}
                   </span>
                 )}
-              </div>
+              </span>
             )}
-          </div>
+          </MonoCell>
         )
       },
       meta: { label: 'Tokens' },
@@ -712,7 +801,11 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
     {
       accessorKey: 'quota',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('Cost')} />
+        <DataTableColumnHeader
+          column={column}
+          title={t('Cost')}
+          className='justify-end text-right'
+        />
       ),
       cell: ({ row }) => {
         const log = row.original
@@ -724,41 +817,34 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
 
         if (isSubscription) {
           return (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <StatusBadge
-                      label={t('Subscription')}
-                      variant='success'
-                      size='sm'
-                      copyable={false}
-                      className='cursor-help'
-                    />
-                  }
-                />
-                <TooltipContent>
-                  <span>
-                    {t('Deducted by subscription')}: {formatLogQuota(quota)}
-                  </span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className='flex justify-end'>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <StatusBadge
+                        label={t('Subscription')}
+                        variant='success'
+                        appearance='soft'
+                        size='sm'
+                        copyable={false}
+                        className='cursor-help'
+                      />
+                    }
+                  />
+                  <TooltipContent>
+                    <span>
+                      {t('Deducted by subscription')}: {formatLogQuota(quota)}
+                    </span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           )
         }
 
-        const quotaStr = formatLogQuota(quota)
-        const quotaDisplay = splitQuotaDisplay(quotaStr)
-
         return (
-          <div className='flex flex-col gap-0.5'>
-            <span className='border-border/80 bg-muted/60 inline-flex h-6 w-fit items-center rounded-md border px-2 text-sm leading-none [font-family:var(--font-body)] font-semibold tabular-nums'>
-              {quotaDisplay.prefix && (
-                <span className='mr-1'>{quotaDisplay.prefix}</span>
-              )}
-              <span>{quotaDisplay.amount}</span>
-            </span>
-          </div>
+          <MonoCell className='font-medium'>{formatLogQuota(quota)}</MonoCell>
         )
       },
       meta: { label: t('Cost') },

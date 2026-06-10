@@ -1,4 +1,10 @@
 {
+  "Announcement": "Announcement",
+  "earlier": "earlier",
+  "Every request routed through your keys, with token counts, cost and latency.": "Every request routed through your keys, with token counts, cost and latency.",
+  "Filter notifications": "Filter notifications",
+  "Mark all read": "Mark all read",
+  "Raw Data": "Raw Data",
   "example.com\nblocked-site.com": "example.com\nblocked-site.com",
   "example.com\ncompany.com": "example.com\ncompany.com",
   "Issue scoped keys with per-key budgets, rate limits and model allowlists.": "Issue scoped keys with per-key budgets, rate limits and model allowlists.",

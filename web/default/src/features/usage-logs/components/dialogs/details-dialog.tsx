@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import {
   Copy,
   Check,
+  ChevronRight,
   Route,
   Settings2,
   AlertTriangle,
@@ -36,8 +37,14 @@ import { formatLogQuota, formatTokens, formatUseTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { Button } from '@/components/ui/button'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { CodeBlock } from '@/components/ai-elements/code-block'
 import { Dialog } from '@/components/dialog'
 import { StatusBadge, type StatusBadgeProps } from '@/components/status-badge'
 import { DynamicPricingBreakdown } from '@/features/pricing/components/dynamic-pricing-breakdown'
@@ -398,6 +405,12 @@ export function DetailsDialog(props: DetailsDialogProps) {
   const details = props.log.content ?? ''
   const other = parseLogOther(props.log.other)
   const typeConfig = getLogTypeConfig(props.log.type)
+  // Raw `other` payload, pretty-printed when it parses as JSON.
+  const rawOtherJson = other
+    ? JSON.stringify(other, null, 2)
+    : typeof props.log.other === 'string'
+      ? props.log.other.trim()
+      : ''
 
   const isViolation = isViolationFeeLog(other)
   const isRefund = props.log.type === 6
@@ -563,10 +576,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                 label={t('IP Address')}
                 value={
                   <span className='flex items-center gap-1'>
-                    <Globe
-                      className='text-warning size-3'
-                      aria-hidden='true'
-                    />
+                    <Globe className='text-warning size-3' aria-hidden='true' />
                     {props.log.ip}
                   </span>
                 }
@@ -845,11 +855,39 @@ export function DetailsDialog(props: DetailsDialogProps) {
 
           {/* Billing breakdown (consume type) */}
           {isConsume && other && !isViolation && (
-            <BillingBreakdown
-              log={props.log}
-              other={other}
-              isAdmin={props.isAdmin}
-            />
+            <>
+              <BillingBreakdown
+                log={props.log}
+                other={other}
+                isAdmin={props.isAdmin}
+              />
+              {/* Raw billing data (other payload) as a collapsible code block */}
+              {rawOtherJson && (
+                <Collapsible>
+                  <CollapsibleTrigger
+                    render={
+                      <button
+                        type='button'
+                        className='text-muted-foreground hover:text-foreground group flex items-center gap-1 text-xs font-semibold transition-colors'
+                      />
+                    }
+                  >
+                    <ChevronRight
+                      className='size-3.5 transition-transform group-data-[panel-open]:rotate-90'
+                      aria-hidden='true'
+                    />
+                    {t('Raw Data')}
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className='mt-1.5'>
+                    <CodeBlock
+                      code={rawOtherJson}
+                      language='json'
+                      title='detail.json'
+                    />
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+            </>
           )}
 
           {/* Tiered pricing breakdown (when billing_mode is tiered_expr) */}

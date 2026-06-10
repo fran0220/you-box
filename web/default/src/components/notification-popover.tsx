@@ -16,11 +16,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import dayjs from 'dayjs'
 import type { TFunction } from 'i18next'
-import { Bell, Megaphone } from 'lucide-react'
+import {
+  AlertTriangle,
+  Bell,
+  CheckCircle2,
+  Info,
+  Megaphone,
+  OctagonAlert,
+  type LucideIcon,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { getAnnouncementColorClass } from '@/lib/colors'
-import { formatDateTimeObject } from '@/lib/time'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -40,8 +47,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  FilterChips,
+  NotificationGroup,
+  NotificationItem,
+  type FilterChipItem,
+} from '@/components/patterns'
 
 interface AnnouncementItem {
   type?: string
@@ -50,83 +61,82 @@ interface AnnouncementItem {
   publishDate?: string | Date
 }
 
+export type NotificationFilter = 'all' | 'notice' | 'announcements'
+
 interface NotificationPopoverProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   unreadCount: number
-  activeTab: 'notice' | 'announcements'
-  onTabChange: (tab: 'notice' | 'announcements') => void
+  activeTab: NotificationFilter
+  onTabChange: (tab: NotificationFilter) => void
   notice: string
   announcements: AnnouncementItem[]
   loading: boolean
+  /**
+   * Clears the unread state (notice + announcements) in the consumer's
+   * read-tracking store. The "Mark all read" button only renders when
+   * this callback is provided and unreadCount > 0.
+   */
+  onMarkAllRead?: () => void
   className?: string
 }
 
-/**
- * Get relative time string from a date
- */
-function getRelativeTime(publishDate: string | Date, t: TFunction): string {
-  if (!publishDate) return ''
+type NotificationTone = 'brand' | 'success' | 'warning' | 'danger' | 'info'
 
-  const now = new Date()
-  const pubDate = new Date(publishDate)
-
-  // If invalid date, return original string
-  if (isNaN(pubDate.getTime()))
-    return typeof publishDate === 'string' ? publishDate : ''
-
-  const diffMs = now.getTime() - pubDate.getTime()
-  const diffSeconds = Math.floor(diffMs / 1000)
-  const diffMinutes = Math.floor(diffSeconds / 60)
-  const diffHours = Math.floor(diffMinutes / 60)
-  const diffDays = Math.floor(diffHours / 24)
-  const diffWeeks = Math.floor(diffDays / 7)
-  const diffMonths = Math.floor(diffDays / 30)
-  const diffYears = Math.floor(diffDays / 365)
-
-  // If future time, show specific date
-  if (diffMs < 0) return formatDateTimeObject(pubDate)
-
-  // Return relative time based on difference
-  if (diffSeconds < 60) return t('Just now')
-  if (diffMinutes < 60)
-    return diffMinutes === 1
-      ? t('1 minute ago')
-      : t('{{count}} minutes ago', { count: diffMinutes })
-  if (diffHours < 24)
-    return diffHours === 1
-      ? t('1 hour ago')
-      : t('{{count}} hours ago', { count: diffHours })
-  if (diffDays < 7)
-    return diffDays === 1
-      ? t('1 day ago')
-      : t('{{count}} days ago', { count: diffDays })
-  if (diffWeeks < 4)
-    return diffWeeks === 1
-      ? t('1 week ago')
-      : t('{{count}} weeks ago', { count: diffWeeks })
-  if (diffMonths < 12)
-    return diffMonths === 1
-      ? t('1 month ago')
-      : t('{{count}} months ago', { count: diffMonths })
-  if (diffYears < 2) return t('1 year ago')
-
-  // Over 2 years, show specific date
-  return formatDateTimeObject(pubDate)
+interface AnnouncementTypeMeta {
+  tone: NotificationTone
+  icon: LucideIcon
+  label: string
 }
 
 /**
- * Announcement status dot indicator
+ * Announcement type → tone/icon/title mapping. Types mirror
+ * AnnouncementType in lib/colors (default/ongoing/success/warning/error).
  */
-function AnnouncementDot({ type }: { type?: string }) {
+const ANNOUNCEMENT_TYPE_META: Record<string, AnnouncementTypeMeta> = {
+  success: { tone: 'success', icon: CheckCircle2, label: 'Success' },
+  warning: { tone: 'warning', icon: AlertTriangle, label: 'Warning' },
+  error: { tone: 'danger', icon: OctagonAlert, label: 'Error' },
+  danger: { tone: 'danger', icon: OctagonAlert, label: 'Error' },
+  ongoing: { tone: 'info', icon: Info, label: 'In Progress' },
+  info: { tone: 'info', icon: Info, label: 'Info' },
+  default: { tone: 'brand', icon: Megaphone, label: 'Announcement' },
+}
+
+function getAnnouncementTypeMeta(type?: string): AnnouncementTypeMeta {
   return (
-    <span
-      className={cn(
-        'mt-1.5 inline-block size-2 shrink-0 rounded-full',
-        getAnnouncementColorClass(type)
-      )}
-    />
+    ANNOUNCEMENT_TYPE_META[(type || 'default').toLowerCase()] ??
+    ANNOUNCEMENT_TYPE_META.default
   )
+}
+
+/** Short mono timestamp for notification rows: now / 12m / 3h / 2d / MM-DD. */
+function formatShortTime(date: Date): string {
+  const diffMs = Date.now() - date.getTime()
+  if (diffMs < 0) return dayjs(date).format('MM-DD')
+  const minutes = Math.floor(diffMs / 60000)
+  if (minutes < 1) return 'now'
+  if (minutes < 60) return `${minutes}m`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h`
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `${days}d`
+  return dayjs(date).format('MM-DD')
+}
+
+function isToday(date: Date): boolean {
+  const now = new Date()
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  )
+}
+
+function parsePublishDate(publishDate?: string | Date): Date | null {
+  if (!publishDate) return null
+  const date = new Date(publishDate)
+  return isNaN(date.getTime()) ? null : date
 }
 
 /**
@@ -154,15 +164,58 @@ function EmptyState({
   )
 }
 
+function AnnouncementRow({ item }: { item: AnnouncementItem }) {
+  const { t } = useTranslation()
+  const meta = getAnnouncementTypeMeta(item.type)
+  const Icon = meta.icon
+  const publishDate = parsePublishDate(item.publishDate)
+
+  return (
+    <NotificationItem
+      tone={meta.tone}
+      icon={<Icon />}
+      title={t(meta.label)}
+      body={
+        <>
+          <Markdown>{item.content || ''}</Markdown>
+          {item.extra ? (
+            <div className='text-muted-foreground mt-1 text-xs'>
+              <Markdown>{item.extra}</Markdown>
+            </div>
+          ) : null}
+        </>
+      }
+      time={publishDate ? formatShortTime(publishDate) : undefined}
+    />
+  )
+}
+
+function NoticeRow({ notice }: { notice: string }) {
+  const { t } = useTranslation()
+  return (
+    <NotificationItem
+      tone='info'
+      icon={<Bell />}
+      title={t('Notice')}
+      body={<Markdown>{notice}</Markdown>}
+    />
+  )
+}
+
 /**
- * Notice tab content
+ * Notification list: notice row + announcements grouped by publish date
+ * (today / earlier), filtered by the active chip.
  */
-function NoticeContent({
+function NotificationList({
+  filter,
   notice,
+  announcements,
   loading,
   t,
 }: {
+  filter: NotificationFilter
   notice: string
+  announcements: AnnouncementItem[]
   loading: boolean
   t: TFunction
 }) {
@@ -176,97 +229,61 @@ function NoticeContent({
     )
   }
 
-  if (!notice) {
+  const showNotice = (filter === 'all' || filter === 'notice') && !!notice
+  const showAnnouncements =
+    (filter === 'all' || filter === 'announcements') && announcements.length > 0
+
+  if (!showNotice && !showAnnouncements) {
+    if (filter === 'announcements') {
+      return (
+        <EmptyState icon={<Megaphone />} title={t('No system announcements')} />
+      )
+    }
     return (
       <EmptyState icon={<Bell />} title={t('No announcements at this time')} />
     )
   }
 
+  // Group announcements by publish date; unparseable dates go to "earlier".
+  const todayItems: AnnouncementItem[] = []
+  const earlierItems: AnnouncementItem[] = []
+  if (showAnnouncements) {
+    for (const item of announcements) {
+      const publishDate = parsePublishDate(item.publishDate)
+      if (publishDate && isToday(publishDate)) {
+        todayItems.push(item)
+      } else {
+        earlierItems.push(item)
+      }
+    }
+  }
+
   return (
-    <ScrollArea className='h-[min(52vh,28rem)] pr-3'>
-      <Markdown>{notice}</Markdown>
-    </ScrollArea>
+    <div className='overflow-hidden rounded-lg border'>
+      <ScrollArea className='h-[min(52vh,28rem)]'>
+        {showNotice && <NoticeRow notice={notice} />}
+        {todayItems.length > 0 && (
+          <NotificationGroup label={t('today')}>
+            {todayItems.map((item, idx) => (
+              <AnnouncementRow key={`today-${idx}`} item={item} />
+            ))}
+          </NotificationGroup>
+        )}
+        {earlierItems.length > 0 && (
+          <NotificationGroup label={t('earlier')}>
+            {earlierItems.map((item, idx) => (
+              <AnnouncementRow key={`earlier-${idx}`} item={item} />
+            ))}
+          </NotificationGroup>
+        )}
+      </ScrollArea>
+    </div>
   )
 }
 
 /**
- * Announcements tab content
- */
-function AnnouncementsContent({
-  announcements,
-  loading,
-  t,
-}: {
-  announcements: AnnouncementItem[]
-  loading: boolean
-  t: TFunction
-}) {
-  if (loading) {
-    return (
-      <EmptyState
-        icon={<Megaphone />}
-        title={t('Loading...')}
-        description={t('Latest platform updates and notices')}
-      />
-    )
-  }
-
-  if (announcements.length === 0) {
-    return (
-      <EmptyState icon={<Megaphone />} title={t('No system announcements')} />
-    )
-  }
-
-  return (
-    <ScrollArea className='h-[min(52vh,28rem)] pr-3'>
-      <div className='flex flex-col'>
-        {announcements.map((item, idx) => {
-          const publishDate = item.publishDate
-            ? new Date(item.publishDate)
-            : null
-          const relativeTime = publishDate
-            ? getRelativeTime(publishDate, t)
-            : ''
-          const absoluteTime = publishDate
-            ? formatDateTimeObject(publishDate)
-            : ''
-
-          return (
-            <div key={idx}>
-              <div className='py-3'>
-                <div className='flex items-start gap-3'>
-                  <AnnouncementDot type={item.type} />
-                  <div className='flex min-w-0 flex-1 flex-col gap-2'>
-                    <div className='text-sm'>
-                      <Markdown>{item.content || ''}</Markdown>
-                    </div>
-
-                    {item.extra ? (
-                      <div className='text-muted-foreground text-xs'>
-                        <Markdown>{item.extra}</Markdown>
-                      </div>
-                    ) : null}
-
-                    {absoluteTime ? (
-                      <div className='text-muted-foreground text-xs'>
-                        {relativeTime ? `${relativeTime} • ` : null}
-                        {absoluteTime}
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-              {idx < announcements.length - 1 ? <Separator /> : null}
-            </div>
-          )
-        })}
-      </div>
-    </ScrollArea>
-  )
-}
-
-/**
- * Notification popover with Notice and Announcements tabs
+ * Notification popover with All / Notice / Announcements filter chips
+ * and date-grouped notification rows.
  */
 export function NotificationPopover({
   open,
@@ -277,9 +294,25 @@ export function NotificationPopover({
   notice,
   announcements,
   loading,
+  onMarkAllRead,
   className,
 }: NotificationPopoverProps) {
   const { t } = useTranslation()
+
+  const chipItems: FilterChipItem<NotificationFilter>[] = [
+    {
+      value: 'all',
+      label: t('All'),
+      count: announcements.length + (notice ? 1 : 0),
+    },
+    { value: 'notice', label: t('Notice') },
+    {
+      value: 'announcements',
+      label: t('Announcements'),
+      count: announcements.length,
+    },
+  ]
+
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger
@@ -315,35 +348,27 @@ export function NotificationPopover({
           </p>
         </PopoverHeader>
 
-        <Tabs
+        <FilterChips
+          items={chipItems}
           value={activeTab}
-          onValueChange={onTabChange as (value: string) => void}
-        >
-          <TabsList className='grid w-full grid-cols-2'>
-            <TabsTrigger value='notice' className='gap-1.5'>
-              <Bell className='size-3.5' />
-              {t('Notice')}
-            </TabsTrigger>
-            <TabsTrigger value='announcements' className='gap-1.5'>
-              <Megaphone className='size-3.5' />
-              {t('Timeline')}
-            </TabsTrigger>
-          </TabsList>
+          onValueChange={onTabChange}
+          label={t('Filter notifications')}
+        />
 
-          <TabsContent value='notice' className='mt-2'>
-            <NoticeContent notice={notice} loading={loading} t={t} />
-          </TabsContent>
+        <NotificationList
+          filter={activeTab}
+          notice={notice}
+          announcements={announcements}
+          loading={loading}
+          t={t}
+        />
 
-          <TabsContent value='announcements' className='mt-2'>
-            <AnnouncementsContent
-              announcements={announcements}
-              loading={loading}
-              t={t}
-            />
-          </TabsContent>
-        </Tabs>
-
-        <div className='flex justify-end'>
+        <div className='flex items-center justify-end gap-2'>
+          {unreadCount > 0 && onMarkAllRead && (
+            <Button variant='outline' size='sm' onClick={onMarkAllRead}>
+              {t('Mark all read')}
+            </Button>
+          )}
           <Button size='sm' onClick={() => onOpenChange(false)}>
             {t('Close')}
           </Button>
