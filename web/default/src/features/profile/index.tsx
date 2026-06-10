@@ -23,10 +23,10 @@ import {
   CardStaggerContainer,
   CardStaggerItem,
 } from '@/components/page-transition'
+import { AccountCard } from './components/account-card'
 import { CheckinCalendarCard } from './components/checkin-calendar-card'
 import { LanguagePreferencesCard } from './components/language-preferences-card'
 import { PasskeyCard } from './components/passkey-card'
-import { ProfileHeader } from './components/profile-header'
 import { ProfileSecurityCard } from './components/profile-security-card'
 import { ProfileSettingsCard } from './components/profile-settings-card'
 import { SidebarModulesCard } from './components/sidebar-modules-card'
@@ -48,38 +48,35 @@ export function Profile() {
   return (
     <Main>
       <div className='min-h-0 flex-1 overflow-auto px-3 py-3 sm:px-4 sm:py-6'>
-        <CardStaggerContainer className='mx-auto flex w-full max-w-7xl flex-col gap-4 sm:gap-6'>
-          <CardStaggerItem>
-            <ProfileHeader profile={profile} loading={loading} />
+        <CardStaggerContainer className='mx-auto grid w-full max-w-7xl gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start'>
+          <CardStaggerItem className='lg:self-start'>
+            <div className='lg:sticky lg:top-6'>
+              <AccountCard profile={profile} loading={loading} />
+            </div>
           </CardStaggerItem>
 
           <CardStaggerItem>
-            <div className='grid gap-4 sm:gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.46fr)] xl:items-start'>
-              <div className='space-y-4 sm:space-y-6'>
-                <ProfileSettingsCard
-                  profile={profile}
-                  loading={loading}
-                  onProfileUpdate={refreshProfile}
+            <div className='flex min-w-0 flex-col gap-4'>
+              <ProfileSettingsCard
+                profile={profile}
+                loading={loading}
+                onProfileUpdate={refreshProfile}
+              />
+              <ProfileSecurityCard profile={profile} loading={loading} />
+              <TwoFACard loading={loading} />
+              <PasskeyCard loading={loading} />
+              <LanguagePreferencesCard
+                profile={profile}
+                onProfileUpdate={refreshProfile}
+              />
+              {canConfigureSidebar && <SidebarModulesCard />}
+              {checkinEnabled && (
+                <CheckinCalendarCard
+                  checkinEnabled={checkinEnabled}
+                  turnstileEnabled={turnstileEnabled}
+                  turnstileSiteKey={turnstileSiteKey}
                 />
-                <LanguagePreferencesCard
-                  profile={profile}
-                  onProfileUpdate={refreshProfile}
-                />
-                <ProfileSecurityCard profile={profile} loading={loading} />
-              </div>
-
-              <div className='space-y-4 sm:space-y-6 xl:sticky xl:top-6'>
-                {checkinEnabled && (
-                  <CheckinCalendarCard
-                    checkinEnabled={checkinEnabled}
-                    turnstileEnabled={turnstileEnabled}
-                    turnstileSiteKey={turnstileSiteKey}
-                  />
-                )}
-                {canConfigureSidebar && <SidebarModulesCard />}
-                <PasskeyCard loading={loading} />
-                <TwoFACard loading={loading} />
-              </div>
+              )}
             </div>
           </CardStaggerItem>
         </CardStaggerContainer>

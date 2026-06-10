@@ -4610,6 +4610,9 @@
     "No matching presets": "没有匹配的预设",
     "Opens externally": "在外部打开",
     "Embedded": "内嵌",
-    "External": "外部"
+    "External": "外部",
+    "Verified": "已验证",
+    "Backup codes let you sign in when your authenticator is unavailable": "备份码可在无法使用验证器时用于登录",
+    "Your account will no longer require a verification code at sign-in": "您的账户登录时将不再需要验证码"
   }
 }

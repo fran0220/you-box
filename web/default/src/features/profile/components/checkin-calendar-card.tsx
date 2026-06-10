@@ -40,6 +40,7 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip'
 import { Dialog } from '@/components/dialog'
+import { Panel } from '@/components/patterns'
 import { Turnstile } from '@/components/turnstile'
 import { getCheckinStatus, performCheckin } from '../api'
 import type { CheckinRecord } from '../types'
@@ -221,7 +222,7 @@ export function CheckinCalendarCard({
 
   if (isLoading) {
     return (
-      <div className='bg-card overflow-hidden rounded-2xl border'>
+      <Panel>
         <div className='p-6'>
           <div className='flex items-start justify-between gap-4'>
             <div className='flex items-center gap-3'>
@@ -234,7 +235,7 @@ export function CheckinCalendarCard({
             <Skeleton className='h-9 w-28 rounded-md' />
           </div>
         </div>
-      </div>
+      </Panel>
     )
   }
 
@@ -270,7 +271,7 @@ export function CheckinCalendarCard({
         </div>
       </Dialog>
 
-      <div className='bg-card overflow-hidden rounded-2xl border'>
+      <Panel>
         {/* Header */}
         <div className='border-b p-4 sm:p-6'>
           <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4'>
@@ -292,7 +293,7 @@ export function CheckinCalendarCard({
                     {t('Daily Check-in')}
                   </h3>
                   {checkedToday && (
-                    <div className='inline-flex items-center gap-1 bg-teal-subtle text-teal rounded-md px-2 py-0.5 text-[11px] font-medium sm:gap-1.5 sm:px-2.5 sm:text-xs'>
+                    <div className='bg-teal-subtle text-teal inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium sm:gap-1.5 sm:px-2.5 sm:text-xs'>
                       <Sparkles className='h-2.5 w-2.5 sm:h-3 sm:w-3' />
                       {t('Checked in')}
                     </div>
@@ -429,7 +430,7 @@ export function CheckinCalendarCard({
                       >
                         <span className='tabular-nums'>{dayNum}</span>
                         {isCheckedIn && !isToday && (
-                          <span className='absolute bottom-0.5 h-1 w-1 rounded-full bg-teal sm:bottom-1' />
+                          <span className='bg-teal absolute bottom-0.5 h-1 w-1 rounded-full sm:bottom-1' />
                         )}
                       </Button>
                     )
@@ -476,7 +477,7 @@ export function CheckinCalendarCard({
             </div>
           </>
         ) : null}
-      </div>
+      </Panel>
     </TooltipProvider>
   )
 }

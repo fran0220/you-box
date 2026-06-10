@@ -16,18 +16,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { Shield, AlertTriangle, RefreshCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useDialogs } from '@/hooks/use-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Panel, PanelBody, PanelHeader } from '@/components/patterns'
+import { SettingRow, SettingsPanel } from '@/components/settings'
 import { StatusBadge } from '@/components/status-badge'
 import { useTwoFA } from '../hooks'
 import { TwoFABackupDialog } from './dialogs/two-fa-backup-dialog'
@@ -35,7 +29,7 @@ import { TwoFADisableDialog } from './dialogs/two-fa-disable-dialog'
 import { TwoFASetupDialog } from './dialogs/two-fa-setup-dialog'
 
 // ============================================================================
-// Two-Factor Authentication Card Component
+// Two-Factor Authentication Card (r2-B13 section 4) — SettingRow form
 // ============================================================================
 
 interface TwoFACardProps {
@@ -51,109 +45,91 @@ export function TwoFACard({ loading: pageLoading }: TwoFACardProps) {
 
   if (pageLoading || loading) {
     return (
-      <Card className='gap-0 overflow-hidden py-0'>
-        <CardHeader className='p-3 sm:p-5'>
-          <Skeleton className='h-6 w-48' />
-          <Skeleton className='mt-2 h-4 w-64' />
-        </CardHeader>
-        <CardContent className='p-3 sm:p-5'>
-          <Skeleton className='h-20 w-full' />
-        </CardContent>
-      </Card>
+      <Panel>
+        <PanelHeader>
+          <Skeleton className='h-5 w-48' />
+        </PanelHeader>
+        <PanelBody>
+          <Skeleton className='h-14 w-full' />
+        </PanelBody>
+      </Panel>
     )
   }
 
   return (
     <>
-      <Card className='gap-0 overflow-hidden py-0'>
-        <CardHeader className='p-3 sm:p-5'>
-          <CardTitle className='text-lg tracking-tight sm:text-xl'>
-            {t('Two-Factor Authentication')}
-          </CardTitle>
-          <CardDescription className='text-xs sm:text-sm'>
-            {t('Add an extra layer of security to your account')}
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className='p-3 sm:p-5'>
-          <div className='space-y-6'>
-            {/* Status Section */}
-            <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between xl:flex-col 2xl:flex-row'>
-              <div className='flex items-start gap-4'>
-                <div className='bg-muted rounded-md p-2'>
-                  <Shield className='h-5 w-5' />
-                </div>
-                <div className='space-y-1'>
-                  <div className='flex items-center gap-2'>
-                    <p className='font-medium'>{t('Two-Step Verification')}</p>
-                    {status.enabled ? (
-                      <StatusBadge
-                        label={t('Enabled')}
-                        variant='success'
-                        showDot
-                        copyable={false}
-                      />
-                    ) : (
-                      <StatusBadge
-                        label={t('Disabled')}
-                        variant='neutral'
-                        showDot
-                        copyable={false}
-                      />
-                    )}
-                    {status.locked && (
-                      <StatusBadge
-                        label={t('Locked')}
-                        variant='danger'
-                        showDot
-                        copyable={false}
-                      />
-                    )}
-                  </div>
-                  <p className='text-muted-foreground text-sm'>
-                    {status.enabled
-                      ? t('Backup codes remaining: {{count}}', {
-                          count: status.backup_codes_remaining,
-                        })
-                      : t('Add an extra layer of security to your account')}
-                  </p>
-                </div>
-              </div>
-
+      <SettingsPanel title={t('Two-Factor Authentication')}>
+        <SettingRow
+          label={t('Two-Step Verification')}
+          description={
+            status.enabled
+              ? t('Backup codes remaining: {{count}}', {
+                  count: status.backup_codes_remaining,
+                })
+              : t('Add an extra layer of security to your account')
+          }
+          control={
+            <>
+              <StatusBadge
+                label={status.enabled ? t('Enabled') : t('Disabled')}
+                variant={status.enabled ? 'success' : 'neutral'}
+                appearance='soft'
+                showDot={false}
+                copyable={false}
+              />
+              {status.locked && (
+                <StatusBadge
+                  label={t('Locked')}
+                  variant='danger'
+                  appearance='soft'
+                  showDot={false}
+                  copyable={false}
+                />
+              )}
               {!status.enabled && (
-                <Button
-                  className='w-full sm:w-auto xl:w-full 2xl:w-auto'
-                  onClick={() => dialogs.open('setup')}
-                >
+                <Button size='sm' onClick={() => dialogs.open('setup')}>
                   {t('Enable')}
                 </Button>
               )}
-            </div>
+            </>
+          }
+        />
 
-            {/* Actions Section - Only show when enabled */}
-            {status.enabled && (
-              <div className='flex flex-col gap-3 border-t pt-6 sm:flex-row xl:flex-col 2xl:flex-row'>
+        {status.enabled && (
+          <>
+            <SettingRow
+              label={t('Regenerate Backup Codes')}
+              description={t(
+                'Backup codes let you sign in when your authenticator is unavailable'
+              )}
+              control={
                 <Button
                   variant='outline'
-                  className='flex-1'
+                  size='sm'
                   onClick={() => dialogs.open('backup')}
                 >
-                  <RefreshCw className='mr-2 h-4 w-4' />
-                  {t('Regenerate Backup Codes')}
+                  {t('Regenerate')}
                 </Button>
+              }
+            />
+            <SettingRow
+              label={t('Disable 2FA')}
+              description={t(
+                'Your account will no longer require a verification code at sign-in'
+              )}
+              control={
                 <Button
                   variant='destructive'
-                  className='flex-1'
+                  size='sm'
                   onClick={() => dialogs.open('disable')}
                 >
-                  <AlertTriangle className='mr-2 h-4 w-4' />
-                  {t('Disable 2FA')}
+                  {t('Disable')}
                 </Button>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              }
+            />
+          </>
+        )}
+      </SettingsPanel>
 
       {/* Dialogs */}
       <TwoFASetupDialog

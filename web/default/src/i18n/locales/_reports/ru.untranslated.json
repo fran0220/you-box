@@ -37,5 +37,8 @@
   "Requests today": "Requests today",
   "New key created — copy it now": "New key created — copy it now",
   "Dismiss": "Dismiss",
-  "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "The full key for {{name}} is shown only this once. Copy it now and store it securely."
+  "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "The full key for {{name}} is shown only this once. Copy it now and store it securely.",
+  "Verified": "Verified",
+  "Backup codes let you sign in when your authenticator is unavailable": "Backup codes let you sign in when your authenticator is unavailable",
+  "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in"
 }

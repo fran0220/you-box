@@ -4610,6 +4610,9 @@
     "No matching presets": "Aucun préréglage correspondant",
     "Opens externally": "S'ouvre en externe",
     "Embedded": "Intégré",
-    "External": "Externe"
+    "External": "Externe",
+    "Verified": "Verified",
+    "Backup codes let you sign in when your authenticator is unavailable": "Backup codes let you sign in when your authenticator is unavailable",
+    "Your account will no longer require a verification code at sign-in": "Your account will no longer require a verification code at sign-in"
   }
 }
