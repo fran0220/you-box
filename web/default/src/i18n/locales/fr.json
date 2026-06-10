@@ -4571,6 +4571,12 @@
     "You": "Vous",
     "Assistant": "Assistant",
     "Save & Submit": "Enregistrer et soumettre",
-    "Responding...": "Réponse en cours..."
+    "Responding...": "Réponse en cours...",
+    "Presets": "Préréglages",
+    "Search presets": "Rechercher des préréglages",
+    "No matching presets": "Aucun préréglage correspondant",
+    "Opens externally": "S'ouvre en externe",
+    "Embedded": "Intégré",
+    "External": "Externe"
   }
 }

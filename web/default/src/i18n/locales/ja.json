@@ -4571,6 +4571,12 @@
     "You": "あなた",
     "Assistant": "アシスタント",
     "Save & Submit": "保存して送信",
-    "Responding...": "応答中..."
+    "Responding...": "応答中...",
+    "Presets": "プリセット",
+    "Search presets": "プリセットを検索",
+    "No matching presets": "一致するプリセットがありません",
+    "Opens externally": "外部で開きます",
+    "Embedded": "埋め込み",
+    "External": "外部"
   }
 }

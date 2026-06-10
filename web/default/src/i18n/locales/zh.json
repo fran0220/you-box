@@ -4571,6 +4571,12 @@
     "You": "你",
     "Assistant": "助手",
     "Save & Submit": "保存并提交",
-    "Responding...": "响应中..."
+    "Responding...": "响应中...",
+    "Presets": "预设",
+    "Search presets": "搜索预设",
+    "No matching presets": "没有匹配的预设",
+    "Opens externally": "在外部打开",
+    "Embedded": "内嵌",
+    "External": "外部"
   }
 }

@@ -4571,6 +4571,12 @@
     "You": "Вы",
     "Assistant": "Ассистент",
     "Save & Submit": "Сохранить и отправить",
-    "Responding...": "Отвечает..."
+    "Responding...": "Отвечает...",
+    "Presets": "Пресеты",
+    "Search presets": "Поиск пресетов",
+    "No matching presets": "Нет подходящих пресетов",
+    "Opens externally": "Открывается во внешнем приложении",
+    "Embedded": "Встроенный",
+    "External": "Внешний"
   }
 }

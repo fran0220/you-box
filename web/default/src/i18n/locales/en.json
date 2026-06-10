@@ -4571,6 +4571,12 @@
     "You": "You",
     "Assistant": "Assistant",
     "Save & Submit": "Save & Submit",
-    "Responding...": "Responding..."
+    "Responding...": "Responding...",
+    "Presets": "Presets",
+    "Search presets": "Search presets",
+    "No matching presets": "No matching presets",
+    "Opens externally": "Opens externally",
+    "Embedded": "Embedded",
+    "External": "External"
   }
 }

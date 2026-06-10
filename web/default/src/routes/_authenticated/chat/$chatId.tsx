@@ -16,12 +16,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { Loader2, MessageCircleWarning } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ChatShell } from '@/features/chat/components/chat-shell'
 import { useActiveChatKey } from '@/features/chat/hooks/use-active-chat-key'
 import { useChatPresets } from '@/features/chat/hooks/use-chat-presets'
 import {
@@ -37,6 +39,27 @@ export const Route = createFileRoute('/_authenticated/chat/$chatId')({
   },
   component: ChatRouteComponent,
 })
+
+function ChatIframe({ src, presetName }: { src: string; presetName: string }) {
+  const [loaded, setLoaded] = useState(false)
+
+  return (
+    <div className='relative h-full w-full'>
+      {!loaded && (
+        <div className='absolute inset-0 p-4'>
+          <Skeleton className='h-full w-full' />
+        </div>
+      )}
+      <iframe
+        src={src}
+        className='h-full w-full border-0'
+        allow='camera; microphone'
+        title={`Chat preset: ${presetName}`}
+        onLoad={() => setLoaded(true)}
+      />
+    </div>
+  )
+}
 
 function ChatRouteComponent() {
   const { t } = useTranslation()
@@ -72,93 +95,99 @@ function ChatRouteComponent() {
     })
   }, [activeKey, isWebLink, preset, requiresActiveKey, serverAddress])
 
-  if (!preset) {
-    return (
-      <div className='flex h-full flex-col items-center justify-center gap-4 p-6 text-center'>
-        <MessageCircleWarning className='text-muted-foreground h-12 w-12' />
-        <div className='space-y-1'>
-          <h2 className='text-lg font-semibold'>
-            {t('Chat preset not found')}
-          </h2>
-          <p className='text-muted-foreground'>
-            {t('The requested chat preset does not exist or has been removed.')}
+  const content = (() => {
+    if (!preset) {
+      return (
+        <div className='flex h-full flex-col items-center justify-center gap-4 p-6 text-center'>
+          <MessageCircleWarning className='text-muted-foreground h-12 w-12' />
+          <div className='space-y-1'>
+            <h2 className='text-lg font-semibold'>
+              {t('Chat preset not found')}
+            </h2>
+            <p className='text-muted-foreground'>
+              {t(
+                'The requested chat preset does not exist or has been removed.'
+              )}
+            </p>
+          </div>
+          <Button variant='outline' render={<Link to='/dashboard' />}>
+            {t('Return to dashboard')}
+          </Button>
+        </div>
+      )
+    }
+
+    if (!isWebLink) {
+      return (
+        <div className='flex h-full flex-col items-center justify-center gap-4 p-6 text-center'>
+          <MessageCircleWarning className='text-muted-foreground h-12 w-12' />
+          <div className='space-y-1'>
+            <h2 className='text-lg font-semibold'>
+              {t('Use sidebar shortcut')}
+            </h2>
+            <p className='text-muted-foreground'>
+              {preset.name}{' '}
+              {t(
+                'opens in an external client. Trigger it from the sidebar or API key actions to launch the configured application.'
+              )}
+            </p>
+          </div>
+          <Button variant='outline' render={<Link to='/dashboard' />}>
+            {t('Return to dashboard')}
+          </Button>
+        </div>
+      )
+    }
+
+    if (requiresActiveKey && isPending) {
+      return (
+        <div className='flex h-full flex-col items-center justify-center gap-4'>
+          <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
+          <p className='text-muted-foreground text-sm'>
+            {t('Preparing your chat link…')}
           </p>
         </div>
-        <Button variant='outline' render={<Link to='/dashboard' />}>
-          {t('Return to dashboard')}
-        </Button>
-      </div>
-    )
-  }
+      )
+    }
 
-  if (!isWebLink) {
-    return (
-      <div className='flex h-full flex-col items-center justify-center gap-4 p-6 text-center'>
-        <MessageCircleWarning className='text-muted-foreground h-12 w-12' />
-        <div className='space-y-1'>
-          <h2 className='text-lg font-semibold'>{t('Use sidebar shortcut')}</h2>
-          <p className='text-muted-foreground'>
-            {preset.name}{' '}
-            {t(
-              'opens in an external client. Trigger it from the sidebar or API key actions to launch the configured application.'
-            )}
-          </p>
+    if (requiresActiveKey && (isError || !activeKey || !iframeSrc)) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Unable to generate chat link. Please check your API keys.'
+      return (
+        <div className='flex h-full flex-col items-center justify-center p-6'>
+          <Alert variant='destructive' className='max-w-xl'>
+            <AlertTitle>{t('Unable to open chat')}</AlertTitle>
+            <AlertDescription>{message}</AlertDescription>
+          </Alert>
         </div>
-        <Button variant='outline' render={<Link to='/dashboard' />}>
-          {t('Return to dashboard')}
-        </Button>
-      </div>
-    )
-  }
+      )
+    }
 
-  if (requiresActiveKey && isPending) {
-    return (
-      <div className='flex h-full flex-col items-center justify-center gap-4'>
-        <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
-        <p className='text-muted-foreground text-sm'>
-          {t('Preparing your chat link…')}
-        </p>
-      </div>
-    )
-  }
+    if (!requiresActiveKey && !iframeSrc) {
+      return (
+        <div className='flex h-full flex-col items-center justify-center p-6'>
+          <Alert variant='destructive' className='max-w-xl'>
+            <AlertTitle>{t('Unable to open chat')}</AlertTitle>
+            <AlertDescription>
+              {t(
+                'Unable to generate chat link. Please contact your administrator.'
+              )}
+            </AlertDescription>
+          </Alert>
+        </div>
+      )
+    }
 
-  if (requiresActiveKey && (isError || !activeKey || !iframeSrc)) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Unable to generate chat link. Please check your API keys.'
     return (
-      <div className='flex h-full flex-col items-center justify-center p-6'>
-        <Alert variant='destructive' className='max-w-xl'>
-          <AlertTitle>{t('Unable to open chat')}</AlertTitle>
-          <AlertDescription>{message}</AlertDescription>
-        </Alert>
-      </div>
+      <ChatIframe key={iframeSrc} src={iframeSrc} presetName={preset.name} />
     )
-  }
-
-  if (!requiresActiveKey && !iframeSrc) {
-    return (
-      <div className='flex h-full flex-col items-center justify-center p-6'>
-        <Alert variant='destructive' className='max-w-xl'>
-          <AlertTitle>{t('Unable to open chat')}</AlertTitle>
-          <AlertDescription>
-            {t(
-              'Unable to generate chat link. Please contact your administrator.'
-            )}
-          </AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
+  })()
 
   return (
-    <iframe
-      src={iframeSrc}
-      key={iframeSrc}
-      className='h-full w-full border-0'
-      allow='camera; microphone'
-      title={`Chat preset: ${preset.name}`}
-    />
+    <ChatShell activeChatId={chatId} preset={preset} resolvedUrl={iframeSrc}>
+      {content}
+    </ChatShell>
   )
 }

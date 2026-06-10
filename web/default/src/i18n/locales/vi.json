@@ -4571,6 +4571,12 @@
     "You": "Bạn",
     "Assistant": "Trợ lý",
     "Save & Submit": "Lưu & Gửi",
-    "Responding...": "Đang phản hồi..."
+    "Responding...": "Đang phản hồi...",
+    "Presets": "Cài đặt sẵn",
+    "Search presets": "Tìm kiếm cài đặt sẵn",
+    "No matching presets": "Không có cài đặt sẵn phù hợp",
+    "Opens externally": "Mở bên ngoài",
+    "Embedded": "Nhúng",
+    "External": "Bên ngoài"
   }
 }
