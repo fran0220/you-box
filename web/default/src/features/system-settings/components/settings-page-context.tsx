@@ -19,25 +19,44 @@ For commercial licensing, please contact support@quantumnous.com
 import {
   createContext,
   useContext,
-  type ComponentProps,
+  useEffect,
+  useMemo,
   type ReactNode,
-  type RefObject,
 } from 'react'
-import { RotateCcw, Save } from 'lucide-react'
 import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
+import { useFormContext, useFormState } from 'react-hook-form'
+
+/**
+ * Snapshot of the active section form, registered by
+ * SettingsPageFormActions and consumed by the sticky save bar
+ * rendered in the settings page frame.
+ */
+export type SettingsFormActionsRegistration = {
+  dirty: boolean
+  saving: boolean
+  save: () => void
+  discard: () => void
+}
 
 type SettingsPageContextValue = {
   actionsContainer: HTMLDivElement | null
   titleStatusContainer: HTMLSpanElement | null
   suppressSectionHeader: boolean
+  /** i18n key of the owning settings group, used as the panel eyebrow. */
+  sectionEyebrow: string | null
+  registerFormActions: (
+    entry: SettingsFormActionsRegistration | null
+  ) => void
 }
+
+const noopRegister = () => {}
 
 const SettingsPageContext = createContext<SettingsPageContextValue>({
   actionsContainer: null,
   titleStatusContainer: null,
   suppressSectionHeader: false,
+  sectionEyebrow: null,
+  registerFormActions: noopRegister,
 })
 
 type SettingsPageProviderProps = {
@@ -45,24 +64,50 @@ type SettingsPageProviderProps = {
   titleStatusContainer?: HTMLSpanElement | null
   children: ReactNode
   suppressSectionHeader?: boolean
+  sectionEyebrow?: string | null
+  registerFormActions?: (
+    entry: SettingsFormActionsRegistration | null
+  ) => void
 }
 
 export function SettingsPageProvider(props: SettingsPageProviderProps) {
+  const {
+    actionsContainer,
+    titleStatusContainer,
+    suppressSectionHeader,
+    sectionEyebrow,
+    registerFormActions,
+  } = props
+
+  const value = useMemo(
+    () => ({
+      actionsContainer,
+      titleStatusContainer: titleStatusContainer ?? null,
+      suppressSectionHeader: suppressSectionHeader ?? true,
+      sectionEyebrow: sectionEyebrow ?? null,
+      registerFormActions: registerFormActions ?? noopRegister,
+    }),
+    [
+      actionsContainer,
+      titleStatusContainer,
+      suppressSectionHeader,
+      sectionEyebrow,
+      registerFormActions,
+    ]
+  )
+
   return (
-    <SettingsPageContext.Provider
-      value={{
-        actionsContainer: props.actionsContainer,
-        titleStatusContainer: props.titleStatusContainer ?? null,
-        suppressSectionHeader: props.suppressSectionHeader ?? true,
-      }}
-    >
+    <SettingsPageContext.Provider value={value}>
       {props.children}
     </SettingsPageContext.Provider>
   )
 }
 
-export function useSuppressSettingsSectionHeader() {
-  return useContext(SettingsPageContext).suppressSectionHeader
+/** Header chrome for SettingsSection: suppress flag + group eyebrow key. */
+export function useSettingsSectionChrome() {
+  const { suppressSectionHeader, sectionEyebrow } =
+    useContext(SettingsPageContext)
+  return { suppressSectionHeader, sectionEyebrow }
 }
 
 type SettingsPageTitleStatusPortalProps = {
@@ -100,47 +145,83 @@ export function SettingsPageActionsPortal(
 
 type SettingsPageFormActionsProps = {
   onSave: () => void
+  /** Custom discard handler; defaults to resetting the enclosing form. */
   onReset?: () => void
   isSaving?: boolean
   isSaveDisabled?: boolean
   isResetDisabled?: boolean
+  /** @deprecated Labels are fixed by the sticky save bar. */
   saveLabel?: string
+  /** @deprecated Labels are fixed by the sticky save bar. */
   savingLabel?: string
+  /** @deprecated Labels are fixed by the sticky save bar. */
   resetLabel?: string
-  resetVariant?: ComponentProps<typeof Button>['variant']
-  saveButtonRef?: RefObject<HTMLButtonElement | null>
 }
 
+/**
+ * Registers the section form's save/discard handlers with the settings
+ * page so the shared StickySaveBar can drive them. Renders nothing in
+ * place — the per-section header buttons were replaced by the bar
+ * (r2-B12a); custom non-form actions still use SettingsPageActionsPortal.
+ */
 export function SettingsPageFormActions(props: SettingsPageFormActionsProps) {
-  const { t } = useTranslation()
-  const saveLabel = props.isSaving
-    ? (props.savingLabel ?? 'Saving...')
-    : (props.saveLabel ?? 'Save Changes')
+  const formContext = useFormContext()
+
+  if (formContext) {
+    return <FormBoundFormActions {...props} />
+  }
+
+  return <StaticFormActions {...props} />
+}
+
+function FormBoundFormActions(props: SettingsPageFormActionsProps) {
+  const { control, reset } = useFormContext()
+  const { isDirty, isSubmitting } = useFormState({ control })
 
   return (
-    <SettingsPageActionsPortal>
-      {props.onReset && (
-        <Button
-          type='button'
-          size='sm'
-          variant={props.resetVariant ?? 'outline'}
-          onClick={props.onReset}
-          disabled={props.isResetDisabled || props.isSaving}
-        >
-          <RotateCcw data-icon='inline-start' />
-          <span>{t(props.resetLabel ?? 'Reset')}</span>
-        </Button>
-      )}
-      <Button
-        ref={props.saveButtonRef}
-        type='button'
-        size='sm'
-        onClick={props.onSave}
-        disabled={props.isSaving || props.isSaveDisabled}
-      >
-        <Save data-icon='inline-start' />
-        <span>{t(saveLabel)}</span>
-      </Button>
-    </SettingsPageActionsPortal>
+    <FormActionsRegistrar
+      dirty={isDirty}
+      saving={Boolean(props.isSaving) || isSubmitting}
+      save={props.onSave}
+      discard={props.onReset ?? (() => reset())}
+    />
   )
+}
+
+function StaticFormActions(props: SettingsPageFormActionsProps) {
+  // No enclosing react-hook-form provider: fall back to the explicit
+  // dirty hints, or keep the bar visible so saving stays reachable.
+  const dirty =
+    props.isResetDisabled != null
+      ? !props.isResetDisabled
+      : props.isSaveDisabled != null
+        ? !props.isSaveDisabled
+        : true
+
+  return (
+    <FormActionsRegistrar
+      dirty={dirty}
+      saving={Boolean(props.isSaving)}
+      save={props.onSave}
+      discard={props.onReset ?? noopRegister}
+    />
+  )
+}
+
+function FormActionsRegistrar(entry: SettingsFormActionsRegistration) {
+  const { registerFormActions } = useContext(SettingsPageContext)
+  const { dirty, saving, save, discard } = entry
+
+  // Re-register on every render so the bar always drives fresh handlers;
+  // the registrar bails out of state updates when dirty/saving are stable.
+  useEffect(() => {
+    registerFormActions({ dirty, saving, save, discard })
+  })
+
+  useEffect(
+    () => () => registerFormActions(null),
+    [registerFormActions]
+  )
+
+  return null
 }

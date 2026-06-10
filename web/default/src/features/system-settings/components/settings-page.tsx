@@ -16,13 +16,28 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo, useState, type ReactNode } from 'react'
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { SectionPageLayout } from '@/components/layout'
+import { StickySaveBar } from '@/components/settings'
 import { useSystemOptions, getOptionValue } from '../hooks/use-system-options'
 import type { SystemOption } from '../types'
-import { SettingsPageProvider } from './settings-page-context'
+import {
+  SettingsPageProvider,
+  type SettingsFormActionsRegistration,
+} from './settings-page-context'
+import { SettingsShell } from './settings-shell'
+import {
+  SETTINGS_SHELL_GROUPS,
+  isSettingsShellGroup,
+} from './settings-shell-config'
 
 type SettingsPageProps<
   TSettings extends Record<string, string | number | boolean | unknown[]>,
@@ -50,7 +65,23 @@ type SettingsPageProps<
 
 type SettingsPageFrameProps = {
   title: ReactNode
+  /** Group segment parsed from the route (`site`, `auth`, ...). */
+  group: string
+  /** Active section id for the in-page rail. */
+  section: string
   children: ReactNode
+}
+
+type FormActionsBarState = {
+  registered: boolean
+  dirty: boolean
+  saving: boolean
+}
+
+const IDLE_BAR_STATE: FormActionsBarState = {
+  registered: false,
+  dirty: false,
+  saving: false,
 }
 
 function SettingsPageFrame(props: SettingsPageFrameProps) {
@@ -59,10 +90,64 @@ function SettingsPageFrame(props: SettingsPageFrameProps) {
   const [titleStatusContainer, setTitleStatusContainer] =
     useState<HTMLSpanElement | null>(null)
 
+  // Save/discard handlers live in a ref (refreshed every render by the
+  // registrar); only the scalars that gate the sticky bar go through
+  // state, with a bail-out so re-registration cannot cascade renders.
+  const formActionsRef = useRef<SettingsFormActionsRegistration | null>(null)
+  const [barState, setBarState] = useState<FormActionsBarState>(IDLE_BAR_STATE)
+
+  const registerFormActions = useCallback(
+    (entry: SettingsFormActionsRegistration | null) => {
+      formActionsRef.current = entry
+      setBarState((prev) => {
+        if (!entry) {
+          return prev.registered ? IDLE_BAR_STATE : prev
+        }
+        if (
+          prev.registered &&
+          prev.dirty === entry.dirty &&
+          prev.saving === entry.saving
+        ) {
+          return prev
+        }
+        return { registered: true, dirty: entry.dirty, saving: entry.saving }
+      })
+    },
+    []
+  )
+
+  const handleSave = useCallback(() => {
+    formActionsRef.current?.save()
+  }, [])
+
+  const handleDiscard = useCallback(() => {
+    formActionsRef.current?.discard()
+  }, [])
+
+  const shellGroup = isSettingsShellGroup(props.group) ? props.group : null
+  const sectionEyebrow = shellGroup
+    ? SETTINGS_SHELL_GROUPS[shellGroup].labelKey
+    : null
+
+  const content = (
+    <>
+      <div className='flex w-full flex-col gap-4'>{props.children}</div>
+      <StickySaveBar
+        dirty={barState.registered && barState.dirty}
+        saving={barState.saving}
+        onDiscard={handleDiscard}
+        onSave={handleSave}
+      />
+    </>
+  )
+
   return (
     <SettingsPageProvider
       actionsContainer={actionsContainer}
       titleStatusContainer={titleStatusContainer}
+      suppressSectionHeader={false}
+      sectionEyebrow={sectionEyebrow}
+      registerFormActions={registerFormActions}
     >
       <SectionPageLayout>
         <SectionPageLayout.Title>
@@ -81,11 +166,24 @@ function SettingsPageFrame(props: SettingsPageFrameProps) {
           />
         </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <div className='flex w-full flex-col gap-4'>{props.children}</div>
+          {shellGroup ? (
+            <SettingsShell group={shellGroup} section={props.section}>
+              {content}
+            </SettingsShell>
+          ) : (
+            content
+          )}
         </SectionPageLayout.Content>
       </SectionPageLayout>
     </SettingsPageProvider>
   )
+}
+
+/** `/_authenticated/system-settings/site/$section` -> `site` */
+function parseGroupFromRoutePath(routePath: string) {
+  const segments = routePath.split('/')
+  const index = segments.indexOf('system-settings')
+  return index >= 0 ? (segments[index + 1] ?? '') : ''
 }
 
 /**
@@ -112,6 +210,7 @@ export function SettingsPage<
   const params = useParams({ from: routePath as any })
   const activeSection = (params?.section ?? defaultSection) as TSectionId
   const sectionMeta = getSectionMeta(activeSection)
+  const group = parseGroupFromRoutePath(routePath)
 
   const settings = useMemo(() => {
     const baseSettings = getOptionValue(
@@ -125,7 +224,11 @@ export function SettingsPage<
 
   if (isLoading) {
     return (
-      <SettingsPageFrame title={t(sectionMeta.titleKey)}>
+      <SettingsPageFrame
+        title={t(sectionMeta.titleKey)}
+        group={group}
+        section={activeSection}
+      >
         <div className='text-muted-foreground flex min-h-40 items-center justify-center text-sm'>
           {t(loadingMessage)}
         </div>
@@ -140,7 +243,11 @@ export function SettingsPage<
   )
 
   return (
-    <SettingsPageFrame title={t(sectionMeta.titleKey)}>
+    <SettingsPageFrame
+      title={t(sectionMeta.titleKey)}
+      group={group}
+      section={activeSection}
+    >
       {sectionContent}
     </SettingsPageFrame>
   )

@@ -16,37 +16,40 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { cn } from '@/lib/utils'
-import { useSuppressSettingsSectionHeader } from './settings-page-context'
+import { useTranslation } from 'react-i18next'
+import { SettingsPanel } from '@/components/settings'
+import { useSettingsSectionChrome } from './settings-page-context'
 
 type SettingsSectionProps = {
   title: string
-  titleProps?: React.HTMLAttributes<HTMLHeadingElement>
   children: React.ReactNode
   className?: string
 }
 
+/**
+ * Shared container for every system-settings section, rendered as an
+ * A3 SettingsPanel (eyebrow = owning group, title = section name). The
+ * suppress-header context still hides the panel header where the page
+ * chrome already names the section.
+ */
 export function SettingsSection({
   title,
-  titleProps,
   children,
   className,
 }: SettingsSectionProps) {
-  const suppressHeader = useSuppressSettingsSectionHeader()
+  const { t } = useTranslation()
+  const { suppressSectionHeader: suppressHeader, sectionEyebrow: eyebrowKey } =
+    useSettingsSectionChrome()
 
   return (
-    <section className={cn('flex flex-col gap-4', className)}>
-      {!suppressHeader && (
-        <div className='flex flex-col gap-1'>
-          <h3
-            {...titleProps}
-            className={cn('text-base font-semibold', titleProps?.className)}
-          >
-            {title}
-          </h3>
-        </div>
-      )}
-      {children}
-    </section>
+    <SettingsPanel
+      className={className}
+      eyebrow={
+        !suppressHeader && eyebrowKey ? t(eyebrowKey).toLowerCase() : undefined
+      }
+      title={!suppressHeader ? title : undefined}
+    >
+      <div className='flex flex-col gap-4 py-3 sm:py-4'>{children}</div>
+    </SettingsPanel>
   )
 }
