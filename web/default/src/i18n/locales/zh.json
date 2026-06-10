@@ -4544,6 +4544,14 @@
     "New key created — copy it now": "新密钥已创建——请立即复制",
     "Dismiss": "关闭",
     "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "{{name}} 的完整密钥仅此一次完整展示，请立即复制并妥善保存。",
-    "{{used}} of {{limit}}": "{{used}} / {{limit}}"
+    "{{used}} of {{limit}}": "{{used}} / {{limit}}",
+    "Requests": "请求数",
+    "~{{days}} days at current rate": "按当前用量约可用 {{days}} 天",
+    "Transactions": "交易记录",
+    "View all": "查看全部",
+    "Pay with": "支付方式",
+    "Minimum {{amount}}": "最低 {{amount}}",
+    "Add {{amount}}": "添加 {{amount}}",
+    "Redeem code": "兑换码"
   }
 }

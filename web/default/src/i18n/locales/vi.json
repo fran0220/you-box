@@ -4544,6 +4544,14 @@
     "New key created — copy it now": "New key created — copy it now",
     "Dismiss": "Dismiss",
     "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "The full key for {{name}} is shown only this once. Copy it now and store it securely.",
-    "{{used}} of {{limit}}": "{{used}} of {{limit}}"
+    "{{used}} of {{limit}}": "{{used}} of {{limit}}",
+    "Requests": "Số yêu cầu",
+    "~{{days}} days at current rate": "≈ {{days}} ngày theo mức dùng hiện tại",
+    "Transactions": "Giao dịch",
+    "View all": "Xem tất cả",
+    "Pay with": "Thanh toán bằng",
+    "Minimum {{amount}}": "Tối thiểu {{amount}}",
+    "Add {{amount}}": "Thêm {{amount}}",
+    "Redeem code": "Mã đổi thưởng"
   }
 }

@@ -4544,6 +4544,14 @@
     "New key created — copy it now": "New key created — copy it now",
     "Dismiss": "Dismiss",
     "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "The full key for {{name}} is shown only this once. Copy it now and store it securely.",
-    "{{used}} of {{limit}}": "{{used}} of {{limit}}"
+    "{{used}} of {{limit}}": "{{used}} of {{limit}}",
+    "Requests": "Requêtes",
+    "~{{days}} days at current rate": "≈ {{days}} jours au rythme actuel",
+    "Transactions": "Transactions",
+    "View all": "Tout afficher",
+    "Pay with": "Payer avec",
+    "Minimum {{amount}}": "Minimum {{amount}}",
+    "Add {{amount}}": "Ajouter {{amount}}",
+    "Redeem code": "Code de rachat"
   }
 }

@@ -4544,6 +4544,14 @@
     "New key created — copy it now": "New key created — copy it now",
     "Dismiss": "Dismiss",
     "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "The full key for {{name}} is shown only this once. Copy it now and store it securely.",
-    "{{used}} of {{limit}}": "{{used}} of {{limit}}"
+    "{{used}} of {{limit}}": "{{used}} of {{limit}}",
+    "Requests": "リクエスト数",
+    "~{{days}} days at current rate": "現在の使用ペースで約 {{days}} 日",
+    "Transactions": "取引履歴",
+    "View all": "すべて表示",
+    "Pay with": "支払い方法",
+    "Minimum {{amount}}": "最低 {{amount}}",
+    "Add {{amount}}": "{{amount}} を追加",
+    "Redeem code": "引き換えコード"
   }
 }

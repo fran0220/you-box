@@ -4544,6 +4544,14 @@
     "New key created — copy it now": "New key created — copy it now",
     "Dismiss": "Dismiss",
     "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "The full key for {{name}} is shown only this once. Copy it now and store it securely.",
-    "{{used}} of {{limit}}": "{{used}} of {{limit}}"
+    "{{used}} of {{limit}}": "{{used}} of {{limit}}",
+    "Requests": "Запросы",
+    "~{{days}} days at current rate": "≈ {{days}} дн. при текущем расходе",
+    "Transactions": "Транзакции",
+    "View all": "Показать все",
+    "Pay with": "Способ оплаты",
+    "Minimum {{amount}}": "Минимум {{amount}}",
+    "Add {{amount}}": "Пополнить на {{amount}}",
+    "Redeem code": "Код активации"
   }
 }
