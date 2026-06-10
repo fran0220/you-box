@@ -9,7 +9,10 @@ docs/redesign-reviews/
   step-00-baseline.md … step-19-final-acceptance.md   # one record per plan step
   final-acceptance-matrix.md                          # step 19 route matrix
   feature-parity-index.md                             # reference → new implementation map
+  page-verification-2026-06-10.md                     # post-acceptance live-browser sweep
+  verify-harness.mjs                                  # reproducible 80-route Playwright sweep
   screenshots/step-NN/                                # browser-review screenshots per step
+  screenshots/verification-2026-06-10/                # sweep evidence (wizard + fixed pages)
 ```
 
 ## Numbering note
