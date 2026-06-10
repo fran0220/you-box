@@ -35,10 +35,10 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  SettingsForm,
-  SettingsSwitchContent,
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsControlGroup,
-  SettingsSwitchItem,
+  SettingsForm,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -225,51 +225,53 @@ export function ClaudeSettingsCard({ defaultValues }: ClaudeSettingsCardProps) {
           />
 
           <SettingsControlGroup>
-            <FormField
-              control={form.control}
-              name='claude.thinking_adapter_enabled'
-              render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Thinking Suffix Adapter')}</FormLabel>
-                    <FormDescription>
-                      {t(
-                        'Adapt `-thinking` suffix requests to Anthropic native thinking behavior while keeping billing predictable.'
-                      )}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
-              )}
-            />
+            <SettingRowGroup>
+              <FormField
+                control={form.control}
+                name='claude.thinking_adapter_enabled'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Thinking Suffix Adapter')}
+                    description={t(
+                      'Adapt `-thinking` suffix requests to Anthropic native thinking behavior while keeping billing predictable.'
+                    )}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='claude.thinking_adapter_budget_tokens_percentage'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Budget Tokens Ratio')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={String(field.value ?? '')}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t(
+              <FormField
+                control={form.control}
+                name='claude.thinking_adapter_budget_tokens_percentage'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Budget Tokens Ratio')}
+                    description={t(
                       'Budget tokens = max tokens × ratio. Accepts a decimal between 0.1 and 1.'
                     )}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-32'
+                          {...field}
+                          value={String(field.value ?? '')}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+            </SettingRowGroup>
           </SettingsControlGroup>
         </SettingsForm>
       </Form>

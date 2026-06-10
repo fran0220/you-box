@@ -36,9 +36,9 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -257,25 +257,25 @@ export function MonitoringSettingsSection({
             isSaving={updateOption.isPending}
             saveLabel='Save monitoring rules'
           />
-          <div className='grid gap-6 md:grid-cols-2'>
+          <SettingRowGroup>
             <FormField
               control={form.control}
               name='monitor_setting.auto_test_channel_enabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Scheduled channel tests')}</FormLabel>
-                    <FormDescription>
-                      {t('Automatically probe all channels in the background')}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Scheduled channel tests')}
+                  description={t(
+                    'Automatically probe all channels in the background'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -283,48 +283,48 @@ export function MonitoringSettingsSection({
               control={form.control}
               name='monitor_setting.auto_test_channel_minutes'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Test interval (minutes)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={1}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('How frequently the system tests all channels')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Test interval (minutes)')}
+                  description={t(
+                    'How frequently the system tests all channels'
+                  )}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={1}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
 
-          <div className='grid gap-6 md:grid-cols-2'>
             <FormField
               control={form.control}
               name='ChannelDisableThreshold'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Disable threshold (seconds)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={0}
-                      step={1}
-                      value={field.value}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t(
-                      'Automatically disable channels exceeding this response time'
-                    )}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Disable threshold (seconds)')}
+                  description={t(
+                    'Automatically disable channels exceeding this response time'
+                  )}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={0}
+                        step={1}
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -332,45 +332,45 @@ export function MonitoringSettingsSection({
               control={form.control}
               name='QuotaRemindThreshold'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Quota reminder (tokens)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={0}
-                      step={1}
-                      value={field.value}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Send email alerts when a user falls below this quota')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Quota reminder (tokens)')}
+                  description={t(
+                    'Send email alerts when a user falls below this quota'
+                  )}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={0}
+                        step={1}
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
 
-          <div className='grid gap-6 md:grid-cols-2'>
             <FormField
               control={form.control}
               name='AutomaticDisableChannelEnabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Disable on failure')}</FormLabel>
-                    <FormDescription>
-                      {t('Automatically disable channels when tests fail')}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Disable on failure')}
+                  description={t(
+                    'Automatically disable channels when tests fail'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -378,23 +378,23 @@ export function MonitoringSettingsSection({
               control={form.control}
               name='AutomaticEnableChannelEnabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Re-enable on success')}</FormLabel>
-                    <FormDescription>
-                      {t('Bring channels back online after successful checks')}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Re-enable on success')}
+                  description={t(
+                    'Bring channels back online after successful checks'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
+          </SettingRowGroup>
 
           <FormField
             control={form.control}
@@ -420,34 +420,38 @@ export function MonitoringSettingsSection({
             )}
           />
 
-          <div className='grid gap-6 md:grid-cols-2'>
+          <SettingRowGroup>
             <FormField
               control={form.control}
               name='AutomaticDisableStatusCodes'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Auto-disable status codes')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t('e.g. 401, 403, 429, 500-599')}
-                      value={field.value}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t(
-                      'Accepts comma-separated status codes and inclusive ranges.'
-                    )}{' '}
-                    {autoDisableParsed.ok &&
-                      autoDisableParsed.normalized &&
-                      autoDisableParsed.normalized !== field.value.trim() && (
-                        <span className='text-muted-foreground'>
-                          {t('Normalized:')} {autoDisableParsed.normalized}
-                        </span>
-                      )}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Auto-disable status codes')}
+                  description={
+                    <>
+                      {t(
+                        'Accepts comma-separated status codes and inclusive ranges.'
+                      )}{' '}
+                      {autoDisableParsed.ok &&
+                        autoDisableParsed.normalized &&
+                        autoDisableParsed.normalized !== field.value.trim() && (
+                          <span className='text-muted-foreground'>
+                            {t('Normalized:')} {autoDisableParsed.normalized}
+                          </span>
+                        )}
+                    </>
+                  }
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        placeholder={t('e.g. 401, 403, 429, 500-599')}
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -455,32 +459,36 @@ export function MonitoringSettingsSection({
               control={form.control}
               name='AutomaticRetryStatusCodes'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Auto-retry status codes')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t('e.g. 401, 403, 429, 500-599')}
-                      value={field.value}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t(
-                      'Accepts comma-separated status codes and inclusive ranges.'
-                    )}{' '}
-                    {autoRetryParsed.ok &&
-                      autoRetryParsed.normalized &&
-                      autoRetryParsed.normalized !== field.value.trim() && (
-                        <span className='text-muted-foreground'>
-                          {t('Normalized:')} {autoRetryParsed.normalized}
-                        </span>
-                      )}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Auto-retry status codes')}
+                  description={
+                    <>
+                      {t(
+                        'Accepts comma-separated status codes and inclusive ranges.'
+                      )}{' '}
+                      {autoRetryParsed.ok &&
+                        autoRetryParsed.normalized &&
+                        autoRetryParsed.normalized !== field.value.trim() && (
+                          <span className='text-muted-foreground'>
+                            {t('Normalized:')} {autoRetryParsed.normalized}
+                          </span>
+                        )}
+                    </>
+                  }
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        placeholder={t('e.g. 401, 403, 429, 500-599')}
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>

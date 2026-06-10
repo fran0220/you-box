@@ -37,15 +37,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
@@ -61,9 +53,9 @@ import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { StatusBadge } from '@/components/status-badge'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -411,75 +403,80 @@ export function PerformanceSection(props: Props) {
             </p>
           </div>
 
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+          <SettingRowGroup>
             <FormField
               control={form.control}
               name='performance_setting.disk_cache_enabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Enable Disk Cache')}</FormLabel>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Enable Disk Cache')}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
             <FormField
               control={form.control}
               name='performance_setting.disk_cache_threshold_mb'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Disk Cache Threshold (MB)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={1}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                      disabled={!diskEnabled}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Use disk cache when request body exceeds this size')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Disk Cache Threshold (MB)')}
+                  description={t(
+                    'Use disk cache when request body exceeds this size'
+                  )}
+                  disabled={!diskEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={1}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                        disabled={!diskEnabled}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
             <FormField
               control={form.control}
               name='performance_setting.disk_cache_max_size_mb'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Max Disk Cache Size (MB)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={100}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                      disabled={!diskEnabled}
-                    />
-                  </FormControl>
-                  {stats?.disk_space_info &&
-                    stats.disk_space_info.total > 0 && (
-                      <FormDescription>
-                        {t('Free: {{free}} / Total: {{total}}', {
+                <SettingRowFormItem
+                  label={t('Max Disk Cache Size (MB)')}
+                  description={
+                    stats?.disk_space_info && stats.disk_space_info.total > 0
+                      ? t('Free: {{free}} / Total: {{total}}', {
                           free: formatBytes(stats.disk_space_info.free),
                           total: formatBytes(stats.disk_space_info.total),
-                        })}
-                      </FormDescription>
-                    )}
-                  <FormMessage />
-                </FormItem>
+                        })
+                      : undefined
+                  }
+                  disabled={!diskEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={100}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                        disabled={!diskEnabled}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
+          </SettingRowGroup>
 
           {lowDiskSpace && (
             <Alert variant='destructive'>
@@ -490,29 +487,36 @@ export function PerformanceSection(props: Props) {
           )}
 
           {!stats?.config?.is_running_in_container && (
-            <FormField
-              control={form.control}
-              name='performance_setting.disk_cache_path'
-              render={({ field }) => (
-                <FormItem className='max-w-md'>
-                  <FormLabel>{t('Cache Directory')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t(
-                        'Leave empty to use system temp directory'
-                      )}
-                      value={field.value ?? ''}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                      disabled={!diskEnabled}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <SettingRowGroup>
+              <FormField
+                control={form.control}
+                name='performance_setting.disk_cache_path'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Cache Directory')}
+                    disabled={!diskEnabled}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          placeholder={t(
+                            'Leave empty to use system temp directory'
+                          )}
+                          value={field.value ?? ''}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                          disabled={!diskEnabled}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+            </SettingRowGroup>
           )}
 
           <Separator />
@@ -529,84 +533,93 @@ export function PerformanceSection(props: Props) {
             </p>
           </div>
 
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-4'>
+          <SettingRowGroup>
             <FormField
               control={form.control}
               name='performance_setting.monitor_enabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Enable Performance Monitoring')}</FormLabel>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Enable Performance Monitoring')}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
             <FormField
               control={form.control}
               name='performance_setting.monitor_cpu_threshold'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('CPU Threshold (%)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={0}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                      disabled={!monitorEnabled}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('CPU Threshold (%)')}
+                  disabled={!monitorEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={0}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                        disabled={!monitorEnabled}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
             <FormField
               control={form.control}
               name='performance_setting.monitor_memory_threshold'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Memory Threshold (%)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={0}
-                      max={100}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                      disabled={!monitorEnabled}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Memory Threshold (%)')}
+                  disabled={!monitorEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={0}
+                        max={100}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                        disabled={!monitorEnabled}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
             <FormField
               control={form.control}
               name='performance_setting.monitor_disk_threshold'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Disk Threshold (%)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={0}
-                      max={100}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                      disabled={!monitorEnabled}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Disk Threshold (%)')}
+                  disabled={!monitorEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={0}
+                        max={100}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                        disabled={!monitorEnabled}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
+          </SettingRowGroup>
 
           <Separator />
 
@@ -619,101 +632,109 @@ export function PerformanceSection(props: Props) {
             </p>
           </div>
 
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-4'>
+          <SettingRowGroup>
             <FormField
               control={form.control}
               name='perf_metrics_setting.enabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>
-                      {t('Enable model performance metrics')}
-                    </FormLabel>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Enable model performance metrics')}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
             <FormField
               control={form.control}
               name='perf_metrics_setting.flush_interval'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Flush interval (minutes)')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={1}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                      disabled={!perfMetricsEnabled}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Flush interval (minutes)')}
+                  disabled={!perfMetricsEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={1}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                        disabled={!perfMetricsEnabled}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
             <FormField
               control={form.control}
               name='perf_metrics_setting.bucket_time'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Aggregation bucket')}</FormLabel>
-                  <Select
-                    items={[
-                      { value: 'minute', label: t('1 minute') },
-                      { value: '5min', label: t('5 minutes') },
-                      { value: 'hour', label: t('1 hour') },
-                    ]}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={!perfMetricsEnabled}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent alignItemWithTrigger={false}>
-                      <SelectGroup>
-                        <SelectItem value='minute'>{t('1 minute')}</SelectItem>
-                        <SelectItem value='5min'>{t('5 minutes')}</SelectItem>
-                        <SelectItem value='hour'>{t('1 hour')}</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Aggregation bucket')}
+                  disabled={!perfMetricsEnabled}
+                  control={
+                    <Select
+                      items={[
+                        { value: 'minute', label: t('1 minute') },
+                        { value: '5min', label: t('5 minutes') },
+                        { value: 'hour', label: t('1 hour') },
+                      ]}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={!perfMetricsEnabled}
+                    >
+                      <FormControl>
+                        <SelectTrigger className='w-40'>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent alignItemWithTrigger={false}>
+                        <SelectGroup>
+                          <SelectItem value='minute'>
+                            {t('1 minute')}
+                          </SelectItem>
+                          <SelectItem value='5min'>
+                            {t('5 minutes')}
+                          </SelectItem>
+                          <SelectItem value='hour'>{t('1 hour')}</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  }
+                />
               )}
             />
             <FormField
               control={form.control}
               name='perf_metrics_setting.retention_days'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Retention days')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      min={0}
-                      step={1}
-                      {...safeNumberFieldProps(field)}
-                      disabled={!perfMetricsEnabled}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('0 means data is kept permanently')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Retention days')}
+                  description={t('0 means data is kept permanently')}
+                  disabled={!perfMetricsEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        type='number'
+                        min={0}
+                        step={1}
+                        {...safeNumberFieldProps(field)}
+                        disabled={!perfMetricsEnabled}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
 

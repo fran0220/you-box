@@ -20,21 +20,13 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -151,49 +143,49 @@ export function EmailSettingsSection({
             isSaving={updateOption.isPending}
             saveLabel='Save SMTP settings'
           />
-          <FormField
-            control={form.control}
-            name='SMTPServer'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('SMTP Host')}</FormLabel>
-                <FormControl>
-                  <Input
-                    autoComplete='off'
-                    placeholder={t('smtp.example.com')}
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t('Hostname or IP of your SMTP provider')}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='SMTPServer'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('SMTP Host')}
+                  description={t('Hostname or IP of your SMTP provider')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        autoComplete='off'
+                        placeholder={t('smtp.example.com')}
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <div className='grid gap-6 md:grid-cols-2'>
             <FormField
               control={form.control}
               name='SMTPPort'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Port')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      autoComplete='off'
-                      type='number'
-                      placeholder='587'
-                      {...field}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Common ports include 25, 465, and 587')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <SettingRowFormItem
+                  label={t('Port')}
+                  description={t('Common ports include 25, 465, and 587')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-32'
+                        autoComplete='off'
+                        type='number'
+                        placeholder='587'
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -201,20 +193,18 @@ export function EmailSettingsSection({
               control={form.control}
               name='SMTPSSLEnabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Enable SSL/TLS')}</FormLabel>
-                    <FormDescription>
-                      {t('Use secure connection when sending emails')}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Enable SSL/TLS')}
+                  description={t('Use secure connection when sending emails')}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
 
@@ -222,90 +212,94 @@ export function EmailSettingsSection({
               control={form.control}
               name='SMTPForceAuthLogin'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Force AUTH LOGIN')}</FormLabel>
-                    <FormDescription>
-                      {t('Force SMTP authentication using AUTH LOGIN method')}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <SettingRowFormItem
+                  label={t('Force AUTH LOGIN')}
+                  description={t(
+                    'Force SMTP authentication using AUTH LOGIN method'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
               )}
             />
-          </div>
 
-          <FormField
-            control={form.control}
-            name='SMTPAccount'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Username')}</FormLabel>
-                <FormControl>
-                  <Input
-                    autoComplete='off'
-                    placeholder={t('noreply@example.com')}
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t('Account used when authenticating with the SMTP server')}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name='SMTPAccount'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Username')}
+                  description={t(
+                    'Account used when authenticating with the SMTP server'
+                  )}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        autoComplete='off'
+                        placeholder={t('noreply@example.com')}
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='SMTPFrom'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('From Address')}</FormLabel>
-                <FormControl>
-                  <Input
-                    autoComplete='off'
-                    placeholder={t('New API <noreply@example.com>')}
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t('Display name and email used in outgoing messages')}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name='SMTPFrom'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('From Address')}
+                  description={t(
+                    'Display name and email used in outgoing messages'
+                  )}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        autoComplete='off'
+                        placeholder={t('New API <noreply@example.com>')}
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='SMTPToken'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Password / Access Token')}</FormLabel>
-                <FormControl>
-                  <Input
-                    autoComplete='off'
-                    type='password'
-                    placeholder={t('Enter new token to update')}
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t('Leave blank to keep the existing credential')}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name='SMTPToken'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Password / Access Token')}
+                  description={t('Leave blank to keep the existing credential')}
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        autoComplete='off'
+                        type='password'
+                        placeholder={t('Enter new token to update')}
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>

@@ -20,21 +20,13 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -113,79 +105,79 @@ export function WorkerSettingsSection({
             isSaving={updateOption.isPending}
             saveLabel='Save Worker settings'
           />
-          <FormField
-            control={form.control}
-            name='WorkerUrl'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Worker URL')}</FormLabel>
-                <FormControl>
-                  <Input
-                    type='url'
-                    inputMode='url'
-                    placeholder={t('https://worker.example.workers.dev')}
-                    autoComplete='off'
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t(
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='WorkerUrl'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Worker URL')}
+                  description={t(
                     'Requests will be forwarded to this worker. Trailing slashes are removed automatically.'
                   )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        type='url'
+                        inputMode='url'
+                        placeholder={t('https://worker.example.workers.dev')}
+                        autoComplete='off'
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='WorkerValidKey'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Worker Access Key')}</FormLabel>
-                <FormControl>
-                  <Input
-                    type='password'
-                    placeholder={t('Enter new key to update')}
-                    autoComplete='new-password'
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t(
+            <FormField
+              control={form.control}
+              name='WorkerValidKey'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Worker Access Key')}
+                  description={t(
                     'Used to authenticate with the worker. Leave blank to keep the existing secret.'
                   )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  control={
+                    <FormControl>
+                      <Input
+                        className='w-72 max-w-full'
+                        type='password'
+                        placeholder={t('Enter new key to update')}
+                        autoComplete='new-password'
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='WorkerAllowHttpImageRequestEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Allow HTTP image requests')}</FormLabel>
-                  <FormDescription>
-                    {t(
-                      'Enable when proxying workers that fetch images over HTTP.'
-                    )}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name='WorkerAllowHttpImageRequestEnabled'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Allow HTTP image requests')}
+                  description={t(
+                    'Enable when proxying workers that fetch images over HTTP.'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>

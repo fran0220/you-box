@@ -38,9 +38,9 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { testDeploymentConnectionWithKey } from '@/features/models/api'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -144,27 +144,29 @@ export function IoNetDeploymentSettingsSection({
             isSaveDisabled={!isDirty}
             saveLabel='Save io.net settings'
           />
-          <FormField
-            control={form.control}
-            name='enabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Enable io.net deployments')}</FormLabel>
-                  <FormDescription>
-                    {t('Enable io.net model deployment service in console')}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={(v) => field.onChange(v)}
-                    disabled={updateOption.isPending || isSubmitting}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='enabled'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Enable io.net deployments')}
+                  description={t(
+                    'Enable io.net model deployment service in console'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(v) => field.onChange(v)}
+                        disabled={updateOption.isPending || isSubmitting}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
+          </SettingRowGroup>
 
           {enabled ? (
             <>

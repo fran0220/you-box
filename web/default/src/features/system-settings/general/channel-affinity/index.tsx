@@ -39,10 +39,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog } from '@/components/dialog'
+import { SettingRow } from '@/components/settings'
 import { StatusBadge, StatusBadgeList } from '@/components/status-badge'
-import { SettingsSwitchField } from '../../components/settings-form-layout'
 import { SettingsPageActionsPortal } from '../../components/settings-page-context'
 import { SettingsSection } from '../../components/settings-section'
 import { useUpdateOption } from '../../hooks/use-update-option'
@@ -413,49 +414,60 @@ export function ChannelAffinitySection(props: Props) {
         </Alert>
 
         {/* Basic Settings */}
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
-          <SettingsSwitchField
-            checked={enabled}
-            onCheckedChange={setEnabled}
+        <div className='flex min-w-0 flex-col'>
+          <SettingRow
             label={t('Enable')}
-            className='border-b-0 py-0'
+            control={<Switch checked={enabled} onCheckedChange={setEnabled} />}
           />
-          <div className='grid gap-1.5'>
-            <Label>{t('Max Entries')}</Label>
-            <Input
-              type='number'
-              min={0}
-              value={maxEntries}
-              onChange={(e) => setMaxEntries(Number(e.target.value))}
-            />
-          </div>
-          <div className='grid gap-1.5'>
-            <Label>{t('Default TTL (seconds)')}</Label>
-            <Input
-              type='number'
-              min={0}
-              value={defaultTtl}
-              onChange={(e) => setDefaultTtl(Number(e.target.value))}
-            />
-          </div>
+          <SettingRow
+            label={t('Max Entries')}
+            control={
+              <Input
+                className='w-32'
+                type='number'
+                min={0}
+                value={maxEntries}
+                onChange={(e) => setMaxEntries(Number(e.target.value))}
+              />
+            }
+          />
+          <SettingRow
+            label={t('Default TTL (seconds)')}
+            control={
+              <Input
+                className='w-32'
+                type='number'
+                min={0}
+                value={defaultTtl}
+                onChange={(e) => setDefaultTtl(Number(e.target.value))}
+              />
+            }
+          />
+          <SettingRow
+            label={t('Switch affinity on success')}
+            description={t(
+              'If the affinity channel fails and retry succeeds on another channel, update affinity to the successful channel.'
+            )}
+            control={
+              <Switch
+                checked={switchOnSuccess}
+                onCheckedChange={setSwitchOnSuccess}
+              />
+            }
+          />
+          <SettingRow
+            label={t('Keep affinity when channel is disabled')}
+            description={t(
+              'When enabled, keep the affinity entry even if the affinity channel is disabled or no longer usable for the current group/model. Leave it off to delete the entry and select another channel.'
+            )}
+            control={
+              <Switch
+                checked={keepOnChannelDisabled}
+                onCheckedChange={setKeepOnChannelDisabled}
+              />
+            }
+          />
         </div>
-
-        <SettingsSwitchField
-          checked={switchOnSuccess}
-          onCheckedChange={setSwitchOnSuccess}
-          label={t('Switch affinity on success')}
-          description={t(
-            'If the affinity channel fails and retry succeeds on another channel, update affinity to the successful channel.'
-          )}
-        />
-        <SettingsSwitchField
-          checked={keepOnChannelDisabled}
-          onCheckedChange={setKeepOnChannelDisabled}
-          label={t('Keep affinity when channel is disabled')}
-          description={t(
-            'When enabled, keep the affinity entry even if the affinity channel is disabled or no longer usable for the current group/model. Leave it off to delete the entry and select another channel.'
-          )}
-        />
 
         <Separator />
 

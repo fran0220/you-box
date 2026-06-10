@@ -34,22 +34,15 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
 import { DateTimePicker } from '@/components/datetime-picker'
 import { deleteLogsBefore } from '../api'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsControlGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -175,29 +168,28 @@ export function LogSettingsSection({
             isSaving={updateOption.isPending}
             saveLabel='Save log settings'
           />
-          <FormField
-            control={form.control}
-            name='LogConsumeEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Record quota usage')}</FormLabel>
-                  <FormDescription>
-                    {t(
-                      'Track per-request consumption to power usage analytics. Keeping this on increases database writes.'
-                    )}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </SettingsSwitchItem>
-            )}
-          />
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='LogConsumeEnabled'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Record quota usage')}
+                  description={t(
+                    'Track per-request consumption to power usage analytics. Keeping this on increases database writes.'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
+          </SettingRowGroup>
 
           <SettingsControlGroup className='space-y-3'>
             <div>

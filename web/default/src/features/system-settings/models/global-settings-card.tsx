@@ -39,9 +39,9 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { StatusBadge } from '@/components/status-badge'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -199,28 +199,28 @@ export function GlobalSettingsCard({ defaultValues }: GlobalSettingsCardProps) {
             onSave={form.handleSubmit(onSubmit)}
             isSaving={updateOption.isPending}
           />
-          <FormField
-            control={form.control}
-            name='global.pass_through_request_enabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Enable Request Passthrough')}</FormLabel>
-                  <FormDescription>
-                    {t(
-                      'Forward requests directly to upstream providers without any post-processing.'
-                    )}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='global.pass_through_request_enabled'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Enable Request Passthrough')}
+                  description={t(
+                    'Forward requests directly to upstream providers without any post-processing.'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
+          </SettingRowGroup>
 
           <FormField
             control={form.control}
@@ -350,61 +350,61 @@ export function GlobalSettingsCard({ defaultValues }: GlobalSettingsCardProps) {
 
           <Separator />
 
-          <FormField
-            control={form.control}
-            name='general_setting.ping_interval_enabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Keep-alive Ping')}</FormLabel>
-                  <FormDescription>
-                    {t(
-                      'Periodically send ping frames to keep streaming connections active.'
-                    )}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+          <SettingRowGroup>
+            <FormField
+              control={form.control}
+              name='general_setting.ping_interval_enabled'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Keep-alive Ping')}
+                  description={t(
+                    'Periodically send ping frames to keep streaming connections active.'
+                  )}
+                  control={
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='general_setting.ping_interval_seconds'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Ping Interval (seconds)')}</FormLabel>
-                <FormControl>
-                  <Input
-                    type='number'
-                    min={1}
-                    disabled={!pingEnabled}
-                    className='w-24'
-                    value={
-                      field.value === undefined || field.value === null
-                        ? ''
-                        : String(field.value)
-                    }
-                    onChange={(event) => field.onChange(event.target.value)}
-                    onBlur={field.onBlur}
-                    name={field.name}
-                    ref={field.ref}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t(
+            <FormField
+              control={form.control}
+              name='general_setting.ping_interval_seconds'
+              render={({ field }) => (
+                <SettingRowFormItem
+                  label={t('Ping Interval (seconds)')}
+                  description={t(
                     'Recommended to keep this high to avoid upstream throttling.'
                   )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  disabled={!pingEnabled}
+                  control={
+                    <FormControl>
+                      <Input
+                        type='number'
+                        min={1}
+                        disabled={!pingEnabled}
+                        className='w-24'
+                        value={
+                          field.value === undefined || field.value === null
+                            ? ''
+                            : String(field.value)
+                        }
+                        onChange={(event) => field.onChange(event.target.value)}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                  }
+                />
+              )}
+            />
+          </SettingRowGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>
