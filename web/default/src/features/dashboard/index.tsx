@@ -65,9 +65,11 @@ const LazyConsumptionDistributionChart = lazy(() =>
   }))
 )
 
+// R2-B1: the models section reuses the redesigned health panel — the old
+// PerformanceOverview duplicated the same KPIs in a private layout.
 const LazyPerformanceOverview = lazy(() =>
-  import('./components/models/performance-overview').then((m) => ({
-    default: m.PerformanceOverview,
+  import('./components/overview/performance-health-panel').then((m) => ({
+    default: m.PerformanceHealthPanel,
   }))
 )
 

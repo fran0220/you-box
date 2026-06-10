@@ -20,8 +20,15 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Gauge, HeartPulse, Timer } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { cn } from '@/lib/utils'
+import {
+  Panel,
+  PanelHeader,
+  StatCard,
+  StatCardRow,
+} from '@/components/patterns'
+import { MonoCell } from '@/components/data-table'
 import { Skeleton } from '@/components/ui/skeleton'
+import { StatusBadge, type StatusVariant } from '@/components/status-badge'
 import { getPerfMetricsSummary } from '@/features/performance-metrics/api'
 import {
   formatLatency,
@@ -51,18 +58,11 @@ function simpleAverage(
   return count > 0 ? total / count : NaN
 }
 
-function rateTextClass(rate: number): string {
-  if (!Number.isFinite(rate)) return 'text-muted-foreground'
-  if (rate >= 99.9) return 'text-success'
-  if (rate >= 99) return 'text-warning'
-  return 'text-destructive'
-}
-
-function rateDotClass(rate: number): string {
-  if (!Number.isFinite(rate)) return 'bg-muted-foreground'
-  if (rate >= 99.9) return 'bg-success'
-  if (rate >= 99) return 'bg-warning'
-  return 'bg-destructive'
+function healthFor(rate: number): { label: string; variant: StatusVariant } {
+  if (!Number.isFinite(rate)) return { label: 'Unknown', variant: 'neutral' }
+  if (rate >= 99.9) return { label: 'Operational', variant: 'success' }
+  if (rate >= 99) return { label: 'Degraded', variant: 'warning' }
+  return { label: 'Down', variant: 'danger' }
 }
 
 export function PerformanceHealthPanel() {
@@ -102,116 +102,114 @@ export function PerformanceHealthPanel() {
   const hasData = models.length > 0
 
   return (
-    <section className='bg-card h-full overflow-hidden rounded-2xl border shadow-xs'>
-      <div className='flex items-center gap-2 border-b px-4 py-3 sm:px-5'>
-        <HeartPulse
-          className='text-muted-foreground/60 size-4 shrink-0'
-          aria-hidden='true'
-        />
-        <h3 className='text-sm font-semibold'>{t('Performance health')}</h3>
-        <span className='text-muted-foreground ml-auto text-xs'>
-          {t('Performance metrics for the last 24 hours')}
-        </span>
-      </div>
-
-      <div className='space-y-3 p-4 sm:p-5'>
-        <div className='grid grid-cols-3 gap-2'>
-          <MetricCell
-            icon={HeartPulse}
+    <Panel className='h-full'>
+      <PanelHeader
+        eyebrow={t('performance')}
+        title={t('Performance health')}
+        actions={
+          <span className='text-muted-foreground font-mono text-[11px]'>
+            {t('Performance metrics for the last 24 hours')}
+          </span>
+        }
+      />
+      <div className='space-y-4 p-4 sm:p-5'>
+        <StatCardRow columns={3}>
+          <StatCard
+            size='sm'
+            icon={<HeartPulse />}
             label={t('Success rate')}
             value={formatUptimePct(summary.successRate)}
             loading={loading}
-            valueClassName={rateTextClass(summary.successRate)}
           />
-          <MetricCell
-            icon={Timer}
+          <StatCard
+            size='sm'
+            icon={<Timer />}
             label={t('Average latency')}
             value={formatLatency(summary.avgLatencyMs)}
             loading={loading}
           />
-          <MetricCell
-            icon={Gauge}
+          <StatCard
+            size='sm'
+            icon={<Gauge />}
             label={t('Throughput')}
             value={formatThroughput(summary.avgTps)}
             loading={loading}
           />
-        </div>
+        </StatCardRow>
 
         {loading ? (
           <div className='space-y-1'>
             {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className='h-5 w-full rounded' />
+              <Skeleton key={i} className='h-6 w-full rounded' />
             ))}
           </div>
         ) : (
           hasData && (
-            <div>
-              <span className='text-muted-foreground mb-1 block text-[11px] font-medium'>
-                {t('Top models by traffic')}
-              </span>
-              <div className='grid grid-cols-1 gap-x-4 sm:grid-cols-2'>
-                {topModels.map((model) => (
-                  <div
-                    key={model.model_name}
-                    className='flex items-center justify-between gap-2 rounded px-1.5 py-1'
-                  >
-                    <span className='min-w-0 flex-1 truncate font-mono text-[11px]'>
-                      {model.model_name}
-                    </span>
-                    <span className='inline-flex shrink-0 items-center gap-1'>
-                      <span
-                        className={cn(
-                          'size-1.5 rounded-full',
-                          rateDotClass(model.success_rate)
-                        )}
-                        aria-hidden='true'
-                      />
-                      <span
-                        className={cn(
-                          'font-mono text-[11px] font-semibold tabular-nums',
-                          rateTextClass(model.success_rate)
-                        )}
+            <div className='overflow-hidden rounded-md border'>
+              <table className='w-full text-sm'>
+                <thead className='bg-surface-2'>
+                  <tr className='text-muted-foreground border-b font-mono text-[10px] tracking-[0.06em] uppercase'>
+                    <th className='px-3 py-2 text-left font-medium'>
+                      {t('Model')}
+                    </th>
+                    <th className='px-3 py-2 text-left font-medium'>
+                      {t('Status')}
+                    </th>
+                    <th className='px-3 py-2 text-right font-medium'>
+                      {t('Success rate')}
+                    </th>
+                    <th className='hidden px-3 py-2 text-right font-medium sm:table-cell'>
+                      {t('Average latency')}
+                    </th>
+                    <th className='hidden px-3 py-2 text-right font-medium sm:table-cell'>
+                      {t('Throughput')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topModels.map((model) => {
+                    const health = healthFor(model.success_rate)
+                    return (
+                      <tr
+                        key={model.model_name}
+                        className='border-divider hover:bg-surface-hover border-b transition-colors last:border-b-0'
                       >
-                        {formatUptimePct(model.success_rate)}
-                      </span>
-                    </span>
-                  </div>
-                ))}
-              </div>
+                        <td className='max-w-44 truncate px-3 py-2 font-mono text-xs'>
+                          {model.model_name}
+                        </td>
+                        <td className='px-3 py-2'>
+                          <StatusBadge
+                            appearance='soft'
+                            variant={health.variant}
+                            label={t(health.label)}
+                            copyable={false}
+                          />
+                        </td>
+                        <td className='px-3 py-2'>
+                          <MonoCell className='text-xs'>
+                            {formatUptimePct(model.success_rate)}
+                          </MonoCell>
+                        </td>
+                        <td className='hidden px-3 py-2 sm:table-cell'>
+                          <MonoCell className='text-xs'>
+                            {formatLatency(model.avg_latency_ms)}
+                          </MonoCell>
+                        </td>
+                        <td className='hidden px-3 py-2 sm:table-cell'>
+                          <MonoCell className='text-xs'>
+                            {formatThroughput(model.avg_tps)}
+                          </MonoCell>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
           )
         )}
       </div>
-    </section>
+    </Panel>
   )
 }
 
-function MetricCell(props: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  value: string
-  loading: boolean
-  valueClassName?: string
-}) {
-  const Icon = props.icon
-  return (
-    <div className='bg-muted/40 rounded-xl px-3 py-2.5'>
-      <div className='text-muted-foreground flex items-center gap-1.5 text-[11px] font-medium'>
-        <Icon className='size-3 shrink-0' aria-hidden='true' />
-        <span className='truncate'>{props.label}</span>
-      </div>
-      {props.loading ? (
-        <Skeleton className='mt-1.5 h-5 w-16' />
-      ) : (
-        <div
-          className={cn(
-            'mt-1.5 font-mono text-sm font-semibold tabular-nums',
-            props.valueClassName
-          )}
-        >
-          {props.value}
-        </div>
-      )}
-    </div>
-  )
-}
