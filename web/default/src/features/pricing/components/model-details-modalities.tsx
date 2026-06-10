@@ -120,7 +120,7 @@ export function ModalitiesMatrix(props: {
               className={cn(
                 'inline-flex items-center justify-center',
                 enabled
-                  ? 'text-emerald-700 dark:text-emerald-300'
+                  ? 'text-success'
                   : 'text-muted-foreground/40'
               )}
               aria-label={

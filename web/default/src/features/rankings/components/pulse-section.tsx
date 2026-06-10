@@ -129,7 +129,7 @@ function MoverRow(props: { row: RankingMover; intent: 'up' | 'down' }) {
           'inline-flex shrink-0 items-center gap-0.5 font-mono text-xs font-semibold tabular-nums',
           props.intent === 'up'
             ? 'text-success'
-            : 'text-rose-600 dark:text-rose-400'
+            : 'text-destructive'
         )}
       >
         {props.intent === 'up' ? (

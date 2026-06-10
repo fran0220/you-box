@@ -61,8 +61,8 @@ function StatCard(props: {
       <span
         className={cn(
           'text-foreground font-mono text-lg font-semibold tabular-nums',
-          intent === 'warning' && 'text-amber-600 dark:text-amber-400',
-          intent === 'success' && 'text-emerald-600 dark:text-emerald-400'
+          intent === 'warning' && 'text-warning',
+          intent === 'success' && 'text-success'
         )}
       >
         {props.value}

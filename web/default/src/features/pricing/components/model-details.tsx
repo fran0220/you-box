@@ -192,7 +192,7 @@ function SpecItem(props: {
       <div
         className={cn(
           'font-display text-foreground mt-1 truncate text-xl font-bold tracking-[-0.02em] tabular-nums',
-          intent === 'warning' && 'text-amber-600 dark:text-amber-400',
+          intent === 'warning' && 'text-warning',
           intent === 'success' && 'text-success'
         )}
       >
