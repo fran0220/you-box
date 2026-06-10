@@ -38,7 +38,7 @@ export function GatewayCard({ logo, systemName }: GatewayCardProps) {
       <Separator className='absolute top-0 left-[10%] h-[2px] w-[80%] bg-gradient-to-r from-transparent via-[var(--brand)]/60 to-transparent' />
 
       {/* Ambient glow behind card */}
-      <div className='absolute -top-32 left-1/2 h-64 w-[120%] -translate-x-1/2 rounded-full bg-radial from-[rgba(254,106,53,0.25)] to-transparent blur-3xl transition-all duration-500 group-hover:opacity-100 dark:opacity-80' />
+      <div className='absolute -top-32 left-1/2 h-64 w-[120%] -translate-x-1/2 rounded-full bg-radial from-[rgba(0, 144, 255,0.25)] to-transparent blur-3xl transition-all duration-500 group-hover:opacity-100 dark:opacity-80' />
 
       <div className='relative'>
         {/* Gateway Header */}

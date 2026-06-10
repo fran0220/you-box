@@ -43,7 +43,7 @@ export function CTA(props: CTAProps) {
             className='pointer-events-none absolute -top-32 left-1/2 -z-0 size-[480px] -translate-x-1/2 rounded-full blur-[10px]'
             style={{
               background:
-                'radial-gradient(circle, rgba(254,106,53,0.16), transparent 62%)',
+                'radial-gradient(circle, rgba(0, 144, 255,0.16), transparent 62%)',
             }}
           />
           <h2 className='font-display relative text-2xl leading-tight font-bold tracking-[-0.03em] md:text-4xl'>

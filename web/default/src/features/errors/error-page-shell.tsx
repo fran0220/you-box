@@ -47,7 +47,7 @@ export function ErrorPageShell(props: ErrorPageShellProps) {
         className='pointer-events-none absolute top-1/2 left-1/2 size-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[10px]'
         style={{
           background:
-            'radial-gradient(circle, rgba(254,106,53,0.12), transparent 62%)',
+            'radial-gradient(circle, rgba(0, 144, 255,0.12), transparent 62%)',
         }}
       />
       <div className='relative max-w-md text-center'>

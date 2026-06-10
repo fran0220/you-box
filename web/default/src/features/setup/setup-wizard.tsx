@@ -285,7 +285,7 @@ export function SetupWizard() {
         className='pointer-events-none absolute -top-40 left-1/2 size-[600px] -translate-x-1/2 rounded-full blur-[10px]'
         style={{
           background:
-            'radial-gradient(circle, rgba(254,106,53,0.14), transparent 62%)',
+            'radial-gradient(circle, rgba(0, 144, 255,0.14), transparent 62%)',
         }}
       />
       <div className='absolute top-4 right-4 sm:top-6 sm:right-6'>

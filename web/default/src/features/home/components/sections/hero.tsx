@@ -85,7 +85,7 @@ export function Hero(props: HeroProps) {
         className='pointer-events-none absolute -top-40 -right-32 -z-10 size-[520px] rounded-full blur-[10px]'
         style={{
           background:
-            'radial-gradient(circle, rgba(254,106,53,0.16), transparent 62%)',
+            'radial-gradient(circle, rgba(0, 144, 255,0.16), transparent 62%)',
         }}
       />
 

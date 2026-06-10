@@ -83,7 +83,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           className='pointer-events-none absolute -top-28 -right-28 size-[420px] rounded-full blur-[10px]'
           style={{
             background:
-              'radial-gradient(circle, rgba(254,106,53,0.16), transparent 62%)',
+              'radial-gradient(circle, rgba(0, 144, 255,0.16), transparent 62%)',
           }}
         />
         <div className='relative'>{brand}</div>
