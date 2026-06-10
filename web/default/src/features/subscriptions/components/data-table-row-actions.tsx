@@ -19,13 +19,14 @@ For commercial licensing, please contact support@quantumnous.com
 import { type Row } from '@tanstack/react-table'
 import { MoreHorizontal, Pencil, Power, PowerOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { RowActionButton, RowActions } from '@/components/data-table'
 import type { PlanRecord } from '../types'
 import { useSubscriptions } from './subscriptions-provider'
 
@@ -33,48 +34,72 @@ interface DataTableRowActionsProps {
   row: Row<PlanRecord>
 }
 
+/**
+ * Row actions (r2-B10 §3, mirroring channels): Edit is a hover-revealed
+ * icon button; Enable/Disable stays in the More dropdown (it is also
+ * reachable via the inline status Switch). Everything keeps the
+ * compliance gate — actions are disabled until terms are confirmed.
+ */
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow, complianceConfirmed } = useSubscriptions()
 
+  const handleEdit = () => {
+    setCurrentRow(row.original)
+    setOpen('update')
+  }
+
+  const handleToggleStatus = () => {
+    setCurrentRow(row.original)
+    setOpen('toggle-status')
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<Button variant='ghost' className='h-8 w-8 p-0' />}
+    <RowActions>
+      <RowActionButton
+        label={t('Edit')}
+        onClick={handleEdit}
+        disabled={!complianceConfirmed}
       >
-        <MoreHorizontal className='h-4 w-4' />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
-        <DropdownMenuItem
-          disabled={!complianceConfirmed}
-          onClick={() => {
-            setCurrentRow(row.original)
-            setOpen('update')
-          }}
+        <Pencil className='size-4' />
+      </RowActionButton>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <RowActionButton
+              label={t('Open menu')}
+              className='data-popup-open:bg-muted'
+            />
+          }
         >
-          <Pencil className='mr-2 h-4 w-4' />
-          {t('Edit')}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          disabled={!complianceConfirmed}
-          onClick={() => {
-            setCurrentRow(row.original)
-            setOpen('toggle-status')
-          }}
-        >
-          {row.original.plan.enabled ? (
-            <>
-              <PowerOff className='mr-2 h-4 w-4' />
-              {t('Disable')}
-            </>
-          ) : (
-            <>
-              <Power className='mr-2 h-4 w-4' />
-              {t('Enable')}
-            </>
-          )}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <MoreHorizontal className='size-4' />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='w-44'>
+          <DropdownMenuItem
+            disabled={!complianceConfirmed}
+            onClick={handleEdit}
+          >
+            {t('Edit')}
+            <DropdownMenuShortcut>
+              <Pencil size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={!complianceConfirmed}
+            onClick={handleToggleStatus}
+          >
+            {row.original.plan.enabled ? t('Disable') : t('Enable')}
+            <DropdownMenuShortcut>
+              {row.original.plan.enabled ? (
+                <PowerOff size={16} />
+              ) : (
+                <Power size={16} />
+              )}
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </RowActions>
   )
 }

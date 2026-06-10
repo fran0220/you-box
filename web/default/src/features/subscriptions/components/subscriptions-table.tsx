@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import {
   type SortingState,
   type VisibilityState,
@@ -28,25 +27,18 @@ import {
 } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
 import { DataTablePage } from '@/components/data-table'
-import { getAdminPlans } from '../api'
 import { useSubscriptionsColumns } from './subscriptions-columns'
-import { useSubscriptions } from './subscriptions-provider'
+import { SubscriptionsStatCards } from './subscriptions-stat-cards'
+import { useAdminPlans } from './use-admin-plans'
 
 export function SubscriptionsTable() {
   const { t } = useTranslation()
   const columns = useSubscriptionsColumns()
-  const { refreshTrigger } = useSubscriptions()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['admin-subscription-plans', refreshTrigger],
-    queryFn: async () => {
-      const result = await getAdminPlans()
-      return result.data || []
-    },
-    placeholderData: (prev) => prev,
-  })
+  // Shared with PlanPreviewPanel — same queryKey, single fetch.
+  const { data, isLoading } = useAdminPlans()
 
   const plans = useMemo(() => data || [], [data])
 
@@ -66,6 +58,7 @@ export function SubscriptionsTable() {
       table={table}
       columns={columns}
       isLoading={isLoading}
+      statHeader={<SubscriptionsStatCards plans={plans} loading={isLoading} />}
       emptyTitle={t('No subscription plans yet')}
       emptyDescription={t(
         'Click "Create Plan" to create your first subscription plan'

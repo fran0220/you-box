@@ -16,17 +16,66 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+/* eslint-disable react-refresh/only-export-components */
 import { useMemo } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
 import { formatQuota } from '@/lib/format'
-import { DataTableColumnHeader } from '@/components/data-table'
+import { Switch } from '@/components/ui/switch'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { DataTableColumnHeader, MonoCell } from '@/components/data-table'
 import { GroupBadge } from '@/components/group-badge'
 import { StatusBadge } from '@/components/status-badge'
 import { TableId } from '@/components/table-id'
-import { formatDuration, formatResetPeriod } from '../lib'
+import { formatDuration, formatPlanPrice, formatResetPeriod } from '../lib'
 import type { PlanRecord } from '../types'
 import { DataTableRowActions } from './data-table-row-actions'
+import { useSubscriptions } from './subscriptions-provider'
+
+/**
+ * Status cell — inline enable/disable Switch (r2-B10 §3, mirroring the
+ * channels StatusCell). Flipping the Switch opens the existing
+ * toggle-status ConfirmDialog instead of patching directly, so the
+ * enable/disable confirmation semantics are preserved; `checked` stays
+ * data-driven (no optimistic flip). While compliance terms are
+ * unconfirmed the Switch is disabled and the tooltip explains why.
+ */
+function PlanStatusCell({ record }: { record: PlanRecord }) {
+  const { t } = useTranslation()
+  const { setOpen, setCurrentRow, complianceConfirmed } = useSubscriptions()
+  const enabled = record.plan.enabled
+
+  return (
+    <TooltipProvider delay={100}>
+      <Tooltip>
+        <TooltipTrigger render={<span className='inline-flex' />}>
+          <Switch
+            size='sm'
+            checked={enabled}
+            disabled={!complianceConfirmed}
+            onCheckedChange={() => {
+              setCurrentRow(record)
+              setOpen('toggle-status')
+            }}
+            aria-label={enabled ? t('Disable') : t('Enable')}
+          />
+        </TooltipTrigger>
+        <TooltipContent side='top'>
+          {complianceConfirmed
+            ? enabled
+              ? t('Disable')
+              : t('Enable')
+            : t('Compliance confirmation required')}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
 
 export function useSubscriptionsColumns(): ColumnDef<PlanRecord>[] {
   const { t } = useTranslation()
@@ -73,9 +122,7 @@ export function useSubscriptionsColumns(): ColumnDef<PlanRecord>[] {
           <DataTableColumnHeader column={column} title={t('Price')} />
         ),
         cell: ({ row }) => (
-          <span className='font-semibold text-success'>
-            ${Number(row.original.plan.price_amount || 0).toFixed(2)}
-          </span>
+          <MonoCell>{formatPlanPrice(row.original.plan)}</MonoCell>
         ),
         size: 100,
       },
@@ -126,20 +173,9 @@ export function useSubscriptionsColumns(): ColumnDef<PlanRecord>[] {
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title={t('Status')} />
         ),
-        cell: ({ row }) =>
-          row.original.plan.enabled ? (
-            <StatusBadge
-              label={t('Enable')}
-              variant='success'
-              copyable={false}
-            />
-          ) : (
-            <StatusBadge
-              label={t('Disable')}
-              variant='neutral'
-              copyable={false}
-            />
-          ),
+        // Mobile cards reuse this cell in the badge slot; the Switch
+        // carries its own aria-label so it stays accessible there too.
+        cell: ({ row }) => <PlanStatusCell record={row.original} />,
         size: 80,
       },
       {

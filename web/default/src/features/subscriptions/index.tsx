@@ -16,10 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { Info } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { SectionPageLayout } from '@/components/layout'
+import { InlineAlert } from '@/components/patterns'
+import { PlanPreviewPanel } from './components/plan-preview-panel'
 import { SubscriptionsDialogs } from './components/subscriptions-dialogs'
 import { SubscriptionsPrimaryButtons } from './components/subscriptions-primary-buttons'
 import {
@@ -39,28 +39,28 @@ function SubscriptionsContent() {
           {t('Subscription Management')}
         </SectionPageLayout.Title>
         <SectionPageLayout.Actions>
-          <div className='flex items-center gap-2'>
-            <Alert variant='default' className='hidden px-3 py-2 sm:flex'>
-              <Info className='h-4 w-4' />
-              <AlertDescription className='text-xs'>
-                {t(
-                  'Stripe/Creem requires creating products on the third-party platform and entering the ID'
-                )}
-              </AlertDescription>
-            </Alert>
-            <SubscriptionsPrimaryButtons />
-          </div>
+          <SubscriptionsPrimaryButtons />
         </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
+          {/* Stripe/Creem product hint — InlineAlert form (r2-B10 §4),
+              copy unchanged. Moved from the header actions slot into the
+              content column so it no longer competes with the Create
+              button for space. */}
+          <InlineAlert tone='info' className='mb-4 px-3 py-2.5'>
+            {t(
+              'Stripe/Creem requires creating products on the third-party platform and entering the ID'
+            )}
+          </InlineAlert>
+          {/* Compliance gate — copy unchanged; warning tone per r2-B10 §4. */}
           {!complianceConfirmed ? (
-            <Alert variant='destructive' className='mb-4'>
-              <AlertDescription>
-                {t(
-                  'Subscription plan creation and changes are locked until the administrator confirms compliance terms in Payment Gateway settings.'
-                )}
-              </AlertDescription>
-            </Alert>
+            <InlineAlert tone='warning' className='mb-4'>
+              {t(
+                'Subscription plan creation and changes are locked until the administrator confirms compliance terms in Payment Gateway settings.'
+              )}
+            </InlineAlert>
           ) : null}
+          {/* Collapsed-by-default preview of the user-side plan list. */}
+          <PlanPreviewPanel className='mb-4' />
           <SubscriptionsTable />
         </SectionPageLayout.Content>
       </SectionPageLayout>

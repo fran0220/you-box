@@ -60,6 +60,20 @@ export function formatResetPeriod(
   return t('No Reset')
 }
 
+/**
+ * Plan price with currency symbol. The plan form pins `currency` to USD
+ * (see formValuesToPlanPayload), matching the wallet's `$` prefix; map a
+ * couple of common codes defensively and fall back to the raw code for
+ * anything else so legacy rows never render a wrong symbol.
+ */
+export function formatPlanPrice(plan: Partial<SubscriptionPlan>): string {
+  const amount = Number(plan?.price_amount || 0).toFixed(2)
+  const currency = plan?.currency || 'USD'
+  const symbols: Record<string, string> = { USD: '$', CNY: '¥', EUR: '€' }
+  const symbol = symbols[currency]
+  return symbol ? `${symbol}${amount}` : `${currency} ${amount}`
+}
+
 export function formatTimestamp(ts: number): string {
   if (!ts) return '-'
   return dayjs(ts * 1000).format('YYYY-MM-DD HH:mm:ss')
