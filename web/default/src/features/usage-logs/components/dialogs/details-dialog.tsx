@@ -71,7 +71,7 @@ function timingTextColorClass(
   variant: 'success' | 'warning' | 'danger'
 ): string {
   if (variant === 'success') return 'text-success'
-  if (variant === 'warning') return 'text-amber-600'
+  if (variant === 'warning') return 'text-warning'
   return 'text-destructive'
 }
 
@@ -111,7 +111,7 @@ function DetailSection(props: {
       <Label
         className={cn(
           'flex items-center gap-1.5 text-xs font-semibold',
-          isDanger && 'text-red-500'
+          isDanger && 'text-destructive'
         )}
       >
         {props.icon}
@@ -121,7 +121,7 @@ function DetailSection(props: {
         className={cn(
           'min-w-0 space-y-1 overflow-hidden rounded-md border p-2.5 max-sm:p-2',
           isDanger
-            ? 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20'
+            ? 'border-destructive/30 bg-[var(--danger-subtle)]'
             : 'bg-muted/30'
         )}
       >
@@ -634,7 +634,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                   aria-label={t('Copy to clipboard')}
                 >
                   {copiedText === conversionLabel ? (
-                    <Check className='size-3 text-green-600' />
+                    <Check className='size-3 text-success' />
                   ) : (
                     <Copy className='size-3' />
                   )}
@@ -1059,7 +1059,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                   aria-label={t('Copy to clipboard')}
                 >
                   {copiedText === details ? (
-                    <Check className='size-3 text-green-600' />
+                    <Check className='size-3 text-success' />
                   ) : (
                     <Copy className='size-3' />
                   )}

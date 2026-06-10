@@ -139,7 +139,7 @@ export function createDurationColumn<T>(config: {
         success:
           'border-teal/20 bg-teal-subtle/50 border',
         warning:
-          'border border-amber-200/45 bg-amber-50/35 dark:border-amber-900/40 dark:bg-amber-950/15',
+          'border border-warning/30 bg-[var(--warning-subtle)]',
         danger:
           'border-destructive/20 bg-[var(--danger-subtle)]/50 border',
       }
@@ -223,7 +223,7 @@ export function createFailReasonColumn<T>(config: {
             onClick={() => setDialogOpen(true)}
             title={cellTitle}
           >
-            <span className='truncate leading-snug text-red-600 group-hover:underline dark:text-red-400'>
+            <span className='truncate leading-snug text-destructive group-hover:underline'>
               {failReason}
             </span>
           </button>

@@ -774,7 +774,7 @@ export function ModelDetailsProviderInfo(props: { model: PricingModel }) {
                 info.license_kind === 'open-weight' &&
                   'border-sky-500/40 text-sky-600 dark:text-sky-400',
                 info.license_kind === 'proprietary' &&
-                  'border-amber-500/40 text-amber-600 dark:text-amber-400'
+                  'border-warning/40 text-warning'
               )}
             >
               {info.license_kind === 'open'

@@ -40,7 +40,7 @@ import { DataTableRowActions } from './data-table-row-actions'
 function getQuotaProgressColor(percentage: number): string {
   if (percentage <= 10)
     return '[&_[data-slot=progress-indicator]]:bg-destructive'
-  if (percentage <= 30) return '[&_[data-slot=progress-indicator]]:bg-amber-500'
+  if (percentage <= 30) return '[&_[data-slot=progress-indicator]]:bg-warning'
   return '[&_[data-slot=progress-indicator]]:bg-success'
 }
 

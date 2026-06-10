@@ -658,7 +658,7 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
         const timingBgMap: Record<string, string> = {
           success: 'border-teal/20 bg-teal-subtle/50 border',
           warning:
-            'border border-amber-200/45 bg-amber-50/35 dark:border-amber-900/40 dark:bg-amber-950/15',
+            'border border-warning/30 bg-[var(--warning-subtle)]',
           danger: 'border-destructive/20 bg-[var(--danger-subtle)]/50 border',
           neutral:
             'border border-border/60 bg-muted/30 dark:border-border/40 dark:bg-muted/20',
@@ -717,7 +717,7 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger
-                        render={<CircleAlert className='size-3 text-red-500' />}
+                        render={<CircleAlert className='size-3 text-destructive' />}
                       ></TooltipTrigger>
                       <TooltipContent>
                         <div className='space-y-0.5 text-xs'>
@@ -877,7 +877,7 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
                     primary.muted
                       ? 'text-muted-foreground/60'
                       : primary.danger
-                        ? 'text-red-600 dark:text-red-400'
+                        ? 'text-destructive'
                         : 'text-foreground'
                   )}
                 >

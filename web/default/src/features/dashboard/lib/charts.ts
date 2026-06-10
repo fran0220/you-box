@@ -296,7 +296,7 @@ export function processChartData(
   )
   const otherColor = modelColorRange[modelColorDomain.indexOf(otherLabel)]
   const otherTooltipColor =
-    typeof otherColor === 'string' ? otherColor : '#FF8A00'
+    typeof otherColor === 'string' ? otherColor : 'var(--chart-1)'
   const modelColor = {
     type: 'ordinal',
     domain: modelColorDomain,

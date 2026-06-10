@@ -406,7 +406,7 @@ export function DynamicPricingBreakdown({
                 </span>
                 <Badge
                   variant='secondary'
-                  className='shrink-0 bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300'
+                  className='shrink-0 bg-[var(--warning-subtle)] text-warning'
                 >
                   {group.multiplier}x
                 </Badge>
