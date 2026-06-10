@@ -36,9 +36,10 @@ import {
   formatQuota as formatQuotaValue,
 } from '@/lib/format'
 import { getLobeIcon } from '@/lib/lobe-icon'
-import { truncateText } from '@/lib/utils'
+import { cn, truncateText } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
 import {
   Tooltip,
   TooltipContent,
@@ -46,25 +47,29 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { CellFlex, LatencyBadge, MonoCell } from '@/components/data-table'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { GroupBadge } from '@/components/group-badge'
 import { StatusBadge, StatusBadgeList } from '@/components/status-badge'
 import { TableId } from '@/components/table-id'
 import { TruncatedText } from '@/components/truncated-text'
 import { getCodexUsage } from '../api'
-import { CHANNEL_STATUS_CONFIG, MODEL_FETCHABLE_TYPES } from '../constants'
+import {
+  CHANNEL_STATUS,
+  CHANNEL_STATUS_CONFIG,
+  MODEL_FETCHABLE_TYPES,
+} from '../constants'
 import {
   formatBalance,
   formatRelativeTime,
-  formatResponseTime,
   getBalanceVariant,
   getChannelTypeIcon,
   getChannelTypeLabel,
-  getResponseTimeConfig,
   isMultiKeyChannel,
   parseModelsList,
   parseGroupsList,
   parseChannelSettings,
+  handleToggleChannelStatus,
   handleUpdateChannelField,
   handleUpdateTagField,
   handleUpdateChannelBalance,
@@ -283,6 +288,96 @@ function WeightCell({ channel }: { channel: Channel }) {
 }
 
 /**
+ * Status cell — inline enable/disable Switch (r2-B7 §4). Reuses the same
+ * toggle action as the previous row-action button (server update + list
+ * invalidation; no optimistic write). The tooltip carries the status label,
+ * multi-key counts and — for auto-disabled channels — the reason and time.
+ * Tag aggregate rows keep their original badge rendering (see column def).
+ */
+function StatusCell({ channel }: { channel: Channel }) {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const [isToggling, setIsToggling] = useState(false)
+
+  const status = channel.status
+  const isEnabled = status === CHANNEL_STATUS.ENABLED
+  const config =
+    CHANNEL_STATUS_CONFIG[status as keyof typeof CHANNEL_STATUS_CONFIG] ||
+    CHANNEL_STATUS_CONFIG[0]
+
+  const isMultiKey = isMultiKeyChannel(channel)
+  const keySize = channel.channel_info?.multi_key_size ?? 0
+  const disabledCount = channel.channel_info?.multi_key_status_list
+    ? Object.keys(channel.channel_info.multi_key_status_list).length
+    : 0
+  const enabledCount = Math.max(0, keySize - disabledCount)
+  const label =
+    isMultiKey && keySize > 0
+      ? `${t(config.label)} (${enabledCount}/${keySize})`
+      : t(config.label)
+
+  // Auto-disabled: surface the disable reason and time in the tooltip
+  let statusReason = ''
+  let statusTime = ''
+  if (status === CHANNEL_STATUS.AUTO_DISABLED) {
+    try {
+      const otherInfo = channel.other_info
+        ? JSON.parse(channel.other_info)
+        : null
+      if (otherInfo) {
+        statusReason = otherInfo.status_reason || ''
+        statusTime = otherInfo.status_time
+          ? formatTimestampToDate(otherInfo.status_time)
+          : ''
+      }
+    } catch {
+      /* empty */
+    }
+  }
+
+  const handleToggle = async () => {
+    if (isToggling) return
+    setIsToggling(true)
+    try {
+      await handleToggleChannelStatus(channel.id, status, queryClient)
+    } finally {
+      setIsToggling(false)
+    }
+  }
+
+  return (
+    <TooltipProvider delay={100}>
+      <Tooltip>
+        <TooltipTrigger render={<span className='inline-flex' />}>
+          <Switch
+            size='sm'
+            checked={isEnabled}
+            onCheckedChange={handleToggle}
+            disabled={isToggling}
+            aria-label={isEnabled ? t('Disable') : t('Enable')}
+          />
+        </TooltipTrigger>
+        <TooltipContent side='top' className='max-w-xs'>
+          <div className='space-y-1 text-xs'>
+            <div>{label}</div>
+            {statusReason && (
+              <div>
+                {t('Reason:')} {statusReason}
+              </div>
+            )}
+            {statusTime && (
+              <div>
+                {t('Time:')} {statusTime}
+              </div>
+            )}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
+/**
  * Balance cell component with click to update
  */
 function BalanceCell({ channel }: { channel: Channel }) {
@@ -308,13 +403,9 @@ function BalanceCell({ channel }: { channel: Channel }) {
   // Tag row: only show cumulative used quota
   if (isTagRow) {
     return (
-      <StatusBadge
-        label={usedLabel}
-        variant='neutral'
-        size='sm'
-        copyable={false}
-        showDot={false}
-      />
+      <MonoCell muted title={usedLabel}>
+        {usedDisplay}
+      </MonoCell>
     )
   }
 
@@ -349,50 +440,47 @@ function BalanceCell({ channel }: { channel: Channel }) {
 
   return (
     <TooltipProvider>
-      <div className='flex items-center gap-1'>
+      {/* MonoCell keeps used/remaining right-aligned and tabular (r2-B7 §4);
+          click-to-update and Codex usage behaviors are preserved. */}
+      <MonoCell className='flex items-center justify-end gap-1'>
         <Tooltip>
           <TooltipTrigger
-            render={
-              <StatusBadge
-                label={usedDisplay}
-                variant='neutral'
-                size='sm'
-                copyable={false}
-                showDot={false}
-                className='cursor-help'
-              />
-            }
-          />
+            render={<span className='text-muted-foreground cursor-help' />}
+          >
+            {usedDisplay}
+          </TooltipTrigger>
           <TooltipContent>
             <p>{usedLabel}</p>
           </TooltipContent>
         </Tooltip>
+        <span className='text-muted-foreground/60'>/</span>
         <Tooltip>
           <TooltipTrigger
             render={
-              <StatusBadge
-                label={
-                  isUpdating
-                    ? t('Updating...')
-                    : channel.type === 57
-                      ? t('Account Info')
-                      : remainingDisplay
-                }
-                variant={
-                  channel.type === 57
-                    ? 'info'
-                    : isUpdating
-                      ? 'neutral'
-                      : variant
-                }
-                size='sm'
-                copyable={false}
-                showDot={false}
-                className='cursor-pointer'
+              <button
+                type='button'
                 onClick={handleClickUpdate}
+                className={cn(
+                  'cursor-pointer font-mono hover:underline',
+                  channel.type === 57
+                    ? 'text-info'
+                    : isUpdating
+                      ? 'text-muted-foreground'
+                      : variant === 'danger'
+                        ? 'text-destructive'
+                        : variant === 'warning'
+                          ? 'text-warning'
+                          : 'text-success'
+                )}
               />
             }
-          />
+          >
+            {isUpdating
+              ? t('Updating...')
+              : channel.type === 57
+                ? t('Account Info')
+                : remainingDisplay}
+          </TooltipTrigger>
           <TooltipContent>
             <p>
               {channel.type === 57
@@ -402,7 +490,7 @@ function BalanceCell({ channel }: { channel: Channel }) {
             {channel.type !== 57 && <p>{t('Click to update balance')}</p>}
           </TooltipContent>
         </Tooltip>
-      </div>
+      </MonoCell>
 
       <CodexUsageDialog
         open={codexUsageOpen}
@@ -531,15 +619,28 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           )
         }
 
-        // Regular channel row
+        // Regular channel row — identity CellFlex: provider icon as leading,
+        // name as primary line, mono type name (and remark) as secondary
+        // line (r2-B7 §4). The standalone type column stays available via
+        // View Options.
         const settings = parseChannelSettings(channel.setting)
         const isPassThrough = settings.pass_through_body_enabled === true
         const hasParamOverride = Boolean(channel.param_override?.trim())
+        const typeName = t(getChannelTypeLabel(channel.type))
+        const typeIcon = getLobeIcon(
+          `${getChannelTypeIcon(channel.type)}.Color`,
+          16
+        )
 
         return (
-          <div className='flex items-center gap-2'>
-            <div className='flex flex-col gap-1'>
-              <div className='flex items-center gap-1.5'>
+          <CellFlex
+            leading={
+              <span className='border-border bg-muted flex size-7 items-center justify-center rounded-md border'>
+                {typeIcon}
+              </span>
+            }
+            primary={
+              <span className='flex items-center gap-1.5'>
                 <TruncatedText
                   text={name}
                   className='font-medium'
@@ -576,25 +677,25 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
                   </TooltipProvider>
                 )}
                 <UpstreamUpdateTags channel={channel} />
-              </div>
-              {channel.remark && (
+              </span>
+            }
+            secondary={
+              channel.remark ? (
                 <TooltipProvider delay={200}>
                   <Tooltip>
-                    <TooltipTrigger
-                      render={
-                        <span className='text-muted-foreground text-xs' />
-                      }
-                    >
-                      {truncateText(channel.remark, 40)}
+                    <TooltipTrigger render={<span />}>
+                      {typeName} · {truncateText(channel.remark, 40)}
                     </TooltipTrigger>
                     <TooltipContent side='bottom' className='max-w-xs'>
                       {channel.remark}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              )}
-            </div>
-          </div>
+              ) : (
+                typeName
+              )
+            }
+          />
         )
       },
       minSize: 200,
@@ -756,80 +857,8 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           }
         }
 
-        // Regular channel row
-        const config =
-          CHANNEL_STATUS_CONFIG[status as keyof typeof CHANNEL_STATUS_CONFIG] ||
-          CHANNEL_STATUS_CONFIG[0]
-
-        const isMultiKey = isMultiKeyChannel(channel)
-        const keySize = channel.channel_info?.multi_key_size ?? 0
-        const disabledCount = channel.channel_info?.multi_key_status_list
-          ? Object.keys(channel.channel_info.multi_key_status_list).length
-          : 0
-        const enabledCount = Math.max(0, keySize - disabledCount)
-        const label =
-          isMultiKey && keySize > 0
-            ? `${t(config.label)} (${enabledCount}/${keySize})`
-            : t(config.label)
-
-        // Auto-disabled: show reason and time tooltip
-        if (status === 3) {
-          let statusReason = ''
-          let statusTime = ''
-          try {
-            const otherInfo = channel.other_info
-              ? JSON.parse(channel.other_info)
-              : null
-            if (otherInfo) {
-              statusReason = otherInfo.status_reason || ''
-              statusTime = otherInfo.status_time
-                ? formatTimestampToDate(otherInfo.status_time)
-                : ''
-            }
-          } catch {
-            /* empty */
-          }
-
-          if (statusReason || statusTime) {
-            return (
-              <TooltipProvider delay={100}>
-                <Tooltip>
-                  <TooltipTrigger render={<span />}>
-                    <StatusBadge
-                      label={label}
-                      variant={config.variant}
-                      size='sm'
-                      copyable={false}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side='top' className='max-w-xs'>
-                    <div className='space-y-1 text-xs'>
-                      {statusReason && (
-                        <div>
-                          {t('Reason:')} {statusReason}
-                        </div>
-                      )}
-                      {statusTime && (
-                        <div>
-                          {t('Time:')} {statusTime}
-                        </div>
-                      )}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )
-          }
-        }
-
-        return (
-          <StatusBadge
-            label={label}
-            variant={config.variant}
-            size='sm'
-            copyable={false}
-          />
-        )
+        // Regular channel row — inline enable/disable Switch (r2-B7 §4)
+        return <StatusCell channel={channel} />
       },
       filterFn: (row, id, value) => {
         if (!value || value.length === 0 || value.includes('all')) return true
@@ -977,6 +1006,9 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
     },
 
     // Response Time column
+    // Mobile cards reuse this cell when visible; the status Switch already
+    // syncs to mobile via `mobileBadge`. Latency stays `mobileHidden`
+    // (pre-existing behavior, kept to preserve the compact card layout).
     {
       accessorKey: 'response_time',
       meta: { label: t('Response'), mobileHidden: true },
@@ -985,16 +1017,9 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
       ),
       cell: ({ row }) => {
         const responseTime = row.getValue('response_time') as number
-        const config = getResponseTimeConfig(responseTime)
-
-        return (
-          <StatusBadge
-            label={formatResponseTime(responseTime, t)}
-            variant={config.variant}
-            size='sm'
-            copyable={false}
-          />
-        )
+        // 0 = never tested → muted dash; thresholds: ≤1s good, ≤3s warning,
+        // above danger (matches the Healthy/Degraded stat cards).
+        return <LatencyBadge ms={responseTime > 0 ? responseTime : null} />
       },
       size: 110,
     },

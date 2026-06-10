@@ -17,30 +17,23 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
-import { Link2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import {
-  SideDrawerSection,
-  SideDrawerSectionHeader,
-} from '@/components/drawer-layout'
+import { SettingsPanel } from '@/components/settings'
 
 type ChannelApiAccessSectionProps = {
   children: ReactNode
 }
 
+/**
+ * API Access section — SettingsPanel container form (r2-B7 §5).
+ * Fields and validation are untouched; only the wrapper changed.
+ */
 export function ChannelApiAccessSection(props: ChannelApiAccessSectionProps) {
   const { t } = useTranslation()
 
   return (
-    <SideDrawerSection>
-      <SideDrawerSectionHeader
-        title={t('API Access')}
-        description={t(
-          'Endpoint, provider-specific settings, and credentials.'
-        )}
-        icon={<Link2 className='h-4 w-4' aria-hidden='true' />}
-      />
-      {props.children}
-    </SideDrawerSection>
+    <SettingsPanel eyebrow={t('api access')} title={t('API Access')}>
+      <div className='flex flex-col gap-4 py-3'>{props.children}</div>
+    </SettingsPanel>
   )
 }

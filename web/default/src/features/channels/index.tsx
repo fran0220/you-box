@@ -33,7 +33,14 @@ export function Channels() {
           <ChannelsPrimaryButtons />
         </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <ChannelsTable />
+          <div className='space-y-3'>
+            <p className='text-muted-foreground text-sm'>
+              {t(
+                'Upstream providers this gateway routes to, with health, priority and balance.'
+              )}
+            </p>
+            <ChannelsTable />
+          </div>
         </SectionPageLayout.Content>
       </SectionPageLayout>
 

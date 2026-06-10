@@ -1,5 +1,6 @@
 {
   "Every request routed through your keys, with token counts, cost and latency.": "Every request routed through your keys, with token counts, cost and latency.",
+  "Upstream providers this gateway routes to, with health, priority and balance.": "Upstream providers this gateway routes to, with health, priority and balance.",
   "Issue scoped keys with per-key budgets, rate limits and model allowlists.": "Issue scoped keys with per-key budgets, rate limits and model allowlists.",
   "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "The full key for {{name}} is shown only this once. Copy it now and store it securely."
 }

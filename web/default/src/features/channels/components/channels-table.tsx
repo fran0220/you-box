@@ -38,6 +38,7 @@ import {
   DISABLED_ROW_DESKTOP,
   DISABLED_ROW_MOBILE,
   DataTablePage,
+  FilterTabs,
 } from '@/components/data-table'
 import { getChannels, searchChannels, getGroups } from '../api'
 import {
@@ -55,7 +56,11 @@ import {
 import type { Channel, ChannelSortBy } from '../types'
 import { useChannelsColumns } from './channels-columns'
 import { useChannels } from './channels-provider'
+import { ChannelsStatCards } from './channels-stat-cards'
 import { DataTableBulkActions } from './data-table-bulk-actions'
+
+/** Quick status tab values mapped onto the `status` column filter. */
+type ChannelStatusTab = 'all' | 'enabled' | 'issues'
 
 const route = getRouteApi('/_authenticated/channels/')
 
@@ -81,9 +86,13 @@ export function ChannelsTable() {
 
   // Table state
   const [sorting, setSorting] = useState<SortingState>([])
+  // `type` is folded into the name cell (CellFlex secondary line); the
+  // standalone type column stays available via View Options but is hidden
+  // by default (r2-B7 §4).
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     models: false,
     tag: false,
+    type: false,
   })
   const [rowSelection, setRowSelection] = useState({})
   const [expanded, setExpanded] = useState<ExpandedState>({})
@@ -371,6 +380,27 @@ export function ChannelsTable() {
     ...groupOptions,
   ]
 
+  // Quick status tabs share the same `status` column filter (and URL state)
+  // as the faceted Status chip, so the two stay in sync (r2-B7 §3).
+  // Backend enum: 'enabled' = status 1; 'disabled' covers both manual (2)
+  // and auto (3) disabled — which is exactly the "Issues" semantics.
+  const statusTab: ChannelStatusTab = statusFilter.includes('enabled')
+    ? 'enabled'
+    : statusFilter.includes('disabled')
+      ? 'issues'
+      : 'all'
+
+  const handleStatusTabChange = (value: ChannelStatusTab) => {
+    onColumnFiltersChange((prev) => {
+      const rest = prev.filter((f) => f.id !== 'status')
+      if (value === 'all') return rest
+      return [
+        ...rest,
+        { id: 'status', value: [value === 'enabled' ? 'enabled' : 'disabled'] },
+      ]
+    })
+  }
+
   return (
     <DataTablePage
       table={table}
@@ -383,8 +413,37 @@ export function ChannelsTable() {
       )}
       skeletonKeyPrefix='channel-skeleton'
       applyHeaderSize
+      statHeader={
+        // Health stats aggregate over the currently loaded page (no global
+        // health endpoint); Total uses the API pagination total (r2-B7 §2).
+        <ChannelsStatCards
+          channels={data?.data?.items || []}
+          total={totalCount}
+          loading={isLoading}
+        />
+      }
       toolbarProps={{
         searchPlaceholder: t('Filter by name, ID, or key...'),
+        customSearch: (
+          <>
+            <FilterTabs<ChannelStatusTab>
+              label={t('Filter by status')}
+              value={statusTab}
+              onValueChange={handleStatusTabChange}
+              items={[
+                { value: 'all', label: t('All') },
+                { value: 'enabled', label: t('Enabled') },
+                { value: 'issues', label: t('Issues') },
+              ]}
+            />
+            <Input
+              placeholder={t('Filter by name, ID, or key...')}
+              value={globalFilter ?? ''}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              className='w-full sm:w-[200px] lg:w-[240px]'
+            />
+          </>
+        ),
         additionalSearch: (
           <Input
             placeholder={t('Filter by model...')}

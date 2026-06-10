@@ -17,28 +17,23 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
-import { Server } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import {
-  SideDrawerSection,
-  SideDrawerSectionHeader,
-} from '@/components/drawer-layout'
+import { SettingsPanel } from '@/components/settings'
 
 type ChannelBasicSectionProps = {
   children: ReactNode
 }
 
+/**
+ * Basic Information section — SettingsPanel container form (r2-B7 §5).
+ * Fields and validation are untouched; only the wrapper changed.
+ */
 export function ChannelBasicSection(props: ChannelBasicSectionProps) {
   const { t } = useTranslation()
 
   return (
-    <SideDrawerSection>
-      <SideDrawerSectionHeader
-        title={t('Basic Information')}
-        description={t('Name, provider type, and availability.')}
-        icon={<Server className='h-4 w-4' aria-hidden='true' />}
-      />
-      {props.children}
-    </SideDrawerSection>
+    <SettingsPanel eyebrow={t('basic')} title={t('Basic Information')}>
+      <div className='flex flex-col gap-4 py-3'>{props.children}</div>
+    </SettingsPanel>
   )
 }
