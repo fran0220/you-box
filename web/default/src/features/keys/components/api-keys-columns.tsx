@@ -23,28 +23,34 @@ import { getUserGroups } from '@/lib/api'
 import { formatQuota, formatTimestampToDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Progress } from '@/components/ui/progress'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { DataTableColumnHeader } from '@/components/data-table'
+import {
+  CellFlex,
+  DataTableColumnHeader,
+  MonoCell,
+} from '@/components/data-table'
 import { GroupBadge } from '@/components/group-badge'
+import { ProgressBar } from '@/components/patterns'
 import { StatusBadge } from '@/components/status-badge'
-import { API_KEY_STATUSES } from '../constants'
+import { API_KEY_STATUS, API_KEY_STATUSES } from '../constants'
 import { type ApiKey } from '../types'
 import {
   ApiKeyCell,
   ModelLimitsCell,
   IpRestrictionsCell,
 } from './api-keys-cells'
-import { DataTableRowActions } from './data-table-row-actions'
+import { ApiKeysRowActions } from './data-table-row-actions'
 
-function getQuotaProgressColor(percentage: number): string {
-  if (percentage <= 10) return '[&_[data-slot=progress-indicator]]:bg-rose-500'
-  if (percentage <= 30) return '[&_[data-slot=progress-indicator]]:bg-amber-500'
-  return '[&_[data-slot=progress-indicator]]:bg-success'
+function getQuotaProgressTone(
+  remainingPercentage: number
+): 'success' | 'warning' | 'danger' {
+  if (remainingPercentage <= 10) return 'danger'
+  if (remainingPercentage <= 30) return 'warning'
+  return 'success'
 }
 
 function useGroupRatios(): Record<string, number> {
@@ -100,9 +106,13 @@ export function useApiKeysColumns(): ColumnDef<ApiKey>[] {
         <DataTableColumnHeader column={column} title={t('Name')} />
       ),
       cell: ({ row }) => (
-        <div className='max-w-[200px] truncate font-medium'>
-          {row.getValue('name')}
-        </div>
+        // Merged identity cell: key name + masked key secondary line.
+        // The full key column below stays available via View Options.
+        <CellFlex
+          className='max-w-[240px]'
+          primary={row.getValue('name')}
+          secondary={`sk-${row.original.key}`}
+        />
       ),
       meta: { label: t('Name'), mobileTitle: true },
     },
@@ -112,11 +122,15 @@ export function useApiKeysColumns(): ColumnDef<ApiKey>[] {
         <DataTableColumnHeader column={column} title={t('Status')} />
       ),
       cell: ({ row }) => {
-        const statusConfig = API_KEY_STATUSES[row.getValue('status') as number]
+        const status = row.getValue('status') as number
+        const statusConfig = API_KEY_STATUSES[status]
         if (!statusConfig) return null
         return (
           <StatusBadge
-            label={t(statusConfig.label)}
+            appearance='soft'
+            label={t(
+              status === API_KEY_STATUS.ENABLED ? 'Active' : statusConfig.label
+            )}
             variant={statusConfig.variant}
             copyable={false}
           />
@@ -143,11 +157,12 @@ export function useApiKeysColumns(): ColumnDef<ApiKey>[] {
         const apiKey = row.original
         if (apiKey.unlimited_quota) {
           return (
-            <StatusBadge
-              label={t('Unlimited')}
-              variant='neutral'
-              copyable={false}
-            />
+            <MonoCell align='left'>
+              ∞{' '}
+              <span className='text-muted-foreground'>
+                / {t('Unlimited')}
+              </span>
+            </MonoCell>
           )
         }
 
@@ -159,17 +174,17 @@ export function useApiKeysColumns(): ColumnDef<ApiKey>[] {
         return (
           <Tooltip>
             <TooltipTrigger render={<div className='w-[150px] space-y-1' />}>
-              <div className='flex justify-between text-xs'>
-                <span className='font-medium tabular-nums'>
-                  {formatQuota(remaining)}
-                </span>
-                <span className='text-muted-foreground tabular-nums'>
-                  {formatQuota(total)}
-                </span>
-              </div>
-              <Progress
-                value={percentage}
-                className={cn('h-1.5', getQuotaProgressColor(percentage))}
+              <MonoCell align='left' className='text-xs'>
+                {t('{{used}} of {{limit}}', {
+                  used: formatQuota(used),
+                  limit: formatQuota(total),
+                })}
+              </MonoCell>
+              <ProgressBar
+                value={used}
+                max={total}
+                tone={getQuotaProgressTone(percentage)}
+                label={t('Quota')}
               />
             </TooltipTrigger>
             <TooltipContent>
@@ -275,9 +290,9 @@ export function useApiKeysColumns(): ColumnDef<ApiKey>[] {
           return <span className='text-muted-foreground text-xs'>-</span>
         }
         return (
-          <span className='text-muted-foreground font-mono text-xs tabular-nums'>
+          <MonoCell align='left' muted className='text-xs'>
             {formatTimestampToDate(accessedTime)}
-          </span>
+          </MonoCell>
         )
       },
       meta: { label: t('Last Used'), mobileHidden: true },
@@ -314,9 +329,9 @@ export function useApiKeysColumns(): ColumnDef<ApiKey>[] {
     },
     {
       id: 'actions',
-      cell: ({ row }) => <DataTableRowActions row={row} />,
+      cell: ({ row }) => <ApiKeysRowActions row={row} />,
       meta: { label: t('Actions') },
-      size: 88,
+      size: 120,
     },
   ]
 }

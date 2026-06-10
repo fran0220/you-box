@@ -25,6 +25,7 @@ import {
   PowerOff,
   ExternalLink,
   ArrowRightLeft,
+  Check,
   Copy,
   Link,
   Loader2,
@@ -50,6 +51,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { RowActionButton, RowActions } from '@/components/data-table'
 import { useChatPresets } from '@/features/chat/hooks/use-chat-presets'
 import { resolveChatUrl, type ChatPreset } from '@/features/chat/lib/chat-links'
 import { sendToFluent } from '@/features/chat/lib/send-to-fluent'
@@ -326,5 +328,77 @@ export function DataTableRowActions<TData>({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
+  )
+}
+
+/**
+ * Desktop actions cell (r2-B2 section 4): hover-revealed RowActions with
+ * Copy key + Edit promoted as icon buttons, followed by the existing
+ * enable/disable toggle and More dropdown (kept whole — including its own
+ * Copy Key / Edit entries — so no functionality is lost).
+ */
+export function ApiKeysRowActions<TData>({
+  row,
+}: DataTableRowActionsProps<TData>) {
+  const { t } = useTranslation()
+  const apiKey = apiKeySchema.parse(row.original)
+  const {
+    setOpen,
+    setCurrentRow,
+    resolveRealKey,
+    resolvedKeys,
+    loadingKeys,
+    copiedKeyId,
+    markKeyCopied,
+  } = useApiKeys()
+
+  const resolvedRealKey = resolvedKeys[apiKey.id]
+  const isRealKeyLoading = Boolean(loadingKeys[apiKey.id])
+  const isCopied = copiedKeyId === apiKey.id
+
+  const prefetchRealKey = useCallback(() => {
+    if (!resolvedRealKey && !isRealKeyLoading) {
+      void resolveRealKey(apiKey.id)
+    }
+  }, [apiKey.id, isRealKeyLoading, resolvedRealKey, resolveRealKey])
+
+  const handleCopyKey = useCallback(async () => {
+    if (!resolvedRealKey) {
+      void resolveRealKey(apiKey.id)
+      toast.info(t('API key is loading, please try again in a moment'))
+      return
+    }
+    const ok = await copyToClipboard(resolvedRealKey)
+    if (ok) markKeyCopied(apiKey.id)
+  }, [apiKey.id, markKeyCopied, resolvedRealKey, resolveRealKey, t])
+
+  return (
+    <RowActions>
+      <RowActionButton
+        label={t('Copy API key')}
+        onClick={handleCopyKey}
+        onPointerEnter={prefetchRealKey}
+        onFocus={prefetchRealKey}
+        disabled={isRealKeyLoading}
+      >
+        {isRealKeyLoading ? (
+          <Loader2 className='size-3.5 animate-spin' />
+        ) : isCopied ? (
+          <Check className='text-success size-3.5' />
+        ) : (
+          <Copy className='size-3.5' />
+        )}
+      </RowActionButton>
+      <RowActionButton
+        label={t('Edit')}
+        onClick={() => {
+          setCurrentRow(apiKey)
+          setOpen('update')
+        }}
+      >
+        <Edit className='size-3.5' />
+      </RowActionButton>
+      <DataTableRowActions row={row} />
+    </RowActions>
   )
 }

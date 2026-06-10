@@ -63,8 +63,10 @@ import { type ApiKey } from '../types'
 import { ApiKeyCell } from './api-keys-cells'
 import { useApiKeysColumns } from './api-keys-columns'
 import { useApiKeys } from './api-keys-provider'
+import { ApiKeysStatCards } from './api-keys-stat-cards'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { DataTableRowActions } from './data-table-row-actions'
+import { NewKeyAlert } from './new-key-alert'
 
 const route = getRouteApi('/_authenticated/keys/')
 
@@ -153,7 +155,12 @@ function ApiKeysMobileList({
               </div>
               {statusConfig && (
                 <StatusBadge
-                  label={t(statusConfig.label)}
+                  appearance='soft'
+                  label={t(
+                    apiKey.status === API_KEY_STATUS.ENABLED
+                      ? 'Active'
+                      : statusConfig.label
+                  )}
                   variant={statusConfig.variant}
                   copyable={false}
                 />
@@ -167,17 +174,22 @@ function ApiKeysMobileList({
               <DataTableRowActions row={row} />
             </div>
 
+            {/* Quota mirrors the desktop "used of limit" form (r2-B2 §4) */}
             <div className='flex items-center justify-between gap-2 text-xs'>
               <span className='text-muted-foreground'>{t('Quota')}</span>
               {apiKey.unlimited_quota ? (
-                <span className='font-medium'>{t('Unlimited')}</span>
-              ) : (
-                <span className='font-medium tabular-nums'>
-                  {formatQuota(apiKey.remain_quota)}
+                <span className='font-mono font-medium'>
+                  ∞{' '}
                   <span className='text-muted-foreground font-normal'>
-                    {' / '}
-                    {formatQuota(total)}
+                    / {t('Unlimited')}
                   </span>
+                </span>
+              ) : (
+                <span className='font-mono font-medium tabular-nums'>
+                  {t('{{used}} of {{limit}}', {
+                    used: formatQuota(apiKey.used_quota),
+                    limit: formatQuota(total),
+                  })}
                 </span>
               )}
             </div>
@@ -194,7 +206,12 @@ export function ApiKeysTable() {
   const columns = useApiKeysColumns()
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  // The masked key now lives in the name cell's secondary line; the
+  // standalone key column stays available via View Options but is hidden
+  // by default.
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    key: false,
+  })
 
   const {
     globalFilter,
@@ -329,6 +346,12 @@ export function ApiKeysTable() {
         'No API keys available. Create your first API key to get started.'
       )}
       skeletonKeyPrefix='api-keys-skeleton'
+      statHeader={
+        <>
+          <ApiKeysStatCards apiKeys={apiKeys} loading={isLoading} />
+          <NewKeyAlert />
+        </>
+      }
       toolbarProps={{
         searchPlaceholder: t('Filter by name...'),
         additionalSearch: (

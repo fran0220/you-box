@@ -24,6 +24,15 @@ import { fetchTokenKey, fetchTokenKeysBatch } from '../api'
 import { ERROR_MESSAGES } from '../constants'
 import { type ApiKey, type ApiKeysDialogType } from '../types'
 
+/**
+ * One-time reveal payload for a freshly created key. Held in memory only —
+ * a page reload clears it, preserving the "shown in full once" semantics.
+ */
+export type LastCreatedKey = {
+  name: string
+  key: string
+}
+
 type ApiKeysContextType = {
   open: ApiKeysDialogType | null
   setOpen: (str: ApiKeysDialogType | null) => void
@@ -31,6 +40,8 @@ type ApiKeysContextType = {
   setCurrentRow: React.Dispatch<React.SetStateAction<ApiKey | null>>
   refreshTrigger: number
   triggerRefresh: () => void
+  lastCreatedKey: LastCreatedKey | null
+  setLastCreatedKey: React.Dispatch<React.SetStateAction<LastCreatedKey | null>>
   resolvedKey: string
   setResolvedKey: React.Dispatch<React.SetStateAction<string>>
   resolveRealKey: (id: number) => Promise<string | null>
@@ -49,6 +60,9 @@ export function ApiKeysProvider({ children }: { children: React.ReactNode }) {
   const [currentRow, setCurrentRow] = useState<ApiKey | null>(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [resolvedKey, setResolvedKey] = useState('')
+  const [lastCreatedKey, setLastCreatedKey] = useState<LastCreatedKey | null>(
+    null
+  )
 
   const [resolvedKeys, setResolvedKeys] = useState<Record<number, string>>({})
   const [loadingKeys, setLoadingKeys] = useState<Record<number, boolean>>({})
@@ -161,6 +175,8 @@ export function ApiKeysProvider({ children }: { children: React.ReactNode }) {
         setCurrentRow,
         refreshTrigger,
         triggerRefresh,
+        lastCreatedKey,
+        setLastCreatedKey,
         resolvedKey,
         setResolvedKey,
         resolveRealKey,

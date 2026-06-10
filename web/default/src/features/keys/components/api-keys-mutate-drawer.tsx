@@ -65,7 +65,7 @@ import {
   sideDrawerSwitchItemClassName,
 } from '@/components/drawer-layout'
 import { MultiSelect } from '@/components/multi-select'
-import { createApiKey, updateApiKey, getApiKey } from '../api'
+import { createApiKey, updateApiKey, getApiKey, getApiKeys } from '../api'
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants'
 import {
   getApiKeyFormSchema,
@@ -94,7 +94,7 @@ export function ApiKeysMutateDrawer({
 }: ApiKeyMutateDrawerProps) {
   const { t } = useTranslation()
   const isUpdate = !!currentRow
-  const { triggerRefresh } = useApiKeys()
+  const { triggerRefresh, resolveRealKey, setLastCreatedKey } = useApiKeys()
   const { status } = useStatus()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [advancedOpen, setAdvancedOpen] = useState(false)
@@ -209,6 +209,27 @@ export function ApiKeysMutateDrawer({
           )
           onOpenChange(false)
           triggerRefresh()
+
+          // One-time key reveal (r2-B2 section 3): the create endpoint does
+          // not return the generated key (backend AddToken responds with
+          // success only), so resolve the newest token — the list is ordered
+          // id desc — and fetch its full key for the inline alert. Batch
+          // creation (count > 1) skips the single-key reveal.
+          if (successCount === 1) {
+            void (async () => {
+              try {
+                const listRes = await getApiKeys({ p: 1, size: 1 })
+                const newest = listRes.data?.items?.[0]
+                if (!newest) return
+                const fullKey = await resolveRealKey(newest.id)
+                if (fullKey) {
+                  setLastCreatedKey({ name: newest.name, key: fullKey })
+                }
+              } catch {
+                // Non-fatal: the key remains copyable from the table row.
+              }
+            })()
+          }
         }
       }
     } catch (_error) {

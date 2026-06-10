@@ -33,7 +33,14 @@ export function ApiKeys() {
           <ApiKeysPrimaryButtons />
         </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <ApiKeysTable />
+          <div className='space-y-3'>
+            <p className='text-muted-foreground text-sm'>
+              {t(
+                'Issue scoped keys with per-key budgets, rate limits and model allowlists.'
+              )}
+            </p>
+            <ApiKeysTable />
+          </div>
         </SectionPageLayout.Content>
       </SectionPageLayout>
 

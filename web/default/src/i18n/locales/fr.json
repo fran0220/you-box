@@ -4536,6 +4536,14 @@
     "Zero retention": "Aucune rétention",
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
+    "Zoom": "Zoom",
+    "Issue scoped keys with per-key budgets, rate limits and model allowlists.": "Issue scoped keys with per-key budgets, rate limits and model allowlists.",
+    "Active keys": "Active keys",
+    "Spend (7d)": "Spend (7d)",
+    "Requests today": "Requests today",
+    "New key created — copy it now": "New key created — copy it now",
+    "Dismiss": "Dismiss",
+    "The full key for {{name}} is shown only this once. Copy it now and store it securely.": "The full key for {{name}} is shown only this once. Copy it now and store it securely.",
+    "{{used}} of {{limit}}": "{{used}} of {{limit}}"
   }
 }
