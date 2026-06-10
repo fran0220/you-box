@@ -73,6 +73,65 @@ export const textColorMap = {
 
 export type StatusVariant = keyof typeof dotColorMap
 
+const softColorMap: Partial<Record<StatusVariant, string>> = {
+  success: 'bg-[var(--success-subtle)]',
+  warning: 'bg-[var(--warning-subtle)]',
+  danger: 'bg-[var(--danger-subtle)]',
+  red: 'bg-[var(--danger-subtle)]',
+  info: 'bg-[var(--info-subtle)]',
+  neutral: 'bg-surface-3',
+  grey: 'bg-surface-3',
+}
+
+const solidColorMap: Partial<Record<StatusVariant, string>> = {
+  success: 'bg-success text-white',
+  warning: 'bg-warning text-white',
+  danger: 'bg-destructive text-white',
+  red: 'bg-destructive text-white',
+  info: 'bg-info text-white',
+  neutral: 'bg-neutral text-background',
+  grey: 'bg-neutral text-background',
+}
+
+/**
+ * Shared status vocabulary → variant mapping (R2-A4). Keeps HTTP codes,
+ * key states and provider health reading the same everywhere:
+ * 2xx/Active/Operational = success, 429/Limited/Degraded = warning,
+ * 5xx/Revoked/Down = danger.
+ */
+export function statusVariantFor(term: string | number): StatusVariant {
+  const value = String(term).toLowerCase()
+  if (/^2\d\d$/.test(value)) return 'success'
+  if (/^4\d\d$/.test(value)) return 'warning'
+  if (/^5\d\d$/.test(value)) return 'danger'
+  switch (value) {
+    case 'active':
+    case 'enabled':
+    case 'operational':
+    case 'healthy':
+    case 'paid':
+    case 'redeemed':
+    case 'verified':
+    case 'on':
+      return 'success'
+    case 'limited':
+    case 'degraded':
+    case 'pending':
+    case 'expired':
+      return 'warning'
+    case 'revoked':
+    case 'down':
+    case 'offline':
+    case 'banned':
+    case 'failed':
+    case 'disabled':
+      return 'danger'
+    default:
+      return 'neutral'
+  }
+}
+
+
 const sizeMap = {
   sm: 'h-5 gap-1 px-1.5 text-xs leading-none',
   md: 'h-5 gap-1 px-1.5 text-xs leading-none',
@@ -91,6 +150,11 @@ export interface StatusBadgeProps extends Omit<
   showDot?: boolean
   variant?: StatusVariant | null
   size?: 'sm' | 'md' | 'lg' | null
+  /**
+   * Visual form: 'text' (legacy dot+text), 'soft' (subtle pill, design
+   * default for tables), 'solid' (high-emphasis fill).
+   */
+  appearance?: 'text' | 'soft' | 'solid'
   copyable?: boolean
   copyText?: string
   autoColor?: string
@@ -102,6 +166,7 @@ export function StatusBadge({
   icon: Icon,
   variant,
   size = 'sm',
+  appearance = 'text',
   pulse = false,
   showDot = true,
   copyable = true,
@@ -133,7 +198,13 @@ export function StatusBadge({
       className={cn(
         'inline-flex w-fit max-w-full shrink-0 items-center rounded-4xl font-medium tracking-normal whitespace-nowrap transition-colors',
         sizeMap[size ?? 'sm'],
-        textColorMap[computedVariant],
+        appearance === 'solid'
+          ? (solidColorMap[computedVariant] ??
+            cn('bg-surface-3', textColorMap[computedVariant]))
+          : textColorMap[computedVariant],
+        appearance === 'soft' &&
+          cn('font-mono', softColorMap[computedVariant] ?? 'bg-surface-3'),
+        appearance === 'solid' && 'font-mono',
         pulse && 'animate-pulse',
         copyable &&
           'cursor-copy hover:brightness-95 active:scale-95 dark:hover:brightness-110',
@@ -143,7 +214,7 @@ export function StatusBadge({
       title={copyable ? `Click to copy: ${copyText || label || ''}` : undefined}
       {...props}
     >
-      {showDot && (
+      {showDot && appearance !== 'solid' && (
         <span
           className={cn(
             'inline-block size-1.5 shrink-0 rounded-full',

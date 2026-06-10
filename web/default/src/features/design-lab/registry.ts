@@ -50,4 +50,9 @@ export const DESIGN_LAB_GROUPS: DesignLabGroup[] = [
     title: 'Settings & forms',
     component: lazy(() => import('./demos/settings-forms')),
   },
+  {
+    id: 'feedback',
+    title: 'Feedback & status',
+    component: lazy(() => import('./demos/feedback')),
+  },
 ]
