@@ -45,5 +45,6 @@
 |---|---|---|
 | C1 全局一致性 | [r2-c1-consistency.md](r2-c1-consistency.md) | pass |
 | C2 最终验收矩阵 v2 | [r2-c2-final-matrix.md](r2-c2-final-matrix.md) | 见记录 |
+| C3 遗留与功能障碍 gap 复审 | [r2-c3-leftover-gap-audit.md](r2-c3-leftover-gap-audit.md) | 修复 85 i18n 幽灵 key + 2 硬编码串 + 调试遗留;lint 债务已记录 |
 
 截图:`screenshots/r2-XX/`。验证环境:Go 后端(SQLite/self-use)`:3001` + `bun run dev`(`:3000`,proxy)。

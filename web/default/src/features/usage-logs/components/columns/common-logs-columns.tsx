@@ -748,7 +748,7 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
       header: ({ column }) => (
         <DataTableColumnHeader
           column={column}
-          title='Tokens'
+          title={t('Tokens')}
           className='justify-end text-right'
         />
       ),
@@ -795,7 +795,7 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
           </MonoCell>
         )
       },
-      meta: { label: 'Tokens' },
+      meta: { label: t('Tokens') },
     },
 
     {

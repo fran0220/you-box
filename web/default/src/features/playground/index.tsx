@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import i18next from 'i18next'
 import { RotateCcw, SlidersHorizontal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -84,7 +85,7 @@ export function Playground() {
         toast.error(
           error instanceof Error
             ? error.message
-            : t('Failed to load playground models')
+            : i18next.t('Failed to load playground models')
         )
         return []
       }
@@ -101,7 +102,7 @@ export function Playground() {
         toast.error(
           error instanceof Error
             ? error.message
-            : t('Failed to load playground groups')
+            : i18next.t('Failed to load playground groups')
         )
         return []
       }
@@ -145,12 +146,6 @@ export function Playground() {
 
     // Send chat request
     sendChat(newMessages)
-  }
-
-  const handleCopyMessage = (message: MessageType) => {
-    // Copy is handled in MessageActions component
-    // eslint-disable-next-line no-console
-    console.log('Message copied:', message.key)
   }
 
   const handleRegenerateMessage = (message: MessageType) => {
@@ -303,7 +298,6 @@ export function Playground() {
             <PlaygroundChat
               messages={messages}
               modelLabel={selectedModelLabel}
-              onCopyMessage={handleCopyMessage}
               onRegenerateMessage={handleRegenerateMessage}
               onEditMessage={handleEditMessage}
               onDeleteMessage={handleDeleteMessage}

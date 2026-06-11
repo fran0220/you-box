@@ -157,7 +157,14 @@ export function OverviewInsights() {
   }, [rangeDays])
 
   const trendQuery = useQuery({
-    queryKey: ['dashboard', 'overview', 'insights', window.start_timestamp, window.end_timestamp],
+    queryKey: [
+      'dashboard',
+      'overview',
+      'insights',
+      rangeDays,
+      window.start_timestamp,
+      window.end_timestamp,
+    ],
     queryFn: async () =>
       getUserQuotaDates({
         start_timestamp: window.start_timestamp,
