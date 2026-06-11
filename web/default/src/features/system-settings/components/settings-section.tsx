@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { SettingsPanel } from '@/components/settings'
-import { useSettingsSectionChrome } from './settings-page-context'
+import { useSettingsSectionChrome } from './use-settings-section-chrome'
 
 type SettingsSectionProps = {
   title: string

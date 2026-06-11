@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -85,10 +85,25 @@ type FAQFormValues = z.infer<typeof faqSchema>
 
 const FAQ_FORM_ID = 'faq-form'
 
+// Pure parse of the option JSON; returns null when the payload is not an
+// array (keep current list) and [] when the JSON is invalid.
+function parseFaqList(data: string): FAQ[] | null {
+  try {
+    const parsed = JSON.parse(data || '[]')
+    if (!Array.isArray(parsed)) return null
+    return parsed.map((item, idx) => ({
+      ...item,
+      id: item.id || idx + 1,
+    }))
+  } catch {
+    return []
+  }
+}
+
 export function FAQSection({ enabled, data }: FAQSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
-  const [faqList, setFaqList] = useState<FAQ[]>([])
+  const [faqList, setFaqList] = useState<FAQ[]>(() => parseFaqList(data) ?? [])
   const [isEnabled, setIsEnabled] = useState(enabled)
   const [hasChanges, setHasChanges] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
@@ -105,25 +120,19 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
     },
   })
 
-  useEffect(() => {
-    try {
-      const parsed = JSON.parse(data || '[]')
-      if (Array.isArray(parsed)) {
-        setFaqList(
-          parsed.map((item, idx) => ({
-            ...item,
-            id: item.id || idx + 1,
-          }))
-        )
-      }
-    } catch {
-      setFaqList([])
-    }
-  }, [data])
+  // Resync from refetched option data (adjust-state-during-render).
+  const [prevData, setPrevData] = useState(data)
+  if (prevData !== data) {
+    setPrevData(data)
+    const next = parseFaqList(data)
+    if (next) setFaqList(next)
+  }
 
-  useEffect(() => {
+  const [prevEnabled, setPrevEnabled] = useState(enabled)
+  if (prevEnabled !== enabled) {
+    setPrevEnabled(enabled)
     setIsEnabled(enabled)
-  }, [enabled])
+  }
 
   const handleToggleEnabled = async (checked: boolean) => {
     try {

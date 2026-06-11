@@ -172,7 +172,11 @@ export function ChannelAffinitySection(props: Props) {
   const [clearRuleName, setClearRuleName] = useState<string | null>(null)
   const [fillTemplateDialogOpen, setFillTemplateDialogOpen] = useState(false)
 
-  useEffect(() => {
+  // Resync local editor state from refetched options
+  // (adjust-state-during-render).
+  const [prevDefaults, setPrevDefaults] = useState(props.defaultValues)
+  if (prevDefaults !== props.defaultValues) {
+    setPrevDefaults(props.defaultValues)
     setEnabled(props.defaultValues['channel_affinity_setting.enabled'])
     setSwitchOnSuccess(
       props.defaultValues['channel_affinity_setting.switch_on_success']
@@ -195,7 +199,7 @@ export function ChannelAffinitySection(props: Props) {
         2
       )
     )
-  }, [props.defaultValues])
+  }
 
   const refreshCache = useCallback(async () => {
     setCacheLoading(true)
@@ -210,7 +214,12 @@ export function ChannelAffinitySection(props: Props) {
   }, [t])
 
   useEffect(() => {
-    refreshCache()
+    // Defer so the loading-state updates stay out of the synchronous
+    // effect body (react-hooks/set-state-in-effect).
+    const timer = setTimeout(() => {
+      void refreshCache()
+    }, 0)
+    return () => clearTimeout(timer)
   }, [refreshCache])
 
   const appendCliTemplates = () => {

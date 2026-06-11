@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -93,6 +93,21 @@ type ApiInfoFormValues = z.infer<ReturnType<typeof createApiInfoSchema>>
 
 const API_INFO_FORM_ID = 'api-info-form'
 
+// Pure parse of the option JSON; returns null when the payload is not an
+// array (keep current list) and [] when the JSON is invalid.
+function parseApiInfoList(data: string): ApiInfo[] | null {
+  try {
+    const parsed = JSON.parse(data || '[]')
+    if (!Array.isArray(parsed)) return null
+    return parsed.map((item, idx) => ({
+      ...item,
+      id: item.id || idx + 1,
+    }))
+  } catch {
+    return []
+  }
+}
+
 const colorOptions = [
   { value: 'blue', label: 'Blue' },
   { value: 'green', label: 'Green' },
@@ -114,7 +129,9 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
   const apiInfoSchema = createApiInfoSchema(t)
-  const [apiInfoList, setApiInfoList] = useState<ApiInfo[]>([])
+  const [apiInfoList, setApiInfoList] = useState<ApiInfo[]>(
+    () => parseApiInfoList(data) ?? []
+  )
   const [isEnabled, setIsEnabled] = useState(enabled)
   const [hasChanges, setHasChanges] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
@@ -133,25 +150,19 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
     },
   })
 
-  useEffect(() => {
-    try {
-      const parsed = JSON.parse(data || '[]')
-      if (Array.isArray(parsed)) {
-        setApiInfoList(
-          parsed.map((item, idx) => ({
-            ...item,
-            id: item.id || idx + 1,
-          }))
-        )
-      }
-    } catch {
-      setApiInfoList([])
-    }
-  }, [data])
+  // Resync from refetched option data (adjust-state-during-render).
+  const [prevData, setPrevData] = useState(data)
+  if (prevData !== data) {
+    setPrevData(data)
+    const next = parseApiInfoList(data)
+    if (next) setApiInfoList(next)
+  }
 
-  useEffect(() => {
+  const [prevEnabled, setPrevEnabled] = useState(enabled)
+  if (prevEnabled !== enabled) {
+    setPrevEnabled(enabled)
     setIsEnabled(enabled)
-  }, [enabled])
+  }
 
   const handleToggleEnabled = async (checked: boolean) => {
     try {

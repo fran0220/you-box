@@ -367,11 +367,17 @@ function DraftNumberInput({
   const [draft, setDraft] = useState(() => formatNumberDraft(value))
   const [focused, setFocused] = useState(false)
 
-  useEffect(() => {
+  // While unfocused, keep the draft in sync with the external value
+  // (adjust-state-during-render).
+  const [prevValue, setPrevValue] = useState(value)
+  const [prevFocused, setPrevFocused] = useState(focused)
+  if (prevValue !== value || prevFocused !== focused) {
+    setPrevValue(value)
+    setPrevFocused(focused)
     if (!focused) {
       setDraft(formatNumberDraft(value))
     }
-  }, [focused, value])
+  }
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextDraft = event.target.value
@@ -594,9 +600,14 @@ function VisualTierCard({
   })
   const [mediaOpen, setMediaOpen] = useState(hasMediaPricing)
 
-  useEffect(() => {
+  // Force the media section open whenever media pricing appears
+  // (adjust-state-during-render).
+  const [prevHasMediaPricing, setPrevHasMediaPricing] =
+    useState(hasMediaPricing)
+  if (prevHasMediaPricing !== hasMediaPricing) {
+    setPrevHasMediaPricing(hasMediaPricing)
     if (hasMediaPricing) setMediaOpen(true)
-  }, [hasMediaPricing])
+  }
 
   const renderPriceVariable = (
     variable: (typeof BILLING_EXTRA_VARS)[number]

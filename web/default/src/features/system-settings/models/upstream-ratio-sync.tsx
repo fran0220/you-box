@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CheckSquare, RefreshCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -159,25 +159,32 @@ export function UpstreamRatioSync({ modelRatios }: UpstreamRatioSyncProps) {
     enabled: channelDialogOpen,
   })
 
-  // Memoize the channels list so the effect below only re-runs when the query
-  // data actually changes, instead of on every render (the `|| []` fallback
-  // would otherwise produce a new array reference each render).
+  // Memoize the channels list so the render adjustment below only re-runs
+  // when the query data actually changes, instead of on every render (the
+  // `|| []` fallback would otherwise produce a new array reference each
+  // render).
   const channels = useMemo(() => channelsData?.data ?? [], [channelsData?.data])
 
-  useEffect(() => {
-    if (channels.length === 0) return
-    setChannelEndpoints((prev) => {
-      let mutated = false
-      const next = { ...prev }
-      for (const channel of channels) {
-        if (!next[channel.id]) {
-          next[channel.id] = getDefaultEndpointForChannel(channel)
-          mutated = true
+  // Seed default endpoints for newly loaded channels
+  // (adjust-state-during-render; seeded with null so cached query data is
+  // also picked up on the first render).
+  const [prevChannels, setPrevChannels] = useState<typeof channels | null>(null)
+  if (prevChannels !== channels) {
+    setPrevChannels(channels)
+    if (channels.length > 0) {
+      setChannelEndpoints((prev) => {
+        let mutated = false
+        const next = { ...prev }
+        for (const channel of channels) {
+          if (!next[channel.id]) {
+            next[channel.id] = getDefaultEndpointForChannel(channel)
+            mutated = true
+          }
         }
-      }
-      return mutated ? next : prev
-    })
-  }, [channels])
+        return mutated ? next : prev
+      })
+    }
+  }
 
   const fetchMutation = useMutation({
     mutationFn: fetchUpstreamRatios,

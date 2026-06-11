@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useMemo, useEffect, useCallback, memo } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import { Pencil, Plus, Trash2, GripVertical, ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -763,18 +763,22 @@ function GroupPricingTable({
     buildGroupPricingRows(groupRatio, userUsableGroups)
   )
 
-  useEffect(() => {
+  // Resync rows when the incoming JSON no longer matches what the current
+  // rows serialize to (adjust-state-during-render).
+  const [prevSource, setPrevSource] = useState({ groupRatio, userUsableGroups })
+  if (
+    prevSource.groupRatio !== groupRatio ||
+    prevSource.userUsableGroups !== userUsableGroups
+  ) {
+    setPrevSource({ groupRatio, userUsableGroups })
     const incomingSignature = sourceGroupPricingSignature(
       groupRatio,
       userUsableGroups
     )
-    setRows((currentRows) => {
-      if (groupPricingSignature(currentRows) === incomingSignature) {
-        return currentRows
-      }
-      return buildGroupPricingRows(groupRatio, userUsableGroups)
-    })
-  }, [groupRatio, userUsableGroups])
+    if (groupPricingSignature(rows) !== incomingSignature) {
+      setRows(buildGroupPricingRows(groupRatio, userUsableGroups))
+    }
+  }
 
   const emitRows = useCallback(
     (nextRows: GroupPricingRow[]) => {
@@ -989,21 +993,21 @@ function SimpleGroupDialog({
   type,
 }: SimpleGroupDialogProps) {
   const { t } = useTranslation()
-  const [name, setName] = useState('')
-  const [value, setValue] = useState('')
+  const [name, setName] = useState(() => (open ? (editData?.name ?? '') : ''))
+  const [value, setValue] = useState(() =>
+    open ? (editData?.value ?? '') : ''
+  )
 
   const title = type === 'groupRatio' ? t('group ratio') : t('top-up ratio')
 
-  useEffect(() => {
-    if (!open) {
-      setName('')
-      setValue('')
-      return
-    }
-
-    setName(editData?.name ?? '')
-    setValue(editData?.value ?? '')
-  }, [editData, open])
+  // Reset the fields when the dialog opens/closes or targets another entry
+  // (adjust-state-during-render).
+  const [prevSync, setPrevSync] = useState({ open, editData })
+  if (prevSync.open !== open || prevSync.editData !== editData) {
+    setPrevSync({ open, editData })
+    setName(open ? (editData?.name ?? '') : '')
+    setValue(open ? (editData?.value ?? '') : '')
+  }
 
   const handleSave = () => {
     if (!name.trim() || !value.trim()) return
@@ -1080,19 +1084,21 @@ function GroupOverrideDialog({
   userGroup,
 }: GroupOverrideDialogProps) {
   const { t } = useTranslation()
-  const [targetGroup, setTargetGroup] = useState('')
-  const [ratio, setRatio] = useState('')
+  const [targetGroup, setTargetGroup] = useState(() =>
+    open ? (editData?.targetGroup ?? '') : ''
+  )
+  const [ratio, setRatio] = useState(() =>
+    open && editData ? String(editData.ratio) : ''
+  )
 
-  useEffect(() => {
-    if (!open) {
-      setTargetGroup('')
-      setRatio('')
-      return
-    }
-
-    setTargetGroup(editData?.targetGroup ?? '')
-    setRatio(editData ? String(editData.ratio) : '')
-  }, [editData, open])
+  // Reset the fields when the dialog opens/closes or targets another entry
+  // (adjust-state-during-render).
+  const [prevSync, setPrevSync] = useState({ open, editData })
+  if (prevSync.open !== open || prevSync.editData !== editData) {
+    setPrevSync({ open, editData })
+    setTargetGroup(open ? (editData?.targetGroup ?? '') : '')
+    setRatio(open && editData ? String(editData.ratio) : '')
+  }
 
   const handleSave = () => {
     if (!targetGroup.trim() || !ratio.trim()) return

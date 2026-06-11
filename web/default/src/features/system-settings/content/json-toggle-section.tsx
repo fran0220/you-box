@@ -162,10 +162,9 @@ export function JsonToggleSection({
   return (
     <SettingsAccordion value={value} title={title}>
       <Form {...form}>
-        {/* eslint-disable-next-line react-hooks/refs */}
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
+        <SettingsForm onSubmit={(event) => form.handleSubmit(onSubmit)(event)}>
           <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
+            onSave={() => form.handleSubmit(onSubmit)()}
             isSaving={updateOption.isPending}
             saveLabel={submitLabel}
           />

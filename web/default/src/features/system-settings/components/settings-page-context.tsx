@@ -16,48 +16,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  type ReactNode,
-} from 'react'
+import { useContext, useEffect, useMemo, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useFormContext, useFormState } from 'react-hook-form'
 
-/**
- * Snapshot of the active section form, registered by
- * SettingsPageFormActions and consumed by the sticky save bar
- * rendered in the settings page frame.
- */
-export type SettingsFormActionsRegistration = {
-  dirty: boolean
-  saving: boolean
-  save: () => void
-  discard: () => void
-}
+import {
+  noopRegister,
+  SettingsPageContext,
+  type SettingsFormActionsRegistration,
+} from './settings-page-context-store'
 
-type SettingsPageContextValue = {
-  actionsContainer: HTMLDivElement | null
-  titleStatusContainer: HTMLSpanElement | null
-  suppressSectionHeader: boolean
-  /** i18n key of the owning settings group, used as the panel eyebrow. */
-  sectionEyebrow: string | null
-  registerFormActions: (
-    entry: SettingsFormActionsRegistration | null
-  ) => void
-}
-
-const noopRegister = () => {}
-
-const SettingsPageContext = createContext<SettingsPageContextValue>({
-  actionsContainer: null,
-  titleStatusContainer: null,
-  suppressSectionHeader: false,
-  sectionEyebrow: null,
-  registerFormActions: noopRegister,
-})
+export type { SettingsFormActionsRegistration } from './settings-page-context-store'
 
 type SettingsPageProviderProps = {
   actionsContainer: HTMLDivElement | null
@@ -101,13 +70,6 @@ export function SettingsPageProvider(props: SettingsPageProviderProps) {
       {props.children}
     </SettingsPageContext.Provider>
   )
-}
-
-/** Header chrome for SettingsSection: suppress flag + group eyebrow key. */
-export function useSettingsSectionChrome() {
-  const { suppressSectionHeader, sectionEyebrow } =
-    useContext(SettingsPageContext)
-  return { suppressSectionHeader, sectionEyebrow }
 }
 
 type SettingsPageTitleStatusPortalProps = {

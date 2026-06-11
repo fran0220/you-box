@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -92,11 +92,28 @@ type UptimeKumaFormValues = z.infer<ReturnType<typeof createUptimeKumaSchema>>
 
 const UPTIME_KUMA_FORM_ID = 'uptime-kuma-form'
 
+// Pure parse of the option JSON; returns null when the payload is not an
+// array (keep current list) and [] when the JSON is invalid.
+function parseUptimeKumaGroups(data: string): UptimeKumaGroup[] | null {
+  try {
+    const parsed = JSON.parse(data || '[]')
+    if (!Array.isArray(parsed)) return null
+    return parsed.map((item, idx) => ({
+      ...item,
+      id: item.id || idx + 1,
+    }))
+  } catch {
+    return []
+  }
+}
+
 export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
   const uptimeKumaSchema = createUptimeKumaSchema(t)
-  const [groups, setGroups] = useState<UptimeKumaGroup[]>([])
+  const [groups, setGroups] = useState<UptimeKumaGroup[]>(
+    () => parseUptimeKumaGroups(data) ?? []
+  )
   const [isEnabled, setIsEnabled] = useState(enabled)
   const [hasChanges, setHasChanges] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
@@ -114,25 +131,19 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
     },
   })
 
-  useEffect(() => {
-    try {
-      const parsed = JSON.parse(data || '[]')
-      if (Array.isArray(parsed)) {
-        setGroups(
-          parsed.map((item, idx) => ({
-            ...item,
-            id: item.id || idx + 1,
-          }))
-        )
-      }
-    } catch {
-      setGroups([])
-    }
-  }, [data])
+  // Resync from refetched option data (adjust-state-during-render).
+  const [prevData, setPrevData] = useState(data)
+  if (prevData !== data) {
+    setPrevData(data)
+    const next = parseUptimeKumaGroups(data)
+    if (next) setGroups(next)
+  }
 
-  useEffect(() => {
+  const [prevEnabled, setPrevEnabled] = useState(enabled)
+  if (prevEnabled !== enabled) {
+    setPrevEnabled(enabled)
     setIsEnabled(enabled)
-  }, [enabled])
+  }
 
   const handleToggleEnabled = async (checked: boolean) => {
     try {
