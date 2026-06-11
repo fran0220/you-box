@@ -137,7 +137,9 @@ export function SidebarModulesCard() {
   }, [])
 
   useEffect(() => {
-    loadConfig()
+    // Defer so the setState inside loadConfig runs outside the effect body
+    const timer = setTimeout(() => loadConfig(), 0)
+    return () => clearTimeout(timer)
   }, [loadConfig])
 
   const toggleSection = (sectionKey: string, val: boolean) => {

@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   INTERFACE_LANGUAGE_OPTIONS,
   normalizeInterfaceLanguage,
@@ -55,9 +55,12 @@ export function LanguagePreferencesCard(props: LanguagePreferencesCardProps) {
 
   const [currentLanguage, setCurrentLanguage] = useState(savedLanguage)
 
-  useEffect(() => {
+  // Follow saved-language updates from the profile (render adjust)
+  const [prevSavedLanguage, setPrevSavedLanguage] = useState(savedLanguage)
+  if (prevSavedLanguage !== savedLanguage) {
+    setPrevSavedLanguage(savedLanguage)
     setCurrentLanguage(savedLanguage)
-  }, [savedLanguage])
+  }
 
   const handleLanguageChange = async (language: string | null) => {
     if (!language) return

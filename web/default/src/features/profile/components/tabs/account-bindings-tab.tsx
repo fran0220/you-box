@@ -86,7 +86,10 @@ export function AccountBindingsTab({
   }, [customProviders])
 
   useEffect(() => {
-    fetchCustomBindings()
+    // Defer so the setState inside fetchCustomBindings runs outside the
+    // effect body
+    const timer = setTimeout(() => fetchCustomBindings(), 0)
+    return () => clearTimeout(timer)
   }, [fetchCustomBindings])
 
   const handleUnbindCustom = async () => {
@@ -115,7 +118,9 @@ export function AccountBindingsTab({
 
   const handleBindCustomOAuth = (provider: { id: string; name: string }) => {
     const redirectUrl = `${window.location.origin}/oauth/${provider.id}?bind=true`
-    window.location.href = `/api/oauth/${provider.id}?redirect=${encodeURIComponent(redirectUrl)}`
+    window.location.assign(
+      `/api/oauth/${provider.id}?redirect=${encodeURIComponent(redirectUrl)}`
+    )
   }
 
   useEffect(() => {

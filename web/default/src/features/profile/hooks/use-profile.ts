@@ -118,9 +118,11 @@ export function useProfile() {
     [refreshProfile]
   )
 
-  // Initial fetch
+  // Initial fetch (deferred so the synchronous setLoading inside
+  // fetchProfile runs outside the effect body)
   useEffect(() => {
-    fetchProfile()
+    const timer = setTimeout(() => fetchProfile(), 0)
+    return () => clearTimeout(timer)
   }, [fetchProfile])
 
   return {

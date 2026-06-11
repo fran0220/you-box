@@ -121,11 +121,12 @@ export function TwoFASetupDialog({
     }
   }
 
-  // Initialize when dialog opens
+  // Initialize when dialog opens (deferred so the synchronous
+  // setInitializing inside handleSetup runs outside the effect body)
   useEffect(() => {
-    if (open && !setupData && !initializing) {
-      handleSetup()
-    }
+    if (!open || setupData || initializing) return
+    const timer = setTimeout(() => handleSetup(), 0)
+    return () => clearTimeout(timer)
   }, [open, setupData, initializing, handleSetup])
 
   return (

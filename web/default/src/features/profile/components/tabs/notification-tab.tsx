@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Bell, Loader2, Mail, Server, Webhook } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -78,7 +78,10 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
     []
   )
 
-  useEffect(() => {
+  // Sync local form state when the profile prop changes (render adjust)
+  const [prevProfile, setPrevProfile] = useState<UserProfile | null>(null)
+  if (prevProfile !== profile) {
+    setPrevProfile(profile)
     if (profile?.setting) {
       const parsed = parseUserSettings(profile.setting)
       setSettings({
@@ -99,7 +102,7 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
           parsed.upstream_model_update_notify_enabled || false,
       })
     }
-  }, [profile])
+  }
 
   const handleSave = async () => {
     try {

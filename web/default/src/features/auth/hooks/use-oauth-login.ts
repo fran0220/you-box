@@ -41,20 +41,28 @@ type LogoutRequestConfig = AxiosRequestConfig & {
 export function useOAuthLogin(status: SystemStatus | null) {
   const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
-  const [githubButtonText, setGithubButtonText] = useState('')
+  const [githubButtonText, setGithubButtonText] = useState(() =>
+    t('Continue with GitHub')
+  )
   const [githubButtonDisabled, setGithubButtonDisabled] = useState(false)
   const githubTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { auth } = useAuthStore()
 
-  useEffect(() => {
+  // Re-translate the default button label when the language changes
+  // (render adjust; `t` identity changes with the active language)
+  const [prevT, setPrevT] = useState(() => t)
+  if (prevT !== t) {
+    setPrevT(() => t)
     setGithubButtonText(t('Continue with GitHub'))
+  }
 
+  useEffect(() => {
     return () => {
       if (githubTimeoutRef.current) {
         clearTimeout(githubTimeoutRef.current)
       }
     }
-  }, [t])
+  }, [])
 
   const resetSession = async () => {
     try {

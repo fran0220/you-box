@@ -90,6 +90,17 @@ export function UserAuthForm({
   const hasUserAgreement = Boolean(status?.user_agreement_enabled)
   const hasPrivacyPolicy = Boolean(status?.privacy_policy_enabled)
   const requiresLegalConsent = hasUserAgreement || hasPrivacyPolicy
+
+  // Default consent to agreed only when no legal consent is required
+  // (render adjust; null sentinel so it also runs on first render)
+  const [prevRequiresLegalConsent, setPrevRequiresLegalConsent] = useState<
+    boolean | null
+  >(null)
+  if (prevRequiresLegalConsent !== requiresLegalConsent) {
+    setPrevRequiresLegalConsent(requiresLegalConsent)
+    setAgreedToLegal(!requiresLegalConsent)
+  }
+
   const passkeyButtonDisabled =
     isPasskeyLoading ||
     !passkeySupported ||
@@ -105,14 +116,6 @@ export function UserAuthForm({
   )
   const hasAlternativeLogin =
     passkeyLoginEnabled || hasWeChatLogin || hasOAuthLogin
-
-  useEffect(() => {
-    if (requiresLegalConsent) {
-      setAgreedToLegal(false)
-    } else {
-      setAgreedToLegal(true)
-    }
-  }, [requiresLegalConsent])
 
   useEffect(() => {
     detectPasskeySupport()

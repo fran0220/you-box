@@ -52,7 +52,10 @@ export function useTwoFA(enabled = true) {
   }, [enabled])
 
   useEffect(() => {
-    fetchStatus()
+    // Defer so the synchronous setLoading inside fetchStatus runs outside
+    // the effect body
+    const timer = setTimeout(() => fetchStatus(), 0)
+    return () => clearTimeout(timer)
   }, [fetchStatus])
 
   return {

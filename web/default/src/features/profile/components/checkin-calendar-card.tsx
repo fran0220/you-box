@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   CalendarDays,
@@ -118,13 +118,12 @@ export function CheckinCalendarCard({
   const checkedToday = checkinData?.stats?.checked_in_today === true
   const todayAward = checkinRecordsMap[todayString]
 
-  useEffect(() => {
-    if (initialLoaded) return
-    if (isLoading) return
-    if (!checkinData) return
+  // One-shot: once the first load completes, collapse the card if today's
+  // check-in is already done (render adjust; converges after a single pass)
+  if (!initialLoaded && !isLoading && checkinData) {
     setCollapsed(checkedToday)
     setInitialLoaded(true)
-  }, [checkinData, checkedToday, initialLoaded, isLoading])
+  }
 
   const shouldTriggerTurnstile = useCallback(
     (message?: string) => {
