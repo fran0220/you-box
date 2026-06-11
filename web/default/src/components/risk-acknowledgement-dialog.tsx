@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import {
@@ -83,22 +83,30 @@ export function RiskAcknowledgementDialog({
   className,
 }: RiskAcknowledgementDialogProps) {
   const { t } = useTranslation()
-  const [checkedItems, setCheckedItems] = useState<boolean[]>([])
+  const [checkedItems, setCheckedItems] = useState<boolean[]>(() =>
+    Array(checklist.length).fill(false)
+  )
   const [typedText, setTypedText] = useState('')
-  const [typedTextParts, setTypedTextParts] = useState<string[]>([])
+  const [typedTextParts, setTypedTextParts] = useState<string[]>(() =>
+    Array(
+      requiredTextParts.filter((part) => part.type === 'input').length
+    ).fill('')
+  )
 
   const normalizedRequiredTextParts = useMemo<
     NormalizedRequiredTextPart[]
   >(() => {
+    const normalized: NormalizedRequiredTextPart[] = []
     let inputIndex = 0
-    return requiredTextParts.map((part) => {
+    for (const part of requiredTextParts) {
       if (part.type === 'input') {
-        const normalizedPart = { ...part, inputIndex }
+        normalized.push({ ...part, inputIndex })
         inputIndex += 1
-        return normalizedPart
+      } else {
+        normalized.push(part)
       }
-      return part
-    })
+    }
+    return normalized
   }, [requiredTextParts])
 
   const requiredTextInputCount = useMemo(
@@ -112,12 +120,17 @@ export function RiskAcknowledgementDialog({
     ? normalizedRequiredTextParts.map((part) => part.text).join('')
     : requiredText
 
-  useEffect(() => {
-    if (!open) return
-    setCheckedItems(Array(checklist.length).fill(false))
-    setTypedText('')
-    setTypedTextParts(Array(requiredTextInputCount).fill(''))
-  }, [open, checklist.length, requiredTextInputCount])
+  // Reset acknowledgement state whenever the dialog (re)opens or its content changes
+  const resetKey = `${open}|${checklist.length}|${requiredTextInputCount}`
+  const [prevResetKey, setPrevResetKey] = useState(resetKey)
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey)
+    if (open) {
+      setCheckedItems(Array(checklist.length).fill(false))
+      setTypedText('')
+      setTypedTextParts(Array(requiredTextInputCount).fill(''))
+    }
+  }
 
   const allChecked = useMemo(() => {
     if (checklist.length === 0) return true

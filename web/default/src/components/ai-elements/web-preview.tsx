@@ -23,7 +23,6 @@ import {
   createContext,
   type ReactNode,
   useContext,
-  useEffect,
   useState,
 } from 'react'
 import { ChevronDownIcon } from 'lucide-react'
@@ -165,9 +164,11 @@ export const WebPreviewUrl = ({
   const [inputValue, setInputValue] = useState(url)
 
   // Sync input value with context URL when it changes externally
-  useEffect(() => {
+  const [prevUrl, setPrevUrl] = useState(url)
+  if (prevUrl !== url) {
+    setPrevUrl(url)
     setInputValue(url)
-  }, [url])
+  }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value)

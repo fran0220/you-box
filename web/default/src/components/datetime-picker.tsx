@@ -62,7 +62,10 @@ export function DateTimePicker({
   const [month, setMonth] = React.useState<Date | undefined>(value)
   const [time, setTime] = React.useState<string>('00:00')
 
-  React.useEffect(() => {
+  // Sync internal state when the controlled value changes externally
+  const [prevValue, setPrevValue] = React.useState<Date | undefined>(value)
+  if (prevValue !== value) {
+    setPrevValue(value)
     setDate(value)
     setMonth(value)
     if (value) {
@@ -70,7 +73,7 @@ export function DateTimePicker({
       const minutes = value.getMinutes().toString().padStart(2, '0')
       setTime(`${hours}:${minutes}`)
     }
-  }, [value])
+  }
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {

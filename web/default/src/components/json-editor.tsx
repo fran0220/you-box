@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Code, Table, Plus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
@@ -43,6 +43,21 @@ type EditorRow = {
   value: string
 }
 
+// Pure JSON-to-rows conversion; returns null when the JSON is invalid
+function jsonToRows(json: string, idPrefix: string): EditorRow[] | null {
+  try {
+    if (!json.trim()) return []
+    const parsed = JSON.parse(json)
+    return Object.entries(parsed).map(([key, val], index) => ({
+      id: `${idPrefix}-${index}`,
+      key,
+      value: typeof val === 'object' ? JSON.stringify(val) : String(val),
+    }))
+  } catch (_error) {
+    return null
+  }
+}
+
 export function JsonEditor({
   value,
   onChange,
@@ -67,33 +82,21 @@ export function JsonEditor({
   const [jsonValue, setJsonValue] = useState(value)
 
   const parseJsonToRows = (json: string) => {
-    try {
-      if (!json.trim()) {
-        setRows([])
-        return
-      }
-      const parsed = JSON.parse(json)
-      const newRows: EditorRow[] = Object.entries(parsed).map(
-        ([key, val], index) => ({
-          id: `${Date.now()}-${index}`,
-          key,
-          value: typeof val === 'object' ? JSON.stringify(val) : String(val),
-        })
-      )
-      setRows(newRows)
-    } catch (_error) {
-      // Invalid JSON, keep current rows
-    }
+    const newRows = jsonToRows(json, `${Date.now()}`)
+    if (newRows) setRows(newRows)
+    // Invalid JSON: keep current rows
   }
 
   // Parse JSON to rows when value changes externally
-  useEffect(() => {
-    if (value !== jsonValue) {
-      setJsonValue(value)
-      parseJsonToRows(value)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
+  const [prevValue, setPrevValue] = useState(value)
+  const [generation, setGeneration] = useState(0)
+  if (prevValue !== value) {
+    setPrevValue(value)
+    setJsonValue(value)
+    setGeneration(generation + 1)
+    const newRows = jsonToRows(value, `g${generation + 1}`)
+    if (newRows) setRows(newRows)
+  }
 
   const convertRowsToJson = (updatedRows: EditorRow[]): string => {
     if (updatedRows.length === 0) {

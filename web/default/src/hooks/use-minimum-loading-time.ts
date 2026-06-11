@@ -26,26 +26,25 @@ export function useMinimumLoadingTime(
   loading: boolean,
   minimumTime = 1000
 ): boolean {
-  const [showSkeleton, setShowSkeleton] = useState(loading)
-  // eslint-disable-next-line react-hooks/purity
-  const loadingStartRef = useRef(Date.now())
+  // While `loading` is true the output is true regardless of `holding`, so the
+  // hold flag can be armed asynchronously without a visible gap.
+  const [holding, setHolding] = useState(loading)
+  const loadingStartRef = useRef(0)
 
   useEffect(() => {
-    if (loading) {
-      loadingStartRef.current = Date.now()
-      setShowSkeleton(true)
-    } else {
-      const elapsed = Date.now() - loadingStartRef.current
-      const remaining = Math.max(0, minimumTime - elapsed)
+    if (!loading) return
+    loadingStartRef.current = Date.now()
+    const arm = setTimeout(() => setHolding(true), 0)
+    return () => clearTimeout(arm)
+  }, [loading])
 
-      if (remaining === 0) {
-        setShowSkeleton(false)
-      } else {
-        const timer = setTimeout(() => setShowSkeleton(false), remaining)
-        return () => clearTimeout(timer)
-      }
-    }
-  }, [loading, minimumTime])
+  useEffect(() => {
+    if (loading || !holding) return
+    const elapsed = Date.now() - loadingStartRef.current
+    const remaining = Math.max(0, minimumTime - elapsed)
+    const release = setTimeout(() => setHolding(false), remaining)
+    return () => clearTimeout(release)
+  }, [loading, holding, minimumTime])
 
-  return showSkeleton
+  return loading || holding
 }
