@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useEffectEvent, useMemo } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -77,13 +77,6 @@ export function TagBatchEditDialog({
     }))
   }, [groupsData, groups])
 
-  useEffect(() => {
-    if (open && currentTag) {
-      loadTagData()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentTag])
-
   const loadTagData = async () => {
     if (!currentTag) return
 
@@ -111,6 +104,17 @@ export function TagBatchEditDialog({
       setIsLoading(false)
     }
   }
+
+  const loadTagDataOnOpen = useEffectEvent(() => {
+    loadTagData()
+  })
+
+  useEffect(() => {
+    if (open && currentTag) {
+      const timer = setTimeout(() => loadTagDataOnOpen(), 0)
+      return () => clearTimeout(timer)
+    }
+  }, [open, currentTag])
 
   const handleSave = async () => {
     if (!currentTag) return

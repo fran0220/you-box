@@ -73,9 +73,14 @@ export function ConsumptionDistributionChart(
   >(null)
   const timeGranularity = props.timeGranularity ?? DEFAULT_TIME_GRANULARITY
 
-  useEffect(() => {
+  // Sync chart type when the default changes (adjust-state-during-render)
+  const [prevDefaultChartType, setPrevDefaultChartType] = useState(
+    props.defaultChartType
+  )
+  if (prevDefaultChartType !== props.defaultChartType) {
+    setPrevDefaultChartType(props.defaultChartType)
     if (props.defaultChartType) setChartType(props.defaultChartType)
-  }, [props.defaultChartType])
+  }
 
   useEffect(() => {
     const updateTheme = async () => {

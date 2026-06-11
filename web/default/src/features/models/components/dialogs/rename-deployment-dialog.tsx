@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -43,9 +43,16 @@ export function RenameDeploymentDialog({
   const [name, setName] = useState(currentName || '')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
+  // Prefill the name when the dialog opens or the current name changes
+  // (adjust-state-during-render)
+  const [prevSync, setPrevSync] = useState<{
+    open: boolean
+    currentName?: string
+  }>({ open, currentName })
+  if (prevSync.open !== open || prevSync.currentName !== currentName) {
+    setPrevSync({ open, currentName })
     if (open) setName(currentName || '')
-  }, [open, currentName])
+  }
 
   const trimmed = name.trim()
 

@@ -16,7 +16,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2, RefreshCw, Trash2, Download, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -96,7 +103,10 @@ export function OllamaModelsDialog({
     [currentRow?.models]
   )
 
-  useEffect(() => {
+  // Reset dialog state when it closes (adjust-state-during-render)
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (prevOpen !== open) {
+    setPrevOpen(open)
     if (!open) {
       setModels([])
       setSelected([])
@@ -104,16 +114,8 @@ export function OllamaModelsDialog({
       setPullName('')
       setIsPulling(false)
       setPullProgress(null)
-      pullAbortRef.current?.abort()
-      pullAbortRef.current = null
-      return
     }
-
-    if (open && isOllamaChannel && channelId) {
-      void fetchOllamaModels()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, isOllamaChannel, channelId])
+  }
 
   const fetchOllamaModels = useCallback(async () => {
     if (!channelId) return
@@ -174,6 +176,24 @@ export function OllamaModelsDialog({
       setIsFetching(false)
     }
   }, [channelId, currentRow, isOllamaChannel, t])
+
+  const fetchModelsOnOpen = useEffectEvent(() => {
+    void fetchOllamaModels()
+  })
+
+  useEffect(() => {
+    if (!open) {
+      // Cancel any in-flight pull when the dialog closes
+      pullAbortRef.current?.abort()
+      pullAbortRef.current = null
+      return
+    }
+
+    if (isOllamaChannel && channelId) {
+      const timer = setTimeout(() => fetchModelsOnOpen(), 0)
+      return () => clearTimeout(timer)
+    }
+  }, [open, isOllamaChannel, channelId])
 
   const toggleSelected = (modelId: string, checked: boolean) => {
     setSelected((prev) => {

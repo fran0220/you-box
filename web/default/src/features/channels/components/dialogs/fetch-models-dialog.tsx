@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useEffectEvent, useMemo } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2, Search, Info, ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -121,13 +121,6 @@ export function FetchModelsDialog({
     })
   }, [fetchedModelSet, redirectSourceKeysSet, searchKeyword, selectedModels])
 
-  useEffect(() => {
-    if (open && (activeChannel || customFetcher)) {
-      handleFetchModels()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, activeChannel?.id, customFetcher])
-
   const handleFetchModels = async () => {
     if (!activeChannel && !customFetcher) return
 
@@ -159,6 +152,18 @@ export function FetchModelsDialog({
       setIsFetching(false)
     }
   }
+
+  const fetchModelsOnOpen = useEffectEvent(() => {
+    handleFetchModels()
+  })
+
+  const activeChannelId = activeChannel?.id
+  useEffect(() => {
+    if (open && (activeChannelId !== undefined || customFetcher)) {
+      const timer = setTimeout(() => fetchModelsOnOpen(), 0)
+      return () => clearTimeout(timer)
+    }
+  }, [open, activeChannelId, customFetcher])
 
   const handleSave = async () => {
     // If onModelsSelected callback is provided, use it (form filling mode)

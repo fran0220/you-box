@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ExternalLink, Copy, Check, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -49,7 +49,10 @@ export function CodexOAuthDialog({
     isCompleting: false,
   })
 
-  useEffect(() => {
+  // Reset state when the dialog closes (adjust-state-during-render)
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (prevOpen !== open) {
+    setPrevOpen(open)
     if (!open) {
       setState({
         authorizeUrl: '',
@@ -58,7 +61,7 @@ export function CodexOAuthDialog({
         isCompleting: false,
       })
     }
-  }, [open])
+  }
 
   const canCopyAuthorizeUrl = Boolean(state.authorizeUrl && !state.isStarting)
   const canComplete = useMemo(

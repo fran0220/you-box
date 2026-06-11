@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Layers3,
@@ -130,12 +130,16 @@ export function PrefillGroupManagementDialog({
     [sortedGroups]
   )
 
-  useEffect(() => {
+  // Reset delete confirmation state when the dialog closes
+  // (adjust-state-during-render)
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (prevOpen !== open) {
+    setPrevOpen(open)
     if (!open) {
       setDeleteState({ open: false, group: null })
       setIsDeleting(false)
     }
-  }, [open])
+  }
 
   const handleDeleteClick = (group: PrefillGroup) => {
     setDeleteState({ open: true, group })

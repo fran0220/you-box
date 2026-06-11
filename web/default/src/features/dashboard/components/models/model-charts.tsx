@@ -71,9 +71,14 @@ export function ModelCharts(props: ModelChartsProps) {
   >(null)
   const timeGranularity = props.timeGranularity ?? DEFAULT_TIME_GRANULARITY
 
-  useEffect(() => {
+  // Sync active tab when the default changes (adjust-state-during-render)
+  const [prevDefaultChartTab, setPrevDefaultChartTab] = useState(
+    props.defaultChartTab
+  )
+  if (prevDefaultChartTab !== props.defaultChartTab) {
+    setPrevDefaultChartTab(props.defaultChartTab)
     if (props.defaultChartTab) setActiveTab(props.defaultChartTab)
-  }, [props.defaultChartTab])
+  }
 
   useEffect(() => {
     const updateTheme = async () => {

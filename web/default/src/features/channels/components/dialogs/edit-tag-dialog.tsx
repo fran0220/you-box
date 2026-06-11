@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -58,8 +58,10 @@ export function EditTagDialog({ open, onOpenChange }: EditTagDialogProps) {
   const { currentTag } = useChannels()
   const queryClient = useQueryClient()
 
-  // Form state
-  const [newTag, setNewTag] = useState('')
+  // Form state (seeded so mount-with-open is prefilled correctly)
+  const [newTag, setNewTag] = useState(() =>
+    open && currentTag ? currentTag : ''
+  )
   const [selectedModels, setSelectedModels] = useState<string[]>([])
   const [customModel, setCustomModel] = useState('')
   const [modelMapping, setModelMapping] = useState('')
@@ -91,8 +93,19 @@ export function EditTagDialog({ open, onOpenChange }: EditTagDialogProps) {
     allModelsData?.data?.map((m) => m.id).filter(Boolean) || []
   const availableGroups = groupsData?.data || []
 
-  // Initialize form when tag changes
-  useEffect(() => {
+  // Initialize form when the dialog opens, the tag changes, or tag models
+  // load (adjust-state-during-render)
+  const [prevSync, setPrevSync] = useState<{
+    open: boolean
+    tag: typeof currentTag
+    tagModels: typeof tagModelsData
+  }>({ open, tag: currentTag, tagModels: tagModelsData })
+  if (
+    prevSync.open !== open ||
+    prevSync.tag !== currentTag ||
+    prevSync.tagModels !== tagModelsData
+  ) {
+    setPrevSync({ open, tag: currentTag, tagModels: tagModelsData })
     if (open && currentTag) {
       setNewTag(currentTag)
       setModelMapping('')
@@ -107,7 +120,7 @@ export function EditTagDialog({ open, onOpenChange }: EditTagDialogProps) {
         setSelectedModels([])
       }
     }
-  }, [open, currentTag, tagModelsData])
+  }
 
   const handleAddCustomModel = () => {
     if (!customModel.trim()) return

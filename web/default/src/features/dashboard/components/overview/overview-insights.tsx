@@ -185,32 +185,42 @@ export function OverviewInsights() {
 
   const split = useMemo(() => {
     const items = trendQuery.data?.data ?? []
-    const current = items.filter((item) => Number(item.created_at) >= window.mid)
-    const previous = items.filter((item) => Number(item.created_at) < window.mid)
-    return { current, previous }
+    const currentPeriod = items.filter(
+      (item) => Number(item.created_at) >= window.mid
+    )
+    const previousPeriod = items.filter(
+      (item) => Number(item.created_at) < window.mid
+    )
+    return { currentPeriod, previousPeriod }
   }, [trendQuery.data?.data, window.mid])
 
   const totals = useMemo(
     () => ({
-      requests: sumSeries(split.current, 'requests'),
-      tokens: sumSeries(split.current, 'tokens'),
-      spend: sumSeries(split.current, 'spend'),
-      prevRequests: sumSeries(split.previous, 'requests'),
-      prevTokens: sumSeries(split.previous, 'tokens'),
-      prevSpend: sumSeries(split.previous, 'spend'),
+      requests: sumSeries(split.currentPeriod, 'requests'),
+      tokens: sumSeries(split.currentPeriod, 'tokens'),
+      spend: sumSeries(split.currentPeriod, 'spend'),
+      prevRequests: sumSeries(split.previousPeriod, 'requests'),
+      prevTokens: sumSeries(split.previousPeriod, 'tokens'),
+      prevSpend: sumSeries(split.previousPeriod, 'spend'),
     }),
     [split]
   )
 
   const chartSeries = useMemo(
     () =>
-      bucketize(split.current, metric, window.mid, window.end_timestamp, CHART_BUCKETS),
-    [split.current, metric, window.mid, window.end_timestamp]
+      bucketize(
+        split.currentPeriod,
+        metric,
+        window.mid,
+        window.end_timestamp,
+        CHART_BUCKETS
+      ),
+    [split.currentPeriod, metric, window.mid, window.end_timestamp]
   )
 
   const spendByModel = useMemo(() => {
     const byModel = new Map<string, number>()
-    for (const item of split.current) {
+    for (const item of split.currentPeriod) {
       const name = item.model_name || t('Unknown')
       byModel.set(name, (byModel.get(name) ?? 0) + (Number(item.quota) || 0))
     }
@@ -219,12 +229,18 @@ export function OverviewInsights() {
       .slice(0, 6)
     const max = rows[0]?.[1] ?? 0
     return { rows, max }
-  }, [split.current, t])
+  }, [split.currentPeriod, t])
 
   const dailySpend = useMemo(() => {
     const buckets = rangeDays === 1 ? 12 : Math.min(rangeDays, 14)
-    return bucketize(split.current, 'spend', window.mid, window.end_timestamp, buckets)
-  }, [split.current, rangeDays, window.mid, window.end_timestamp])
+    return bucketize(
+      split.currentPeriod,
+      'spend',
+      window.mid,
+      window.end_timestamp,
+      buckets
+    )
+  }, [split.currentPeriod, rangeDays, window.mid, window.end_timestamp])
 
   const totalQuota = usedQuota + remainQuota
   const burnPerDay = totals.spend / rangeDays

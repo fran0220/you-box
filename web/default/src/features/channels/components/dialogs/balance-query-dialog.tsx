@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2, RefreshCw, DollarSign } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -74,11 +74,15 @@ export function BalanceQueryDialog({
     }
   }
 
+  const queryCodexUsageOnOpen = useEffectEvent(() => {
+    handleQueryCodexUsage()
+  })
+
   useEffect(() => {
     if (!isCodex) return
     if (!open) return
-    handleQueryCodexUsage()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const timer = setTimeout(() => queryCodexUsageOnOpen(), 0)
+    return () => clearTimeout(timer)
   }, [open, isCodex])
 
   if (!currentRow) return null

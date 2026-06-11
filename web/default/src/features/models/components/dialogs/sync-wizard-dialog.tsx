@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2, RefreshCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -60,7 +60,20 @@ export function SyncWizardDialog({
   const SYNC_SOURCE_OPTIONS = getSyncSourceOptions(t)
   const SYNC_LOCALE_OPTIONS = getSyncLocaleOptions(t)
 
-  useEffect(() => {
+  // Prefill from saved wizard options when the dialog opens or the saved
+  // options change (adjust-state-during-render). `t` stands in for the
+  // translated option lists, which are derived from it.
+  const [prevSync, setPrevSync] = useState<{
+    open: boolean
+    options: typeof syncWizardOptions
+    t: typeof t
+  }>({ open, options: syncWizardOptions, t })
+  if (
+    prevSync.open !== open ||
+    prevSync.options !== syncWizardOptions ||
+    prevSync.t !== t
+  ) {
+    setPrevSync({ open, options: syncWizardOptions, t })
     if (open) {
       setLocale(syncWizardOptions.locale || 'zh')
       const preferredSource = SYNC_SOURCE_OPTIONS.find(
@@ -72,7 +85,7 @@ export function SyncWizardDialog({
           : 'official'
       )
     }
-  }, [open, syncWizardOptions, SYNC_SOURCE_OPTIONS])
+  }
 
   const handleSync = async () => {
     setIsSyncing(true)

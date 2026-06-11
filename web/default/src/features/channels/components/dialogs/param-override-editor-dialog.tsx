@@ -21,6 +21,7 @@ import {
   type KeyboardEvent,
   useCallback,
   useEffect,
+  useEffectEvent,
   useMemo,
   useState,
 } from 'react'
@@ -1111,10 +1112,11 @@ export function ParamOverrideEditorDialog(
   const [templatePresetKey, setTemplatePresetKey] =
     useState('operations_default')
 
-  // Initialize state when dialog opens
-  useEffect(() => {
-    if (!props.open) return
-    const state = parseInitialState(props.value)
+  // Initialize state when dialog opens. parseInitialState is impure (it
+  // generates fresh local ids), so this must stay in an effect; the setState
+  // calls are deferred to a microtask to avoid synchronous effect setState.
+  const initializeFromValue = useEffectEvent((value: string) => {
+    const state = parseInitialState(value)
     setEditMode(state.editMode)
     setVisualMode(state.visualMode)
     setLegacyValue(state.legacyValue)
@@ -1132,18 +1134,28 @@ export function ParamOverrideEditorDialog(
     } else {
       setTemplatePresetKey('operations_default')
     }
+  })
+
+  useEffect(() => {
+    if (!props.open) return
+    const value = props.value
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) initializeFromValue(value)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [props.open, props.value])
 
-  // Keep selectedOperationId valid
-  useEffect(() => {
-    if (operations.length === 0) {
+  // Keep selectedOperationId valid (adjust-state-during-render)
+  if (operations.length === 0) {
+    if (selectedOperationId !== '') {
       setSelectedOperationId('')
-      return
     }
-    if (!operations.some((o) => o.id === selectedOperationId)) {
-      setSelectedOperationId(operations[0].id)
-    }
-  }, [operations, selectedOperationId])
+  } else if (!operations.some((o) => o.id === selectedOperationId)) {
+    setSelectedOperationId(operations[0].id)
+  }
 
   // Template preset options filtered by group
   const templatePresetOptions = useMemo(

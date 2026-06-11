@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -47,9 +47,12 @@ export function ExtendDeploymentDialog({
   const [hours, setHours] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
+  // Reset duration when the dialog opens (adjust-state-during-render)
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (prevOpen !== open) {
+    setPrevOpen(open)
     if (open) setHours(1)
-  }, [open])
+  }
 
   const { data: detailsRes, isLoading: isLoadingDetails } = useQuery({
     queryKey: ['deployment-details-for-extend', deploymentId],

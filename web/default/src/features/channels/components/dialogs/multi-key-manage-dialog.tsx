@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useEffectEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2, RefreshCw, Trash2, Power, PowerOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -94,15 +94,17 @@ export function MultiKeyManageDialog({
     useState<MultiKeyConfirmAction | null>(null)
   const [isPerformingAction, setIsPerformingAction] = useState(false)
 
-  // Reset and load data when dialog opens
-  useEffect(() => {
+  // Reset pagination/filter when dialog opens (adjust-state-during-render)
+  const currentRowId = currentRow?.id
+  const resetKey = `${open}|${currentRowId ?? ''}`
+  const [prevResetKey, setPrevResetKey] = useState(resetKey)
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey)
     if (open && currentRow) {
       setCurrentPage(1)
       setStatusFilter(null)
-      loadKeyStatus(1, pageSize, null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentRow?.id])
+  }
 
   const loadKeyStatus = async (
     page: number = currentPage,
@@ -140,6 +142,18 @@ export function MultiKeyManageDialog({
       setIsLoading(false)
     }
   }
+
+  // Load data when dialog opens
+  const loadKeyStatusOnOpen = useEffectEvent(() => {
+    loadKeyStatus(1, pageSize, null)
+  })
+
+  useEffect(() => {
+    if (open && currentRowId !== undefined) {
+      const timer = setTimeout(() => loadKeyStatusOnOpen(), 0)
+      return () => clearTimeout(timer)
+    }
+  }, [open, currentRowId])
 
   const handleStatusFilterChange = (value: string) => {
     const newFilter = value === 'all' ? null : parseInt(value)
