@@ -51,6 +51,7 @@ import type {
   PaymentMethod,
   PresetAmount,
   CreemProduct,
+  TopupInfo,
 } from './types'
 
 interface WalletProps {
@@ -68,7 +69,9 @@ export function Wallet(props: WalletProps) {
   const [paymentLoading, setPaymentLoading] = useState<string | null>(null)
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
   const [transferDialogOpen, setTransferDialogOpen] = useState(false)
-  const [billingDialogOpen, setBillingDialogOpen] = useState(false)
+  const [billingDialogOpen, setBillingDialogOpen] = useState(
+    !!props.initialShowHistory
+  )
   const [redemptionCode, setRedemptionCode] = useState('')
   const [creemDialogOpen, setCreemDialogOpen] = useState(false)
   const [selectedCreemProduct, setSelectedCreemProduct] =
@@ -103,10 +106,10 @@ export function Wallet(props: WalletProps) {
   const { processing: pancakeProcessing, processWaffoPancakePayment } =
     useWaffoPancakePayment()
 
-  // Fetch and refresh user data
-  const fetchUser = useCallback(async () => {
+  // Fetch user data (no synchronous setState: safe to call from the mount
+  // effect; `userLoading` already starts as true for the initial fetch)
+  const loadUser = useCallback(async () => {
     try {
-      setUserLoading(true)
       const response = await getSelf()
       if (response.success && response.data) {
         setUser(response.data as UserWalletData)
@@ -119,28 +122,68 @@ export function Wallet(props: WalletProps) {
     }
   }, [])
 
+  // Refresh entry point for event handlers: flips loading back on first
+  const fetchUser = useCallback(async () => {
+    setUserLoading(true)
+    await loadUser()
+  }, [loadUser])
+
   useEffect(() => {
-    fetchUser()
-  }, [fetchUser])
+    void (async () => {
+      await loadUser()
+    })()
+  }, [loadUser])
+
+  // Open the billing dialog when navigation requests it after mount (the
+  // mount case is covered by the lazy initial state of billingDialogOpen).
+  const [prevShowHistory, setPrevShowHistory] = useState(
+    props.initialShowHistory
+  )
+  if (prevShowHistory !== props.initialShowHistory) {
+    setPrevShowHistory(props.initialShowHistory)
+    if (props.initialShowHistory) {
+      setBillingDialogOpen(true)
+    }
+  }
 
   useEffect(() => {
     if (props.initialShowHistory) {
-      setBillingDialogOpen(true)
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [props.initialShowHistory])
 
-  // Initialize topup amount when topup info is loaded
-  useEffect(() => {
+  // Initialize topup amount when topup info is loaded (adjust state during
+  // render; the initial payment-amount calculation is an external request,
+  // so it runs in the effect below once the adjustment is queued).
+  const [pendingInitialCalc, setPendingInitialCalc] = useState<{
+    info: TopupInfo
+  } | null>(null)
+  const [prevTopupInit, setPrevTopupInit] = useState<{
+    topupInfo: TopupInfo | null
+    topupAmount: number
+  } | null>(null)
+  if (
+    prevTopupInit === null ||
+    prevTopupInit.topupInfo !== topupInfo ||
+    prevTopupInit.topupAmount !== topupAmount
+  ) {
+    setPrevTopupInit({ topupInfo, topupAmount })
     if (topupInfo && topupAmount === 0) {
-      const minTopup = getMinTopupAmount(topupInfo)
-      setTopupAmount(minTopup)
-
-      // Calculate initial payment amount with default payment type
-      const defaultPaymentType = getDefaultPaymentType(topupInfo)
-      calculatePaymentAmount(minTopup, defaultPaymentType)
+      setTopupAmount(getMinTopupAmount(topupInfo))
+      setPendingInitialCalc({ info: topupInfo })
     }
-  }, [topupInfo, topupAmount, calculatePaymentAmount])
+  }
+
+  useEffect(() => {
+    if (pendingInitialCalc) {
+      // Calculate initial payment amount with default payment type
+      const info = pendingInitialCalc.info
+      calculatePaymentAmount(
+        getMinTopupAmount(info),
+        getDefaultPaymentType(info)
+      )
+    }
+  }, [pendingInitialCalc, calculatePaymentAmount])
 
   // Get current payment type (selected or default)
   const getCurrentPaymentType = useCallback(() => {

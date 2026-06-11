@@ -111,6 +111,10 @@ export function SubscriptionPlansCard({
 
   const [purchaseOpen, setPurchaseOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<PlanRecord | null>(null)
+  // Reference time (seconds) for expiry/remaining-days display. Date.now()
+  // is impure, so it is snapshotted at mount and refreshed whenever the
+  // subscription data is (re)fetched instead of being read during render.
+  const [nowSec, setNowSec] = useState(() => Date.now() / 1000)
 
   const enableStripe = !!topupInfo?.enable_stripe_topup
   const enableCreem = !!topupInfo?.enable_creem_topup
@@ -136,6 +140,7 @@ export function SubscriptionPlansCard({
     try {
       const res = await getSelfSubscriptionFull()
       if (res.success && res.data) {
+        setNowSec(Date.now() / 1000)
         setBillingPreference(
           res.data.billing_preference || 'subscription_first'
         )
@@ -232,8 +237,7 @@ export function SubscriptionPlansCard({
   const getRemainingDays = (sub: UserSubscriptionRecord) => {
     const endTime = sub?.subscription?.end_time || 0
     if (!endTime) return 0
-    const now = Date.now() / 1000
-    return Math.max(0, Math.ceil((endTime - now) / 86400))
+    return Math.max(0, Math.ceil((endTime - nowSec) / 86400))
   }
 
   const getUsagePercent = (sub: UserSubscriptionRecord) => {
@@ -412,8 +416,7 @@ export function SubscriptionPlansCard({
                       planTitleMap.get(subscription?.plan_id) || ''
                     const remainDays = getRemainingDays(sub)
                     const usagePercent = getUsagePercent(sub)
-                    const now = Date.now() / 1000
-                    const isExpired = (subscription?.end_time || 0) < now
+                    const isExpired = (subscription?.end_time || 0) < nowSec
                     const isCancelled = subscription?.status === 'cancelled'
                     const isActive =
                       subscription?.status === 'active' && !isExpired

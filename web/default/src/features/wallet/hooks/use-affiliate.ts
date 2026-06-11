@@ -35,10 +35,10 @@ export function useAffiliate() {
   const [transferring, setTransferring] = useState(false)
   const { copyToClipboard } = useCopyToClipboard()
 
-  // Fetch affiliate code
-  const fetchAffiliateCode = useCallback(async () => {
+  // Fetch affiliate code (no synchronous setState: safe to call from effects;
+  // `loading` already starts as true for the initial mount fetch)
+  const loadAffiliateCode = useCallback(async () => {
     try {
-      setLoading(true)
       const response = await getAffiliateCode()
 
       if (response.success && response.data) {
@@ -53,6 +53,12 @@ export function useAffiliate() {
       setLoading(false)
     }
   }, [])
+
+  // Refetch entry point for event handlers: flips loading back on first
+  const fetchAffiliateCode = useCallback(async () => {
+    setLoading(true)
+    await loadAffiliateCode()
+  }, [loadAffiliateCode])
 
   // Copy affiliate link
   const copyAffiliateLink = useCallback(() => {
@@ -82,8 +88,10 @@ export function useAffiliate() {
   }, [])
 
   useEffect(() => {
-    fetchAffiliateCode()
-  }, [fetchAffiliateCode])
+    void (async () => {
+      await loadAffiliateCode()
+    })()
+  }, [loadAffiliateCode])
 
   return {
     affiliateCode,

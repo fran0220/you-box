@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { useNavigate, getRouteApi } from '@tanstack/react-router'
 import { type Table } from '@tanstack/react-table'
@@ -74,19 +74,62 @@ export function CommonLogsFilterBar<TData>(
   const { sensitiveVisible, setSensitiveVisible } = useUsageLogsContext()
   const fetchingLogs = useIsFetching({ queryKey: ['logs'] })
 
-  const [filters, setFilters] = useState<CommonLogFilters>(() => {
-    const { start, end } = getDefaultTimeRange()
-    return { startTime: start, endTime: end }
-  })
+  // Mount-time snapshot of the default range (getDefaultTimeRange reads the
+  // current clock, so it must not be called during the render adjustment).
+  const [defaultRange] = useState(getDefaultTimeRange)
+  const [filters, setFilters] = useState<CommonLogFilters>(() => ({
+    startTime: defaultRange.start,
+    endTime: defaultRange.end,
+  }))
   const [logType, setLogType] = useState<LogTypeValue>(LOG_TYPE_ALL_VALUE)
 
-  useEffect(() => {
-    const { start, end } = getDefaultTimeRange()
+  // Sync local filter state from the URL search params (adjust state during
+  // render). Comparisons mirror the individual params, so unrelated search
+  // changes (e.g. pagination) never clobber in-progress filter edits.
+  const [prevSearch, setPrevSearch] = useState<{
+    startTime: typeof searchParams.startTime
+    endTime: typeof searchParams.endTime
+    channel: typeof searchParams.channel
+    model: typeof searchParams.model
+    token: typeof searchParams.token
+    group: typeof searchParams.group
+    username: typeof searchParams.username
+    requestId: typeof searchParams.requestId
+    upstreamRequestId: typeof searchParams.upstreamRequestId
+    type: typeof searchParams.type
+  } | null>(null)
+  if (
+    prevSearch === null ||
+    prevSearch.startTime !== searchParams.startTime ||
+    prevSearch.endTime !== searchParams.endTime ||
+    prevSearch.channel !== searchParams.channel ||
+    prevSearch.model !== searchParams.model ||
+    prevSearch.token !== searchParams.token ||
+    prevSearch.group !== searchParams.group ||
+    prevSearch.username !== searchParams.username ||
+    prevSearch.requestId !== searchParams.requestId ||
+    prevSearch.upstreamRequestId !== searchParams.upstreamRequestId ||
+    prevSearch.type !== searchParams.type
+  ) {
+    setPrevSearch({
+      startTime: searchParams.startTime,
+      endTime: searchParams.endTime,
+      channel: searchParams.channel,
+      model: searchParams.model,
+      token: searchParams.token,
+      group: searchParams.group,
+      username: searchParams.username,
+      requestId: searchParams.requestId,
+      upstreamRequestId: searchParams.upstreamRequestId,
+      type: searchParams.type,
+    })
     setFilters({
       startTime: searchParams.startTime
         ? new Date(searchParams.startTime)
-        : start,
-      endTime: searchParams.endTime ? new Date(searchParams.endTime) : end,
+        : defaultRange.start,
+      endTime: searchParams.endTime
+        ? new Date(searchParams.endTime)
+        : defaultRange.end,
       channel: searchParams.channel || undefined,
       model: searchParams.model || undefined,
       token: searchParams.token || undefined,
@@ -97,25 +140,14 @@ export function CommonLogsFilterBar<TData>(
     })
 
     const typeArr = searchParams.type
-    const nextLogType =
+    setLogType(
       Array.isArray(typeArr) &&
-      typeArr.length === 1 &&
-      isLogTypeValue(typeArr[0])
+        typeArr.length === 1 &&
+        isLogTypeValue(typeArr[0])
         ? typeArr[0]
         : LOG_TYPE_ALL_VALUE
-    setLogType(nextLogType)
-  }, [
-    searchParams.startTime,
-    searchParams.endTime,
-    searchParams.channel,
-    searchParams.model,
-    searchParams.token,
-    searchParams.group,
-    searchParams.username,
-    searchParams.requestId,
-    searchParams.upstreamRequestId,
-    searchParams.type,
-  ])
+    )
+  }
 
   const handleChange = useCallback(
     (field: keyof CommonLogFilters, value: Date | string | undefined) => {

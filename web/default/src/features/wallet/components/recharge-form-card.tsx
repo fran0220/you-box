@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import { ArrowRight, ExternalLink, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getCurrencyDisplay } from '@/lib/currency'
@@ -126,9 +126,13 @@ export function RechargeFormCard({
   const [localAmount, setLocalAmount] = useState(topupAmount.toString())
   const [selectedPay, setSelectedPay] = useState<string | null>(null)
 
-  useEffect(() => {
+  // Sync the local input when the controlled amount changes (adjust state
+  // during render instead of a cascading setState-in-effect).
+  const [prevTopupAmount, setPrevTopupAmount] = useState(topupAmount)
+  if (prevTopupAmount !== topupAmount) {
+    setPrevTopupAmount(topupAmount)
     setLocalAmount(topupAmount.toString())
-  }, [topupAmount])
+  }
 
   // Site currency symbol/code for amount displays (single-currency site:
   // the currency slot renders a static code label).

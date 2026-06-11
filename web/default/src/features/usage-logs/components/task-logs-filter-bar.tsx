@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { useNavigate, getRouteApi } from '@tanstack/react-router'
 import { type Table } from '@tanstack/react-table'
@@ -71,18 +71,47 @@ export function TaskLogsFilterBar<TData>(props: TaskLogsFilterBarProps<TData>) {
   const isAdmin = useIsAdmin()
   const fetchingLogs = useIsFetching({ queryKey: ['logs'] })
 
-  const [filters, setFilters] = useState<TaskLogsFilters>(() => {
-    const { start, end } = getDefaultTimeRange()
-    return { startTime: start, endTime: end }
-  })
+  // Mount-time snapshot of the default range (getDefaultTimeRange reads the
+  // current clock, so it must not be called during the render adjustment).
+  const [defaultRange] = useState(getDefaultTimeRange)
+  const [filters, setFilters] = useState<TaskLogsFilters>(() => ({
+    startTime: defaultRange.start,
+    endTime: defaultRange.end,
+  }))
 
-  useEffect(() => {
-    const { start, end } = getDefaultTimeRange()
+  // Sync local filter state from the URL search params (adjust state during
+  // render). Comparisons mirror the individual params, so unrelated search
+  // changes (e.g. pagination) never clobber in-progress filter edits.
+  const [prevSearch, setPrevSearch] = useState<{
+    logCategory: TaskLikeLogCategory
+    startTime: typeof searchParams.startTime
+    endTime: typeof searchParams.endTime
+    channel: typeof searchParams.channel
+    filter: typeof searchParams.filter
+  } | null>(null)
+  if (
+    prevSearch === null ||
+    prevSearch.logCategory !== props.logCategory ||
+    prevSearch.startTime !== searchParams.startTime ||
+    prevSearch.endTime !== searchParams.endTime ||
+    prevSearch.channel !== searchParams.channel ||
+    prevSearch.filter !== searchParams.filter
+  ) {
+    setPrevSearch({
+      logCategory: props.logCategory,
+      startTime: searchParams.startTime,
+      endTime: searchParams.endTime,
+      channel: searchParams.channel,
+      filter: searchParams.filter,
+    })
+
     const baseFilters = {
       startTime: searchParams.startTime
         ? new Date(searchParams.startTime)
-        : start,
-      endTime: searchParams.endTime ? new Date(searchParams.endTime) : end,
+        : defaultRange.start,
+      endTime: searchParams.endTime
+        ? new Date(searchParams.endTime)
+        : defaultRange.end,
       ...(searchParams.channel
         ? { channel: String(searchParams.channel) }
         : {}),
@@ -99,13 +128,7 @@ export function TaskLogsFilterBar<TData>(props: TaskLogsFilterBarProps<TData>) {
           }
 
     setFilters(next)
-  }, [
-    props.logCategory,
-    searchParams.startTime,
-    searchParams.endTime,
-    searchParams.channel,
-    searchParams.filter,
-  ])
+  }
 
   const handleChange = useCallback(
     (field: keyof TaskLogsFilters, value: Date | string | undefined) => {

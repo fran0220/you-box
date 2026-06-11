@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Crown, CalendarClock, Package } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -72,13 +72,24 @@ export function SubscriptionPurchaseDialog(props: Props) {
   const [paying, setPaying] = useState(false)
   const [selectedEpayMethod, setSelectedEpayMethod] = useState('')
 
-  useEffect(() => {
+  // Preselect the first epay method on open and clear it on close (adjust
+  // state during render instead of a cascading setState-in-effect).
+  const [prevEpaySync, setPrevEpaySync] = useState<{
+    open: boolean
+    epayMethods: PaymentMethod[] | undefined
+  } | null>(null)
+  if (
+    prevEpaySync === null ||
+    prevEpaySync.open !== props.open ||
+    prevEpaySync.epayMethods !== props.epayMethods
+  ) {
+    setPrevEpaySync({ open: props.open, epayMethods: props.epayMethods })
     if (props.open && props.epayMethods && props.epayMethods.length > 0) {
       setSelectedEpayMethod(props.epayMethods[0].type)
     } else if (!props.open) {
       setSelectedEpayMethod('')
     }
-  }, [props.open, props.epayMethods])
+  }
 
   const plan = props.plan?.plan
   if (!plan) return null

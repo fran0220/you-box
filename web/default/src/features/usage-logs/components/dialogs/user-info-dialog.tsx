@@ -32,6 +32,15 @@ interface UserInfoDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
+function InfoItem({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className='space-y-1.5'>
+      <Label className='text-muted-foreground text-xs'>{label}</Label>
+      <div className='text-sm font-semibold'>{value}</div>
+    </div>
+  )
+}
+
 export function UserInfoDialog({
   userId,
   open,
@@ -41,9 +50,10 @@ export function UserInfoDialog({
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  // Fetch user info (no synchronous setState: safe to call from the effect
+  // below; `isLoading` is turned on by the render adjustment instead)
   const fetchUserInfo = useCallback(
     async (id: number) => {
-      setIsLoading(true)
       try {
         const result = await getUserInfo(id)
         if (result.success) {
@@ -62,24 +72,32 @@ export function UserInfoDialog({
     [t]
   )
 
+  // Show the loading state whenever a (re)fetch is about to start (adjust
+  // state during render, keyed on the same values as the fetch effect).
+  const [prevFetchKey, setPrevFetchKey] = useState<{
+    open: boolean
+    userId: number | null
+    fetchUserInfo: typeof fetchUserInfo
+  } | null>(null)
+  if (
+    prevFetchKey === null ||
+    prevFetchKey.open !== open ||
+    prevFetchKey.userId !== userId ||
+    prevFetchKey.fetchUserInfo !== fetchUserInfo
+  ) {
+    setPrevFetchKey({ open, userId, fetchUserInfo })
+    if (open && userId) {
+      setIsLoading(true)
+    }
+  }
+
   useEffect(() => {
     if (open && userId) {
-      fetchUserInfo(userId)
+      void (async () => {
+        await fetchUserInfo(userId)
+      })()
     }
   }, [open, userId, fetchUserInfo])
-
-  const InfoItem = ({
-    label,
-    value,
-  }: {
-    label: string
-    value: string | number
-  }) => (
-    <div className='space-y-1.5'>
-      <Label className='text-muted-foreground text-xs'>{label}</Label>
-      <div className='text-sm font-semibold'>{value}</div>
-    </div>
-  )
 
   return (
     <Dialog

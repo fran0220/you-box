@@ -51,11 +51,30 @@ export function useBillingHistory(options: UseBillingHistoryOptions = {}) {
   const [loading, setLoading] = useState(false)
   const [completing, setCompleting] = useState(false)
 
-  /**
-   * Fetch billing history
-   */
-  const fetchBillingHistory = useCallback(async () => {
+  // Show the loading state as soon as the query inputs change (adjust state
+  // during render instead of a synchronous setState inside the fetch effect).
+  const [prevQuery, setPrevQuery] = useState<{
+    isAdmin: boolean
+    page: number
+    pageSize: number
+    keyword: string
+  } | null>(null)
+  if (
+    prevQuery === null ||
+    prevQuery.isAdmin !== isAdmin ||
+    prevQuery.page !== page ||
+    prevQuery.pageSize !== pageSize ||
+    prevQuery.keyword !== keyword
+  ) {
+    setPrevQuery({ isAdmin, page, pageSize, keyword })
     setLoading(true)
+  }
+
+  /**
+   * Fetch billing history (no synchronous setState: safe to call from the
+   * effect below; the render adjustment above turns `loading` on)
+   */
+  const loadBillingHistory = useCallback(async () => {
     try {
       const response = isAdmin
         ? await getAllBillingHistory(page, pageSize, keyword)
@@ -81,6 +100,14 @@ export function useBillingHistory(options: UseBillingHistoryOptions = {}) {
       setLoading(false)
     }
   }, [isAdmin, page, pageSize, keyword])
+
+  /**
+   * Refresh entry point for event handlers: flips loading back on first
+   */
+  const fetchBillingHistory = useCallback(async () => {
+    setLoading(true)
+    await loadBillingHistory()
+  }, [loadBillingHistory])
 
   /**
    * Complete a pending order (admin only)
@@ -141,8 +168,10 @@ export function useBillingHistory(options: UseBillingHistoryOptions = {}) {
 
   // Fetch data when dependencies change
   useEffect(() => {
-    fetchBillingHistory()
-  }, [fetchBillingHistory])
+    void (async () => {
+      await loadBillingHistory()
+    })()
+  }, [loadBillingHistory])
 
   return {
     records,

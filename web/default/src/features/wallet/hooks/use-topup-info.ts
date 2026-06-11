@@ -166,10 +166,10 @@ export function useTopupInfo() {
   const [presetAmounts, setPresetAmounts] = useState<PresetAmount[]>([])
   const [loading, setLoading] = useState(true)
 
-  const fetchTopupInfo = async () => {
+  // Fetch + parse topup info (no synchronous setState: safe to call from the
+  // mount effect; `loading` already starts as true for the initial fetch)
+  const loadTopupInfo = async () => {
     try {
-      setLoading(true)
-
       const response = await getTopupInfo()
 
       if (!response.success || !response.data) {
@@ -213,8 +213,16 @@ export function useTopupInfo() {
     }
   }
 
+  // Refetch entry point for event handlers: flips loading back on first
+  const fetchTopupInfo = async () => {
+    setLoading(true)
+    await loadTopupInfo()
+  }
+
   useEffect(() => {
-    fetchTopupInfo()
+    void (async () => {
+      await loadTopupInfo()
+    })()
   }, [])
 
   return {

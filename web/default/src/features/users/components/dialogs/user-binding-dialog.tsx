@@ -167,9 +167,10 @@ export function UserBindingDialog(props: Props) {
   const [unbindTarget, setUnbindTarget] = useState<BindingItem | null>(null)
   const [unbinding, setUnbinding] = useState(false)
 
-  const fetchData = useCallback(async () => {
+  // Fetch user + binding data (no synchronous setState: safe to call from
+  // the effect below; `loading` is turned on by the render adjustment)
+  const loadData = useCallback(async () => {
     if (!props.userId) return
-    setLoading(true)
     try {
       const [userRes, oauthRes, statusRes] = await Promise.all([
         getUser(props.userId),
@@ -201,16 +202,44 @@ export function UserBindingDialog(props: Props) {
     }
   }, [props.userId, t])
 
-  useEffect(() => {
+  // Refresh entry point for event handlers: flips loading back on first
+  const fetchData = useCallback(async () => {
+    if (!props.userId) return
+    setLoading(true)
+    await loadData()
+  }, [props.userId, loadData])
+
+  // Reset dialog state on open/close (adjust state during render, keyed on
+  // the same values as the fetch effect below).
+  const [prevSync, setPrevSync] = useState<{
+    open: boolean
+    userId: number | null
+    loadData: typeof loadData
+  } | null>(null)
+  if (
+    prevSync === null ||
+    prevSync.open !== props.open ||
+    prevSync.userId !== props.userId ||
+    prevSync.loadData !== loadData
+  ) {
+    setPrevSync({ open: props.open, userId: props.userId, loadData })
     if (props.open && props.userId) {
       setShowBoundOnly(true)
-      fetchData()
+      setLoading(true)
     } else {
       setUser(null)
       setOauthBindings([])
       setStatusInfo({})
     }
-  }, [props.open, props.userId, fetchData])
+  }
+
+  useEffect(() => {
+    if (props.open && props.userId) {
+      void (async () => {
+        await loadData()
+      })()
+    }
+  }, [props.open, props.userId, loadData])
 
   const allBindings = useMemo<BindingItem[]>(() => {
     const items: BindingItem[] = []
