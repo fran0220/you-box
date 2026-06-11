@@ -34,5 +34,15 @@
 
 ## 备注
 
-- `tiered-pricing-editor.tsx:1669` 保留一个**既有** disable(initRef 门控的 once-per-model 初始化,与 dirty 流耦合,改写风险大于收益);其余既有 react-hooks disable(cache-stats-dialog、rule-editor-dialog、form-navigation-guard 等)不在 95 错误清单内,未触碰。
+- ~~`tiered-pricing-editor.tsx:1669` 保留一个既有 disable~~ **后续已清除**(见下节 C4b);其余既有 react-hooks disable(cache-stats-dialog、rule-editor-dialog、form-navigation-guard 等约 32 处)不在 95 错误清单内,未触碰。
+
+## C4b — tiered-pricing-editor 抑制清除(追加)
+
+原 initRef 门控语义:**每个 modelName 周期内,挂载/换模型后的第一次 expr-prop 变化触发一次本地状态重播种**(接住 sheet 异步加载),之后的 prop 变化视为编辑器自身 emit 的回声、不得覆盖编辑。改写为等价的 render 期调整:`initCycle {model, exprKey, armed}` state——modelName 变化重新武装;armed 且 exprKey 变化时消费武装并重播种(全部 helper 已确认为纯函数);并把惰性初始 state 补齐为原 effect 挂载行为(不可解析 expr → raw 模式、空 expr → 默认配置)。同时删除 initRef 与 `[modelName]` 重置 effect。
+
+运行时实测(Playwright,经 API 播种 `zz-seeded-expr` = `tier("base", p * 7 + c * 21)` 后走 UI,事后清理):
+- 打开播种模型:Expression 标签自动选中 ✓,visual 编辑器**重播种为 7/21** ✓(原 initRef 保护的核心路径);
+- 加载后编辑 7→9:emit→父级回声沉降后保持 9/21,**不被覆盖** ✓;
+- 新建模型路径:默认 tier 渲染、编辑 3/15 抗回声 ✓;全程 0 page error。
+- 静态:`eslint .` exit 0;`tsc -b` ✓;生产构建 ✓。
 - settings-page-context 拆分:context 对象与类型移至 `settings-page-context-store.ts`,chrome hook 移至 `use-settings-section-chrome.ts`(消除 react-refresh only-export-components 警告);既有组件导入路径不变。

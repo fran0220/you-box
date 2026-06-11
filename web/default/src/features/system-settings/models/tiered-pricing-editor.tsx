@@ -21,7 +21,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ChangeEvent,
   type FocusEvent,
@@ -1649,9 +1648,13 @@ export const TieredPricingEditor = memo(function TieredPricingEditor({
   onRequestRuleExprChange,
 }: TieredPricingEditorProps) {
   const { t } = useTranslation()
-  const [editorMode, setEditorMode] = useState<EditorMode>('visual')
-  const [visualConfig, setVisualConfig] = useState<VisualConfig | null>(() =>
-    tryParseVisualConfig(currentExpr)
+  const [editorMode, setEditorMode] = useState<EditorMode>(() =>
+    tryParseVisualConfig(currentExpr) || !currentExpr ? 'visual' : 'raw'
+  )
+  const [visualConfig, setVisualConfig] = useState<VisualConfig | null>(
+    () =>
+      tryParseVisualConfig(currentExpr) ??
+      (currentExpr ? null : createDefaultVisualConfig())
   )
   const [rawExpr, setRawExpr] = useState(() =>
     combineBillingExpr(currentExpr || '', currentRequestRuleExpr || '')
@@ -1659,14 +1662,23 @@ export const TieredPricingEditor = memo(function TieredPricingEditor({
   const [requestRuleGroups, setRequestRuleGroups] = useState<
     RequestRuleGroup[]
   >(() => tryParseRequestRuleExpr(currentRequestRuleExpr) || [])
-  const initRef = useRef(false)
 
-  useEffect(() => {
-    if (initRef.current) return
-    initRef.current = true
+  // One re-seed per model cycle: after mount or a modelName change, the next
+  // expr-prop change (the sheet loading the record async) re-initializes the
+  // local editor state; later prop changes are this editor's own emits echoed
+  // back by the parent and must not clobber in-progress edits.
+  const exprKey = `${currentExpr}\u0000${currentRequestRuleExpr}`
+  const [initCycle, setInitCycle] = useState({
+    model: modelName,
+    exprKey,
+    armed: true,
+  })
+  if (modelName !== initCycle.model) {
+    setInitCycle({ model: modelName, exprKey, armed: true })
+  } else if (initCycle.armed && exprKey !== initCycle.exprKey) {
+    setInitCycle({ model: modelName, exprKey, armed: false })
     const parsedConfig = tryParseVisualConfig(currentExpr)
     if (parsedConfig) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisualConfig(parsedConfig)
       setEditorMode('visual')
     } else if (currentExpr) {
@@ -1679,11 +1691,7 @@ export const TieredPricingEditor = memo(function TieredPricingEditor({
       combineBillingExpr(currentExpr || '', currentRequestRuleExpr || '')
     )
     setRequestRuleGroups(tryParseRequestRuleExpr(currentRequestRuleExpr) || [])
-  }, [currentExpr, currentRequestRuleExpr])
-
-  useEffect(() => {
-    initRef.current = false
-  }, [modelName])
+  }
 
   const canUseVisualRules = useMemo(() => {
     if (!currentRequestRuleExpr) return true
