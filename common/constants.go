@@ -6,7 +6,6 @@ import (
 	//"strconv"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,24 +17,6 @@ var SystemName = "New API"
 var Footer = ""
 var Logo = ""
 var TopUpLink = ""
-
-var themeValue atomic.Value // stores string; safe for concurrent read/write
-
-func init() {
-	themeValue.Store("default")
-}
-
-func GetTheme() string {
-	return themeValue.Load().(string)
-}
-
-// SetTheme updates the frontend theme atomically.
-// Only "default" and "classic" are accepted; other values are silently ignored.
-func SetTheme(t string) {
-	if t == "default" || t == "classic" {
-		themeValue.Store(t)
-	}
-}
 
 // legacyConsolePathRewrites maps classic-frontend /console/* prefixes to
 // their default-theme equivalents. Order matters: more specific prefixes
@@ -61,15 +42,10 @@ var legacyConsolePathRewrites = []struct {
 	{"/console/chat", "/chat"},
 }
 
-// ThemeAwarePath rewrites legacy /console/* paths to the default-theme
-// equivalents when the active theme is "default".  For "classic" (or any
-// other theme) the path is returned unchanged.  The function only touches
-// known prefixes so it is safe to call with arbitrary suffixes and query
-// strings.
+// ThemeAwarePath rewrites legacy /console/* paths (used by the removed
+// classic frontend) to their current equivalents. It only touches known
+// prefixes so it is safe to call with arbitrary suffixes and query strings.
 func ThemeAwarePath(suffix string) string {
-	if GetTheme() != "default" {
-		return suffix
-	}
 	for _, rule := range legacyConsolePathRewrites {
 		if strings.HasPrefix(suffix, rule.prefix) {
 			return strings.Replace(suffix, rule.prefix, rule.replacement, 1)
