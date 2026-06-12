@@ -3907,8 +3907,6 @@
     "Team Collaboration": "团队协作",
     "Technical Support": "技术支持",
     "Telegram": "Telegram",
-    "Telegram login requires widget integration; coming soon": "Telegram 登录需要小部件集成；即将推出",
-    "Telegram Login Widget": "Telegram 登录小部件",
     "Template": "模板",
     "Template variables:": "模板变量：",
     "Templates": "模板",
@@ -4706,6 +4704,10 @@
     "{{value}} tokens": "{{value}} tokens",
     "~{{count}} days left": "约剩 {{count}} 天",
     "~{{count}} days left at current rate": "按当前速率约剩 {{count}} 天",
-    "This will permanently delete all manually and automatically disabled channels. This action cannot be undone.": "这将永久删除所有手动和自动禁用的渠道。此操作无法撤销。"
+    "This will permanently delete all manually and automatically disabled channels. This action cannot be undone.": "这将永久删除所有手动和自动禁用的渠道。此操作无法撤销。",
+    "Login successful": "登录成功",
+    "Failed to login with Telegram": "Telegram 登录失败，请重试",
+    "Telegram account bound successfully": "Telegram 账户绑定成功",
+    "Failed to bind Telegram account": "绑定 Telegram 账户失败"
   }
 }

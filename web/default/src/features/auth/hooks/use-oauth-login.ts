@@ -22,6 +22,10 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { api } from '@/lib/api'
+import {
+  telegramAuthToParams,
+  type TelegramAuthPayload,
+} from '@/lib/telegram-auth'
 import { getOAuthState } from '../api'
 import {
   buildGitHubOAuthUrl,
@@ -30,6 +34,7 @@ import {
   buildLinuxDOOAuthUrl,
 } from '../lib/oauth'
 import type { SystemStatus, CustomOAuthProviderInfo } from '../types'
+import { useAuthRedirect } from './use-auth-redirect'
 
 type LogoutRequestConfig = AxiosRequestConfig & {
   skipErrorHandler?: boolean
@@ -47,6 +52,7 @@ export function useOAuthLogin(status: SystemStatus | null) {
   const [githubButtonDisabled, setGithubButtonDisabled] = useState(false)
   const githubTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { auth } = useAuthStore()
+  const { handleLoginSuccess } = useAuthRedirect()
 
   // Re-translate the default button label when the language changes
   // (render adjust; `t` identity changes with the active language)
@@ -193,8 +199,28 @@ export function useOAuthLogin(status: SystemStatus | null) {
     }
   }
 
-  const handleTelegramLogin = () => {
-    toast.info(t('Telegram login requires widget integration; coming soon'))
+  const handleTelegramAuth = async (payload: TelegramAuthPayload) => {
+    setIsLoading(true)
+    try {
+      const res = await api.get('/api/oauth/telegram/login', {
+        params: telegramAuthToParams(payload),
+      })
+      const { success, message, data } = res.data as {
+        success: boolean
+        message?: string
+        data?: { id?: number } | null
+      }
+      if (success) {
+        toast.success(t('Login successful'))
+        await handleLoginSuccess(data ?? null)
+      } else {
+        toast.error(message || t('Failed to login with Telegram'))
+      }
+    } catch (_error) {
+      toast.error(t('Failed to login with Telegram'))
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleCustomOAuthLogin = async (provider: CustomOAuthProviderInfo) => {
@@ -237,7 +263,7 @@ export function useOAuthLogin(status: SystemStatus | null) {
     handleDiscordLogin,
     handleOIDCLogin,
     handleLinuxDOLogin,
-    handleTelegramLogin,
+    handleTelegramAuth,
     handleCustomOAuthLogin,
   }
 }

@@ -26,6 +26,7 @@ import {
 } from '@/assets/brand-icons'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { TelegramLoginWidget } from '@/components/telegram-login-widget'
 import { useOAuthLogin } from '../hooks/use-oauth-login'
 import type { SystemStatus } from '../types'
 
@@ -61,7 +62,7 @@ export function OAuthProviders({
     handleDiscordLogin,
     handleOIDCLogin,
     handleLinuxDOLogin,
-    handleTelegramLogin,
+    handleTelegramAuth,
     handleCustomOAuthLogin,
   } = useOAuthLogin(status)
 
@@ -113,13 +114,11 @@ export function OAuthProviders({
     })
   }
 
-  if (status?.telegram_oauth) {
-    providerButtons.push({
-      key: 'telegram',
-      label: t('Continue with Telegram'),
-      onClick: handleTelegramLogin,
-    })
-  }
+  const telegramBotName =
+    typeof status?.telegram_bot_name === 'string'
+      ? status.telegram_bot_name
+      : ''
+  const showTelegram = Boolean(status?.telegram_oauth && telegramBotName)
 
   // Custom OAuth providers
   const customProviders = status?.custom_oauth_providers
@@ -133,7 +132,7 @@ export function OAuthProviders({
     }
   }
 
-  if (providerButtons.length === 0) return null
+  if (providerButtons.length === 0 && !showTelegram) return null
 
   return (
     <div className={cn('space-y-3', className)}>
@@ -163,6 +162,13 @@ export function OAuthProviders({
               {label}
             </Button>
           )
+        )}
+        {showTelegram && (
+          <TelegramLoginWidget
+            botName={telegramBotName}
+            onAuth={handleTelegramAuth}
+            className='flex justify-center'
+          />
         )}
       </div>
     </div>

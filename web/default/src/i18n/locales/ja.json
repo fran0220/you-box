@@ -3907,8 +3907,6 @@
     "Team Collaboration": "チームコラボレーション",
     "Technical Support": "テクニカルサポート",
     "Telegram": "Telegram",
-    "Telegram login requires widget integration; coming soon": "Telegramログインにはウィジェット統合が必要です；近日公開",
-    "Telegram Login Widget": "Telegramログインウィジェット",
     "Template": "テンプレート",
     "Template variables:": "テンプレート変数:",
     "Templates": "テンプレート",
@@ -4706,6 +4704,10 @@
     "{{value}} tokens": "{{value}} トークン",
     "~{{count}} days left": "残り約 {{count}} 日",
     "~{{count}} days left at current rate": "現在のペースで残り約 {{count}} 日",
-    "This will permanently delete all manually and automatically disabled channels. This action cannot be undone.": "手動および自動で無効化されたすべてのチャネルが完全に削除されます。この操作は元に戻せません。"
+    "This will permanently delete all manually and automatically disabled channels. This action cannot be undone.": "手動および自動で無効化されたすべてのチャネルが完全に削除されます。この操作は元に戻せません。",
+    "Login successful": "ログインに成功しました",
+    "Failed to login with Telegram": "Telegram でのログインに失敗しました",
+    "Telegram account bound successfully": "Telegram アカウントの連携に成功しました",
+    "Failed to bind Telegram account": "Telegram アカウントの連携に失敗しました"
   }
 }

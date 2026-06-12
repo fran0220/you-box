@@ -3907,8 +3907,6 @@
     "Team Collaboration": "Team Collaboration",
     "Technical Support": "Technical Support",
     "Telegram": "Telegram",
-    "Telegram login requires widget integration; coming soon": "Telegram login requires widget integration; coming soon",
-    "Telegram Login Widget": "Telegram Login Widget",
     "Template": "Template",
     "Template variables:": "Template variables:",
     "Templates": "Templates",
@@ -4706,6 +4704,10 @@
     "{{value}} tokens": "{{value}} tokens",
     "~{{count}} days left": "~{{count}} days left",
     "~{{count}} days left at current rate": "~{{count}} days left at current rate",
-    "This will permanently delete all manually and automatically disabled channels. This action cannot be undone.": "This will permanently delete all manually and automatically disabled channels. This action cannot be undone."
+    "This will permanently delete all manually and automatically disabled channels. This action cannot be undone.": "This will permanently delete all manually and automatically disabled channels. This action cannot be undone.",
+    "Login successful": "Login successful",
+    "Failed to login with Telegram": "Failed to login with Telegram",
+    "Telegram account bound successfully": "Telegram account bound successfully",
+    "Failed to bind Telegram account": "Failed to bind Telegram account"
   }
 }
