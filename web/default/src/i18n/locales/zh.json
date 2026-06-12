@@ -4254,7 +4254,6 @@
     "Upload files": "上传文件",
     "Upload multiple JSON files in batch modes": "批量模式下可上传多个 JSON 文件",
     "Upload or reference a local configuration file.": "上传或引用本地配置文件。",
-    "Upload photo": "上传照片",
     "Upscale": "放大",
     "Upstream": "上游",
     "Upstream Model Detection Settings": "检测上游模型设置",
@@ -4708,6 +4707,10 @@
     "Login successful": "登录成功",
     "Failed to login with Telegram": "Telegram 登录失败，请重试",
     "Telegram account bound successfully": "Telegram 账户绑定成功",
-    "Failed to bind Telegram account": "绑定 Telegram 账户失败"
+    "Failed to bind Telegram account": "绑定 Telegram 账户失败",
+    "Add image URL": "添加图片地址",
+    "Remove image URL": "移除图片地址",
+    "Attached image": "附加图片",
+    "https://example.com/image.png": "https://example.com/image.png"
   }
 }

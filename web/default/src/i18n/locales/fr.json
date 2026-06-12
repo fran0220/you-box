@@ -4254,7 +4254,6 @@
     "Upload files": "Téléverser des fichiers",
     "Upload multiple JSON files in batch modes": "Télécharger plusieurs fichiers JSON en mode batch",
     "Upload or reference a local configuration file.": "Chargez ou référencez un fichier de configuration local.",
-    "Upload photo": "Téléverser une photo",
     "Upscale": "Agrandir",
     "Upstream": "Amont",
     "Upstream Model Detection Settings": "Paramètres de détection des modèles en amont",
@@ -4708,6 +4707,10 @@
     "Login successful": "Connexion réussie",
     "Failed to login with Telegram": "Échec de la connexion avec Telegram",
     "Telegram account bound successfully": "Compte Telegram lié avec succès",
-    "Failed to bind Telegram account": "Échec de la liaison du compte Telegram"
+    "Failed to bind Telegram account": "Échec de la liaison du compte Telegram",
+    "Add image URL": "Ajouter une URL d'image",
+    "Remove image URL": "Supprimer l'URL de l'image",
+    "Attached image": "Image jointe",
+    "https://example.com/image.png": "https://example.com/image.png"
   }
 }

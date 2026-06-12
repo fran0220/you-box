@@ -26,6 +26,7 @@ import {
   GlobeIcon,
   SendIcon,
   SquareIcon,
+  XIcon,
   BarChartIcon,
   BoxIcon,
   NotepadTextIcon,
@@ -34,12 +35,14 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import {
   PromptInput,
@@ -52,7 +55,7 @@ import {
 import { Suggestion, Suggestions } from '@/components/ai-elements/suggestion'
 
 interface PlaygroundInputProps {
-  onSubmit: (text: string) => void
+  onSubmit: (text: string, imageUrls?: string[]) => void
   onStop?: () => void
   disabled?: boolean
   isGenerating?: boolean
@@ -79,12 +82,27 @@ export function PlaygroundInput({
 }: PlaygroundInputProps) {
   const { t } = useTranslation()
   const [text, setText] = useState('')
+  const [imageUrls, setImageUrls] = useState<string[]>([])
   const isMac = isMacPlatform()
 
   const handleSubmit = (message: PromptInputMessage) => {
     if (!message.text?.trim() || disabled) return
-    onSubmit(message.text)
+    const validImages = imageUrls.filter((url) => url.trim() !== '')
+    onSubmit(message.text, validImages.length > 0 ? validImages : undefined)
     setText('')
+    setImageUrls([])
+  }
+
+  const handleAddImageUrl = () => {
+    setImageUrls((urls) => [...urls, ''])
+  }
+
+  const handleUpdateImageUrl = (index: number, value: string) => {
+    setImageUrls((urls) => urls.map((url, i) => (i === index ? value : url)))
+  }
+
+  const handleRemoveImageUrl = (index: number) => {
+    setImageUrls((urls) => urls.filter((_, i) => i !== index))
   }
 
   const handleFileAction = (action: string) => {
@@ -112,6 +130,39 @@ export function PlaygroundInput({
           value={text}
         />
 
+        {imageUrls.length > 0 && (
+          <div className='space-y-1.5 px-3 pb-1'>
+            {imageUrls.map((url, index) => (
+              // Entries are positional and edited in place; index is the identity.
+              <div key={index} className='flex items-center gap-1.5'>
+                <ImageIcon
+                  size={14}
+                  className='text-muted-foreground shrink-0'
+                />
+                <Input
+                  value={url}
+                  onChange={(event) =>
+                    handleUpdateImageUrl(index, event.target.value)
+                  }
+                  placeholder={t('https://example.com/image.png')}
+                  className='h-7 flex-1 text-xs'
+                  disabled={disabled}
+                />
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon'
+                  className='h-7 w-7 shrink-0'
+                  onClick={() => handleRemoveImageUrl(index)}
+                  aria-label={t('Remove image URL')}
+                >
+                  <XIcon size={14} />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <PromptInputFooter className='p-2.5'>
           <PromptInputTools>
             <DropdownMenu>
@@ -135,11 +186,9 @@ export function PlaygroundInput({
                   <FileIcon className='mr-2' size={16} />
                   {t('Upload file')}
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleFileAction('upload-photo')}
-                >
+                <DropdownMenuItem onClick={handleAddImageUrl}>
                   <ImageIcon className='mr-2' size={16} />
-                  {t('Upload photo')}
+                  {t('Add image URL')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleFileAction('take-screenshot')}

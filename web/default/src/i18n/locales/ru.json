@@ -4254,7 +4254,6 @@
     "Upload files": "Загрузить файлы",
     "Upload multiple JSON files in batch modes": "Загрузка нескольких файлов JSON в пакетных режимах",
     "Upload or reference a local configuration file.": "Загрузить или сослаться на локальный файл конфигурации.",
-    "Upload photo": "Загрузить фото",
     "Upscale": "Увеличение",
     "Upstream": "Источник",
     "Upstream Model Detection Settings": "Настройки обнаружения моделей провайдера",
@@ -4708,6 +4707,10 @@
     "Login successful": "Вход выполнен успешно",
     "Failed to login with Telegram": "Не удалось войти через Telegram",
     "Telegram account bound successfully": "Аккаунт Telegram успешно привязан",
-    "Failed to bind Telegram account": "Не удалось привязать аккаунт Telegram"
+    "Failed to bind Telegram account": "Не удалось привязать аккаунт Telegram",
+    "Add image URL": "Добавить URL изображения",
+    "Remove image URL": "Удалить URL изображения",
+    "Attached image": "Прикреплённое изображение",
+    "https://example.com/image.png": "https://example.com/image.png"
   }
 }

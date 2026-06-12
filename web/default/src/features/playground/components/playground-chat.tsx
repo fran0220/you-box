@@ -265,6 +265,26 @@ export function PlaygroundChat({
                                     </Reasoning>
                                   )}
 
+                                  {/* Attached images (vision input) */}
+                                  {!!message.imageUrls?.length && (
+                                    <div className='mb-1 flex flex-wrap gap-2'>
+                                      {message.imageUrls.map((url) => (
+                                        <a
+                                          key={url}
+                                          href={url}
+                                          target='_blank'
+                                          rel='noreferrer'
+                                        >
+                                          <img
+                                            src={url}
+                                            alt={t('Attached image')}
+                                            className='h-20 w-20 rounded-md border object-cover'
+                                          />
+                                        </a>
+                                      ))}
+                                    </div>
+                                  )}
+
                                   {/* Loader */}
                                   {showLoader && (
                                     <div className='flex items-center gap-2 py-2'>

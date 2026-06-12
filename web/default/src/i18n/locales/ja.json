@@ -4254,7 +4254,6 @@
     "Upload files": "ファイルをアップロード",
     "Upload multiple JSON files in batch modes": "バッチモードで複数のJSONファイルをアップロードする",
     "Upload or reference a local configuration file.": "ローカルの構成ファイルをアップロードまたは参照してください。",
-    "Upload photo": "写真をアップロード",
     "Upscale": "アップスケール",
     "Upstream": "アップストリーム",
     "Upstream Model Detection Settings": "アップストリームモデル検出設定",
@@ -4708,6 +4707,10 @@
     "Login successful": "ログインに成功しました",
     "Failed to login with Telegram": "Telegram でのログインに失敗しました",
     "Telegram account bound successfully": "Telegram アカウントの連携に成功しました",
-    "Failed to bind Telegram account": "Telegram アカウントの連携に失敗しました"
+    "Failed to bind Telegram account": "Telegram アカウントの連携に失敗しました",
+    "Add image URL": "画像 URL を追加",
+    "Remove image URL": "画像 URL を削除",
+    "Attached image": "添付画像",
+    "https://example.com/image.png": "https://example.com/image.png"
   }
 }

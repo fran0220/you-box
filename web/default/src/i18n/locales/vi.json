@@ -4254,7 +4254,6 @@
     "Upload files": "Tải tệp lên",
     "Upload multiple JSON files in batch modes": "Tải lên nhiều tệp JSON trong chế độ hàng loạt",
     "Upload or reference a local configuration file.": "Tải lên hoặc tham chiếu tệp cấu hình cục bộ.",
-    "Upload photo": "Tải ảnh lên",
     "Upscale": "Phóng to",
     "Upstream": "Thượng nguồn",
     "Upstream Model Detection Settings": "Cài đặt phát hiện mô hình nguồn",
@@ -4708,6 +4707,10 @@
     "Login successful": "Đăng nhập thành công",
     "Failed to login with Telegram": "Đăng nhập bằng Telegram thất bại",
     "Telegram account bound successfully": "Liên kết tài khoản Telegram thành công",
-    "Failed to bind Telegram account": "Liên kết tài khoản Telegram thất bại"
+    "Failed to bind Telegram account": "Liên kết tài khoản Telegram thất bại",
+    "Add image URL": "Thêm URL hình ảnh",
+    "Remove image URL": "Xóa URL hình ảnh",
+    "Attached image": "Hình ảnh đính kèm",
+    "https://example.com/image.png": "https://example.com/image.png"
   }
 }

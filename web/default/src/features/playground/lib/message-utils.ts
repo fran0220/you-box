@@ -59,11 +59,16 @@ export function updateCurrentVersionContent(
 /**
  * Create a user message
  */
-export function createUserMessage(content: string): Message {
+export function createUserMessage(
+  content: string,
+  imageUrls: string[] = []
+): Message {
+  const validImages = imageUrls.filter((url) => url.trim() !== '')
   return {
     key: nanoid(),
     from: MESSAGE_ROLES.USER,
     versions: [createMessageVersion(content)],
+    ...(validImages.length > 0 ? { imageUrls: validImages } : {}),
   }
 }
 
@@ -133,7 +138,7 @@ export function formatMessageForAPI(message: Message): ChatCompletionMessage {
   const currentVersion = getCurrentVersion(message)
   return {
     role: message.from,
-    content: currentVersion.content,
+    content: buildMessageContent(currentVersion.content, message.imageUrls),
   }
 }
 

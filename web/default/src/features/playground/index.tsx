@@ -137,8 +137,8 @@ export function Playground() {
     }
   }, [groupsData, setGroups, config.group, updateConfig])
 
-  const handleSendMessage = (text: string) => {
-    const userMessage = createUserMessage(text)
+  const handleSendMessage = (text: string, imageUrls?: string[]) => {
+    const userMessage = createUserMessage(text, imageUrls)
     const assistantMessage = createLoadingAssistantMessage()
 
     const newMessages = [...messages, userMessage, assistantMessage]

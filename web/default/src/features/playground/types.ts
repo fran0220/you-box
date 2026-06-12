@@ -36,6 +36,8 @@ export interface Message {
   key: string
   from: MessageRole
   versions: MessageVersion[]
+  /** Image URLs attached to a user message (vision input). */
+  imageUrls?: string[]
   sources?: { href: string; title: string }[]
   reasoning?: {
     content: string
