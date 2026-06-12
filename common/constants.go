@@ -37,6 +37,30 @@ func SetTheme(t string) {
 	}
 }
 
+// legacyConsolePathRewrites maps classic-frontend /console/* prefixes to
+// their default-theme equivalents. Order matters: more specific prefixes
+// must come before shorter ones. /console/setting and /console/deployment
+// are intentionally absent — their query parameters (tab, deployment_id)
+// are remapped by dedicated redirect routes in the default frontend.
+var legacyConsolePathRewrites = []struct {
+	prefix      string
+	replacement string
+}{
+	{"/console/topup", "/wallet"},
+	{"/console/log", "/usage-logs"},
+	{"/console/personal", "/profile"},
+	{"/console/channel", "/channels"},
+	{"/console/token", "/keys"},
+	{"/console/redemption", "/redemption-codes"},
+	{"/console/user", "/users"},
+	{"/console/models", "/models"},
+	{"/console/subscription", "/subscriptions"},
+	{"/console/playground", "/playground"},
+	{"/console/midjourney", "/usage-logs/drawing"},
+	{"/console/task", "/usage-logs/task"},
+	{"/console/chat", "/chat"},
+}
+
 // ThemeAwarePath rewrites legacy /console/* paths to the default-theme
 // equivalents when the active theme is "default".  For "classic" (or any
 // other theme) the path is returned unchanged.  The function only touches
@@ -46,13 +70,13 @@ func ThemeAwarePath(suffix string) string {
 	if GetTheme() != "default" {
 		return suffix
 	}
-	switch {
-	case strings.HasPrefix(suffix, "/console/topup"):
-		return strings.Replace(suffix, "/console/topup", "/wallet", 1)
-	case strings.HasPrefix(suffix, "/console/log"):
-		return strings.Replace(suffix, "/console/log", "/usage-logs", 1)
-	case strings.HasPrefix(suffix, "/console/personal"):
-		return strings.Replace(suffix, "/console/personal", "/profile", 1)
+	for _, rule := range legacyConsolePathRewrites {
+		if strings.HasPrefix(suffix, rule.prefix) {
+			return strings.Replace(suffix, rule.prefix, rule.replacement, 1)
+		}
+	}
+	if suffix == "/console" || suffix == "/console/" || strings.HasPrefix(suffix, "/console?") {
+		return strings.Replace(suffix, "/console", "/dashboard", 1)
 	}
 	return suffix
 }
