@@ -65,6 +65,10 @@ func SetRelayRouter(router *gin.Engine) {
 	playgroundRouter.Use(middleware.UserAuth(), middleware.Distribute())
 	{
 		playgroundRouter.POST("/chat/completions", controller.Playground)
+		// Additional modalities for the multimodal playground console.
+		playgroundRouter.POST("/embeddings", controller.PlaygroundEmbeddings)
+		playgroundRouter.POST("/images/generations", controller.PlaygroundImages)
+		playgroundRouter.POST("/rerank", controller.PlaygroundRerank)
 	}
 	relayV1Router := router.Group("/v1")
 	relayV1Router.Use(middleware.RouteTag("relay"))

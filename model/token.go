@@ -28,7 +28,14 @@ type Token struct {
 	UsedQuota          int            `json:"used_quota" gorm:"default:0"` // used quota
 	Group              string         `json:"group" gorm:"default:''"`
 	CrossGroupRetry    bool           `json:"cross_group_retry"` // 跨分组重试，仅auto分组有效
-	DeletedAt          gorm.DeletedAt `gorm:"index"`
+	// SpendLimit/ResetPeriod implement an OpenRouter-style recurring spend
+	// budget: every period the key's RemainQuota is reset to SpendLimit. 0 /
+	// "none" disables it. Enforcement reuses the existing RemainQuota path, so
+	// no billing hot-path change is required.
+	SpendLimit    int    `json:"spend_limit" gorm:"default:0"`
+	ResetPeriod   string `json:"reset_period" gorm:"type:varchar(16);default:'none'"`
+	NextResetTime int64  `json:"next_reset_time" gorm:"bigint;default:0"`
+	DeletedAt     gorm.DeletedAt `gorm:"index"`
 }
 
 func (token *Token) Clean() {
@@ -295,7 +302,8 @@ func (token *Token) Update() (err error) {
 		}
 	}()
 	err = DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota",
-		"model_limits_enabled", "model_limits", "allow_ips", "group", "cross_group_retry").Updates(token).Error
+		"model_limits_enabled", "model_limits", "allow_ips", "group", "cross_group_retry",
+		"spend_limit", "reset_period", "next_reset_time").Updates(token).Error
 	return err
 }
 

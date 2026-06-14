@@ -221,6 +221,9 @@ func AddToken(c *gin.Context) {
 		AllowIps:           token.AllowIps,
 		Group:              token.Group,
 		CrossGroupRetry:    token.CrossGroupRetry,
+		SpendLimit:         token.SpendLimit,
+		ResetPeriod:        token.ResetPeriod,
+		NextResetTime:      token.NextResetTime,
 	}
 	err = cleanToken.Insert()
 	if err != nil {

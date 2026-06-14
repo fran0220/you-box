@@ -1151,6 +1151,9 @@ type UpdateUserSettingRequest struct {
 	UpstreamModelUpdateNotifyEnabled *bool   `json:"upstream_model_update_notify_enabled,omitempty"`
 	AcceptUnsetModelRatioModel       bool    `json:"accept_unset_model_ratio_model"`
 	RecordIpLog                      bool    `json:"record_ip_log"`
+	AutoTopupEnabled                 bool    `json:"auto_topup_enabled"`
+	AutoTopupThreshold               float64 `json:"auto_topup_threshold"`
+	AutoTopupAmount                  float64 `json:"auto_topup_amount"`
 }
 
 func UpdateUserSetting(c *gin.Context) {
@@ -1253,6 +1256,9 @@ func UpdateUserSetting(c *gin.Context) {
 		UpstreamModelUpdateNotifyEnabled: upstreamModelUpdateNotifyEnabled,
 		AcceptUnsetRatioModel:            req.AcceptUnsetModelRatioModel,
 		RecordIpLog:                      req.RecordIpLog,
+		AutoTopupEnabled:                 req.AutoTopupEnabled,
+		AutoTopupThreshold:               req.AutoTopupThreshold,
+		AutoTopupAmount:                  req.AutoTopupAmount,
 	}
 
 	// 如果是webhook类型,添加webhook相关设置

@@ -16,6 +16,12 @@ type UserSetting struct {
 	SidebarModules                   string  `json:"sidebar_modules,omitempty"`                      // SidebarModules 左侧边栏模块配置
 	BillingPreference                string  `json:"billing_preference,omitempty"`                   // BillingPreference 扣费策略（订阅/钱包）
 	Language                         string  `json:"language,omitempty"`                             // Language 用户语言偏好 (zh, en)
+	// Auto top-up (OpenRouter-style): when enabled, the user is alerted to top
+	// up AutoTopupAmount once their balance falls below AutoTopupThreshold
+	// (both in display-currency / USD-equivalent units).
+	AutoTopupEnabled   bool    `json:"auto_topup_enabled,omitempty"`
+	AutoTopupThreshold float64 `json:"auto_topup_threshold,omitempty"`
+	AutoTopupAmount    float64 `json:"auto_topup_amount,omitempty"`
 }
 
 var (
