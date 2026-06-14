@@ -20,14 +20,15 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Gauge, HeartPulse, Timer } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { AnimatedNumber } from '@/components/ui/animated-number'
+import { Skeleton } from '@/components/ui/skeleton'
+import { MonoCell } from '@/components/data-table'
 import {
   Panel,
   PanelHeader,
   StatCard,
   StatCardRow,
 } from '@/components/patterns'
-import { MonoCell } from '@/components/data-table'
-import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge, type StatusVariant } from '@/components/status-badge'
 import { getPerfMetricsSummary } from '@/features/performance-metrics/api'
 import {
@@ -118,21 +119,36 @@ export function PerformanceHealthPanel() {
             size='sm'
             icon={<HeartPulse />}
             label={t('Success rate')}
-            value={formatUptimePct(summary.successRate)}
+            value={
+              <AnimatedNumber
+                value={summary.successRate}
+                format={formatUptimePct}
+              />
+            }
             loading={loading}
           />
           <StatCard
             size='sm'
             icon={<Timer />}
             label={t('Average latency')}
-            value={formatLatency(summary.avgLatencyMs)}
+            value={
+              <AnimatedNumber
+                value={summary.avgLatencyMs}
+                format={formatLatency}
+              />
+            }
             loading={loading}
           />
           <StatCard
             size='sm'
             icon={<Gauge />}
             label={t('Throughput')}
-            value={formatThroughput(summary.avgTps)}
+            value={
+              <AnimatedNumber
+                value={summary.avgTps}
+                format={formatThroughput}
+              />
+            }
             loading={loading}
           />
         </StatCardRow>
@@ -212,4 +228,3 @@ export function PerformanceHealthPanel() {
     </Panel>
   )
 }
-

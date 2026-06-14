@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect } from 'react'
 import { Check, Moon, Sun } from 'lucide-react'
+import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/context/theme-provider'
@@ -41,31 +42,84 @@ export function ThemeSwitch() {
     if (metaThemeColor) metaThemeColor.setAttribute('content', themeColor)
   }, [theme])
 
+  // Theme change with a circular reveal via the View Transitions API,
+  // emanating from the click point. flushSync forces the theme class onto
+  // <html> synchronously inside the transition callback so the captured
+  // snapshot reflects the new theme. Falls back to an instant switch when the
+  // API is unavailable or the user prefers reduced motion.
+  function handleSetTheme(
+    next: 'light' | 'dark' | 'system',
+    event?: { clientX?: number; clientY?: number }
+  ) {
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { ready: Promise<void> }
+    }
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    if (!doc.startViewTransition || prefersReduced) {
+      setTheme(next)
+      return
+    }
+
+    const x = event?.clientX || window.innerWidth / 2
+    const y = event?.clientY || window.innerHeight / 2
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    )
+    const easing =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--ease-out')
+        .trim() || 'ease-out'
+
+    const transition = doc.startViewTransition(() => {
+      flushSync(() => setTheme(next))
+    })
+    transition.ready
+      .then(() => {
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0px at ${x}px ${y}px)`,
+              `circle(${endRadius}px at ${x}px ${y}px)`,
+            ],
+          },
+          {
+            duration: 400,
+            easing,
+            pseudoElement: '::view-transition-new(root)',
+          }
+        )
+      })
+      .catch(() => {})
+  }
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger
         render={<Button variant='ghost' size='icon' className='h-9 w-9' />}
       >
-        <Sun className='size-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90' />
-        <Moon className='absolute size-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0' />
+        <Sun className='duration-base size-[1.2rem] scale-100 rotate-0 transition-all ease-out dark:scale-0 dark:-rotate-90' />
+        <Moon className='duration-base absolute size-[1.2rem] scale-0 rotate-90 transition-all ease-out dark:scale-100 dark:rotate-0' />
         <span className='sr-only'>{t('Toggle theme')}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem onClick={() => setTheme('light')}>
+        <DropdownMenuItem onClick={(event) => handleSetTheme('light', event)}>
           {t('Light')}{' '}
           <Check
             size={14}
             className={cn('ms-auto', theme !== 'light' && 'hidden')}
           />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
+        <DropdownMenuItem onClick={(event) => handleSetTheme('dark', event)}>
           {t('Dark')}
           <Check
             size={14}
             className={cn('ms-auto', theme !== 'dark' && 'hidden')}
           />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
+        <DropdownMenuItem onClick={(event) => handleSetTheme('system', event)}>
           {t('System')}
           <Check
             size={14}

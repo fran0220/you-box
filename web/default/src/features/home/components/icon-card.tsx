@@ -34,11 +34,11 @@ export function IconCard({ iconName, size = 32, className }: IconCardProps) {
       className={cn(
         'bg-card group/card border-border',
         'relative overflow-hidden rounded-2xl border p-5',
-        'transition-all duration-500 hover:scale-105',
+        'duration-slow transition-all hover:scale-105',
         className
       )}
     >
-      <div className='absolute -top-8 left-1/2 h-16 w-32 -translate-x-1/2 rounded-full bg-radial from-[rgba(0, 144, 255,0.12)] to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover/card:opacity-100' />
+      <div className='from-brand/12 duration-slow absolute -top-8 left-1/2 h-16 w-32 -translate-x-1/2 rounded-full bg-radial to-transparent opacity-0 blur-xl transition-opacity group-hover/card:opacity-100' />
       <div className='relative flex items-center justify-center'>
         {getLobeIcon(iconName, size)}
       </div>

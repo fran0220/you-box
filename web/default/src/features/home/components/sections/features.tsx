@@ -52,7 +52,7 @@ export function Features(_props: FeaturesProps) {
             (name) => (
               <div
                 key={name}
-                className='border-border/30 bg-muted/20 text-muted-foreground flex items-center justify-center rounded-lg border px-3 py-2 text-xs transition-colors duration-300 hover:border-brand-border hover:bg-brand-subtle'
+                className='border-border/30 bg-muted/20 text-muted-foreground duration-base hover:border-brand-border hover:bg-brand-subtle flex items-center justify-center rounded-lg border px-3 py-2 text-xs transition-colors'
               >
                 {name}
               </div>
@@ -73,13 +73,10 @@ export function Features(_props: FeaturesProps) {
       visual: (
         <div className='mt-4 flex items-center justify-center'>
           <div className='relative'>
-            <div className='flex size-16 items-center justify-center rounded-2xl border-teal/20 bg-teal-subtle border'>
-              <Shield
-                className='size-7 text-teal/70'
-                strokeWidth={1.5}
-              />
+            <div className='border-teal/20 bg-teal-subtle flex size-16 items-center justify-center rounded-2xl border'>
+              <Shield className='text-teal/70 size-7' strokeWidth={1.5} />
             </div>
-            <div className='absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-teal'>
+            <div className='bg-teal absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full'>
               <svg
                 className='size-2.5 text-white'
                 fill='none'
@@ -200,7 +197,7 @@ export function Features(_props: FeaturesProps) {
               key={f.id}
               delay={i * 100}
               animation='scale-in'
-              className={`bg-background group hover:bg-muted/20 p-7 transition-colors duration-300 md:p-8 ${f.span}`}
+              className={`bg-background group hover:bg-muted/20 duration-base p-7 transition-colors md:p-8 ${f.span}`}
             >
               <div className='mb-3 flex items-center gap-3'>
                 <span className='border-border/40 bg-muted text-muted-foreground flex size-7 items-center justify-center rounded-md border font-mono text-[10px] font-semibold tabular-nums'>

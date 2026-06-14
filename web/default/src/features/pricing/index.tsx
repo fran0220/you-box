@@ -17,8 +17,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useMemo, useState } from 'react'
-import { Star } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Scale, Star } from 'lucide-react'
+import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
+import { MOTION_TRANSITION } from '@/lib/motion'
 import { Button } from '@/components/ui/button'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
@@ -39,6 +42,7 @@ import { usePricingData } from './hooks/use-pricing-data'
 
 export function Pricing() {
   const { t } = useTranslation()
+  const reduceMotion = useReducedMotion()
   const [selectedModelName, setSelectedModelName] = useState<string | null>(
     null
   )
@@ -68,6 +72,7 @@ export function Pricing() {
     groupFilter,
     quotaTypeFilter,
     endpointTypeFilter,
+    modalityFilter,
     tagFilter,
     tokenUnit,
     viewMode,
@@ -78,6 +83,7 @@ export function Pricing() {
     setGroupFilter,
     setQuotaTypeFilter,
     setEndpointTypeFilter,
+    setModalityFilter,
     setTagFilter,
     setTokenUnit,
     setViewMode,
@@ -202,7 +208,7 @@ export function Pricing() {
           className='pointer-events-none absolute -top-48 left-1/2 size-[560px] -translate-x-1/2 rounded-full blur-[10px]'
           style={{
             background:
-              'radial-gradient(circle, rgba(0, 144, 255,0.14), transparent 62%)',
+              'radial-gradient(circle, color-mix(in oklch, var(--brand) 14%, transparent), transparent 62%)',
           }}
         />
         <PageTransition className='relative mx-auto w-full max-w-[1800px] px-3 pt-16 pb-8 sm:px-6 sm:pt-20 sm:pb-10 xl:px-8'>
@@ -230,17 +236,32 @@ export function Pricing() {
               )}
               className='mx-auto mt-4 max-w-2xl sm:mt-6'
             />
+            <div className='mt-3 flex justify-center'>
+              <Button
+                render={
+                  <Link to='/pricing/compare' search={{ models: undefined }} />
+                }
+                variant='outline'
+                size='sm'
+                className='gap-1.5'
+              >
+                <Scale className='size-4' />
+                {t('Compare models')}
+              </Button>
+            </div>
           </header>
 
           <div className='grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]'>
             <PricingSidebar
               quotaTypeFilter={quotaTypeFilter}
               endpointTypeFilter={endpointTypeFilter}
+              modalityFilter={modalityFilter}
               vendorFilter={vendorFilter}
               groupFilter={groupFilter}
               tagFilter={tagFilter}
               onQuotaTypeChange={setQuotaTypeFilter}
               onEndpointTypeChange={setEndpointTypeFilter}
+              onModalityChange={setModalityFilter}
               onVendorChange={setVendorFilter}
               onGroupChange={setGroupFilter}
               onTagChange={setTagFilter}
@@ -270,11 +291,13 @@ export function Pricing() {
                 onViewModeChange={setViewMode}
                 quotaTypeFilter={quotaTypeFilter}
                 endpointTypeFilter={endpointTypeFilter}
+                modalityFilter={modalityFilter}
                 vendorFilter={vendorFilter}
                 groupFilter={groupFilter}
                 tagFilter={tagFilter}
                 onQuotaTypeChange={setQuotaTypeFilter}
                 onEndpointTypeChange={setEndpointTypeFilter}
+                onModalityChange={setModalityFilter}
                 onVendorChange={setVendorFilter}
                 onGroupChange={setGroupFilter}
                 onTagChange={setTagFilter}
@@ -288,7 +311,18 @@ export function Pricing() {
                 onClearFilters={clearFilters}
               />
 
-              {renderPricingContent()}
+              {/* Crossfade card ↔ table on view switch (keyed on viewMode so
+                  it fires on switch, not on every search/filter change). */}
+              <m.div
+                key={viewMode}
+                initial={reduceMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={
+                  reduceMotion ? { duration: 0 } : MOTION_TRANSITION.fast
+                }
+              >
+                {renderPricingContent()}
+              </m.div>
             </main>
           </div>
 

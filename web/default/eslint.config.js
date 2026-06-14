@@ -53,6 +53,24 @@ export default defineConfig(
         },
       ],
       'no-duplicate-imports': 'error',
+      // Motion guardrail: forbid arbitrary durations / inline cubic-bezier in
+      // class strings — use the design tokens (duration-instant/fast/base/slow,
+      // ease-out/in-out/spring) or src/lib/motion.ts. See docs/motion.md.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'Literal[value=/duration-\\[|ease-\\[cubic-bezier|cubic-bezier\\(/]',
+          message:
+            'Use motion tokens (duration-*/ease-*), not arbitrary durations or inline cubic-bezier. See docs/motion.md.',
+        },
+        {
+          selector:
+            'TemplateElement[value.raw=/duration-\\[|ease-\\[cubic-bezier|cubic-bezier\\(/]',
+          message:
+            'Use motion tokens (duration-*/ease-*), not arbitrary durations or inline cubic-bezier. See docs/motion.md.',
+        },
+      ],
     },
   },
   {

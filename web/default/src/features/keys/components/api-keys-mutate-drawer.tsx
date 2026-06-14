@@ -44,6 +44,14 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Sheet,
   SheetClose,
   SheetContent,
@@ -485,6 +493,61 @@ export function ApiKeysMutateDrawer({
                       <FormMessage />
                     </FormItem>
                   )}
+                />
+              )}
+
+              {!unlimitedQuota && (
+                <FormField
+                  control={form.control}
+                  name='reset_period'
+                  render={({ field }) => {
+                    const resetOptions = [
+                      { value: 'none', label: t('No automatic reset') },
+                      { value: 'daily', label: t('Every day') },
+                      { value: 'weekly', label: t('Every week') },
+                      { value: 'monthly', label: t('Every month') },
+                    ]
+                    const current =
+                      resetOptions.find(
+                        (o) => o.value === (field.value ?? 'none')
+                      )?.label ?? resetOptions[0].label
+                    return (
+                      <FormItem>
+                        <FormLabel>{t('Limit reset')}</FormLabel>
+                        <Select
+                          items={resetOptions}
+                          value={field.value ?? 'none'}
+                          onValueChange={(value) =>
+                            field.onChange(value ?? 'none')
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className='w-full'>
+                              <SelectValue>{current}</SelectValue>
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent alignItemWithTrigger={false}>
+                            <SelectGroup>
+                              {resetOptions.map((option) => (
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          {t(
+                            'Automatically refill the credit limit on this schedule.'
+                          )}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }}
                 />
               )}
 

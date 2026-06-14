@@ -16,13 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   PaperclipIcon,
-  FileIcon,
+  UploadIcon,
   ImageIcon,
-  ScreenShareIcon,
-  CameraIcon,
   GlobeIcon,
   SendIcon,
   SquareIcon,
@@ -35,6 +33,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -59,11 +58,17 @@ interface PlaygroundInputProps {
   onStop?: () => void
   disabled?: boolean
   isGenerating?: boolean
+  /** Native web search toggle state + setter (wired to config.webSearch). */
+  webSearch?: boolean
+  onWebSearchChange?: (value: boolean) => void
 }
 
 const isMacPlatform = () =>
   typeof navigator !== 'undefined' &&
   /mac/i.test(navigator.platform || navigator.userAgent)
+
+// Max size for an uploaded (base64-inlined) image.
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024
 
 const suggestions = [
   { icon: BarChartIcon, text: 'Analyze data', color: 'var(--teal)' },
@@ -74,15 +79,27 @@ const suggestions = [
   { icon: null, text: 'More' },
 ]
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+}
+
 export function PlaygroundInput({
   onSubmit,
   onStop,
   disabled,
   isGenerating,
+  webSearch = false,
+  onWebSearchChange,
 }: PlaygroundInputProps) {
   const { t } = useTranslation()
   const [text, setText] = useState('')
   const [imageUrls, setImageUrls] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const isMac = isMacPlatform()
 
   const handleSubmit = (message: PromptInputMessage) => {
@@ -105,10 +122,32 @@ export function PlaygroundInput({
     setImageUrls((urls) => urls.filter((_, i) => i !== index))
   }
 
-  const handleFileAction = (action: string) => {
-    toast.info(t('Feature in development'), {
-      description: action,
-    })
+  const handlePickFiles = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFilesSelected = async (files: FileList | null) => {
+    if (!files?.length) return
+    const dataUrls: string[] = []
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) {
+        toast.error(t('Only image files are supported'))
+        continue
+      }
+      if (file.size > MAX_IMAGE_BYTES) {
+        toast.error(t('Image is too large (max 10MB)'))
+        continue
+      }
+      try {
+        dataUrls.push(await readFileAsDataUrl(file))
+      } catch {
+        toast.error(t('Failed to read image'))
+      }
+    }
+    if (dataUrls.length) {
+      setImageUrls((urls) => [...urls, ...dataUrls])
+    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -117,6 +156,14 @@ export function PlaygroundInput({
 
   return (
     <div className='grid shrink-0 gap-4 px-1 md:pb-4'>
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='image/*'
+        multiple
+        className='hidden'
+        onChange={(event) => void handleFilesSelected(event.target.files)}
+      />
       <PromptInput groupClassName='rounded-xl' onSubmit={handleSubmit}>
         <PromptInputTextarea
           autoComplete='off'
@@ -131,35 +178,61 @@ export function PlaygroundInput({
         />
 
         {imageUrls.length > 0 && (
-          <div className='space-y-1.5 px-3 pb-1'>
-            {imageUrls.map((url, index) => (
-              // Entries are positional and edited in place; index is the identity.
-              <div key={index} className='flex items-center gap-1.5'>
-                <ImageIcon
-                  size={14}
-                  className='text-muted-foreground shrink-0'
-                />
-                <Input
-                  value={url}
-                  onChange={(event) =>
-                    handleUpdateImageUrl(index, event.target.value)
-                  }
-                  placeholder={t('https://example.com/image.png')}
-                  className='h-7 flex-1 text-xs'
-                  disabled={disabled}
-                />
-                <Button
-                  type='button'
-                  variant='ghost'
-                  size='icon'
-                  className='h-7 w-7 shrink-0'
-                  onClick={() => handleRemoveImageUrl(index)}
-                  aria-label={t('Remove image URL')}
-                >
-                  <XIcon size={14} />
-                </Button>
-              </div>
-            ))}
+          <div className='flex flex-wrap gap-2 px-3 pb-1'>
+            {imageUrls.map((url, index) => {
+              const isData = url.startsWith('data:')
+              if (isData) {
+                // Uploaded image → thumbnail chip (data URLs are too long to edit).
+                return (
+                  <div
+                    key={index}
+                    className='group relative h-16 w-16 overflow-hidden rounded-md border'
+                  >
+                    <img
+                      src={url}
+                      alt={t('Attached image')}
+                      className='h-full w-full object-cover'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => handleRemoveImageUrl(index)}
+                      aria-label={t('Remove image URL')}
+                      className='bg-background/80 absolute top-0.5 right-0.5 rounded p-0.5 opacity-0 transition-opacity group-hover:opacity-100'
+                    >
+                      <XIcon size={12} />
+                    </button>
+                  </div>
+                )
+              }
+              // URL entry → editable text field.
+              return (
+                <div key={index} className='flex w-full items-center gap-1.5'>
+                  <ImageIcon
+                    size={14}
+                    className='text-muted-foreground shrink-0'
+                  />
+                  <Input
+                    value={url}
+                    onChange={(event) =>
+                      handleUpdateImageUrl(index, event.target.value)
+                    }
+                    placeholder={t('https://example.com/image.png')}
+                    className='h-7 flex-1 text-xs'
+                    disabled={disabled}
+                  />
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='icon'
+                    className='h-7 w-7 shrink-0'
+                    onClick={() => handleRemoveImageUrl(index)}
+                    aria-label={t('Remove image URL')}
+                  >
+                    <XIcon size={14} />
+                  </Button>
+                </div>
+              )
+            })}
           </div>
         )}
 
@@ -180,36 +253,26 @@ export function PlaygroundInput({
                 <span className='sr-only sm:hidden'>{t('Attach')}</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='start'>
-                <DropdownMenuItem
-                  onClick={() => handleFileAction('upload-file')}
-                >
-                  <FileIcon className='mr-2' size={16} />
-                  {t('Upload file')}
+                <DropdownMenuItem onClick={handlePickFiles}>
+                  <UploadIcon className='mr-2' size={16} />
+                  {t('Upload image')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleAddImageUrl}>
                   <ImageIcon className='mr-2' size={16} />
                   {t('Add image URL')}
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleFileAction('take-screenshot')}
-                >
-                  <ScreenShareIcon className='mr-2' size={16} />
-                  {t('Take screenshot')}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleFileAction('take-photo')}
-                >
-                  <CameraIcon className='mr-2' size={16} />
-                  {t('Take photo')}
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <PromptInputButton
-              className='border font-medium'
+              className={cn(
+                'border font-medium',
+                webSearch && 'border-brand-border'
+              )}
               disabled={disabled}
-              onClick={() => toast.info(t('Search feature in development'))}
-              variant='outline'
+              onClick={() => onWebSearchChange?.(!webSearch)}
+              variant={webSearch ? 'default' : 'outline'}
+              aria-pressed={webSearch}
             >
               <GlobeIcon size={16} />
               <span className='hidden sm:inline'>{t('Search')}</span>
@@ -254,17 +317,17 @@ export function PlaygroundInput({
       </PromptInput>
 
       <Suggestions>
-        {suggestions.map(({ icon: Icon, text, color }) => (
+        {suggestions.map(({ icon: Icon, text: suggestionText, color }) => (
           <Suggestion
             className={`text-xs font-normal sm:text-sm ${
-              text === 'More' ? 'hidden sm:flex' : ''
+              suggestionText === 'More' ? 'hidden sm:flex' : ''
             }`}
-            key={text}
-            onClick={() => handleSuggestionClick(text)}
-            suggestion={text}
+            key={suggestionText}
+            onClick={() => handleSuggestionClick(suggestionText)}
+            suggestion={suggestionText}
           >
             {Icon && <Icon size={16} style={{ color }} />}
-            {text}
+            {suggestionText}
           </Suggestion>
         ))}
       </Suggestions>

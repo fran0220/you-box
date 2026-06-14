@@ -19,7 +19,9 @@ For commercial licensing, please contact support@quantumnous.com
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useSystemConfig } from '@/hooks/use-system-config'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { Skeleton } from '@/components/ui/skeleton'
+import { AnimateInView } from '@/components/animate-in-view'
 
 type AuthLayoutProps = {
   children: React.ReactNode
@@ -60,10 +62,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
     </Link>
   )
 
-  const stats: Array<[string, string]> = [
-    ['50+', t('upstream services integrated')],
-    ['100+', t('model billing support')],
-    ['50+', t('compatible API routes')],
+  const stats: Array<{ value: number; suffix: string; label: string }> = [
+    { value: 50, suffix: '+', label: t('upstream services integrated') },
+    { value: 100, suffix: '+', label: t('model billing support') },
+    { value: 50, suffix: '+', label: t('compatible API routes') },
   ]
 
   return (
@@ -83,11 +85,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           className='pointer-events-none absolute -top-28 -right-28 size-[420px] rounded-full blur-[10px]'
           style={{
             background:
-              'radial-gradient(circle, rgba(0, 144, 255,0.16), transparent 62%)',
+              'radial-gradient(circle, color-mix(in oklch, var(--brand) 16%, transparent), transparent 62%)',
           }}
         />
         <div className='relative'>{brand}</div>
-        <div className='relative'>
+        <AnimateInView as='div' animation='fade-up' className='relative'>
           <p className='yb-eyebrow mb-4'>
             {'// '}
             {t('AI Application Infrastructure Foundation')}
@@ -95,17 +97,27 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           <p className='font-display max-w-[18em] text-3xl leading-[1.25] font-semibold tracking-[-0.02em]'>
             {t('Unified API Gateway for')} {t('Vast Range of AI Models')}
           </p>
-        </div>
-        <div className='relative flex gap-8'>
-          {stats.map(([value, label]) => (
-            <div key={label}>
-              <div className='font-display text-2xl font-bold'>{value}</div>
+        </AnimateInView>
+        <AnimateInView
+          as='div'
+          animation='fade-up'
+          delay={120}
+          className='relative flex gap-8'
+        >
+          {stats.map((s) => (
+            <div key={s.label}>
+              <div className='font-display text-2xl font-bold'>
+                <AnimatedNumber
+                  value={s.value}
+                  format={(n) => `${Math.round(n)}${s.suffix}`}
+                />
+              </div>
               <div className='text-muted-foreground mt-1 max-w-[12em] font-mono text-[11px] tracking-[0.06em] uppercase'>
-                {label}
+                {s.label}
               </div>
             </div>
           ))}
-        </div>
+        </AnimateInView>
       </div>
     </div>
   )

@@ -87,7 +87,7 @@ export function FilterTabs<T extends string>({
             tabIndex={active ? 0 : -1}
             onClick={() => onValueChange(item.value)}
             className={cn(
-              'flex items-center gap-1.5 rounded-sm px-3 py-1 text-sm font-medium whitespace-nowrap transition-colors duration-[80ms]',
+              'duration-instant flex items-center gap-1.5 rounded-sm px-3 py-1 text-sm font-medium whitespace-nowrap transition-colors',
               'focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none',
               active
                 ? 'bg-card text-foreground shadow-xs'

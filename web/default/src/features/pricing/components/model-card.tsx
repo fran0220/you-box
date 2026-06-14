@@ -186,7 +186,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   return (
     <div
       className={cn(
-        'group bg-card border-border relative flex flex-col rounded-lg border p-3 transition-all duration-[220ms] ease-[cubic-bezier(0.16,1,0.3,1)] sm:p-5',
+        'group bg-card border-border duration-base relative flex flex-col rounded-lg border p-3 transition-all ease-out sm:p-5',
         'hover:border-brand-border hover:shadow-[var(--glow-brand)] motion-safe:hover:-translate-y-0.5'
       )}
     >
@@ -244,7 +244,12 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
             )}
           >
             <Star
-              className={cn('size-3.5', favorited && 'fill-current')}
+              key={favorited ? 'on' : 'off'}
+              className={cn(
+                'size-3.5',
+                favorited &&
+                  'motion-safe:animate-in motion-safe:zoom-in-50 duration-fast ease-spring fill-current'
+              )}
               aria-hidden='true'
             />
           </button>

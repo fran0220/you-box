@@ -35,9 +35,9 @@ import {
 import { Form } from '@/components/ui/form'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ErrorState } from '@/components/error-state'
-import { StepIndicator } from '@/components/patterns'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { LoadingState } from '@/components/loading-state'
+import { StepIndicator } from '@/components/patterns'
 import { buildSetupPayload, getSetupStatus, submitSetup } from './api'
 import { AdminStep } from './components/admin-step'
 import { CompleteStep } from './components/complete-step'
@@ -285,7 +285,7 @@ export function SetupWizard() {
         className='pointer-events-none absolute -top-40 left-1/2 size-[600px] -translate-x-1/2 rounded-full blur-[10px]'
         style={{
           background:
-            'radial-gradient(circle, rgba(0, 144, 255,0.14), transparent 62%)',
+            'radial-gradient(circle, color-mix(in oklch, var(--brand) 14%, transparent), transparent 62%)',
         }}
       />
       <div className='absolute top-4 right-4 sm:top-6 sm:right-6'>

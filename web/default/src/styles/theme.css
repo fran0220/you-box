@@ -33,19 +33,17 @@ For commercial licensing, please contact support@quantumnous.com
    * JetBrains Mono for code/eyebrows/numerics. */
   --font-sans:
     'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui,
-    -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei',
-    sans-serif;
+    -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
   --font-display:
     'Space Grotesk Variable', 'Space Grotesk', 'Hanken Grotesk Variable',
     ui-sans-serif, system-ui, 'PingFang SC', 'Noto Sans SC', sans-serif;
   --font-mono:
-    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono',
-    Menlo, Consolas, monospace;
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo,
+    Consolas, monospace;
   /* Legacy font axes — kept resolvable so existing `font-serif` /
    * `font-inter` / `font-manrope` utilities don't break; they all resolve
    * to YouBox-approved stacks now. */
-  --font-serif:
-    Georgia, 'Times New Roman', 'Noto Serif SC', 'Songti SC', serif;
+  --font-serif: Georgia, 'Times New Roman', 'Noto Serif SC', 'Songti SC', serif;
   --font-inter: var(--font-sans);
   --font-manrope: var(--font-sans);
 
@@ -124,6 +122,19 @@ For commercial licensing, please contact support@quantumnous.com
   --radius-4xl: 36px;
 }
 
+/* Motion easings — theme-invariant. Declared in @theme (not @theme inline)
+ * so Tailwind both emits the :root custom properties AND generates the
+ * `ease-out` / `ease-in-out` / `ease-spring` transition-timing-function
+ * utilities. Those utilities also set `--tw-ease`, which tw-animate-css
+ * reads, so the same curve drives CSS transitions, Tailwind utilities, and
+ * `animate-in`/`animate-out` overlay animations. Durations live in :root
+ * below and are wired to `duration-*` utilities in styles/index.css. */
+@theme {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 :root {
   /* -------- Raw ramps (theme-invariant) --------
    * OpenRouter-inspired palette: accent = Radix Blue (azure; #0090ff is
@@ -178,10 +189,12 @@ For commercial licensing, please contact support@quantumnous.com
   --blue-500: #4d9fff;
   --blue-600: #2d7fe0;
 
-  /* -------- Motion (YouBox effects tokens) -------- */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* -------- Motion (YouBox effects tokens) --------
+   * Easings live in the @theme block above (so they also generate utilities).
+   * Durations are raw vars here; the matching `duration-instant/fast/base/slow`
+   * utilities are defined in styles/index.css (Tailwind v4 has no
+   * `--duration-*` theme namespace). Keep these in sync with EASE/DUR in
+   * src/lib/motion.ts — that file is the JS-side mirror of these tokens. */
   --dur-instant: 80ms;
   --dur-fast: 140ms;
   --dur-base: 220ms;

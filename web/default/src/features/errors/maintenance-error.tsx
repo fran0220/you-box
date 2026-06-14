@@ -34,7 +34,11 @@ export function MaintenanceError() {
           {t("We'll be back online shortly.")}
         </>
       }
-      actions={<Button variant='secondary'>{t('Learn more')}</Button>}
+      actions={
+        <Button variant='secondary' onClick={() => window.location.reload()}>
+          {t('Try again')}
+        </Button>
+      }
     />
   )
 }

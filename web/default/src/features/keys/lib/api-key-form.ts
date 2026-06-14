@@ -37,6 +37,9 @@ export function getApiKeyFormSchema(t: TFunction) {
       allow_ips: z.string().optional(),
       group: z.string().optional(),
       cross_group_retry: z.boolean().optional(),
+      // When set to a recurring period, the credit limit auto-refills each
+      // period (OpenRouter-style). 'none' disables it.
+      reset_period: z.enum(['none', 'daily', 'weekly', 'monthly']).optional(),
       tokenCount: z.number().min(1).optional(),
     })
     .superRefine((data, ctx) => {
@@ -72,6 +75,7 @@ export const API_KEY_FORM_DEFAULT_VALUES: ApiKeyFormValues = {
   allow_ips: '',
   group: DEFAULT_GROUP,
   cross_group_retry: true,
+  reset_period: 'none',
   tokenCount: 1,
 }
 
@@ -95,11 +99,22 @@ export function getApiKeyFormDefaultValues(
 export function transformFormDataToPayload(
   data: ApiKeyFormValues
 ): ApiKeyFormData {
+  const remainQuota = data.unlimited_quota
+    ? 0
+    : parseQuotaFromDollars(data.remain_quota_dollars || 0)
+
+  // The recurring spend limit reuses the credit-limit value: when a reset
+  // period is chosen (and the key is not unlimited), the budget auto-refills
+  // to that amount each period.
+  const recurring =
+    !data.unlimited_quota &&
+    data.reset_period != null &&
+    data.reset_period !== 'none' &&
+    remainQuota > 0
+
   return {
     name: data.name,
-    remain_quota: data.unlimited_quota
-      ? 0
-      : parseQuotaFromDollars(data.remain_quota_dollars || 0),
+    remain_quota: remainQuota,
     expired_time: data.expired_time
       ? Math.floor(data.expired_time.getTime() / 1000)
       : -1,
@@ -109,6 +124,10 @@ export function transformFormDataToPayload(
     allow_ips: data.allow_ips || '',
     group: data.group || '',
     cross_group_retry: data.group === 'auto' ? !!data.cross_group_retry : false,
+    spend_limit: recurring ? remainQuota : 0,
+    reset_period: recurring ? data.reset_period! : 'none',
+    // Let the backend scheduler initialize the next reset time.
+    next_reset_time: 0,
   }
 }
 
@@ -118,11 +137,18 @@ export function transformFormDataToPayload(
 export function transformApiKeyToFormDefaults(
   apiKey: ApiKey
 ): ApiKeyFormValues {
+  const resetPeriod = apiKey.reset_period || 'none'
+  const recurring =
+    resetPeriod !== 'none' && (apiKey.spend_limit ?? 0) > 0
+  // For a recurring key the credit-limit field reflects the spend budget, not
+  // the (possibly partially-spent) current remaining quota.
+  const creditDollars = apiKey.unlimited_quota
+    ? 0
+    : quotaUnitsToDollars(recurring ? apiKey.spend_limit ?? 0 : apiKey.remain_quota)
+
   return {
     name: apiKey.name,
-    remain_quota_dollars: apiKey.unlimited_quota
-      ? 0
-      : quotaUnitsToDollars(apiKey.remain_quota),
+    remain_quota_dollars: creditDollars,
     expired_time:
       apiKey.expired_time > 0
         ? new Date(apiKey.expired_time * 1000)
@@ -134,6 +160,9 @@ export function transformApiKeyToFormDefaults(
     allow_ips: apiKey.allow_ips || '',
     group: apiKey.group || DEFAULT_GROUP,
     cross_group_retry: !!apiKey.cross_group_retry,
+    reset_period: recurring
+      ? (resetPeriod as 'daily' | 'weekly' | 'monthly')
+      : 'none',
     tokenCount: 1,
   }
 }

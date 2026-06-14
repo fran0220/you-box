@@ -20,8 +20,9 @@ import { useState, useCallback, useMemo } from 'react'
 import { useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { useNavigate, getRouteApi } from '@tanstack/react-router'
 import { type Table } from '@tanstack/react-table'
-import { Eye, EyeOff } from 'lucide-react'
+import { Download, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { useIsAdmin } from '@/hooks/use-admin'
 import { Button } from '@/components/ui/button'
 import {
@@ -38,6 +39,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { LOG_TYPE_ALL_VALUE, LOG_TYPE_FILTERS } from '../constants'
+import { exportCommonLogsCsv } from '../lib/export-logs'
 import { buildSearchParams } from '../lib/filter'
 import { getDefaultTimeRange } from '../lib/utils'
 import type { CommonLogFilters } from '../types'
@@ -73,6 +75,37 @@ export function CommonLogsFilterBar<TData>(
   const isAdmin = useIsAdmin()
   const { sensitiveVisible, setSensitiveVisible } = useUsageLogsContext()
   const fetchingLogs = useIsFetching({ queryKey: ['logs'] })
+  const [isExporting, setIsExporting] = useState(false)
+
+  const handleExport = useCallback(async () => {
+    setIsExporting(true)
+    try {
+      const result = await exportCommonLogsCsv({
+        isAdmin,
+        searchParams: searchParams as Record<string, unknown>,
+        columnFilters: props.table.getState().columnFilters as Array<{
+          id: string
+          value: unknown
+        }>,
+      })
+      if (result.exported === 0) {
+        toast.info(t('No logs to export'))
+      } else if (result.truncated) {
+        toast.warning(
+          t('Exported {{exported}} of {{total}} logs (export is capped).', {
+            exported: result.exported,
+            total: result.total,
+          })
+        )
+      } else {
+        toast.success(t('Exported {{count}} logs', { count: result.exported }))
+      }
+    } catch {
+      toast.error(t('Failed to export logs'))
+    } finally {
+      setIsExporting(false)
+    }
+  }, [isAdmin, searchParams, props.table, t])
 
   // Mount-time snapshot of the default range (getDefaultTimeRange reads the
   // current clock, so it must not be called during the render adjustment).
@@ -394,6 +427,22 @@ export function CommonLogsFilterBar<TData>(
       onSearch={handleApply}
       searchLoading={fetchingLogs > 0}
       onReset={handleReset}
+      actions={
+        <Button
+          type='button'
+          variant='outline'
+          onClick={handleExport}
+          disabled={isExporting}
+          className='gap-1.5'
+        >
+          {isExporting ? (
+            <Loader2 className='size-4 animate-spin' />
+          ) : (
+            <Download className='size-4' />
+          )}
+          <span className='hidden sm:inline'>{t('Export CSV')}</span>
+        </Button>
+      }
     />
   )
 }

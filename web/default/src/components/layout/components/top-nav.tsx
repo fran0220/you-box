@@ -94,10 +94,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
 
       {/* 桌面端水平导航 */}
       <nav
-        className={cn(
-          'hidden items-center gap-0.5 lg:flex',
-          className
-        )}
+        className={cn('hidden items-center gap-0.5 lg:flex', className)}
         {...props}
       >
         {normalizedLinks.map(({ title, href, isActive, disabled, external }) =>
@@ -108,7 +105,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
               target='_blank'
               rel='noopener noreferrer'
               className={cn(
-                'rounded-sm px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors duration-[140ms]',
+                'duration-fast rounded-sm px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors',
                 isActive
                   ? 'bg-surface-2 text-foreground'
                   : 'text-muted-foreground hover:bg-surface-hover hover:text-foreground'
@@ -122,7 +119,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
               to={href}
               disabled={disabled}
               className={cn(
-                'rounded-sm px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors duration-[140ms]',
+                'duration-fast rounded-sm px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors',
                 isActive
                   ? 'bg-surface-2 text-foreground'
                   : 'text-muted-foreground hover:bg-surface-hover hover:text-foreground'

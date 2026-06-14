@@ -73,9 +73,10 @@ export function createUserMessage(
 }
 
 /**
- * Create a loading assistant message
+ * Create a loading assistant message, optionally tagged with the model that
+ * will produce it (used by the side-by-side compare view).
  */
-export function createLoadingAssistantMessage(): Message {
+export function createLoadingAssistantMessage(model?: string): Message {
   return {
     key: nanoid(),
     from: MESSAGE_ROLES.ASSISTANT,
@@ -85,6 +86,7 @@ export function createLoadingAssistantMessage(): Message {
     isContentComplete: false,
     isReasoningStreaming: false,
     status: MESSAGE_STATUS.LOADING,
+    ...(model ? { model } : {}),
   }
 }
 
@@ -257,6 +259,43 @@ export function updateLastAssistantMessage(
   const updated = [...messages]
   updated[updated.length - 1] = updater(last)
   return updated
+}
+
+/**
+ * Update a specific message by key. Used by the side-by-side compare view,
+ * where multiple assistant messages stream concurrently and "the last
+ * assistant message" is ambiguous — each stream targets its own key.
+ */
+export function updateMessageByKey(
+  messages: Message[],
+  key: string,
+  updater: (message: Message) => Message
+): Message[] {
+  const index = messages.findIndex((m) => m.key === key)
+  if (index === -1) return messages
+  const updated = [...messages]
+  updated[index] = updater(messages[index])
+  return updated
+}
+
+/**
+ * Set a specific assistant message (by key) into the error state.
+ */
+export function setMessageErrorByKey(
+  messages: Message[],
+  key: string,
+  errorMessage: string,
+  errorCode?: string
+): Message[] {
+  return updateMessageByKey(messages, key, (message) => ({
+    ...updateCurrentVersionContent(
+      message,
+      `${ERROR_MESSAGES.API_REQUEST_ERROR}: ${errorMessage}`
+    ),
+    status: MESSAGE_STATUS.ERROR,
+    isReasoningStreaming: false,
+    errorCode: errorCode || null,
+  }))
 }
 
 /**

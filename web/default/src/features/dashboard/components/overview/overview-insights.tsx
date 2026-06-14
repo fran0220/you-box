@@ -25,6 +25,17 @@ import { useAuthStore } from '@/stores/auth-store'
 import { formatNumber, formatQuota } from '@/lib/format'
 import { computeTimeRange } from '@/lib/time'
 import { cn } from '@/lib/utils'
+import { AnimatedNumber } from '@/components/ui/animated-number'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { FilterTabs } from '@/components/data-table'
 import {
   Eyebrow,
   Panel,
@@ -36,16 +47,6 @@ import {
   StatCardRow,
   type StatCardDelta,
 } from '@/components/patterns'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { FilterTabs } from '@/components/data-table'
 import { StatusBadge, type StatusVariant } from '@/components/status-badge'
 import { getUserQuotaDates } from '@/features/dashboard/api'
 import type { QuotaDataItem } from '@/features/dashboard/types'
@@ -97,7 +98,10 @@ function bucketize(
   return series
 }
 
-function deltaFor(current: number, previous: number): StatCardDelta | undefined {
+function deltaFor(
+  current: number,
+  previous: number
+): StatCardDelta | undefined {
   if (previous <= 0) return undefined
   const pct = ((current - previous) / previous) * 100
   if (!Number.isFinite(pct)) return undefined
@@ -109,7 +113,12 @@ function deltaFor(current: number, previous: number): StatCardDelta | undefined 
 }
 
 function modelInitials(name: string): string {
-  return name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2).toUpperCase() || '?'
+  return (
+    name
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .slice(0, 2)
+      .toUpperCase() || '?'
+  )
 }
 
 const LOG_STATUS: Record<number, { label: string; variant: StatusVariant }> = {
@@ -127,8 +136,10 @@ function relativeTime(
 ) {
   const seconds = Math.max(0, Math.floor(Date.now() / 1000) - ts)
   if (seconds < 60) return t('{{count}}s ago', { count: seconds })
-  if (seconds < 3600) return t('{{count}}m ago', { count: Math.floor(seconds / 60) })
-  if (seconds < 86400) return t('{{count}}h ago', { count: Math.floor(seconds / 3600) })
+  if (seconds < 3600)
+    return t('{{count}}m ago', { count: Math.floor(seconds / 60) })
+  if (seconds < 86400)
+    return t('{{count}}h ago', { count: Math.floor(seconds / 3600) })
   return t('{{count}}d ago', { count: Math.floor(seconds / 86400) })
 }
 
@@ -290,7 +301,11 @@ export function OverviewInsights() {
             value={String(rangeDays)}
             onValueChange={(v) => setRangeDays(Number(v) as RangeDays)}
           >
-            <SelectTrigger size='sm' className='w-36' aria-label={t('Time range')}>
+            <SelectTrigger
+              size='sm'
+              className='w-36'
+              aria-label={t('Time range')}
+            >
               <SelectValue>{rangeLabel[rangeDays]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -313,28 +328,30 @@ export function OverviewInsights() {
         <StatCard
           icon={<Activity />}
           label={t('Requests')}
-          value={formatNumber(totals.requests)}
+          value={
+            <AnimatedNumber value={totals.requests} format={formatNumber} />
+          }
           delta={deltaFor(totals.requests, totals.prevRequests)}
           loading={loading}
         />
         <StatCard
           icon={<Coins />}
           label={t('Spend')}
-          value={formatQuota(totals.spend)}
+          value={<AnimatedNumber value={totals.spend} format={formatQuota} />}
           delta={deltaFor(totals.spend, totals.prevSpend)}
           loading={loading}
         />
         <StatCard
           icon={<Zap />}
           label={t('Tokens')}
-          value={formatNumber(totals.tokens)}
+          value={<AnimatedNumber value={totals.tokens} format={formatNumber} />}
           delta={deltaFor(totals.tokens, totals.prevTokens)}
           loading={loading}
         />
         <StatCard
           icon={<Wallet />}
           label={t('Balance')}
-          value={formatQuota(remainQuota)}
+          value={<AnimatedNumber value={remainQuota} format={formatQuota} />}
           delta={
             runwayDays !== null
               ? {
@@ -434,7 +451,11 @@ export function OverviewInsights() {
           <PanelHeader
             title={t('Recent activity')}
             actions={
-              <Button variant='ghost' size='sm' render={<Link to='/usage-logs' />}>
+              <Button
+                variant='ghost'
+                size='sm'
+                render={<Link to='/usage-logs' />}
+              >
                 {t('View all')}
               </Button>
             }
@@ -488,7 +509,11 @@ export function OverviewInsights() {
           <PanelHeader
             title={t('Credit balance')}
             actions={
-              <Button variant='outline' size='sm' render={<Link to='/wallet' />}>
+              <Button
+                variant='outline'
+                size='sm'
+                render={<Link to='/wallet' />}
+              >
                 <Plus data-icon='inline-start' />
                 {t('Top up')}
               </Button>
@@ -535,7 +560,9 @@ export function OverviewInsights() {
                     'bg-brand min-h-0.5 flex-1 rounded-[2px]',
                     index !== dailySpend.length - 1 && 'opacity-50'
                   )}
-                  style={{ height: `${Math.max(3, (value / maxDailySpend) * 100)}%` }}
+                  style={{
+                    height: `${Math.max(3, (value / maxDailySpend) * 100)}%`,
+                  }}
                 />
               ))}
             </div>

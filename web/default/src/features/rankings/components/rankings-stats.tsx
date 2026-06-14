@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { StatCard, StatCardRow } from '@/components/patterns'
 import { formatTokens } from '../lib/format'
 import type { ModelHistorySeries, ModelRanking, VendorRanking } from '../types'
@@ -73,18 +74,18 @@ export function RankingsStats(props: RankingsStatsProps) {
       <StatCard
         size='sm'
         label={t('Tokens')}
-        value={formatTokens(totalTokens)}
+        value={<AnimatedNumber value={totalTokens} format={formatTokens} />}
         sparkline={tokensSparkline.length > 1 ? tokensSparkline : undefined}
       />
       <StatCard
         size='sm'
         label={t('Models')}
-        value={props.models.length.toLocaleString()}
+        value={<AnimatedNumber value={props.models.length} />}
       />
       <StatCard
         size='sm'
         label={t('Vendors')}
-        value={props.vendors.length.toLocaleString()}
+        value={<AnimatedNumber value={props.vendors.length} />}
       />
       {topGrowth && (
         <StatCard

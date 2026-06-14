@@ -37,15 +37,21 @@ export const API_ENDPOINTS = {
   CHAT_COMPLETIONS: '/pg/chat/completions',
   USER_MODELS: '/api/user/models',
   USER_GROUPS: '/api/user/self/groups',
+  PRICING: '/api/pricing',
 } as const
 
 // Default group — uses 'default' as the safe fallback; auto-group is
 // only selected when the backend confirms it is available for the user.
 export const DEFAULT_GROUP = 'default' as const
 
+// Maximum number of models that can be compared side by side (incl. primary).
+export const MAX_COMPARE_MODELS = 4 as const
+
 // Default configuration
 export const DEFAULT_CONFIG: PlaygroundConfig = {
+  systemPrompt: '',
   model: 'gpt-4o',
+  compareModels: [],
   group: DEFAULT_GROUP,
   temperature: 0.7,
   top_p: 1,
@@ -54,6 +60,9 @@ export const DEFAULT_CONFIG: PlaygroundConfig = {
   presence_penalty: 0,
   seed: null,
   stream: true,
+  reasoningEffort: 'off',
+  reasoningMaxTokens: 0,
+  webSearch: false,
 }
 
 export const DEFAULT_PARAMETER_ENABLED: ParameterEnabled = {

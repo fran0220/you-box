@@ -22,12 +22,13 @@ import { z } from 'zod'
 // Form Schemas
 // ============================================================================
 
+// Login must accept whatever password the account already has (default admin,
+// admin-set, OAuth-set, or migrated credentials may be shorter than the
+// registration minimum). Only enforce non-empty here; strength rules live on
+// the registration schema below.
 export const loginFormSchema = z.object({
   username: z.string().min(1, 'Please enter your username or email'),
-  password: z
-    .string()
-    .min(1, 'Please enter your password')
-    .min(8, 'Password must be at least 8 characters long'),
+  password: z.string().min(1, 'Please enter your password'),
 })
 
 export const registerFormSchema = z

@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 'use client'
 
 import { type CSSProperties, type ElementType, memo, useMemo } from 'react'
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { cn } from '@/lib/utils'
 
 export type TextShimmerProps = {
@@ -30,7 +30,7 @@ export type TextShimmerProps = {
   spread?: number
 }
 
-const MotionP = motion.p
+const MotionP = m.p
 
 const ShimmerComponent = ({
   children,

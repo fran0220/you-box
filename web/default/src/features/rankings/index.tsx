@@ -62,7 +62,7 @@ export function Rankings() {
           className='pointer-events-none absolute -top-48 left-1/2 size-[560px] -translate-x-1/2 rounded-full blur-[10px]'
           style={{
             background:
-              'radial-gradient(circle, rgba(0, 144, 255,0.14), transparent 62%)',
+              'radial-gradient(circle, color-mix(in oklch, var(--brand) 14%, transparent), transparent 62%)',
           }}
         />
         <PageTransition className='relative mx-auto w-full max-w-[1280px] space-y-8 px-3 pt-16 pb-10 sm:px-6 sm:pt-20 sm:pb-12 xl:px-8'>

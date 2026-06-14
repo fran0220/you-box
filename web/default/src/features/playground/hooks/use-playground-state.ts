@@ -108,6 +108,23 @@ export function usePlaygroundState() {
     saveParameterEnabled(DEFAULT_PARAMETER_ENABLED)
   }, [])
 
+  // Apply a saved preset: replace config (and optionally parameter-enabled
+  // flags) wholesale, merging over defaults so older/partial presets stay
+  // valid, and persist.
+  const applyPreset = useCallback(
+    (nextConfig: Partial<PlaygroundConfig>, nextEnabled?: ParameterEnabled) => {
+      const merged = { ...DEFAULT_CONFIG, ...nextConfig }
+      setConfig(merged)
+      saveConfig(merged)
+      if (nextEnabled) {
+        const mergedEnabled = { ...DEFAULT_PARAMETER_ENABLED, ...nextEnabled }
+        setParameterEnabled(mergedEnabled)
+        saveParameterEnabled(mergedEnabled)
+      }
+    },
+    []
+  )
+
   return {
     // State
     config,
@@ -126,5 +143,6 @@ export function usePlaygroundState() {
     updateMessages,
     clearMessages,
     resetConfig,
+    applyPreset,
   }
 }

@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { ShieldCheck, UserX, Users, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber, formatQuota } from '@/lib/format'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { StatCard, StatCardRow } from '@/components/patterns'
 import { USER_ROLE, USER_STATUS } from '../constants'
 import type { User } from '../types'
@@ -53,28 +54,28 @@ export function UsersStatCards({ users, total, loading }: UsersStatCardsProps) {
         size='sm'
         label={t('Total users')}
         icon={<Users />}
-        value={formatNumber(total)}
+        value={<AnimatedNumber value={total} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Admins')}
         icon={<ShieldCheck />}
-        value={formatNumber(admins)}
+        value={<AnimatedNumber value={admins} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Banned')}
         icon={<UserX />}
-        value={formatNumber(banned)}
+        value={<AnimatedNumber value={banned} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Total balance')}
         icon={<Wallet />}
-        value={formatQuota(balance)}
+        value={<AnimatedNumber value={balance} format={formatQuota} />}
         loading={loading}
       />
     </StatCardRow>

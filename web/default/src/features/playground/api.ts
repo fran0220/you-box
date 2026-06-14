@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { api } from '@/lib/api'
 import { API_ENDPOINTS } from './constants'
+import type { ModelPricing } from './lib/cost'
 import type {
   ChatCompletionRequest,
   ChatCompletionResponse,
@@ -74,4 +75,69 @@ export async function getUserGroups(): Promise<GroupOption[]> {
     ratio: info.ratio,
     desc: info.desc,
   }))
+}
+
+interface PricingRow {
+  model_name: string
+  quota_type: number
+  model_ratio: number
+  completion_ratio: number
+  model_price?: number
+  cache_ratio?: number | null
+}
+
+/**
+ * Fetch per-model pricing and reduce it to the fields needed to derive a USD
+ * cost from token usage. Keyed by model name.
+ */
+export async function getModelPricingMap(): Promise<Record<string, ModelPricing>> {
+  const res = await api.get(API_ENDPOINTS.PRICING)
+  const { data } = res
+  const rows: PricingRow[] = Array.isArray(data?.data) ? data.data : []
+
+  const map: Record<string, ModelPricing> = {}
+  for (const row of rows) {
+    if (!row?.model_name) continue
+    map[row.model_name] = {
+      quotaType: row.quota_type,
+      modelRatio: row.model_ratio,
+      completionRatio: row.completion_ratio,
+      modelPrice: row.model_price,
+      cacheRatio: row.cache_ratio,
+    }
+  }
+  return map
+}
+
+// ---- Presets --------------------------------------------------------------
+
+/** A saved playground preset as returned by the backend. */
+export interface PlaygroundPreset {
+  id: number
+  name: string
+  /** JSON string of the serialized preset payload (config + parameterEnabled). */
+  config: string
+  created_time: number
+  updated_time: number
+}
+
+export async function getPresets(): Promise<PlaygroundPreset[]> {
+  const res = await api.get('/api/preset/')
+  return res.data?.success && Array.isArray(res.data.data) ? res.data.data : []
+}
+
+export async function createPreset(name: string, config: string): Promise<void> {
+  await api.post('/api/preset/', { name, config })
+}
+
+export async function updatePreset(
+  id: number,
+  name: string,
+  config: string
+): Promise<void> {
+  await api.put(`/api/preset/${id}`, { name, config })
+}
+
+export async function deletePreset(id: number): Promise<void> {
+  await api.delete(`/api/preset/${id}`)
 }

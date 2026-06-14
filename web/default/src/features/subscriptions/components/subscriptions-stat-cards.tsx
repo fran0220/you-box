@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { CircleDollarSign, Layers, ToggleRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { StatCard, StatCardRow } from '@/components/patterns'
 import type { PlanRecord } from '../types'
 
@@ -56,21 +57,26 @@ export function SubscriptionsStatCards({
         size='sm'
         label={t('Total plans')}
         icon={<Layers />}
-        value={plans.length}
+        value={<AnimatedNumber value={plans.length} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Enabled')}
         icon={<ToggleRight />}
-        value={enabledPlans.length}
+        value={<AnimatedNumber value={enabledPlans.length} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Enabled value')}
         icon={<CircleDollarSign />}
-        value={`$${enabledValue.toFixed(2)}`}
+        value={
+          <AnimatedNumber
+            value={enabledValue}
+            format={(n) => `$${n.toFixed(2)}`}
+          />
+        }
         loading={loading}
       />
     </StatCardRow>

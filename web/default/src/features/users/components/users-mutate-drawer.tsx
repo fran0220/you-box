@@ -128,8 +128,11 @@ export function UsersMutateDrawer({
   const currentQuotaRaw = form.watch('quota_dollars') || 0
 
   const onSubmit = async (data: UserFormValues) => {
-    if (!isUpdate) {
-      const passwordLength = data.password?.length || 0
+    // On create, a password is optional (admin may pre-provision OAuth-only
+    // accounts). Only enforce length when one is actually entered; the backend
+    // rejects with a clear message if it genuinely requires a password.
+    if (!isUpdate && data.password) {
+      const passwordLength = data.password.length
       if (passwordLength < 8 || passwordLength > 20) {
         form.setError('password', {
           type: 'manual',

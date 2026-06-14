@@ -22,8 +22,9 @@ import {
   QUOTA_TYPES,
   QUOTA_TYPE_VALUES,
   ENDPOINT_TYPES,
+  MODALITY_FILTERS,
 } from '../constants'
-import type { PricingModel } from '../types'
+import type { Modality, PricingModel } from '../types'
 
 // ----------------------------------------------------------------------------
 // Filter Utilities
@@ -99,6 +100,23 @@ export function filterByEndpointType(
 }
 
 /**
+ * Filter models by accepted input modality. Models with no declared input
+ * modalities are treated as text-only.
+ */
+export function filterByInputModality(
+  models: PricingModel[],
+  modality: string
+): PricingModel[] {
+  if (modality === MODALITY_FILTERS.ALL) return models
+  return models.filter((m) => {
+    const modalities: Modality[] = m.input_modalities?.length
+      ? m.input_modalities
+      : ['text']
+    return modalities.includes(modality as Modality)
+  })
+}
+
+/**
  * Get model price for sorting
  */
 function getModelPrice(model: PricingModel): number {
@@ -126,6 +144,16 @@ export function sortModels(
     case SORT_OPTIONS.PRICE_HIGH:
       sorted.sort((a, b) => getModelPrice(b) - getModelPrice(a))
       break
+    case SORT_OPTIONS.CONTEXT_HIGH:
+      sorted.sort((a, b) => (b.context_length || 0) - (a.context_length || 0))
+      break
+    case SORT_OPTIONS.NEWEST:
+      sorted.sort(
+        (a, b) =>
+          new Date(b.release_date || 0).getTime() -
+          new Date(a.release_date || 0).getTime()
+      )
+      break
   }
 
   return sorted
@@ -142,6 +170,7 @@ export function filterAndSortModels(
     group: string
     quotaType: string
     endpointType: string
+    modality: string
     tag: string
     sortBy: string
   }
@@ -151,6 +180,7 @@ export function filterAndSortModels(
   result = filterByGroup(result, filters.group)
   result = filterByQuotaType(result, filters.quotaType)
   result = filterByEndpointType(result, filters.endpointType)
+  result = filterByInputModality(result, filters.modality)
   result = filterByTag(result, filters.tag)
   result = sortModels(result, filters.sortBy)
 

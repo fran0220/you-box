@@ -68,6 +68,9 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
     accept_unset_model_ratio_model: false,
     record_ip_log: false,
     upstream_model_update_notify_enabled: false,
+    auto_topup_enabled: false,
+    auto_topup_threshold: 0,
+    auto_topup_amount: 0,
   })
 
   // Update form field helper
@@ -100,6 +103,9 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
         record_ip_log: parsed.record_ip_log || false,
         upstream_model_update_notify_enabled:
           parsed.upstream_model_update_notify_enabled || false,
+        auto_topup_enabled: parsed.auto_topup_enabled || false,
+        auto_topup_threshold: parsed.auto_topup_threshold ?? 0,
+        auto_topup_amount: parsed.auto_topup_amount ?? 0,
       })
     }
   }
@@ -168,6 +174,7 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
         <Input
           id='threshold'
           type='number'
+          min={0}
           className='h-9'
           value={settings.quota_warning_threshold}
           onChange={(e) =>
@@ -178,6 +185,61 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
         <p className='text-muted-foreground text-xs'>
           {t('Get notified when balance falls below this value')}
         </p>
+      </div>
+
+      {/* Auto top-up */}
+      <div className='space-y-3 rounded-lg border p-3'>
+        <div className='flex items-center justify-between gap-3'>
+          <div className='flex flex-col gap-0.5'>
+            <Label htmlFor='auto-topup'>{t('Auto top-up')}</Label>
+            <p className='text-muted-foreground text-xs'>
+              {t(
+                'Get an alert to top up a set amount when your balance runs low.'
+              )}
+            </p>
+          </div>
+          <Switch
+            id='auto-topup'
+            checked={settings.auto_topup_enabled}
+            onCheckedChange={(checked) =>
+              updateField('auto_topup_enabled', checked)
+            }
+          />
+        </div>
+        {settings.auto_topup_enabled && (
+          <div className='grid gap-3 sm:grid-cols-2'>
+            <div className='space-y-1.5'>
+              <Label htmlFor='auto-topup-threshold'>
+                {t('When balance is below')}
+              </Label>
+              <Input
+                id='auto-topup-threshold'
+                type='number'
+                min={0}
+                step={0.01}
+                className='h-9'
+                value={settings.auto_topup_threshold}
+                onChange={(e) =>
+                  updateField('auto_topup_threshold', Number(e.target.value))
+                }
+              />
+            </div>
+            <div className='space-y-1.5'>
+              <Label htmlFor='auto-topup-amount'>{t('Suggested top-up')}</Label>
+              <Input
+                id='auto-topup-amount'
+                type='number'
+                min={0}
+                step={0.01}
+                className='h-9'
+                value={settings.auto_topup_amount}
+                onChange={(e) =>
+                  updateField('auto_topup_amount', Number(e.target.value))
+                }
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Email Settings */}

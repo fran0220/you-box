@@ -136,9 +136,12 @@ export function AppHeader({
             {typeof quota === 'number' && (
               <Link
                 to='/wallet'
-                className='border-border bg-surface-2 hover:bg-surface-3 hidden h-7 items-center gap-1.5 rounded-full border px-3 font-mono text-xs font-medium transition-colors duration-[140ms] md:inline-flex'
+                className='border-border bg-surface-2 hover:bg-surface-3 duration-fast hidden h-7 items-center gap-1.5 rounded-full border px-3 font-mono text-xs font-medium transition-colors md:inline-flex'
               >
-                <span aria-hidden='true' className='bg-teal size-1.5 rounded-full' />
+                <span
+                  aria-hidden='true'
+                  className='bg-teal size-1.5 rounded-full'
+                />
                 {formatQuota(quota)}
               </Link>
             )}

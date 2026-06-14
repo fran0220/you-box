@@ -118,6 +118,12 @@ export interface UserSettings {
   upstream_model_update_notify_enabled?: boolean
   /** Preferred interface/API response language */
   language?: string
+  /** Auto top-up: alert to top up when balance falls below the threshold. */
+  auto_topup_enabled?: boolean
+  /** Auto top-up balance threshold (display currency). */
+  auto_topup_threshold?: number
+  /** Auto top-up suggested amount (display currency). */
+  auto_topup_amount?: number
 }
 
 /**
@@ -145,6 +151,9 @@ export interface UpdateUserSettingsRequest {
   accept_unset_model_ratio_model?: boolean
   record_ip_log?: boolean
   upstream_model_update_notify_enabled?: boolean
+  auto_topup_enabled?: boolean
+  auto_topup_threshold?: number
+  auto_topup_amount?: number
 }
 
 /**

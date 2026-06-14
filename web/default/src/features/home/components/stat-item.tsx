@@ -24,8 +24,7 @@ interface StatItemProps {
   description?: string
 }
 
-const GRADIENT_TEXT =
-  'font-display text-foreground font-bold'
+const GRADIENT_TEXT = 'font-display text-foreground font-bold'
 
 /**
  * Individual stat item with value, suffix, and description
@@ -37,7 +36,7 @@ export function StatItem({ value, suffix, description }: StatItemProps) {
         <div
           className={cn(
             GRADIENT_TEXT,
-            'text-4xl drop-shadow-sm transition-all duration-300 sm:text-5xl md:text-6xl'
+            'duration-base text-4xl drop-shadow-sm transition-all sm:text-5xl md:text-6xl'
           )}
         >
           {value}

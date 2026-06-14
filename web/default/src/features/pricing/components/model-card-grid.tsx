@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -39,6 +39,14 @@ export interface ModelCardGridProps {
 export function ModelCardGrid(props: ModelCardGridProps) {
   const { t } = useTranslation()
   const [page, setPage] = useState(1)
+  // One-shot stagger: mark the grid as "staggering" only for a short window
+  // after mount (and on view-switch remount), so cards added later by
+  // filtering/search don't re-animate on every keystroke.
+  const [staggering, setStaggering] = useState(true)
+  useEffect(() => {
+    const timer = setTimeout(() => setStaggering(false), 700)
+    return () => clearTimeout(timer)
+  }, [])
   const pageSize = DEFAULT_PRICING_PAGE_SIZE
   const tokenUnit = props.tokenUnit ?? DEFAULT_TOKEN_UNIT
   const totalPages = Math.max(1, Math.ceil(props.models.length / pageSize))
@@ -70,7 +78,10 @@ export function ModelCardGrid(props: ModelCardGridProps) {
 
   return (
     <div className='space-y-4 sm:space-y-5'>
-      <div className='grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3'>
+      <div
+        className='grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3'
+        data-grid-stagger={staggering ? '' : undefined}
+      >
         {pagedModels.map((model) => (
           <ModelCard
             key={model.id ?? model.model_name}

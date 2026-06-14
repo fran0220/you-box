@@ -81,6 +81,7 @@ export function LatencyTrendChart(props: {
     }))
     return {
       type: 'line' as const,
+      animation: true,
       data: [{ id: 'latency', values: data }],
       xField: 'time',
       yField: 'ttft',
@@ -182,6 +183,7 @@ export function UptimeTrendChart(props: {
 
     return {
       type: 'line' as const,
+      animation: true,
       data: [{ id: 'uptime', values: data }],
       xField: 'date',
       yField: 'uptime',
@@ -304,6 +306,7 @@ export function ThroughputBarChart(props: {
     return {
       type: 'bar' as const,
       direction: 'horizontal' as const,
+      animation: true,
       data: [{ id: 'tput', values: filtered.map((r) => ({ ...r })) }],
       xField: 'throughput_tps',
       yField: 'group',

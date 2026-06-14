@@ -45,6 +45,11 @@ export const apiKeySchema = z.object({
   model_limits_enabled: z.boolean(),
   model_limits: z.string().nullish().default(''),
   allow_ips: z.string().nullish().default(''),
+  // Recurring spend-limit (OpenRouter-style): the budget auto-refills to
+  // spend_limit every reset_period. 'none' disables it.
+  spend_limit: z.number().nullish().default(0),
+  reset_period: z.string().nullish().default('none'),
+  next_reset_time: z.number().nullish().default(0),
 })
 
 export type ApiKey = z.infer<typeof apiKeySchema>
@@ -92,6 +97,9 @@ export interface ApiKeyFormData {
   allow_ips: string
   group: string
   cross_group_retry: boolean
+  spend_limit: number
+  reset_period: string
+  next_reset_time: number
 }
 
 // ============================================================================

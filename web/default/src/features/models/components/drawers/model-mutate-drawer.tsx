@@ -1120,7 +1120,7 @@ export function ModelMutateDrawer({
                     >
                       {t('Advanced options')}
                       <ChevronDown
-                        className={`h-4 w-4 transition-transform duration-200 ${
+                        className={`duration-fast h-4 w-4 transition-transform ${
                           advancedOpen ? 'rotate-180' : ''
                         }`}
                       />

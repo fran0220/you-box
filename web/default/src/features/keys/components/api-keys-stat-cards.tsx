@@ -21,6 +21,7 @@ import { Activity, KeyRound, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber, formatQuota } from '@/lib/format'
 import { computeTimeRange } from '@/lib/time'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { StatCard, StatCardRow } from '@/components/patterns'
 import { getUserQuotaDates } from '@/features/dashboard/api'
 import { API_KEY_STATUS } from '../constants'
@@ -75,21 +76,33 @@ export function ApiKeysStatCards({ apiKeys, loading }: ApiKeysStatCardsProps) {
         size='sm'
         label={t('Active keys')}
         icon={<KeyRound />}
-        value={formatNumber(activeCount)}
+        value={<AnimatedNumber value={activeCount} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Spend (7d)')}
         icon={<Wallet />}
-        value={spend7d.data ? formatQuota(spend7d.data.quota) : '-'}
+        value={
+          spend7d.data ? (
+            <AnimatedNumber value={spend7d.data.quota} format={formatQuota} />
+          ) : (
+            '-'
+          )
+        }
         loading={spend7d.isLoading}
       />
       <StatCard
         size='sm'
         label={t('Requests today')}
         icon={<Activity />}
-        value={today.data ? formatNumber(today.data.count) : '-'}
+        value={
+          today.data ? (
+            <AnimatedNumber value={today.data.count} format={formatNumber} />
+          ) : (
+            '-'
+          )
+        }
         loading={today.isLoading}
       />
     </StatCardRow>

@@ -68,7 +68,9 @@ export function ChipGroup({
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
     event.preventDefault()
     const chips = Array.from(
-      ref.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') ?? []
+      ref.current?.querySelectorAll<HTMLButtonElement>(
+        'button:not(:disabled)'
+      ) ?? []
     )
     const current = chips.findIndex((chip) => chip === document.activeElement)
     const base = current >= 0 ? current : 0
@@ -102,13 +104,14 @@ export function ChipGroup({
 }
 
 const chipVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-md border font-medium whitespace-nowrap transition-all duration-[80ms] focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&>svg]:size-4',
+  'inline-flex items-center justify-center gap-2 rounded-md border font-medium whitespace-nowrap transition-all duration-instant focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&>svg]:size-4',
   {
     variants: {
       size: {
         default: 'h-9 px-3.5 text-sm',
         /** Amount-preset form: tall chip with display-font value. */
-        preset: 'h-[52px] min-w-20 px-4 font-display text-lg font-bold tracking-[-0.01em]',
+        preset:
+          'h-[52px] min-w-20 px-4 font-display text-lg font-bold tracking-[-0.01em]',
       },
       selected: {
         true: 'border-brand-border bg-brand-subtle text-brand',
@@ -128,7 +131,13 @@ type ChipProps = Omit<VariantProps<typeof chipVariants>, 'selected'> & {
 }
 
 /** A selectable chip; `size='preset'` renders the tall amount form. */
-export function Chip({ value, size, disabled, className, children }: ChipProps) {
+export function Chip({
+  value,
+  size,
+  disabled,
+  className,
+  children,
+}: ChipProps) {
   const group = useContext(ChipGroupContext)
   if (!group) {
     throw new Error('Chip must be used inside a ChipGroup')

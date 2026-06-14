@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useNavigate } from '@tanstack/react-router'
 import i18n from 'i18next'
+import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { getSelf } from '@/lib/api'
 import type { User } from '@/features/users/types'
@@ -54,7 +55,7 @@ export function useAuthRedirect() {
    * @param redirectTo - Redirect path after login
    */
   const handleLoginSuccess = async (
-    userData?: { id?: number } | null,
+    userData?: (Partial<User> & { id?: number }) | null,
     redirectTo?: string
   ) => {
     // Save user ID if available
@@ -62,32 +63,46 @@ export function useAuthRedirect() {
       saveUserId(userData.id)
     }
 
-    // Fetch and set user data
+    // Prefer the full profile from /api/user/self; if that fails (e.g. the
+    // session cookie wasn't established), fall back to the login response so
+    // the auth guard still has a user and we don't bounce back to /sign-in.
+    let resolved: User | null = null
     try {
       const self = await getSelf()
       if (self?.success && self.data) {
-        const user = self.data as User
-        auth.setUser(user)
-
-        // Update user ID if not already set
-        if (user.id) {
-          saveUserId(user.id)
-        }
-
-        // Restore saved language preference
-        const savedLang = getSavedLanguage(user)
-        if (savedLang && savedLang !== i18n.language) {
-          i18n.changeLanguage(savedLang)
-        }
+        resolved = self.data as User
       }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Failed to fetch user data:', error)
     }
 
+    if (!resolved && userData?.id) {
+      resolved = userData as User
+    }
+
+    // If we couldn't establish a user at all, surface it and stay put rather
+    // than redirecting into a guard bounce.
+    if (!resolved) {
+      toast.error(
+        i18n.t('Signed in, but loading your profile failed. Please try again.')
+      )
+      return
+    }
+
+    auth.setUser(resolved)
+    if (resolved.id) {
+      saveUserId(resolved.id)
+    }
+
+    // Restore saved language preference
+    const savedLang = getSavedLanguage(resolved)
+    if (savedLang && savedLang !== i18n.language) {
+      i18n.changeLanguage(savedLang)
+    }
+
     // Navigate to target page
-    const targetPath = redirectTo || '/dashboard'
-    navigate({ to: targetPath, replace: true })
+    navigate({ to: redirectTo || '/dashboard', replace: true })
   }
 
   /**

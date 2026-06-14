@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { Activity, AlertTriangle, PowerOff, Server } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber } from '@/lib/format'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { StatCard, StatCardRow } from '@/components/patterns'
 import { CHANNEL_STATUS } from '../constants'
 import type { Channel } from '../types'
@@ -67,28 +68,28 @@ export function ChannelsStatCards({
         size='sm'
         label={t('Total channels')}
         icon={<Server />}
-        value={formatNumber(total)}
+        value={<AnimatedNumber value={total} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Healthy')}
         icon={<Activity />}
-        value={formatNumber(healthy)}
+        value={<AnimatedNumber value={healthy} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Degraded')}
         icon={<AlertTriangle />}
-        value={formatNumber(degraded)}
+        value={<AnimatedNumber value={degraded} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Offline')}
         icon={<PowerOff />}
-        value={formatNumber(offline)}
+        value={<AnimatedNumber value={offline} format={formatNumber} />}
         loading={loading}
       />
     </StatCardRow>

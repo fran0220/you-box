@@ -33,12 +33,12 @@ export function GatewayCard({ logo, systemName }: GatewayCardProps) {
   const features = getGatewayFeatures(t)
 
   return (
-    <div className='bg-card border-border group relative overflow-hidden rounded-2xl border p-10 shadow-[var(--shadow-md)] transition-all duration-500 sm:p-12'>
+    <div className='bg-card border-border group duration-slow relative overflow-hidden rounded-2xl border p-10 shadow-[var(--shadow-md)] transition-all sm:p-12'>
       {/* Top gradient border effect */}
       <Separator className='absolute top-0 left-[10%] h-[2px] w-[80%] bg-gradient-to-r from-transparent via-[var(--brand)]/60 to-transparent' />
 
       {/* Ambient glow behind card */}
-      <div className='absolute -top-32 left-1/2 h-64 w-[120%] -translate-x-1/2 rounded-full bg-radial from-[rgba(0, 144, 255,0.25)] to-transparent blur-3xl transition-all duration-500 group-hover:opacity-100 dark:opacity-80' />
+      <div className='from-brand/25 duration-slow absolute -top-32 left-1/2 h-64 w-[120%] -translate-x-1/2 rounded-full bg-radial to-transparent blur-3xl transition-all group-hover:opacity-100 dark:opacity-80' />
 
       <div className='relative'>
         {/* Gateway Header */}
@@ -58,9 +58,9 @@ export function GatewayCard({ logo, systemName }: GatewayCardProps) {
           {features.map((feature, i) => (
             <div
               key={i}
-              className='bg-surface-2 group/item border-border relative overflow-hidden rounded-xl border px-4 py-3.5 text-center shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-brand-border hover:shadow-md'
+              className='bg-surface-2 group/item border-border duration-base hover:border-brand-border relative overflow-hidden rounded-xl border px-4 py-3.5 text-center shadow-sm transition-all hover:scale-[1.02] hover:shadow-md'
             >
-              <div className='absolute inset-0 transition-all duration-300 group-hover/item:bg-brand-subtle/60' />
+              <div className='duration-base group-hover/item:bg-brand-subtle/60 absolute inset-0 transition-all' />
               <span className='text-foreground/90 group-hover/item:text-foreground relative text-sm font-medium'>
                 {feature}
               </span>

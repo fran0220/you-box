@@ -37,7 +37,7 @@ import {
   Timer,
   type LucideIcon,
 } from 'lucide-react'
-import { motion, useReducedMotion } from 'motion/react'
+import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
@@ -60,8 +60,8 @@ import {
 import { AnnouncementsPanel } from './announcements-panel'
 import { ApiInfoPanel } from './api-info-panel'
 import { FAQPanel } from './faq-panel'
-import { PerformanceHealthPanel } from './performance-health-panel'
 import { OverviewInsights } from './overview-insights'
+import { PerformanceHealthPanel } from './performance-health-panel'
 import { UptimePanel } from './uptime-panel'
 
 const SETUP_GUIDE_VISIBILITY_STORAGE_KEY =
@@ -190,7 +190,7 @@ function SetupGuideBackdrop(props: { compact?: boolean }) {
       />
       <div
         className={cn(
-          'text-foreground/5 pointer-events-none absolute inset-y-0 right-0 hidden overflow-hidden font-mono sm:block dark:text-foreground/8',
+          'text-foreground/5 dark:text-foreground/8 pointer-events-none absolute inset-y-0 right-0 hidden overflow-hidden font-mono sm:block',
           props.compact ? 'w-1/2 opacity-45' : 'w-[58%] opacity-75'
         )}
         aria-hidden='true'
@@ -314,14 +314,14 @@ function RequestPreview(props: {
   }
 
   return (
-    <motion.div
+    <m.div
       initial={shouldReduceMotion ? false : { opacity: 0, y: 10, scale: 0.98 }}
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
       transition={MOTION_TRANSITION.slow}
       className='bg-background/75 relative overflow-hidden rounded-2xl border p-3 shadow-sm backdrop-blur'
     >
       {!shouldReduceMotion && (
-        <motion.div
+        <m.div
           className='via-foreground/30 pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent to-transparent'
           animate={{ x: ['-100%', '100%'] }}
           transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
@@ -408,7 +408,7 @@ function RequestPreview(props: {
           )
         })}
       </div>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -589,7 +589,9 @@ export function OverviewDashboard() {
       model,
       keyName,
       keyId: preferredKey?.id,
-      displayKey: preferredKey ? formatDisplayKey(`sk-${preferredKey.key}`) : 'sk-...',
+      displayKey: preferredKey
+        ? formatDisplayKey(`sk-${preferredKey.key}`)
+        : 'sk-...',
       ready,
     }
   }, [apiInfoItems, modelsQuery.data, preferredKey, t])

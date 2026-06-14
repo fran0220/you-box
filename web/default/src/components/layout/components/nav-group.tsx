@@ -173,7 +173,7 @@ function SidebarMenuCollapsible({
         {item.icon && <item.icon className='shrink-0' />}
         <span className='min-w-0 flex-1 truncate'>{item.title}</span>
         {item.badge && <NavBadge>{item.badge}</NavBadge>}
-        <ChevronRight className='ms-auto size-4 shrink-0 transition-transform duration-200 group-data-[panel-open]/collapsible-trigger:rotate-90' />
+        <ChevronRight className='duration-base ms-auto size-4 shrink-0 transition-transform group-data-[panel-open]/collapsible-trigger:rotate-90' />
       </CollapsibleTrigger>
       <CollapsibleContent className='CollapsibleContent'>
         <SidebarMenuSub>
@@ -222,7 +222,7 @@ function SidebarMenuCollapsedDropdown({
           {item.icon && <item.icon className='shrink-0' />}
           <span className='min-w-0 flex-1 truncate'>{item.title}</span>
           {item.badge && <NavBadge>{item.badge}</NavBadge>}
-          <ChevronRight className='ms-auto size-4 shrink-0 transition-transform duration-200 group-data-[popup-open]/dropdown-trigger:rotate-90' />
+          <ChevronRight className='duration-base ms-auto size-4 shrink-0 transition-transform group-data-[popup-open]/dropdown-trigger:rotate-90' />
         </DropdownMenuTrigger>
         <DropdownMenuContent side='right' align='start' sideOffset={4}>
           <DropdownMenuGroup>

@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
 import { Outlet, useRouterState } from '@tanstack/react-router'
-import { motion, useReducedMotion, type Variants } from 'motion/react'
+import { m, useReducedMotion, type Variants } from 'motion/react'
 import {
   CARD_ITEM_VARIANTS,
   CARD_STAGGER_VARIANTS,
@@ -43,14 +43,14 @@ export function PageTransition(props: PageTransitionProps) {
   }
 
   return (
-    <motion.div
+    <m.div
       initial={MOTION_VARIANTS.pageEnter.initial}
       animate={MOTION_VARIANTS.pageEnter.animate}
       transition={MOTION_TRANSITION.default}
       className={props.className}
     >
       {props.children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -69,7 +69,7 @@ export function AnimatedOutlet() {
   }
 
   return (
-    <motion.div
+    <m.div
       key={routeKey}
       initial={MOTION_VARIANTS.pageEnter.initial}
       animate={MOTION_VARIANTS.pageEnter.animate}
@@ -77,7 +77,7 @@ export function AnimatedOutlet() {
       className='flex min-h-0 flex-1 flex-col'
     >
       <Outlet />
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -95,14 +95,14 @@ export function StaggerContainer(props: StaggerContainerProps) {
   }
 
   return (
-    <motion.div
+    <m.div
       variants={props.variants ?? STAGGER_VARIANTS}
       initial='initial'
       animate='animate'
       className={props.className}
     >
       {props.children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -114,12 +114,12 @@ interface StaggerItemProps {
 
 export function StaggerItem(props: StaggerItemProps) {
   return (
-    <motion.div
+    <m.div
       variants={props.variants ?? STAGGER_ITEM_VARIANTS}
       className={props.className}
     >
       {props.children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -131,22 +131,22 @@ export function TableStaggerContainer(props: StaggerContainerProps) {
   }
 
   return (
-    <motion.tbody
+    <m.tbody
       variants={TABLE_STAGGER_VARIANTS}
       initial='initial'
       animate='animate'
       className={props.className}
     >
       {props.children}
-    </motion.tbody>
+    </m.tbody>
   )
 }
 
 export function TableStaggerRow(props: StaggerItemProps) {
   return (
-    <motion.tr variants={TABLE_ROW_VARIANTS} className={props.className}>
+    <m.tr variants={TABLE_ROW_VARIANTS} className={props.className}>
       {props.children}
-    </motion.tr>
+    </m.tr>
   )
 }
 
@@ -158,22 +158,22 @@ export function CardStaggerContainer(props: StaggerContainerProps) {
   }
 
   return (
-    <motion.div
+    <m.div
       variants={CARD_STAGGER_VARIANTS}
       initial='initial'
       animate='animate'
       className={props.className}
     >
       {props.children}
-    </motion.div>
+    </m.div>
   )
 }
 
 export function CardStaggerItem(props: StaggerItemProps) {
   return (
-    <motion.div variants={CARD_ITEM_VARIANTS} className={props.className}>
+    <m.div variants={CARD_ITEM_VARIANTS} className={props.className}>
       {props.children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -191,7 +191,7 @@ export function FadeIn(props: FadeInProps) {
   }
 
   return (
-    <motion.div
+    <m.div
       initial={MOTION_VARIANTS.fadeIn.initial}
       animate={MOTION_VARIANTS.fadeIn.animate}
       transition={{
@@ -201,6 +201,6 @@ export function FadeIn(props: FadeInProps) {
       className={props.className}
     >
       {props.children}
-    </motion.div>
+    </m.div>
   )
 }

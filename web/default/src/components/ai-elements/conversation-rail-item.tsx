@@ -43,7 +43,7 @@ export const ConversationRailItem = ({
     data-slot='conversation-rail-item'
     aria-current={active ? 'true' : undefined}
     className={cn(
-      'flex w-full flex-col items-start gap-0.5 rounded-md px-3 py-2.5 text-start transition-colors duration-[80ms]',
+      'duration-instant flex w-full flex-col items-start gap-0.5 rounded-md px-3 py-2.5 text-start transition-colors',
       'focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none',
       active ? 'bg-surface-2' : 'hover:bg-surface-hover',
       className

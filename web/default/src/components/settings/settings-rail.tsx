@@ -50,7 +50,14 @@ export function SettingsRail<T extends string>({
   const ref = useRef<HTMLDivElement>(null)
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const keys = ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Home', 'End']
+    const keys = [
+      'ArrowDown',
+      'ArrowUp',
+      'ArrowLeft',
+      'ArrowRight',
+      'Home',
+      'End',
+    ]
     if (!keys.includes(event.key)) return
     event.preventDefault()
     const index = items.findIndex((item) => item.value === value)
@@ -89,7 +96,7 @@ export function SettingsRail<T extends string>({
             tabIndex={active ? 0 : -1}
             onClick={() => onValueChange(item.value)}
             className={cn(
-              'flex shrink-0 items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-[80ms] lg:w-full',
+              'duration-instant flex shrink-0 items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors lg:w-full',
               'focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none',
               active
                 ? 'bg-surface-2 text-foreground'

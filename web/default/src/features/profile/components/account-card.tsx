@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useTranslation } from 'react-i18next'
 import { formatNumber, formatQuota } from '@/lib/format'
 import { getRoleLabel, ROLE } from '@/lib/roles'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Metric, Panel, PanelBody } from '@/components/patterns'
@@ -81,9 +82,18 @@ export function AccountCard({ profile, loading }: AccountCardProps) {
   const initials = getUserInitials(profile)
   const metrics = [
     { k: t('Group'), v: profile.group || '-' },
-    { k: t('API Requests'), v: formatNumber(profile.request_count) },
-    { k: t('Current Balance'), v: formatQuota(profile.quota) },
-    { k: t('Total Usage'), v: formatQuota(profile.used_quota) },
+    {
+      k: t('API Requests'),
+      v: <AnimatedNumber value={profile.request_count} format={formatNumber} />,
+    },
+    {
+      k: t('Current Balance'),
+      v: <AnimatedNumber value={profile.quota} format={formatQuota} />,
+    },
+    {
+      k: t('Total Usage'),
+      v: <AnimatedNumber value={profile.used_quota} format={formatQuota} />,
+    },
   ]
 
   return (

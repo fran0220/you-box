@@ -26,6 +26,7 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import i18next from 'i18next'
+import { LazyMotion } from 'motion/react'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { getStatus } from '@/lib/api'
@@ -47,6 +48,14 @@ import './styles/index.css'
 // VChart theme is driven by our ThemeProvider (html.light/html.dark) via per-chart `theme` prop.
 initializeFrontendCache()
 installBuildMetadata()
+
+// Code-split Framer (motion) DOM features (domMax: the ~84KB layout / projection
+// / gesture / animation handlers) into an async chunk that LazyMotion loads
+// after first paint, instead of shipping them in the initial bundle. Components
+// use the lightweight `m` primitives (not `motion`), which read these features
+// from context once loaded. See docs/motion.md.
+const loadMotionFeatures = () =>
+  import('motion/react').then((mod) => mod.domMax)
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -164,7 +173,12 @@ if (!rootElement.innerHTML) {
           <ThemeProvider>
             <FontProvider>
               <DirectionProvider>
-                <RouterProvider router={router} />
+                {/* domMax features load in an async chunk after first paint
+                    (loadMotionFeatures) — keeps ~84KB out of the initial
+                    bundle. See docs/motion.md. */}
+                <LazyMotion features={loadMotionFeatures}>
+                  <RouterProvider router={router} />
+                </LazyMotion>
               </DirectionProvider>
             </FontProvider>
           </ThemeProvider>

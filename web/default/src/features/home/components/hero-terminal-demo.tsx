@@ -46,8 +46,7 @@ const ACCENT_CLASSES: Record<
   emerald: {
     activeText: 'text-teal',
     activeBorder: 'border-teal',
-    badge:
-      'bg-teal-subtle text-teal',
+    badge: 'bg-teal-subtle text-teal',
   },
   amber: {
     activeText: 'text-warning',
@@ -57,14 +56,12 @@ const ACCENT_CLASSES: Record<
   blue: {
     activeText: 'text-info',
     activeBorder: 'border-info',
-    badge:
-      'bg-[var(--info-subtle)] text-info',
+    badge: 'bg-[var(--info-subtle)] text-info',
   },
   violet: {
     activeText: 'text-brand',
     activeBorder: 'border-brand',
-    badge:
-      'bg-brand-subtle text-brand',
+    badge: 'bg-brand-subtle text-brand',
   },
 }
 
@@ -210,7 +207,7 @@ export function HeroTerminalDemo(props: HeroTerminalDemoProps) {
         className={cn(
           'overflow-hidden rounded-2xl border backdrop-blur-sm',
           'border-border/60 bg-white/95 shadow-[0_20px_50px_-25px_rgba(15,23,42,0.18)]',
-          'dark:border-white/[0.06] dark:bg-[#0b0f17]/95 dark:shadow-[0_20px_60px_-25px_rgba(0,0,0,0.7)]'
+          'dark:bg-background/95 dark:border-white/[0.06] dark:shadow-[0_20px_60px_-25px_rgba(0,0,0,0.7)]'
         )}
       >
         {/* Tab strip */}
@@ -239,7 +236,7 @@ export function HeroTerminalDemo(props: HeroTerminalDemoProps) {
             )
           })}
           <div className='ml-auto flex items-center gap-2 pr-2 sm:pr-3'>
-            <span className='inline-block size-1.5 rounded-full bg-teal' />
+            <span className='bg-teal inline-block size-1.5 rounded-full' />
             <span className='text-foreground/40 font-mono text-[10px] tracking-wider uppercase'>
               200 ok
             </span>
@@ -255,15 +252,16 @@ export function HeroTerminalDemo(props: HeroTerminalDemoProps) {
         >
           <span
             className={cn(
-              'rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider',
-              accent.badge
+              'duration-fast rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider transition-opacity',
+              accent.badge,
+              transitioning ? 'opacity-0' : 'opacity-100'
             )}
           >
             {demo.method}
           </span>
           <code
             className={cn(
-              'text-foreground/75 truncate font-mono text-[12.5px] transition-opacity duration-200',
+              'text-foreground/75 duration-fast truncate font-mono text-[12.5px] transition-opacity',
               transitioning ? 'opacity-0' : 'opacity-100'
             )}
           >
@@ -321,8 +319,10 @@ function RequestBlock(props: { demo: ApiDemoConfig; transitioning: boolean }) {
     <div className='relative px-5 py-4'>
       <SectionLabel>Request</SectionLabel>
       <div
+        key={demo.endpoint}
+        data-terminal-lines=''
         className={cn(
-          'mt-2 transition-opacity duration-200',
+          'duration-fast mt-2 transition-opacity',
           transitioning ? 'opacity-0' : 'opacity-100'
         )}
       >
@@ -365,8 +365,10 @@ function ResponseBlock(props: { demo: ApiDemoConfig; transitioning: boolean }) {
     >
       <SectionLabel>Response</SectionLabel>
       <div
+        key={demo.endpoint}
+        data-terminal-lines=''
         className={cn(
-          'mt-2 transition-opacity duration-200',
+          'duration-fast mt-2 transition-opacity',
           transitioning ? 'opacity-0' : 'opacity-100'
         )}
       >
@@ -501,37 +503,23 @@ function CodeLine(props: { children: ReactNode; indent?: number }) {
 }
 
 function Command(props: { children: ReactNode }) {
-  return (
-    <span className='text-teal font-medium'>
-      {props.children}
-    </span>
-  )
+  return <span className='text-teal font-medium'>{props.children}</span>
 }
 
 function Flag(props: { children: ReactNode }) {
-  return (
-    <span className='text-info'>{props.children}</span>
-  )
+  return <span className='text-info'>{props.children}</span>
 }
 
 function Key(props: { children: ReactNode }) {
-  return (
-    <span className='text-info'>{props.children}</span>
-  )
+  return <span className='text-info'>{props.children}</span>
 }
 
 function StringText(props: { children: ReactNode }) {
-  return (
-    <span className='text-warning'>{props.children}</span>
-  )
+  return <span className='text-warning'>{props.children}</span>
 }
 
 function NumberText(props: { children: ReactNode }) {
-  return (
-    <span className='text-brand font-medium'>
-      {props.children}
-    </span>
-  )
+  return <span className='text-brand font-medium'>{props.children}</span>
 }
 
 function Muted(props: { children: ReactNode }) {

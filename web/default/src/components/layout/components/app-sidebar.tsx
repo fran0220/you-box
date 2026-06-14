@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, m, useReducedMotion } from 'motion/react'
 import { MOTION_TRANSITION, MOTION_VARIANTS } from '@/lib/motion'
 import { useLayout } from '@/context/layout-provider'
 import { useSidebarView } from '@/hooks/use-sidebar-view'
@@ -52,7 +52,7 @@ export function AppSidebar() {
 
       <SidebarContent className='py-2'>
         <AnimatePresence mode='wait' initial={false}>
-          <motion.div
+          <m.div
             key={key}
             initial={
               shouldReduce ? false : MOTION_VARIANTS.sidebarSlide.initial
@@ -65,7 +65,7 @@ export function AppSidebar() {
             {navGroups.map((props) => (
               <NavGroup key={props.id || props.title} {...props} />
             ))}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </SidebarContent>
 

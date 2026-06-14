@@ -18,12 +18,14 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import {
   Activity,
+  BookText,
   Box,
   CreditCard,
   FileText,
   FlaskConical,
   Key,
   LayoutDashboard,
+  LayoutGrid,
   ListTodo,
   MessageSquare,
   Radio,
@@ -32,6 +34,7 @@ import {
   User,
   Users,
   Wallet,
+  Wrench,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { type SidebarData } from '@/components/layout/types'
@@ -60,6 +63,27 @@ export function useSidebarData(): SidebarData {
             title: t('Chat'),
             icon: MessageSquare,
             type: 'chat-presets',
+          },
+        ],
+      },
+      {
+        id: 'developer',
+        title: t('Developer'),
+        items: [
+          {
+            title: t('API tools'),
+            url: '/api-tools',
+            icon: Wrench,
+          },
+          {
+            title: t('API reference'),
+            url: '/docs',
+            icon: BookText,
+          },
+          {
+            title: t('App rankings'),
+            url: '/apps',
+            icon: LayoutGrid,
           },
         ],
       },

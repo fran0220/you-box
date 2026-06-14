@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatNumber, formatQuota } from '@/lib/format'
 import { computeTimeRange } from '@/lib/time'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { StatCard, StatCardRow } from '@/components/patterns'
 import { getUserQuotaDates } from '@/features/dashboard/api'
 import { useModelStatCardsConfig } from '@/features/dashboard/hooks/use-dashboard-config'
@@ -102,10 +103,8 @@ export function LogStatCards(props: LogStatCardsProps) {
 
   const items = statCardsConfig.map((config) => ({
     title: config.title,
-    value:
-      config.key === 'quota'
-        ? formatQuota(config.getValue(adaptedStats, timeRangeMinutes))
-        : formatNumber(config.getValue(adaptedStats, timeRangeMinutes)),
+    rawValue: config.getValue(adaptedStats, timeRangeMinutes),
+    format: config.key === 'quota' ? formatQuota : formatNumber,
     desc: config.description,
     icon: config.icon,
   }))
@@ -120,7 +119,13 @@ export function LogStatCards(props: LogStatCardsProps) {
             size='sm'
             icon={<Icon />}
             label={it.title}
-            value={error ? '--' : it.value}
+            value={
+              error ? (
+                '--'
+              ) : (
+                <AnimatedNumber value={it.rawValue} format={it.format} />
+              )
+            }
             loading={loading}
           />
         )

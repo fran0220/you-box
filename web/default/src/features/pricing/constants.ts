@@ -28,6 +28,8 @@ export const SORT_OPTIONS = {
   NAME: 'name',
   PRICE_LOW: 'price-low',
   PRICE_HIGH: 'price-high',
+  CONTEXT_HIGH: 'context-high',
+  NEWEST: 'newest',
 } as const
 
 export type SortOption = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS]
@@ -37,6 +39,34 @@ export function getSortLabels(t: TFunction): Record<SortOption, string> {
     [SORT_OPTIONS.NAME]: t('Name'),
     [SORT_OPTIONS.PRICE_LOW]: t('Price: Low to High'),
     [SORT_OPTIONS.PRICE_HIGH]: t('Price: High to Low'),
+    [SORT_OPTIONS.CONTEXT_HIGH]: t('Context: High to Low'),
+    [SORT_OPTIONS.NEWEST]: t('Newest'),
+  }
+}
+
+/** Input-modality filter options (what a model can accept). */
+export const MODALITY_FILTERS = {
+  ALL: 'all',
+  TEXT: 'text',
+  IMAGE: 'image',
+  AUDIO: 'audio',
+  VIDEO: 'video',
+  FILE: 'file',
+} as const
+
+export type ModalityFilterOption =
+  (typeof MODALITY_FILTERS)[keyof typeof MODALITY_FILTERS]
+
+export function getModalityLabels(
+  t: TFunction
+): Record<ModalityFilterOption, string> {
+  return {
+    [MODALITY_FILTERS.ALL]: t('All Modalities'),
+    [MODALITY_FILTERS.TEXT]: t('Text'),
+    [MODALITY_FILTERS.IMAGE]: t('Image'),
+    [MODALITY_FILTERS.AUDIO]: t('Audio'),
+    [MODALITY_FILTERS.VIDEO]: t('Video'),
+    [MODALITY_FILTERS.FILE]: t('File'),
   }
 }
 
@@ -142,3 +172,6 @@ export type ViewMode = (typeof VIEW_MODES)[keyof typeof VIEW_MODES]
 
 /** Default page size for pricing table */
 export const DEFAULT_PRICING_PAGE_SIZE = 20
+
+/** Maximum number of models that can be compared side by side. */
+export const MAX_COMPARE_MODELS = 5

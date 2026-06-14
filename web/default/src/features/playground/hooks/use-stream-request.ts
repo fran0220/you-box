@@ -16,65 +16,105 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { SSE } from 'sse.js'
 import { getCommonHeaders } from '@/lib/api'
 import { API_ENDPOINTS, ERROR_MESSAGES } from '../constants'
-import type { ChatCompletionRequest, ChatCompletionChunk } from '../types'
+import type {
+  ChatCompletionRequest,
+  ChatCompletionChunk,
+  TokenUsage,
+  UrlCitationAnnotation,
+} from '../types'
+
+export interface StreamCallbacks {
+  onUpdate: (type: 'reasoning' | 'content', chunk: string) => void
+  onAnnotations?: (annotations: UrlCitationAnnotation[]) => void
+  onComplete: (usage?: TokenUsage) => void
+  onError: (error: string, errorCode?: string) => void
+}
 
 /**
- * Hook for handling streaming chat completion requests
+ * Hook for handling streaming chat completion requests.
+ *
+ * Supports multiple concurrent streams keyed by an opaque `streamId`, which the
+ * side-by-side compare view relies on (one in-flight SSE per compared model).
+ * Single-model mode simply uses one stream.
  */
 export function useStreamRequest() {
-  const sseSourceRef = useRef<SSE | null>(null)
-  const isStreamCompleteRef = useRef(false)
+  // Active SSE connections keyed by streamId.
+  const sourcesRef = useRef<Map<string, SSE>>(new Map())
+  // streamIds that have already completed normally (suppress late errors).
+  const completedRef = useRef<Set<string>>(new Set())
+  // Drives re-renders so `isStreaming` reflects reality independent of message
+  // state updates.
+  const [activeCount, setActiveCount] = useState(0)
+
+  const closeStream = useCallback((streamId: string) => {
+    const source = sourcesRef.current.get(streamId)
+    if (source) {
+      source.close()
+      sourcesRef.current.delete(streamId)
+      setActiveCount(sourcesRef.current.size)
+    }
+  }, [])
 
   const sendStreamRequest = useCallback(
     (
+      streamId: string,
       payload: ChatCompletionRequest,
-      onUpdate: (type: 'reasoning' | 'content', chunk: string) => void,
-      onComplete: () => void,
-      onError: (error: string, errorCode?: string) => void
+      callbacks: StreamCallbacks
     ) => {
+      const { onUpdate, onAnnotations, onComplete, onError } = callbacks
+
       const source = new SSE(API_ENDPOINTS.CHAT_COMPLETIONS, {
         headers: getCommonHeaders(),
         method: 'POST',
         payload: JSON.stringify(payload),
       })
 
-      sseSourceRef.current = source
-      isStreamCompleteRef.current = false
+      // Replace any prior source under this id, then register the new one.
+      sourcesRef.current.get(streamId)?.close()
+      sourcesRef.current.set(streamId, source)
+      completedRef.current.delete(streamId)
+      setActiveCount(sourcesRef.current.size)
 
-      const closeSource = () => {
-        source.close()
-        sseSourceRef.current = null
-      }
+      // Usage may arrive on the final chunk; hold it until [DONE].
+      let pendingUsage: TokenUsage | undefined
 
       const handleError = (errorMessage: string, errorCode?: string) => {
-        if (!isStreamCompleteRef.current) {
+        if (!completedRef.current.has(streamId)) {
           onError(errorMessage, errorCode)
-          closeSource()
+          closeStream(streamId)
         }
       }
 
       source.addEventListener('message', (e: MessageEvent) => {
         if (e.data === '[DONE]') {
-          isStreamCompleteRef.current = true
-          closeSource()
-          onComplete()
+          completedRef.current.add(streamId)
+          closeStream(streamId)
+          onComplete(pendingUsage)
           return
         }
 
         try {
           const chunk: ChatCompletionChunk = JSON.parse(e.data)
-          const delta = chunk.choices?.[0]?.delta
 
+          // Usage-only chunk (stream_options.include_usage): no choices.
+          if (chunk.usage) {
+            pendingUsage = chunk.usage
+          }
+
+          const delta = chunk.choices?.[0]?.delta
           if (delta) {
             if (delta.reasoning_content) {
               onUpdate('reasoning', delta.reasoning_content)
             }
             if (delta.content) {
               onUpdate('content', delta.content)
+            }
+            if (delta.annotations?.length && onAnnotations) {
+              onAnnotations(delta.annotations)
             }
           }
         } catch (error) {
@@ -129,26 +169,30 @@ export function useStreamRequest() {
         // eslint-disable-next-line no-console
         console.error('Failed to start SSE stream:', error)
         onError(ERROR_MESSAGES.STREAM_START_ERROR)
-        sseSourceRef.current = null
+        closeStream(streamId)
       }
     },
-    []
+    [closeStream]
   )
 
-  const stopStream = useCallback(() => {
-    if (sseSourceRef.current) {
-      sseSourceRef.current.close()
-      sseSourceRef.current = null
+  // Stop one stream (id given) or all in-flight streams.
+  const stopStream = useCallback((streamId?: string) => {
+    if (streamId) {
+      const source = sourcesRef.current.get(streamId)
+      source?.close()
+      sourcesRef.current.delete(streamId)
+    } else {
+      for (const source of sourcesRef.current.values()) {
+        source.close()
+      }
+      sourcesRef.current.clear()
     }
+    setActiveCount(sourcesRef.current.size)
   }, [])
-
-  // eslint-disable-next-line react-hooks/refs
-  const isStreaming = sseSourceRef.current !== null
 
   return {
     sendStreamRequest,
     stopStream,
-    // eslint-disable-next-line react-hooks/refs
-    isStreaming,
+    isStreaming: activeCount > 0,
   }
 }

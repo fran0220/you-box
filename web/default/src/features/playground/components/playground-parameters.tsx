@@ -19,12 +19,27 @@ For commercial licensing, please contact support@quantumnous.com
 import { useId, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
 import { SessionStats } from '@/components/ai-elements/session-stats'
 import { Eyebrow, MonoInput, ParameterSlider } from '@/components/patterns'
 import { SettingRow } from '@/components/settings'
-import type { Message, ParameterEnabled, PlaygroundConfig } from '../types'
+import { formatCostUsd } from '../lib/cost'
+import type {
+  Message,
+  ParameterEnabled,
+  PlaygroundConfig,
+  ReasoningEffort,
+} from '../types'
 
 type SliderParameterKey =
   | 'temperature'
@@ -66,6 +81,18 @@ export function PlaygroundParameters({
   const { t } = useTranslation()
   const seedId = useId()
   const streamId = useId()
+  const reasoningMaxId = useId()
+
+  const reasoningOptions: Array<{ value: ReasoningEffort; label: string }> = [
+    { value: 'off', label: t('Off') },
+    { value: 'minimal', label: t('Minimal') },
+    { value: 'low', label: t('Low') },
+    { value: 'medium', label: t('Medium') },
+    { value: 'high', label: t('High') },
+  ]
+  const reasoningLabel =
+    reasoningOptions.find((o) => o.value === config.reasoningEffort)?.label ??
+    t('Off')
 
   const sliderParameters: Array<{
     key: SliderParameterKey
@@ -102,19 +129,24 @@ export function PlaygroundParameters({
   ]
 
   // Session stats from real response data only — no fabricated values.
-  // Tokens: usage is only reported on non-streaming responses today (the
-  // streaming path does not request `stream_options.include_usage`).
-  // Cost: per-request cost is not exposed by the backend yet → always '—'
-  // until usage/pricing passthrough lands.
+  // Tokens: usage is reported on non-streaming responses and on streaming
+  // responses (the playground now sends stream_options.include_usage).
+  // Cost: derived from usage × the model's pricing (see lib/cost.ts).
   // Latency: measured wall-clock duration of each completed request.
   const sessionStats = useMemo(() => {
     let totalTokens = 0
     let hasUsage = false
+    let totalCost = 0
+    let hasCost = false
     let lastLatencyMs: number | undefined
     for (const message of messages) {
       if (message.usage) {
         hasUsage = true
         totalTokens += message.usage.total_tokens
+      }
+      if (message.costUsd != null) {
+        hasCost = true
+        totalCost += message.costUsd
       }
       if (message.latencyMs != null) {
         lastLatencyMs = message.latencyMs
@@ -122,7 +154,7 @@ export function PlaygroundParameters({
     }
     return {
       tokens: hasUsage ? totalTokens.toLocaleString() : '—',
-      cost: '—',
+      cost: hasCost ? formatCostUsd(totalCost) : '—',
       latency:
         lastLatencyMs != null ? `${(lastLatencyMs / 1000).toFixed(2)}s` : '—',
     }
@@ -133,6 +165,21 @@ export function PlaygroundParameters({
       data-slot='playground-parameters'
       className={cn('flex flex-col gap-5 p-4 sm:p-5', className)}
     >
+      <div className='flex flex-col gap-2'>
+        <Eyebrow>{t('System prompt')}</Eyebrow>
+        <Textarea
+          value={config.systemPrompt}
+          onChange={(event) =>
+            onConfigChange('systemPrompt', event.target.value)
+          }
+          placeholder={t('You are a helpful assistant…')}
+          className='min-h-20 text-sm'
+          rows={3}
+        />
+      </div>
+
+      <Separator />
+
       <Eyebrow>{t('Parameters')}</Eyebrow>
 
       <div className='flex flex-col gap-5'>
@@ -196,6 +243,67 @@ export function PlaygroundParameters({
             aria-label={t('Enable {{parameter}}', { parameter: t('Seed') })}
           />
         </div>
+      </div>
+
+      <Separator />
+
+      {/* Reasoning effort (OpenAI/OpenRouter-style). 'Off' sends nothing. */}
+      <div className='flex flex-col gap-3'>
+        <Eyebrow>{t('Reasoning')}</Eyebrow>
+        <div className='flex flex-col gap-2'>
+          <label className='text-muted-foreground text-[13px]'>
+            {t('Effort')}
+          </label>
+          <Select
+            items={reasoningOptions}
+            value={config.reasoningEffort}
+            onValueChange={(value) =>
+              onConfigChange(
+                'reasoningEffort',
+                (value as ReasoningEffort) ?? 'off'
+              )
+            }
+          >
+            <SelectTrigger className='w-full'>
+              <SelectValue>{reasoningLabel}</SelectValue>
+            </SelectTrigger>
+            <SelectContent alignItemWithTrigger={false}>
+              <SelectGroup>
+                {reasoningOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {config.reasoningEffort !== 'off' && (
+          <div className='flex flex-col gap-2'>
+            <label
+              htmlFor={reasoningMaxId}
+              className='text-muted-foreground text-[13px]'
+            >
+              {t('Max reasoning tokens (optional)')}
+            </label>
+            <MonoInput
+              id={reasoningMaxId}
+              type='number'
+              inputMode='numeric'
+              min={0}
+              placeholder={t('Use effort level')}
+              value={config.reasoningMaxTokens || ''}
+              onChange={(event) => {
+                const parsed = Number.parseInt(event.target.value, 10)
+                onConfigChange(
+                  'reasoningMaxTokens',
+                  Number.isNaN(parsed) || parsed < 0 ? 0 : parsed
+                )
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <Separator />

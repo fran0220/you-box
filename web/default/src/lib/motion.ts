@@ -18,21 +18,33 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import type { Transition, Variants } from 'motion/react'
 
-const EASE_OUT_CUBIC = [0.33, 1, 0.68, 1] as const
+/**
+ * Motion SSOT (JS side) — mirrors the CSS motion tokens in styles/theme.css
+ * (`--ease-*` and `--dur-*`). Keep both in sync so Framer and CSS speak one
+ * motion language. Easings are the same bezier curves as the CSS `ease-*`
+ * utilities; durations are expressed in seconds here (Framer) vs. ms in CSS.
+ */
+type Bezier = [number, number, number, number]
 
-const DURATION = {
-  instant: 0,
-  fast: 0.15,
-  normal: 0.25,
-  slow: 0.35,
+export const EASE = {
+  out: [0.16, 1, 0.3, 1] as Bezier,
+  inOut: [0.65, 0, 0.35, 1] as Bezier,
+  spring: [0.34, 1.56, 0.64, 1] as Bezier,
+}
+
+export const DUR = {
+  instant: 0.08,
+  fast: 0.14,
+  base: 0.22,
+  slow: 0.4,
 } as const
 
 export const MOTION_TRANSITION: Record<string, Transition> = {
-  default: { duration: DURATION.normal, ease: EASE_OUT_CUBIC },
-  fast: { duration: DURATION.fast, ease: EASE_OUT_CUBIC },
-  slow: { duration: DURATION.slow, ease: EASE_OUT_CUBIC },
+  default: { duration: DUR.base, ease: EASE.out },
+  fast: { duration: DUR.fast, ease: EASE.out },
+  slow: { duration: DUR.slow, ease: EASE.out },
   spring: { type: 'spring', damping: 20, stiffness: 300 },
-  none: { duration: DURATION.instant },
+  none: { duration: 0 },
 }
 
 export const MOTION_VARIANTS = {

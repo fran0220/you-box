@@ -16,32 +16,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo, useCallback, useState } from 'react'
-import { useSearch } from '@tanstack/react-router'
+import { useMemo, useCallback } from 'react'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   FILTER_ALL,
   SORT_OPTIONS,
   QUOTA_TYPES,
   ENDPOINT_TYPES,
+  MODALITY_FILTERS,
   DEFAULT_TOKEN_UNIT,
   VIEW_MODES,
   type ViewMode,
 } from '../constants'
 import { filterAndSortModels, extractAllTags } from '../lib/filters'
 import type { PricingModel, TokenUnit } from '../types'
-
-type FilterState = {
-  search?: string
-  sort?: string
-  vendor?: string
-  group?: string
-  quotaType?: string
-  endpointType?: string
-  tag?: string
-  tokenUnit?: TokenUnit
-  view?: ViewMode
-  rechargePrice?: boolean
-}
 
 function normalizeViewMode(value: unknown): ViewMode {
   if (value === VIEW_MODES.TABLE) {
@@ -52,42 +40,39 @@ function normalizeViewMode(value: unknown): ViewMode {
 
 export function useFilters(models: PricingModel[]) {
   const search = useSearch({ from: '/pricing/' })
-  const [filterState, setFilterState] = useState<FilterState>(() => ({
-    search: search.search,
-    sort: search.sort,
-    vendor: search.vendor,
-    group: search.group,
-    quotaType: search.quotaType,
-    endpointType: search.endpointType,
-    tag: search.tag,
-    tokenUnit: search.tokenUnit,
-    view: search.view,
-    rechargePrice: search.rechargePrice,
-  }))
+  const navigate = useNavigate({ from: '/pricing/' })
 
-  const searchInput = filterState.search || ''
-  const sortBy = filterState.sort || SORT_OPTIONS.NAME
-  const vendorFilter = filterState.vendor || FILTER_ALL
-  const groupFilter = filterState.group || FILTER_ALL
-  const quotaTypeFilter = filterState.quotaType || QUOTA_TYPES.ALL
-  const endpointTypeFilter = filterState.endpointType || ENDPOINT_TYPES.ALL
-  const tagFilter = filterState.tag || FILTER_ALL
-  const tokenUnit: TokenUnit =
-    filterState.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
-  const viewMode = normalizeViewMode(filterState.view)
-  const showRechargePrice = filterState.rechargePrice === true
+  // URL search params are the single source of truth, so filters / sort / view /
+  // token-unit persist across refresh and navigation, and are shareable.
+  const searchInput = search.search || ''
+  const sortBy = search.sort || SORT_OPTIONS.NAME
+  const vendorFilter = search.vendor || FILTER_ALL
+  const groupFilter = search.group || FILTER_ALL
+  const quotaTypeFilter = search.quotaType || QUOTA_TYPES.ALL
+  const endpointTypeFilter = search.endpointType || ENDPOINT_TYPES.ALL
+  const modalityFilter = search.modality || MODALITY_FILTERS.ALL
+  const tagFilter = search.tag || FILTER_ALL
+  const tokenUnit: TokenUnit = search.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
+  const viewMode = normalizeViewMode(search.view)
+  const showRechargePrice = search.rechargePrice === true
 
-  const updateFilters = useCallback((updates: Record<string, unknown>) => {
-    setFilterState((prev) => {
-      const next: Record<string, unknown> = { ...prev, ...updates }
-      for (const key of Object.keys(next)) {
-        if (next[key] === undefined || next[key] === null) {
-          delete next[key]
-        }
-      }
-      return next as FilterState
-    })
-  }, [])
+  const updateFilters = useCallback(
+    (updates: Record<string, unknown>) => {
+      navigate({
+        replace: true,
+        search: (prev) => {
+          const next: Record<string, unknown> = { ...prev, ...updates }
+          for (const key of Object.keys(next)) {
+            if (next[key] === undefined || next[key] === null) {
+              delete next[key]
+            }
+          }
+          return next
+        },
+      })
+    },
+    [navigate]
+  )
 
   const setSearchInput = useCallback(
     (v: string) => updateFilters({ search: v || undefined }),
@@ -116,6 +101,11 @@ export function useFilters(models: PricingModel[]) {
       updateFilters({
         endpointType: v === ENDPOINT_TYPES.ALL ? undefined : v,
       }),
+    [updateFilters]
+  )
+  const setModalityFilter = useCallback(
+    (v: string) =>
+      updateFilters({ modality: v === MODALITY_FILTERS.ALL ? undefined : v }),
     [updateFilters]
   )
   const setTagFilter = useCallback(
@@ -151,6 +141,7 @@ export function useFilters(models: PricingModel[]) {
       group: groupFilter,
       quotaType: quotaTypeFilter,
       endpointType: endpointTypeFilter,
+      modality: modalityFilter,
       tag: tagFilter,
       sortBy,
     })
@@ -161,6 +152,7 @@ export function useFilters(models: PricingModel[]) {
     groupFilter,
     quotaTypeFilter,
     endpointTypeFilter,
+    modalityFilter,
     tagFilter,
     sortBy,
   ])
@@ -171,8 +163,16 @@ export function useFilters(models: PricingModel[]) {
       groupFilter !== FILTER_ALL ||
       quotaTypeFilter !== QUOTA_TYPES.ALL ||
       endpointTypeFilter !== ENDPOINT_TYPES.ALL ||
+      modalityFilter !== MODALITY_FILTERS.ALL ||
       tagFilter !== FILTER_ALL,
-    [vendorFilter, groupFilter, quotaTypeFilter, endpointTypeFilter, tagFilter]
+    [
+      vendorFilter,
+      groupFilter,
+      quotaTypeFilter,
+      endpointTypeFilter,
+      modalityFilter,
+      tagFilter,
+    ]
   )
 
   const activeFilterCount = useMemo(
@@ -181,8 +181,16 @@ export function useFilters(models: PricingModel[]) {
       (groupFilter !== FILTER_ALL ? 1 : 0) +
       (quotaTypeFilter !== QUOTA_TYPES.ALL ? 1 : 0) +
       (endpointTypeFilter !== ENDPOINT_TYPES.ALL ? 1 : 0) +
+      (modalityFilter !== MODALITY_FILTERS.ALL ? 1 : 0) +
       (tagFilter !== FILTER_ALL ? 1 : 0),
-    [vendorFilter, groupFilter, quotaTypeFilter, endpointTypeFilter, tagFilter]
+    [
+      vendorFilter,
+      groupFilter,
+      quotaTypeFilter,
+      endpointTypeFilter,
+      modalityFilter,
+      tagFilter,
+    ]
   )
 
   const clearFilters = useCallback(() => {
@@ -191,6 +199,7 @@ export function useFilters(models: PricingModel[]) {
       group: undefined,
       quotaType: undefined,
       endpointType: undefined,
+      modality: undefined,
       tag: undefined,
     })
   }, [updateFilters])
@@ -206,6 +215,7 @@ export function useFilters(models: PricingModel[]) {
     groupFilter,
     quotaTypeFilter,
     endpointTypeFilter,
+    modalityFilter,
     tagFilter,
     tokenUnit,
     viewMode,
@@ -216,6 +226,7 @@ export function useFilters(models: PricingModel[]) {
     setGroupFilter,
     setQuotaTypeFilter,
     setEndpointTypeFilter,
+    setModalityFilter,
     setTagFilter,
     setTokenUnit,
     setViewMode,

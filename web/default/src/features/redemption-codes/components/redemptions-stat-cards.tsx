@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { CircleDashed, Ticket, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber, formatQuota } from '@/lib/format'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { StatCard, StatCardRow } from '@/components/patterns'
 import { REDEMPTION_STATUS } from '../constants'
 import type { Redemption } from '../types'
@@ -61,21 +62,21 @@ export function RedemptionsStatCards({
         size='sm'
         label={t('Codes issued')}
         icon={<Ticket />}
-        value={formatNumber(total)}
+        value={<AnimatedNumber value={total} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Unused')}
         icon={<CircleDashed />}
-        value={formatNumber(unused)}
+        value={<AnimatedNumber value={unused} format={formatNumber} />}
         loading={loading}
       />
       <StatCard
         size='sm'
         label={t('Redeemed value')}
         icon={<Wallet />}
-        value={formatQuota(redeemedValue)}
+        value={<AnimatedNumber value={redeemedValue} format={formatQuota} />}
         loading={loading}
       />
     </StatCardRow>

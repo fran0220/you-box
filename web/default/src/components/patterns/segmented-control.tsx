@@ -16,6 +16,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useId } from 'react'
+import { m, useReducedMotion } from 'motion/react'
+import { MOTION_TRANSITION } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import {
   Tooltip,
@@ -44,6 +47,11 @@ export type SegmentedControlProps = {
  * icon, or both; icon-only options can attach a tooltip.
  */
 export function SegmentedControl(props: SegmentedControlProps) {
+  // Unique per instance so multiple segmented controls on a page don't share
+  // (and fight over) the same Framer shared-layout indicator.
+  const layoutId = useId()
+  const reduceMotion = useReducedMotion()
+
   return (
     <div
       role='group'
@@ -63,15 +71,27 @@ export function SegmentedControl(props: SegmentedControlProps) {
             onClick={() => props.onChange(option.value)}
             aria-pressed={isActive}
             className={cn(
-              'inline-flex h-full items-center justify-center rounded-md text-xs font-medium transition-all',
+              'relative inline-flex h-full items-center justify-center rounded-md text-xs font-medium transition-colors',
               Icon && !option.label ? 'w-7' : 'gap-1.5 px-3',
               isActive
-                ? 'bg-primary text-primary-foreground shadow-sm'
+                ? 'text-primary-foreground'
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            {Icon && <Icon className='size-3.5' />}
-            {option.label}
+            {isActive &&
+              (reduceMotion ? (
+                <span className='bg-primary absolute inset-0 rounded-md shadow-sm' />
+              ) : (
+                <m.span
+                  layoutId={layoutId}
+                  className='bg-primary absolute inset-0 rounded-md shadow-sm'
+                  transition={MOTION_TRANSITION.default}
+                />
+              ))}
+            {Icon && <Icon className='relative z-10 size-3.5' />}
+            {option.label && (
+              <span className='relative z-10'>{option.label}</span>
+            )}
           </button>
         )
 

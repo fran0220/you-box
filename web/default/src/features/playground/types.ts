@@ -30,12 +30,22 @@ export interface TokenUsage {
   prompt_tokens: number
   completion_tokens: number
   total_tokens: number
+  /** OpenRouter-style cached prompt tokens, when reported. */
+  prompt_tokens_details?: {
+    cached_tokens?: number
+  }
 }
 
 export interface Message {
   key: string
   from: MessageRole
   versions: MessageVersion[]
+  /**
+   * Model that produced this assistant message. Set on assistant messages so
+   * the side-by-side compare view can group responses per model. User messages
+   * leave this undefined (they are shared across all compared models).
+   */
+  model?: string
   /** Image URLs attached to a user message (vision input). */
   imageUrls?: string[]
   sources?: { href: string; title: string }[]
@@ -49,14 +59,22 @@ export interface Message {
   status?: MessageStatus
   errorCode?: string | null
   /**
-   * Token usage reported by the API. Only available on non-streaming
-   * responses today — the streaming path does not request
-   * `stream_options.include_usage`, so usage chunks are never emitted.
+   * Token usage reported by the API. Available on non-streaming responses and
+   * on streaming responses once `stream_options.include_usage` is requested
+   * (the playground now sends it).
    */
   usage?: TokenUsage
+  /** Per-response cost in USD, derived from usage × the model's pricing. */
+  costUsd?: number
   /** Wall-clock latency (ms) of the request that produced this message. */
   latencyMs?: number
 }
+
+/**
+ * Reasoning effort level (OpenAI/OpenRouter-style). `'off'` means do not send
+ * any reasoning control upstream.
+ */
+export type ReasoningEffort = 'off' | 'minimal' | 'low' | 'medium' | 'high'
 
 // API payload types
 export interface ChatCompletionMessage {
@@ -72,17 +90,44 @@ export interface ContentPart {
   }
 }
 
+/** URL citation annotation (web search results), OpenAI/OpenRouter-style. */
+export interface UrlCitationAnnotation {
+  type: 'url_citation'
+  url_citation: {
+    url: string
+    title?: string
+    content?: string
+    start_index?: number
+    end_index?: number
+  }
+}
+
+export interface StreamOptions {
+  include_usage?: boolean
+}
+
+export interface WebSearchOptions {
+  search_context_size?: 'low' | 'medium' | 'high'
+}
+
 export interface ChatCompletionRequest {
   model: string
   group?: string
   messages: ChatCompletionMessage[]
   stream: boolean
+  stream_options?: StreamOptions
   temperature?: number
   top_p?: number
   max_tokens?: number
   frequency_penalty?: number
   presence_penalty?: number
   seed?: number
+  /** OpenAI/OpenRouter reasoning effort control. Omitted when 'off'. */
+  reasoning_effort?: Exclude<ReasoningEffort, 'off'>
+  /** OpenRouter-style reasoning object (token budget mode). */
+  reasoning?: { max_tokens?: number; effort?: Exclude<ReasoningEffort, 'off'> }
+  /** Native web search controls (OpenAI/OpenRouter `web_search_options`). */
+  web_search_options?: WebSearchOptions
 }
 
 export interface ChatCompletionChunk {
@@ -96,9 +141,12 @@ export interface ChatCompletionChunk {
       role?: MessageRole
       content?: string
       reasoning_content?: string
+      annotations?: UrlCitationAnnotation[]
     }
     finish_reason: string | null
   }>
+  /** Present on the final chunk when `stream_options.include_usage` is set. */
+  usage?: TokenUsage
 }
 
 export interface ChatCompletionResponse {
@@ -112,6 +160,7 @@ export interface ChatCompletionResponse {
       role: MessageRole
       content: string
       reasoning_content?: string
+      annotations?: UrlCitationAnnotation[]
     }
     finish_reason: string
   }>
@@ -120,7 +169,15 @@ export interface ChatCompletionResponse {
 
 // Configuration types
 export interface PlaygroundConfig {
+  /** Optional system prompt prepended to every request. */
+  systemPrompt: string
   model: string
+  /**
+   * Additional models to compare against the primary `model`, side by side.
+   * Empty for single-model mode. The full active set is `[model, ...compareModels]`
+   * (deduplicated).
+   */
+  compareModels: string[]
   group: string
   temperature: number
   top_p: number
@@ -129,6 +186,12 @@ export interface PlaygroundConfig {
   presence_penalty: number
   seed: number | null
   stream: boolean
+  /** Reasoning effort control (see ReasoningEffort). */
+  reasoningEffort: ReasoningEffort
+  /** When set, sends an explicit reasoning token budget instead of effort. */
+  reasoningMaxTokens: number
+  /** Toggle native web search for the request. */
+  webSearch: boolean
 }
 
 export interface ParameterEnabled {

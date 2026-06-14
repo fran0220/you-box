@@ -18,49 +18,19 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo, useState } from 'react'
 import { MessagesSquare } from 'lucide-react'
+import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Branch,
-  BranchMessages,
-  BranchNext,
-  BranchPage,
-  BranchPrevious,
-  BranchSelector,
-} from '@/components/ai-elements/branch'
+import { MOTION_TRANSITION } from '@/lib/motion'
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
 } from '@/components/ai-elements/conversation'
-import { Loader } from '@/components/ai-elements/loader'
-import {
-  MessageContent,
-  SpeakerMessage,
-} from '@/components/ai-elements/message'
-import {
-  Reasoning,
-  ReasoningContent,
-  ReasoningTrigger,
-} from '@/components/ai-elements/reasoning'
-import { Response } from '@/components/ai-elements/response'
-import { Shimmer } from '@/components/ai-elements/shimmer'
-import {
-  Source,
-  Sources,
-  SourcesContent,
-  SourcesTrigger,
-} from '@/components/ai-elements/sources'
-import { StreamingCursor } from '@/components/ai-elements/streaming-cursor'
 import { MESSAGE_ROLES } from '../constants'
-import { getMessageContentStyles } from '../lib/message-styles'
-import { parseThinkTags } from '../lib/message-utils'
+import { formatCostUsd } from '../lib/cost'
 import type { Message as MessageType } from '../types'
-import { MessageActions } from './message-actions'
-import { MessageError } from './message-error'
+import { PlaygroundMessage } from './playground-message'
 
 interface PlaygroundChatProps {
   messages: MessageType[]
@@ -75,6 +45,53 @@ interface PlaygroundChatProps {
   onSaveEdit?: (newContent: string) => void
   onCancelEdit?: (open: boolean) => void
   onSaveEditAndSubmit?: (newContent: string) => void
+}
+
+type ChatRow =
+  | { kind: 'single'; message: MessageType }
+  | { kind: 'group'; messages: MessageType[] }
+
+/** Group consecutive assistant messages into a turn (one entry per model). */
+function buildRows(messages: MessageType[]): ChatRow[] {
+  const rows: ChatRow[] = []
+  let group: MessageType[] = []
+  const flush = () => {
+    if (group.length) {
+      rows.push({ kind: 'group', messages: group })
+      group = []
+    }
+  }
+  for (const message of messages) {
+    if (message.from === MESSAGE_ROLES.ASSISTANT) {
+      group.push(message)
+    } else {
+      flush()
+      rows.push({ kind: 'single', message })
+    }
+  }
+  flush()
+  return rows
+}
+
+/** Compact per-response meta line (model compare columns). */
+function ResponseMeta({ message }: { message: MessageType }) {
+  const { t } = useTranslation()
+  const parts: string[] = []
+  if (message.usage?.total_tokens != null) {
+    parts.push(`${message.usage.total_tokens.toLocaleString()} ${t('tokens')}`)
+  }
+  if (message.costUsd != null) {
+    parts.push(formatCostUsd(message.costUsd))
+  }
+  if (message.latencyMs != null) {
+    parts.push(`${(message.latencyMs / 1000).toFixed(2)}s`)
+  }
+  if (parts.length === 0) return null
+  return (
+    <div className='text-muted-foreground mt-2 text-[11px]'>
+      {parts.join(' · ')}
+    </div>
+  )
 }
 
 export function PlaygroundChat({
@@ -92,10 +109,10 @@ export function PlaygroundChat({
 }: PlaygroundChatProps) {
   const { t } = useTranslation()
   const user = useAuthStore((state) => state.auth.user)
+  const shouldReduce = useReducedMotion()
   const [editText, setEditText] = useState('')
   const [originalText, setOriginalText] = useState('')
 
-  // Role tile: first two characters of the username, uppercased.
   const userInitials = (user?.username || '').slice(0, 2).toUpperCase() || 'ME'
 
   useEffect(() => {
@@ -104,19 +121,56 @@ export function PlaygroundChat({
     const content = message?.versions?.[0]?.content || ''
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setEditText(content)
-
     setOriginalText(content)
   }, [editingKey, messages])
 
-  const isEditing = (key: string) => editingKey === key
-  const isEmpty = useMemo(() => !editText.trim(), [editText])
-  const isChanged = useMemo(
+  const editEmpty = useMemo(() => !editText.trim(), [editText])
+  const editChanged = useMemo(
     () => editText !== originalText,
     [editText, originalText]
   )
+
+  const rows = useMemo(() => buildRows(messages), [messages])
+  // Index of the last assistant group → its messages keep actions visible.
+  const lastGroupIndex = useMemo(() => {
+    for (let i = rows.length - 1; i >= 0; i--) {
+      if (rows[i].kind === 'group') return i
+    }
+    return -1
+  }, [rows])
+
+  const sharedMessageProps = (message: MessageType, isLatestTurn: boolean) => ({
+    message,
+    userInitials,
+    isLatestTurn,
+    isGenerating,
+    isEditing: editingKey === message.key,
+    editText,
+    onEditTextChange: setEditText,
+    editEmpty,
+    editChanged,
+    onSaveEdit,
+    onSaveEditAndSubmit,
+    onCancelEdit,
+    onCopyMessage,
+    onRegenerateMessage,
+    onEditMessage,
+    onDeleteMessage,
+  })
+
+  // Per-message mount reveal (opacity + small rise). Transform/opacity only so
+  // it never changes layout and can't fight the stick-to-bottom auto-scroll;
+  // keyed by message.key so it plays once on mount, not on each streaming token.
+  const reveal = shouldReduce
+    ? undefined
+    : {
+        initial: { opacity: 0, y: 6 },
+        animate: { opacity: 1, y: 0 },
+        transition: MOTION_TRANSITION.default,
+      }
+
   return (
     <Conversation>
-      {/* Remove outer padding; apply padding to inner centered container to align with input */}
       <ConversationContent className='p-0'>
         <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-4'>
           {messages.length === 0 && !isGenerating && (
@@ -134,214 +188,78 @@ export function PlaygroundChat({
               </div>
             </div>
           )}
-          {messages.map((message, messageIndex) => {
-            const { versions = [] } = message
-            const isLastAssistantMessage =
-              messageIndex === messages.length - 1 &&
-              message.from === MESSAGE_ROLES.ASSISTANT
+
+          {rows.map((row, rowIndex) => {
+            if (row.kind === 'single') {
+              return (
+                <m.div
+                  key={row.message.key}
+                  initial={reveal?.initial}
+                  animate={reveal?.animate}
+                  transition={reveal?.transition}
+                >
+                  <PlaygroundMessage
+                    modelLabel={modelLabel}
+                    {...sharedMessageProps(row.message, false)}
+                  />
+                </m.div>
+              )
+            }
+
+            const isLatestTurn = rowIndex === lastGroupIndex
+            // Single assistant response → render inline (single-model mode).
+            if (row.messages.length === 1) {
+              const message = row.messages[0]
+              return (
+                <m.div
+                  key={message.key}
+                  initial={reveal?.initial}
+                  animate={reveal?.animate}
+                  transition={reveal?.transition}
+                >
+                  <PlaygroundMessage
+                    modelLabel={message.model || modelLabel}
+                    {...sharedMessageProps(message, isLatestTurn)}
+                  />
+                </m.div>
+              )
+            }
+
+            // Multiple responses → side-by-side compare columns (staggered in).
             return (
-              <Branch defaultBranch={0} key={message.key}>
-                <BranchMessages>
-                  {versions.map((version, versionIndex) => (
-                    <SpeakerMessage
-                      from={message.from}
-                      tile={
-                        message.from === MESSAGE_ROLES.USER ? userInitials : '✦'
-                      }
-                      speaker={
-                        message.from === MESSAGE_ROLES.USER
-                          ? t('You')
-                          : modelLabel || t('Assistant')
-                      }
-                      key={`${message.key}-${version.id}-${versionIndex}`}
+              <div
+                key={`group-${row.messages[0].key}`}
+                className='grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-3'
+              >
+                {row.messages.map((message, colIndex) => (
+                  <m.div
+                    key={message.key}
+                    className='bg-surface/40 min-w-0 rounded-lg border p-3'
+                    initial={reveal?.initial}
+                    animate={reveal?.animate}
+                    transition={
+                      reveal
+                        ? {
+                            ...MOTION_TRANSITION.default,
+                            delay: colIndex * 0.06,
+                          }
+                        : undefined
+                    }
+                  >
+                    <div
+                      className='text-muted-foreground mb-1 truncate text-xs font-medium'
+                      title={message.model || modelLabel}
                     >
-                      <div className='w-full min-w-0'>
-                        {isEditing(message.key) ? (
-                          <div className='space-y-2'>
-                            <Textarea
-                              value={editText}
-                              onChange={(e) => setEditText(e.target.value)}
-                              className='font-mono text-sm'
-                              rows={8}
-                            />
-                            <div className='flex gap-2'>
-                              {/* Save & Submit only makes sense for user messages */}
-                              {message.from === MESSAGE_ROLES.USER && (
-                                <Button
-                                  size='sm'
-                                  onClick={() =>
-                                    onSaveEditAndSubmit?.(editText)
-                                  }
-                                  disabled={isEmpty || !isChanged}
-                                >
-                                  {t('Save & Submit')}
-                                </Button>
-                              )}
-                              <Button
-                                size='sm'
-                                onClick={() => onSaveEdit?.(editText)}
-                                disabled={isEmpty || !isChanged}
-                              >
-                                {t('Save')}
-                              </Button>
-                              <Button
-                                size='sm'
-                                variant='outline'
-                                onClick={() => onCancelEdit?.(false)}
-                              >
-                                {t('Cancel')}
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            {(() => {
-                              const isAssistant =
-                                message.from === MESSAGE_ROLES.ASSISTANT
-                              const hasSources = !!message.sources?.length
-                              const showReasoning =
-                                isAssistant && !!message.reasoning?.content
-                              const showLoader =
-                                isAssistant &&
-                                !message.isReasoningStreaming &&
-                                (message.status === 'loading' ||
-                                  (message.status === 'streaming' &&
-                                    !version.content))
-                              const showMessageContent =
-                                (message.from === MESSAGE_ROLES.USER ||
-                                  !message.isReasoningStreaming) &&
-                                !!version.content
-
-                              // Extract visible content (remove <think> tags for assistant messages)
-                              const displayContent = isAssistant
-                                ? parseThinkTags(version.content).visibleContent
-                                : version.content
-
-                              const actions = (
-                                <MessageActions
-                                  message={message}
-                                  onCopy={onCopyMessage}
-                                  onRegenerate={onRegenerateMessage}
-                                  onEdit={onEditMessage}
-                                  onDelete={onDeleteMessage}
-                                  isGenerating={isGenerating}
-                                  alwaysVisible={isLastAssistantMessage}
-                                  className='mt-1'
-                                />
-                              )
-
-                              return (
-                                <>
-                                  {/* Sources */}
-                                  {hasSources && (
-                                    <Sources>
-                                      <SourcesTrigger
-                                        count={message.sources!.length}
-                                      />
-                                      <SourcesContent>
-                                        {message.sources!.map(
-                                          (source, sourceIndex) => (
-                                            <Source
-                                              href={source.href}
-                                              key={`${message.key}-source-${sourceIndex}`}
-                                              title={source.title}
-                                            />
-                                          )
-                                        )}
-                                      </SourcesContent>
-                                    </Sources>
-                                  )}
-
-                                  {/* Reasoning */}
-                                  {showReasoning && (
-                                    <Reasoning
-                                      defaultOpen={true}
-                                      isStreaming={message.isReasoningStreaming}
-                                    >
-                                      <ReasoningTrigger />
-                                      <ReasoningContent>
-                                        {message.reasoning!.content}
-                                      </ReasoningContent>
-                                    </Reasoning>
-                                  )}
-
-                                  {/* Attached images (vision input) */}
-                                  {!!message.imageUrls?.length && (
-                                    <div className='mb-1 flex flex-wrap gap-2'>
-                                      {message.imageUrls.map((url) => (
-                                        <a
-                                          key={url}
-                                          href={url}
-                                          target='_blank'
-                                          rel='noreferrer'
-                                        >
-                                          <img
-                                            src={url}
-                                            alt={t('Attached image')}
-                                            className='h-20 w-20 rounded-md border object-cover'
-                                          />
-                                        </a>
-                                      ))}
-                                    </div>
-                                  )}
-
-                                  {/* Loader */}
-                                  {showLoader && (
-                                    <div className='flex items-center gap-2 py-2'>
-                                      <Loader />
-                                      <Shimmer className='text-sm' duration={1}>
-                                        {t('Responding...')}
-                                      </Shimmer>
-                                    </div>
-                                  )}
-
-                                  {/* Error or Content */}
-                                  {message.status === 'error' ? (
-                                    <>
-                                      <MessageError
-                                        message={message}
-                                        className='mb-2'
-                                      />
-                                      {actions}
-                                    </>
-                                  ) : (
-                                    showMessageContent && (
-                                      <>
-                                        <MessageContent
-                                          variant='flat'
-                                          className={cn(
-                                            getMessageContentStyles()
-                                          )}
-                                        >
-                                          <Response>{displayContent}</Response>
-                                          {isGenerating &&
-                                            isLastAssistantMessage && (
-                                              <StreamingCursor />
-                                            )}
-                                        </MessageContent>
-                                        {actions}
-                                      </>
-                                    )
-                                  )}
-                                </>
-                              )
-                            })()}
-                          </>
-                        )}
-                      </div>
-                    </SpeakerMessage>
-                  ))}
-                </BranchMessages>
-
-                {/* Branch selector for multiple versions */}
-                {versions.length > 1 && (
-                  <BranchSelector className='px-0' from={message.from}>
-                    <BranchPrevious />
-                    <BranchPage />
-                    <BranchNext />
-                  </BranchSelector>
-                )}
-              </Branch>
+                      {message.model || modelLabel || t('Assistant')}
+                    </div>
+                    <PlaygroundMessage
+                      modelLabel={message.model || modelLabel}
+                      {...sharedMessageProps(message, isLatestTurn)}
+                    />
+                    <ResponseMeta message={message} />
+                  </m.div>
+                ))}
+              </div>
             )
           })}
         </div>

@@ -146,7 +146,7 @@ export function RowActions({
       className={cn(
         'flex items-center justify-end gap-1',
         !alwaysVisible &&
-          'transition-opacity duration-[80ms] sm:opacity-0 sm:group-hover/row:opacity-100 sm:has-focus-visible:opacity-100 sm:has-[[aria-expanded=true]]:opacity-100',
+          'duration-instant transition-opacity sm:opacity-0 sm:group-hover/row:opacity-100 sm:has-focus-visible:opacity-100 sm:has-[[aria-expanded=true]]:opacity-100',
         className
       )}
       {...props}

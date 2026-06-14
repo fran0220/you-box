@@ -20,6 +20,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { formatQuota } from '@/lib/format'
 import { computeTimeRange } from '@/lib/time'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   DeltaBadge,
@@ -101,13 +102,25 @@ export function BalanceHeroCard({ user, loading }: BalanceHeroCardProps) {
         <div className='min-w-0'>
           <Eyebrow>{t('Balance')}</Eyebrow>
           <div className='font-display text-foreground mt-1 text-[40px] font-bold tracking-[-0.03em] break-all'>
-            {formatQuota(quota)}
+            <AnimatedNumber
+              value={quota}
+              format={formatQuota}
+              duration={1200}
+            />
           </div>
           <div className='mt-3 flex flex-wrap items-start gap-x-8 gap-y-3'>
-            <Metric k={t('Used')} v={formatQuota(user?.used_quota ?? 0)} />
+            <Metric
+              k={t('Used')}
+              v={
+                <AnimatedNumber
+                  value={user?.used_quota ?? 0}
+                  format={formatQuota}
+                />
+              }
+            />
             <Metric
               k={t('Requests')}
-              v={(user?.request_count ?? 0).toLocaleString()}
+              v={<AnimatedNumber value={user?.request_count ?? 0} />}
             />
           </div>
         </div>

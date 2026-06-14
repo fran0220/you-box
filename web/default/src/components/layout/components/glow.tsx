@@ -49,7 +49,7 @@ export function Glow({ className, variant, ...props }: GlowProps) {
     >
       <div
         className={cn(
-          'absolute left-1/2 h-[256px] w-[60%] -translate-x-1/2 scale-[2.5] rounded-[50%] bg-radial from-[rgba(0,144,255,0.6)] from-10% to-[rgba(0,144,255,0)] to-60% opacity-40 sm:h-[512px] dark:opacity-80',
+          'from-brand/60 absolute left-1/2 h-[256px] w-[60%] -translate-x-1/2 scale-[2.5] rounded-[50%] bg-radial from-10% to-transparent to-60% opacity-40 sm:h-[512px] dark:opacity-80',
           variant === 'center' && '-translate-y-1/2'
         )}
       />

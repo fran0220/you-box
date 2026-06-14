@@ -36,12 +36,19 @@ import {
 } from '@/components/ai-elements/model-selector-header'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { ModelGroupSelector } from '@/components/model-group-selector'
-import { getUserModels, getUserGroups } from './api'
+import { getUserModels, getUserGroups, getModelPricingMap } from './api'
+import { CompareModelsSelector } from './components/compare-models-selector'
 import { PlaygroundChat } from './components/playground-chat'
 import { PlaygroundInput } from './components/playground-input'
 import { PlaygroundParameters } from './components/playground-parameters'
-import { usePlaygroundState, useChatHandler } from './hooks'
-import { createUserMessage, createLoadingAssistantMessage } from './lib'
+import { PresetsMenu } from './components/presets-menu'
+import { MAX_COMPARE_MODELS } from './constants'
+import { usePlaygroundState, useChatHandler, type ChatTarget } from './hooks'
+import {
+  createUserMessage,
+  createLoadingAssistantMessage,
+  getActiveModels,
+} from './lib'
 import type { Message as MessageType } from './types'
 
 export function Playground() {
@@ -58,12 +65,33 @@ export function Playground() {
     updateConfig,
     updateParameterEnabled,
     clearMessages,
+    applyPreset,
   } = usePlaygroundState()
+
+  // Pricing map (model → ratios) used to derive real per-response cost.
+  const { data: pricingMap } = useQuery({
+    queryKey: ['playground-pricing'],
+    queryFn: async () => {
+      try {
+        return await getModelPricingMap()
+      } catch {
+        return {}
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const groupRatio = useMemo(
+    () => groups.find((g) => g.value === config.group)?.ratio ?? 1,
+    [groups, config.group]
+  )
 
   const { sendChat, stopGeneration, isGenerating } = useChatHandler({
     config,
     parameterEnabled,
     onMessageUpdate: updateMessages,
+    pricingMap,
+    groupRatio,
   })
 
   // Edit dialog state
@@ -139,27 +167,46 @@ export function Playground() {
 
   const handleSendMessage = (text: string, imageUrls?: string[]) => {
     const userMessage = createUserMessage(text, imageUrls)
-    const assistantMessage = createLoadingAssistantMessage()
+    const activeModels = getActiveModels(config)
 
-    const newMessages = [...messages, userMessage, assistantMessage]
+    // One loading assistant slot per active model (side-by-side compare).
+    const assistantMessages = activeModels.map((model) =>
+      createLoadingAssistantMessage(model)
+    )
+    const targets: ChatTarget[] = assistantMessages.map((m, i) => ({
+      key: m.key,
+      model: activeModels[i],
+    }))
+
+    const newMessages = [...messages, userMessage, ...assistantMessages]
     updateMessages(newMessages)
-
-    // Send chat request
-    sendChat(newMessages)
+    sendChat(newMessages, targets)
   }
 
   const handleRegenerateMessage = (message: MessageType) => {
-    // Find the message index and regenerate from there
     const messageIndex = messages.findIndex((m) => m.key === message.key)
     if (messageIndex === -1) return
 
-    // Remove messages after this one and regenerate
-    const messagesUpToHere = messages.slice(0, messageIndex)
-    const loadingMessage = createLoadingAssistantMessage()
-    const newMessages = [...messagesUpToHere, loadingMessage]
+    // Regenerate only this model's response, in place, preserving sibling
+    // columns. History = everything up to and including the preceding user
+    // message (the chat handler scopes it to this model).
+    const model = message.model || config.model
+    let userIndex = -1
+    for (let i = messageIndex - 1; i >= 0; i--) {
+      if (messages[i].from === 'user') {
+        userIndex = i
+        break
+      }
+    }
 
+    const reloaded = createLoadingAssistantMessage(model)
+    const newMessages = messages.map((m) =>
+      m.key === message.key ? { ...reloaded, key: message.key } : m
+    )
     updateMessages(newMessages)
-    sendChat(newMessages)
+
+    const history = newMessages.slice(0, userIndex + 1)
+    sendChat(history, [{ key: message.key, model }])
   }
 
   const handleEditMessage = useCallback((message: MessageType) => {
@@ -190,14 +237,21 @@ export function Playground() {
         return
       }
 
-      const toSubmit = [
-        ...updated.slice(0, index + 1),
-        createLoadingAssistantMessage(),
-      ]
+      // Re-run all active models from the edited user message.
+      const activeModels = getActiveModels(config)
+      const assistantMessages = activeModels.map((model) =>
+        createLoadingAssistantMessage(model)
+      )
+      const targets: ChatTarget[] = assistantMessages.map((m, i) => ({
+        key: m.key,
+        model: activeModels[i],
+      }))
+
+      const toSubmit = [...updated.slice(0, index + 1), ...assistantMessages]
       updateMessages(toSubmit)
-      sendChat(toSubmit)
+      sendChat(toSubmit, targets)
     },
-    [editingMessageKey, messages, updateMessages, sendChat]
+    [editingMessageKey, messages, updateMessages, sendChat, config]
   )
 
   const handleDeleteMessage = (message: MessageType) => {
@@ -208,6 +262,17 @@ export function Playground() {
   const handleResetConfirm = () => {
     clearMessages()
     setResetConfirmOpen(false)
+  }
+
+  // Switching the primary model drops it from the compare set (it is implicit).
+  const handlePrimaryModelChange = (value: string) => {
+    updateConfig('model', value)
+    if (config.compareModels.includes(value)) {
+      updateConfig(
+        'compareModels',
+        config.compareModels.filter((m) => m !== value)
+      )
+    }
   }
 
   const selectedGroup = useMemo(
@@ -243,7 +308,7 @@ export function Playground() {
           <ModelGroupSelector
             selectedModel={config.model}
             models={models}
-            onModelChange={(value) => updateConfig('model', value)}
+            onModelChange={handlePrimaryModelChange}
             selectedGroup={config.group}
             groups={groups}
             onGroupChange={(value) => updateConfig('group', value)}
@@ -266,6 +331,20 @@ export function Playground() {
         }
         actions={
           <>
+            <PresetsMenu
+              config={config}
+              parameterEnabled={parameterEnabled}
+              onApply={applyPreset}
+              disabled={isLoadingModels}
+            />
+            <CompareModelsSelector
+              models={models}
+              primaryModel={config.model}
+              value={config.compareModels}
+              onChange={(next) => updateConfig('compareModels', next)}
+              max={MAX_COMPARE_MODELS}
+              disabled={isSelectorDisabled}
+            />
             <Button
               variant='ghost'
               size='icon-sm'
@@ -316,6 +395,8 @@ export function Playground() {
               isGenerating={isGenerating}
               onStop={stopGeneration}
               onSubmit={handleSendMessage}
+              webSearch={config.webSearch}
+              onWebSearchChange={(value) => updateConfig('webSearch', value)}
             />
           </div>
         </div>

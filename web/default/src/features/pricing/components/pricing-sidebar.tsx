@@ -31,12 +31,14 @@ import {
 import {
   ENDPOINT_TYPES,
   FILTER_ALL,
+  MODALITY_FILTERS,
   QUOTA_TYPES,
   getEndpointTypeLabels,
+  getModalityLabels,
   getQuotaTypeLabels,
 } from '../constants'
 import { parseTags } from '../lib/filters'
-import type { PricingModel, PricingVendor } from '../types'
+import type { Modality, PricingModel, PricingVendor } from '../types'
 
 type FilterOption = {
   value: string
@@ -56,11 +58,13 @@ type FilterSectionProps = {
 export interface PricingSidebarProps {
   quotaTypeFilter: string
   endpointTypeFilter: string
+  modalityFilter: string
   vendorFilter: string
   groupFilter: string
   tagFilter: string
   onQuotaTypeChange: (value: string) => void
   onEndpointTypeChange: (value: string) => void
+  onModalityChange: (value: string) => void
   onVendorChange: (value: string) => void
   onGroupChange: (value: string) => void
   onTagChange: (value: string) => void
@@ -158,6 +162,14 @@ export function PricingSidebar(props: PricingSidebarProps) {
   const { t } = useTranslation()
   const quotaTypeLabels = getQuotaTypeLabels(t)
   const endpointTypeLabels = getEndpointTypeLabels(t)
+  const modalityLabels = getModalityLabels(t)
+
+  const modalityHasModel = (modality: Modality) => (model: PricingModel) => {
+    const modalities: Modality[] = model.input_modalities?.length
+      ? model.input_modalities
+      : ['text']
+    return modalities.includes(modality)
+  }
 
   const vendorOptions: FilterOption[] = [
     {
@@ -243,6 +255,29 @@ export function PricingSidebar(props: PricingSidebarProps) {
       })),
   ]
 
+  const modalityOptions: FilterOption[] = [
+    {
+      value: MODALITY_FILTERS.ALL,
+      label: modalityLabels[MODALITY_FILTERS.ALL],
+      count: props.models.length,
+    },
+    ...(
+      [
+        MODALITY_FILTERS.TEXT,
+        MODALITY_FILTERS.IMAGE,
+        MODALITY_FILTERS.AUDIO,
+        MODALITY_FILTERS.VIDEO,
+        MODALITY_FILTERS.FILE,
+      ] as Modality[]
+    )
+      .map((modality) => ({
+        value: modality,
+        label: modalityLabels[modality],
+        count: countBy(props.models, modalityHasModel(modality)),
+      }))
+      .filter((option) => option.count > 0),
+  ]
+
   return (
     <aside className={cn('rounded-xl border p-3', props.className)}>
       <div className='mb-2.5 flex items-center justify-between gap-2'>
@@ -296,6 +331,14 @@ export function PricingSidebar(props: PricingSidebarProps) {
           options={quotaOptions}
           onChange={props.onQuotaTypeChange}
         />
+        {modalityOptions.length > 1 && (
+          <FilterSection
+            title={t('Input Modality')}
+            value={props.modalityFilter}
+            options={modalityOptions}
+            onChange={props.onModalityChange}
+          />
+        )}
         <FilterSection
           title={t('Endpoint Type')}
           value={props.endpointTypeFilter}

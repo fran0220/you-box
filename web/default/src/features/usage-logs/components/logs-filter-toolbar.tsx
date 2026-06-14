@@ -50,6 +50,8 @@ interface LogsFilterToolbarProps<TData> {
   searchLoading?: boolean
   onReset: () => void
   onSearch: () => void
+  /** Extra action(s) rendered alongside Reset/Search (e.g. an Export button). */
+  actions?: ReactNode
   className?: string
 }
 
@@ -114,6 +116,7 @@ export function LogsFilterToolbar<TData>(props: LogsFilterToolbarProps<TData>) {
           <div className='mt-2 flex flex-col gap-2'>
             {props.stats}
             <div className='flex items-center justify-end gap-1.5'>
+              {props.actions}
               <DrawerTrigger asChild>
                 <Button
                   type='button'
@@ -221,13 +224,14 @@ export function LogsFilterToolbar<TData>(props: LogsFilterToolbarProps<TData>) {
               )}
               <ChevronDown
                 className={cn(
-                  'size-3.5 transition-transform duration-200',
+                  'duration-fast size-3.5 transition-transform',
                   advancedOpen && 'rotate-180'
                 )}
               />
             </Button>
           )}
 
+          {props.actions}
           <Button
             type='button'
             variant='outline'

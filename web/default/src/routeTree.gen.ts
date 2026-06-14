@@ -20,8 +20,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SetupIndexRouteImport } from './routes/setup/index'
 import { Route as RankingsIndexRouteImport } from './routes/rankings/index'
 import { Route as PricingIndexRouteImport } from './routes/pricing/index'
+import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as ConsoleIndexRouteImport } from './routes/console/index'
+import { Route as AppsIndexRouteImport } from './routes/apps/index'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
+import { Route as PricingCompareRouteImport } from './routes/pricing/compare'
 import { Route as OauthProviderRouteImport } from './routes/oauth/$provider'
 import { Route as ConsoleUserRouteImport } from './routes/console/user'
 import { Route as ConsoleTopupRouteImport } from './routes/console/topup'
@@ -65,6 +68,7 @@ import { Route as AuthenticatedModelsIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedKeysIndexRouteImport } from './routes/_authenticated/keys/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
 import { Route as AuthenticatedChannelsIndexRouteImport } from './routes/_authenticated/channels/index'
+import { Route as AuthenticatedApiToolsIndexRouteImport } from './routes/_authenticated/api-tools/index'
 import { Route as ConsoleChatIdRouteImport } from './routes/console/chat/$id'
 import { Route as AuthenticatedUsageLogsSectionRouteImport } from './routes/_authenticated/usage-logs/$section'
 import { Route as AuthenticatedModelsSectionRouteImport } from './routes/_authenticated/models/$section'
@@ -140,14 +144,29 @@ const PricingIndexRoute = PricingIndexRouteImport.update({
   path: '/pricing/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/docs/',
+  path: '/docs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
   id: '/console/',
   path: '/console/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppsIndexRoute = AppsIndexRouteImport.update({
+  id: '/apps/',
+  path: '/apps/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutIndexRoute = AboutIndexRouteImport.update({
   id: '/about/',
   path: '/about/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingCompareRoute = PricingCompareRouteImport.update({
+  id: '/pricing/compare',
+  path: '/pricing/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OauthProviderRoute = OauthProviderRouteImport.update({
@@ -376,6 +395,12 @@ const AuthenticatedChannelsIndexRoute =
     path: '/channels/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedApiToolsIndexRoute =
+  AuthenticatedApiToolsIndexRouteImport.update({
+    id: '/api-tools/',
+    path: '/api-tools/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ConsoleChatIdRoute = ConsoleChatIdRouteImport.update({
   id: '/console/chat/$id',
   path: '/console/chat/$id',
@@ -536,8 +561,11 @@ export interface FileRoutesByFullPath {
   '/console/topup': typeof ConsoleTopupRoute
   '/console/user': typeof ConsoleUserRoute
   '/oauth/$provider': typeof OauthProviderRoute
+  '/pricing/compare': typeof PricingCompareRoute
   '/about/': typeof AboutIndexRoute
+  '/apps/': typeof AppsIndexRoute
   '/console/': typeof ConsoleIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/rankings/': typeof RankingsIndexRoute
   '/setup/': typeof SetupIndexRoute
@@ -548,6 +576,7 @@ export interface FileRoutesByFullPath {
   '/models/$section': typeof AuthenticatedModelsSectionRoute
   '/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
   '/console/chat/$id': typeof ConsoleChatIdRoute
+  '/api-tools/': typeof AuthenticatedApiToolsIndexRoute
   '/channels/': typeof AuthenticatedChannelsIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/keys/': typeof AuthenticatedKeysIndexRoute
@@ -612,8 +641,11 @@ export interface FileRoutesByTo {
   '/console/topup': typeof ConsoleTopupRoute
   '/console/user': typeof ConsoleUserRoute
   '/oauth/$provider': typeof OauthProviderRoute
+  '/pricing/compare': typeof PricingCompareRoute
   '/about': typeof AboutIndexRoute
+  '/apps': typeof AppsIndexRoute
   '/console': typeof ConsoleIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/pricing': typeof PricingIndexRoute
   '/rankings': typeof RankingsIndexRoute
   '/setup': typeof SetupIndexRoute
@@ -624,6 +656,7 @@ export interface FileRoutesByTo {
   '/models/$section': typeof AuthenticatedModelsSectionRoute
   '/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
   '/console/chat/$id': typeof ConsoleChatIdRoute
+  '/api-tools': typeof AuthenticatedApiToolsIndexRoute
   '/channels': typeof AuthenticatedChannelsIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/keys': typeof AuthenticatedKeysIndexRoute
@@ -692,8 +725,11 @@ export interface FileRoutesById {
   '/console/topup': typeof ConsoleTopupRoute
   '/console/user': typeof ConsoleUserRoute
   '/oauth/$provider': typeof OauthProviderRoute
+  '/pricing/compare': typeof PricingCompareRoute
   '/about/': typeof AboutIndexRoute
+  '/apps/': typeof AppsIndexRoute
   '/console/': typeof ConsoleIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/rankings/': typeof RankingsIndexRoute
   '/setup/': typeof SetupIndexRoute
@@ -704,6 +740,7 @@ export interface FileRoutesById {
   '/_authenticated/models/$section': typeof AuthenticatedModelsSectionRoute
   '/_authenticated/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
   '/console/chat/$id': typeof ConsoleChatIdRoute
+  '/_authenticated/api-tools/': typeof AuthenticatedApiToolsIndexRoute
   '/_authenticated/channels/': typeof AuthenticatedChannelsIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/keys/': typeof AuthenticatedKeysIndexRoute
@@ -771,8 +808,11 @@ export interface FileRouteTypes {
     | '/console/topup'
     | '/console/user'
     | '/oauth/$provider'
+    | '/pricing/compare'
     | '/about/'
+    | '/apps/'
     | '/console/'
+    | '/docs/'
     | '/pricing/'
     | '/rankings/'
     | '/setup/'
@@ -783,6 +823,7 @@ export interface FileRouteTypes {
     | '/models/$section'
     | '/usage-logs/$section'
     | '/console/chat/$id'
+    | '/api-tools/'
     | '/channels/'
     | '/dashboard/'
     | '/keys/'
@@ -847,8 +888,11 @@ export interface FileRouteTypes {
     | '/console/topup'
     | '/console/user'
     | '/oauth/$provider'
+    | '/pricing/compare'
     | '/about'
+    | '/apps'
     | '/console'
+    | '/docs'
     | '/pricing'
     | '/rankings'
     | '/setup'
@@ -859,6 +903,7 @@ export interface FileRouteTypes {
     | '/models/$section'
     | '/usage-logs/$section'
     | '/console/chat/$id'
+    | '/api-tools'
     | '/channels'
     | '/dashboard'
     | '/keys'
@@ -926,8 +971,11 @@ export interface FileRouteTypes {
     | '/console/topup'
     | '/console/user'
     | '/oauth/$provider'
+    | '/pricing/compare'
     | '/about/'
+    | '/apps/'
     | '/console/'
+    | '/docs/'
     | '/pricing/'
     | '/rankings/'
     | '/setup/'
@@ -938,6 +986,7 @@ export interface FileRouteTypes {
     | '/_authenticated/models/$section'
     | '/_authenticated/usage-logs/$section'
     | '/console/chat/$id'
+    | '/_authenticated/api-tools/'
     | '/_authenticated/channels/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/keys/'
@@ -997,8 +1046,11 @@ export interface RootRouteChildren {
   ConsoleTopupRoute: typeof ConsoleTopupRoute
   ConsoleUserRoute: typeof ConsoleUserRoute
   OauthProviderRoute: typeof OauthProviderRoute
+  PricingCompareRoute: typeof PricingCompareRoute
   AboutIndexRoute: typeof AboutIndexRoute
+  AppsIndexRoute: typeof AppsIndexRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
+  DocsIndexRoute: typeof DocsIndexRoute
   PricingIndexRoute: typeof PricingIndexRoute
   RankingsIndexRoute: typeof RankingsIndexRoute
   SetupIndexRoute: typeof SetupIndexRoute
@@ -1086,6 +1138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs/': {
+      id: '/docs/'
+      path: '/docs'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof DocsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console/': {
       id: '/console/'
       path: '/console'
@@ -1093,11 +1152,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apps/': {
+      id: '/apps/'
+      path: '/apps'
+      fullPath: '/apps/'
+      preLoaderRoute: typeof AppsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about/': {
       id: '/about/'
       path: '/about'
       fullPath: '/about/'
       preLoaderRoute: typeof AboutIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing/compare': {
+      id: '/pricing/compare'
+      path: '/pricing/compare'
+      fullPath: '/pricing/compare'
+      preLoaderRoute: typeof PricingCompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oauth/$provider': {
@@ -1401,6 +1474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChannelsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/api-tools/': {
+      id: '/_authenticated/api-tools/'
+      path: '/api-tools'
+      fullPath: '/api-tools/'
+      preLoaderRoute: typeof AuthenticatedApiToolsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/console/chat/$id': {
       id: '/console/chat/$id'
       path: '/console/chat/$id'
@@ -1642,6 +1722,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedModelsSectionRoute: typeof AuthenticatedModelsSectionRoute
   AuthenticatedUsageLogsSectionRoute: typeof AuthenticatedUsageLogsSectionRoute
+  AuthenticatedApiToolsIndexRoute: typeof AuthenticatedApiToolsIndexRoute
   AuthenticatedChannelsIndexRoute: typeof AuthenticatedChannelsIndexRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedKeysIndexRoute: typeof AuthenticatedKeysIndexRoute
@@ -1664,6 +1745,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedModelsSectionRoute: AuthenticatedModelsSectionRoute,
   AuthenticatedUsageLogsSectionRoute: AuthenticatedUsageLogsSectionRoute,
+  AuthenticatedApiToolsIndexRoute: AuthenticatedApiToolsIndexRoute,
   AuthenticatedChannelsIndexRoute: AuthenticatedChannelsIndexRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   AuthenticatedKeysIndexRoute: AuthenticatedKeysIndexRoute,
@@ -1710,8 +1792,11 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleTopupRoute: ConsoleTopupRoute,
   ConsoleUserRoute: ConsoleUserRoute,
   OauthProviderRoute: OauthProviderRoute,
+  PricingCompareRoute: PricingCompareRoute,
   AboutIndexRoute: AboutIndexRoute,
+  AppsIndexRoute: AppsIndexRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
+  DocsIndexRoute: DocsIndexRoute,
   PricingIndexRoute: PricingIndexRoute,
   RankingsIndexRoute: RankingsIndexRoute,
   SetupIndexRoute: SetupIndexRoute,

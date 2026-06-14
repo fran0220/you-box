@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
 import { X, User, Wallet, LogOut } from 'lucide-react'
-import { AnimatePresence, motion, type Variants } from 'motion/react'
+import { AnimatePresence, m, type Variants } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import type { AuthUser } from '@/stores/auth-store'
 import useDialogState from '@/hooks/use-dialog'
@@ -204,7 +204,7 @@ export function MobileDrawer({
       {isOpen && (
         <>
           {/* Overlay */}
-          <motion.div
+          <m.div
             className={MOBILE_DRAWER_CONFIG.overlayClassName}
             initial='hidden'
             animate='visible'
@@ -217,7 +217,7 @@ export function MobileDrawer({
           />
 
           {/* Drawer Content */}
-          <motion.div
+          <m.div
             className={MOBILE_DRAWER_CONFIG.drawerClassName}
             initial='hidden'
             animate='visible'
@@ -247,7 +247,7 @@ export function MobileDrawer({
               </div>
 
               {/* Navigation links */}
-              <motion.div
+              <m.div
                 className='border-border mb-4 flex flex-col rounded-md border text-sm'
                 variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
               >
@@ -260,7 +260,7 @@ export function MobileDrawer({
                 ) : (
                   <AnimatePresence>
                     {mobileLinksList.map((link, index) => (
-                      <motion.div
+                      <m.div
                         key={`${link.href}-${index}`}
                         className='border-border border-b p-2.5 last:border-b-0'
                         variants={MOBILE_DRAWER_ANIMATION.menuItem as Variants}
@@ -272,11 +272,11 @@ export function MobileDrawer({
                         >
                           {link.title}
                         </Link>
-                      </motion.div>
+                      </m.div>
                     ))}
                   </AnimatePresence>
                 )}
-              </motion.div>
+              </m.div>
 
               {/* User profile section */}
               {showAuthButtons &&
@@ -286,7 +286,7 @@ export function MobileDrawer({
                   <MobileSignInButton onNavigate={onClose} />
                 ))}
             </div>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>

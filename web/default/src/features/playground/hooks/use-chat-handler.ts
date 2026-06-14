@@ -16,203 +16,254 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { sendChatCompletion } from '../api'
 import { MESSAGE_STATUS, ERROR_MESSAGES } from '../constants'
 import {
   buildChatCompletionPayload,
-  updateAssistantMessageWithError,
-  updateLastAssistantMessage,
+  setMessageErrorByKey,
+  updateMessageByKey,
   processStreamingContent,
   finalizeMessage,
+  computeCostUsd,
+  type ModelPricing,
 } from '../lib'
-import type { Message, PlaygroundConfig, ParameterEnabled } from '../types'
+import type {
+  Message,
+  PlaygroundConfig,
+  ParameterEnabled,
+  TokenUsage,
+  UrlCitationAnnotation,
+} from '../types'
 import { useStreamRequest } from './use-stream-request'
+
+/** An assistant slot to fill: its message key and the model that produces it. */
+export interface ChatTarget {
+  key: string
+  model: string
+}
 
 interface UseChatHandlerOptions {
   config: PlaygroundConfig
   parameterEnabled: ParameterEnabled
   onMessageUpdate: (updater: (prev: Message[]) => Message[]) => void
+  /** model name → pricing, used to derive per-response cost. */
+  pricingMap?: Record<string, ModelPricing>
+  /** Ratio of the active group, multiplied into the cost. */
+  groupRatio?: number
+}
+
+/** Merge new url citations into an assistant message's sources (dedup by href). */
+function mergeSources(
+  message: Message,
+  annotations: UrlCitationAnnotation[]
+): Message['sources'] {
+  const existing = message.sources ?? []
+  const seen = new Set(existing.map((s) => s.href))
+  const additions = annotations
+    .filter((a) => a.type === 'url_citation' && a.url_citation?.url)
+    .map((a) => ({
+      href: a.url_citation.url,
+      title: a.url_citation.title || a.url_citation.url,
+    }))
+    .filter((s) => {
+      if (seen.has(s.href)) return false
+      seen.add(s.href)
+      return true
+    })
+  return additions.length ? [...existing, ...additions] : existing
 }
 
 /**
- * Hook for handling chat message sending and receiving
+ * Hook for handling chat message sending and receiving. Drives one or many
+ * concurrent model responses (side-by-side compare), routing each stream to
+ * its own assistant message by key.
  */
 export function useChatHandler({
   config,
   parameterEnabled,
   onMessageUpdate,
+  pricingMap,
+  groupRatio = 1,
 }: UseChatHandlerOptions) {
   const { sendStreamRequest, stopStream, isStreaming } = useStreamRequest()
 
-  // Wall-clock start of the in-flight request, used to derive per-response
-  // latency for the session stats rail.
-  const requestStartRef = useRef<number | null>(null)
+  // Wall-clock start per in-flight target (keyed by assistant message key).
+  const requestStartRef = useRef<Map<string, number>>(new Map())
+  // Count of in-flight non-streaming requests (the stream manager only tracks
+  // SSE connections), so `isGenerating` is correct in non-streaming mode too.
+  const [pendingCount, setPendingCount] = useState(0)
 
-  // Handle stream update
-  const handleStreamUpdate = useCallback(
-    (type: 'reasoning' | 'content', chunk: string) => {
-      onMessageUpdate((prev) =>
-        updateLastAssistantMessage(prev, (message) => {
-          if (message.status === MESSAGE_STATUS.ERROR) return message
+  const costFor = useCallback(
+    (model: string, usage: TokenUsage | undefined): number | undefined =>
+      computeCostUsd(usage, pricingMap?.[model], groupRatio),
+    [pricingMap, groupRatio]
+  )
 
-          if (type === 'reasoning') {
-            // Direct API reasoning_content
-            return {
+  // ---- streaming -----------------------------------------------------------
+
+  const sendStreamingTo = useCallback(
+    (messages: Message[], target: ChatTarget) => {
+      const payload = buildChatCompletionPayload(messages, config, parameterEnabled, {
+        model: target.model,
+        scopeHistoryToModel: true,
+      })
+      requestStartRef.current.set(target.key, Date.now())
+
+      sendStreamRequest(target.key, payload, {
+        onUpdate: (type, chunk) => {
+          onMessageUpdate((prev) =>
+            updateMessageByKey(prev, target.key, (message) => {
+              if (message.status === MESSAGE_STATUS.ERROR) return message
+              if (type === 'reasoning') {
+                return {
+                  ...message,
+                  reasoning: {
+                    content: (message.reasoning?.content || '') + chunk,
+                    duration: 0,
+                  },
+                  isReasoningStreaming: true,
+                  status: MESSAGE_STATUS.STREAMING,
+                }
+              }
+              return {
+                ...processStreamingContent(message, chunk),
+                status: MESSAGE_STATUS.STREAMING,
+              }
+            })
+          )
+        },
+        onAnnotations: (annotations) => {
+          onMessageUpdate((prev) =>
+            updateMessageByKey(prev, target.key, (message) => ({
               ...message,
-              reasoning: {
-                content: (message.reasoning?.content || '') + chunk,
-                duration: 0,
-              },
-              isReasoningStreaming: true,
-              status: MESSAGE_STATUS.STREAMING,
-            }
-          }
-
-          // Content streaming: handle <think> tags
-          return {
-            ...processStreamingContent(message, chunk),
-            status: MESSAGE_STATUS.STREAMING,
-          }
-        })
-      )
+              sources: mergeSources(message, annotations),
+            }))
+          )
+        },
+        onComplete: (usage) => {
+          const startedAt = requestStartRef.current.get(target.key)
+          const latencyMs = startedAt != null ? Date.now() - startedAt : undefined
+          requestStartRef.current.delete(target.key)
+          onMessageUpdate((prev) =>
+            updateMessageByKey(prev, target.key, (message) =>
+              message.status === MESSAGE_STATUS.COMPLETE ||
+              message.status === MESSAGE_STATUS.ERROR
+                ? message
+                : {
+                    ...finalizeMessage(message),
+                    status: MESSAGE_STATUS.COMPLETE,
+                    usage,
+                    costUsd: costFor(target.model, usage),
+                    latencyMs,
+                  }
+            )
+          )
+        },
+        onError: (error, errorCode) => {
+          requestStartRef.current.delete(target.key)
+          toast.error(error)
+          onMessageUpdate((prev) =>
+            setMessageErrorByKey(prev, target.key, error, errorCode)
+          )
+        },
+      })
     },
-    [onMessageUpdate]
+    [config, parameterEnabled, sendStreamRequest, onMessageUpdate, costFor]
   )
 
-  // Handle stream complete
-  // NOTE: streaming responses carry no token usage today — the payload does
-  // not request `stream_options.include_usage`, so only latency is recorded
-  // here. Usage stays undefined until backend usage passthrough lands.
-  const handleStreamComplete = useCallback(() => {
-    const startedAt = requestStartRef.current
-    const latencyMs = startedAt != null ? Date.now() - startedAt : undefined
-    requestStartRef.current = null
-    onMessageUpdate((prev) =>
-      updateLastAssistantMessage(prev, (message) =>
-        message.status === MESSAGE_STATUS.COMPLETE ||
-        message.status === MESSAGE_STATUS.ERROR
-          ? message
-          : {
-              ...finalizeMessage(message),
-              status: MESSAGE_STATUS.COMPLETE,
-              latencyMs,
-            }
-      )
-    )
-  }, [onMessageUpdate])
+  // ---- non-streaming -------------------------------------------------------
 
-  // Handle stream error
-  const handleStreamError = useCallback(
-    (error: string, errorCode?: string) => {
-      toast.error(error)
-      onMessageUpdate((prev) =>
-        updateAssistantMessageWithError(prev, error, errorCode)
-      )
-    },
-    [onMessageUpdate]
-  )
-
-  // Send streaming chat request
-  const sendStreamingChat = useCallback(
-    (messages: Message[]) => {
-      const payload = buildChatCompletionPayload(
-        messages,
-        config,
-        parameterEnabled
-      )
-      requestStartRef.current = Date.now()
-      sendStreamRequest(
-        payload,
-        handleStreamUpdate,
-        handleStreamComplete,
-        handleStreamError
-      )
-    },
-    [
-      config,
-      parameterEnabled,
-      sendStreamRequest,
-      handleStreamUpdate,
-      handleStreamComplete,
-      handleStreamError,
-    ]
-  )
-
-  // Send non-streaming chat request
-  const sendNonStreamingChat = useCallback(
-    async (messages: Message[]) => {
-      const payload = buildChatCompletionPayload(
-        messages,
-        config,
-        parameterEnabled
-      )
-
+  const sendNonStreamingTo = useCallback(
+    async (messages: Message[], target: ChatTarget) => {
+      const payload = buildChatCompletionPayload(messages, config, parameterEnabled, {
+        model: target.model,
+        scopeHistoryToModel: true,
+      })
       const startedAt = Date.now()
+      setPendingCount((c) => c + 1)
       try {
         const response = await sendChatCompletion(payload)
         const latencyMs = Date.now() - startedAt
         const choice = response.choices?.[0]
         if (!choice) return
 
+        const annotations = choice.message?.annotations
         onMessageUpdate((prev) =>
-          updateLastAssistantMessage(prev, (message) => ({
-            ...finalizeMessage(
-              {
-                ...message,
-                versions: [
-                  {
-                    ...message.versions[0],
-                    content: choice.message?.content || '',
-                  },
-                ],
-              },
-              choice.message?.reasoning_content
-            ),
-            status: MESSAGE_STATUS.COMPLETE,
-            usage: response.usage,
-            latencyMs,
-          }))
+          updateMessageByKey(prev, target.key, (message) => {
+            const withContent: Message = {
+              ...message,
+              versions: [
+                { ...message.versions[0], content: choice.message?.content || '' },
+              ],
+            }
+            return {
+              ...finalizeMessage(withContent, choice.message?.reasoning_content),
+              status: MESSAGE_STATUS.COMPLETE,
+              usage: response.usage,
+              costUsd: costFor(target.model, response.usage),
+              latencyMs,
+              sources: annotations?.length
+                ? mergeSources(message, annotations)
+                : message.sources,
+            }
+          })
         )
       } catch (error: unknown) {
         const err = error as {
-          response?: {
-            data?: { message?: string; error?: { code?: string } }
-          }
+          response?: { data?: { message?: string; error?: { code?: string } } }
           message?: string
         }
-        handleStreamError(
+        const errorMessage =
           err?.response?.data?.message ||
-            err?.message ||
-            ERROR_MESSAGES.API_REQUEST_ERROR,
-          err?.response?.data?.error?.code || undefined
+          err?.message ||
+          ERROR_MESSAGES.API_REQUEST_ERROR
+        toast.error(errorMessage)
+        onMessageUpdate((prev) =>
+          setMessageErrorByKey(
+            prev,
+            target.key,
+            errorMessage,
+            err?.response?.data?.error?.code || undefined
+          )
         )
+      } finally {
+        setPendingCount((c) => Math.max(0, c - 1))
       }
     },
-    [config, parameterEnabled, onMessageUpdate, handleStreamError]
+    [config, parameterEnabled, onMessageUpdate, costFor]
   )
 
-  // Send chat request (stream or non-stream based on config)
+  // ---- public api ----------------------------------------------------------
+
+  /**
+   * Send the conversation to one or more model targets. Each target streams
+   * (or resolves) into its own assistant message by key.
+   */
   const sendChat = useCallback(
-    (messages: Message[]) => {
-      if (config.stream) {
-        sendStreamingChat(messages)
-      } else {
-        sendNonStreamingChat(messages)
+    (messages: Message[], targets: ChatTarget[]) => {
+      for (const target of targets) {
+        if (config.stream) {
+          sendStreamingTo(messages, target)
+        } else {
+          void sendNonStreamingTo(messages, target)
+        }
       }
     },
-    [config.stream, sendStreamingChat, sendNonStreamingChat]
+    [config.stream, sendStreamingTo, sendNonStreamingTo]
   )
 
-  // Stop generation
+  // Stop all in-flight generations and finalize any still-pending messages.
   const stopGeneration = useCallback(() => {
     stopStream()
-    requestStartRef.current = null
+    requestStartRef.current.clear()
+    setPendingCount(0)
     onMessageUpdate((prev) =>
-      updateLastAssistantMessage(prev, (message) =>
-        message.status === MESSAGE_STATUS.LOADING ||
-        message.status === MESSAGE_STATUS.STREAMING
+      prev.map((message) =>
+        message.from === 'assistant' &&
+        (message.status === MESSAGE_STATUS.LOADING ||
+          message.status === MESSAGE_STATUS.STREAMING)
           ? { ...finalizeMessage(message), status: MESSAGE_STATUS.COMPLETE }
           : message
       )
@@ -222,6 +273,6 @@ export function useChatHandler({
   return {
     sendChat,
     stopGeneration,
-    isGenerating: isStreaming,
+    isGenerating: isStreaming || pendingCount > 0,
   }
 }

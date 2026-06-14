@@ -35,12 +35,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { SegmentedControl } from '@/components/patterns'
 import {
   sideDrawerContentClassName,
   sideDrawerFormClassName,
   sideDrawerHeaderClassName,
 } from '@/components/drawer-layout'
+import { SegmentedControl } from '@/components/patterns'
 import {
   VIEW_MODES,
   getSortLabels,
@@ -66,11 +66,13 @@ export interface PricingToolbarProps {
   onViewModeChange: (value: ViewMode) => void
   quotaTypeFilter: string
   endpointTypeFilter: string
+  modalityFilter: string
   vendorFilter: string
   groupFilter: string
   tagFilter: string
   onQuotaTypeChange: (value: string) => void
   onEndpointTypeChange: (value: string) => void
+  onModalityChange: (value: string) => void
   onVendorChange: (value: string) => void
   onGroupChange: (value: string) => void
   onTagChange: (value: string) => void
@@ -251,11 +253,13 @@ export function PricingToolbar(props: PricingToolbarProps) {
             <PricingSidebar
               quotaTypeFilter={props.quotaTypeFilter}
               endpointTypeFilter={props.endpointTypeFilter}
+              modalityFilter={props.modalityFilter}
               vendorFilter={props.vendorFilter}
               groupFilter={props.groupFilter}
               tagFilter={props.tagFilter}
               onQuotaTypeChange={props.onQuotaTypeChange}
               onEndpointTypeChange={props.onEndpointTypeChange}
+              onModalityChange={props.onModalityChange}
               onVendorChange={props.onVendorChange}
               onGroupChange={props.onGroupChange}
               onTagChange={props.onTagChange}

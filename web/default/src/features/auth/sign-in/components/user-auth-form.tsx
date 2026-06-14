@@ -67,6 +67,7 @@ export function UserAuthForm({
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false)
   const [isWeChatDialogOpen, setIsWeChatDialogOpen] = useState(false)
   const [isWeChatSubmitting, setIsWeChatSubmitting] = useState(false)
+  const [capsLockOn, setCapsLockOn] = useState(false)
   const legalConsentErrorMessage = t('Please agree to the legal terms first')
   const loginFailedMessage = t('Login failed')
 
@@ -311,12 +312,14 @@ export function UserAuthForm({
         </div>
       )}
 
-      {/* OAuth Providers */}
+      {/* OAuth Providers — the divider only shows when a primary method
+          (password / passkey) sits above it. */}
       <OAuthProviders
         status={status}
         disabled={isLoading || (requiresLegalConsent && !agreedToLegal)}
         onWeChatLogin={hasWeChatLogin ? handleOpenWeChatDialog : undefined}
         isWeChatLoading={isWeChatSubmitting}
+        showDivider={passwordLoginEnabled || passkeyLoginEnabled}
       />
     </>
   )
@@ -328,8 +331,6 @@ export function UserAuthForm({
         className={cn('grid gap-4', className)}
         {...props}
       >
-        {hasAlternativeLogin && alternativeLoginMethods}
-
         {passwordLoginEnabled && (
           <>
             {/* Username Field */}
@@ -342,6 +343,7 @@ export function UserAuthForm({
                   <FormControl>
                     <Input
                       placeholder={t('Enter your username or email')}
+                      autoComplete='username'
                       {...field}
                     />
                   </FormControl>
@@ -360,9 +362,21 @@ export function UserAuthForm({
                   <FormControl>
                     <PasswordInput
                       placeholder={t('Enter password')}
+                      autoComplete='current-password'
+                      onKeyUp={(e) =>
+                        setCapsLockOn(e.getModifierState('CapsLock'))
+                      }
+                      onKeyDown={(e) =>
+                        setCapsLockOn(e.getModifierState('CapsLock'))
+                      }
                       {...field}
                     />
                   </FormControl>
+                  {capsLockOn && (
+                    <p className='text-warning text-xs'>
+                      {t('Caps Lock is on')}
+                    </p>
+                  )}
                   <FormMessage />
                   <Link
                     to='/forgot-password'
@@ -396,14 +410,14 @@ export function UserAuthForm({
           </>
         )}
 
+        {hasAlternativeLogin && alternativeLoginMethods}
+
         <LegalConsent
           status={status}
           checked={agreedToLegal}
           onCheckedChange={setAgreedToLegal}
           className='mt-1'
         />
-
-        {!hasAlternativeLogin && alternativeLoginMethods}
       </form>
 
       {hasWeChatLogin && (

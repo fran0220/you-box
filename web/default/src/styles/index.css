@@ -166,6 +166,28 @@ For commercial licensing, please contact support@quantumnous.com
   color: var(--brand);
 }
 
+/* Motion duration utilities — bind the --dur-* tokens (theme.css) to named
+ * `duration-*` classes. Tailwind v4 has no --duration-* theme namespace, so
+ * these are explicit. Each sets `--tw-duration` as well as
+ * `transition-duration`, so the same token drives plain CSS transitions AND
+ * tw-animate-css `animate-in`/`animate-out` (which read `--tw-duration`). */
+@utility duration-instant {
+  --tw-duration: var(--dur-instant);
+  transition-duration: var(--dur-instant);
+}
+@utility duration-fast {
+  --tw-duration: var(--dur-fast);
+  transition-duration: var(--dur-fast);
+}
+@utility duration-base {
+  --tw-duration: var(--dur-base);
+  transition-duration: var(--dur-base);
+}
+@utility duration-slow {
+  --tw-duration: var(--dur-slow);
+  transition-duration: var(--dur-slow);
+}
+
 @utility container {
   margin-inline: auto;
   padding-inline: 2rem;
@@ -470,19 +492,19 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .landing-animate-fade-up {
-  animation: landing-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: landing-fade-up 0.6s var(--ease-out) both;
 }
 .landing-animate-fade-in {
-  animation: landing-fade-in 0.6s ease-out both;
+  animation: landing-fade-in 0.6s var(--ease-out) both;
 }
 .landing-animate-scale-in {
-  animation: landing-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: landing-scale-in 0.6s var(--ease-out) both;
 }
 .landing-animate-fade-left {
-  animation: landing-fade-left 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: landing-fade-left 0.6s var(--ease-out) both;
 }
 .landing-animate-fade-right {
-  animation: landing-fade-right 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: landing-fade-right 0.6s var(--ease-out) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -501,8 +523,8 @@ For commercial licensing, please contact support@quantumnous.com
 @media (prefers-reduced-motion: no-preference) {
   [data-slot='card'] {
     transition:
-      transform 150ms ease,
-      box-shadow 150ms ease;
+      transform var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
   }
 
   @media (min-width: 641px) {
@@ -522,12 +544,12 @@ For commercial licensing, please contact support@quantumnous.com
   }
 
   [data-slot='table'] tr {
-    transition: background-color 120ms ease;
+    transition: background-color var(--dur-fast) var(--ease-out);
   }
 
   /* Table row stagger-in animation */
   [data-slot='table'] tbody tr {
-    animation: tableRowEnter 0.2s cubic-bezier(0.33, 1, 0.68, 1) both;
+    animation: tableRowEnter var(--dur-base) var(--ease-out) both;
   }
   [data-slot='table'] tbody tr:nth-child(2) {
     animation-delay: 25ms;
@@ -562,6 +584,98 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 @keyframes tableRowEnter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pricing card grid — one-shot stagger on mount / view-switch. The
+ * `data-grid-stagger` attribute is present only during a short mount window
+ * (set in model-card-grid.tsx), so cards added later by filtering/search do
+ * not re-animate. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-grid-stagger] > * {
+    animation: cardGridEnter var(--dur-base) var(--ease-out) both;
+  }
+  [data-grid-stagger] > *:nth-child(2) {
+    animation-delay: 30ms;
+  }
+  [data-grid-stagger] > *:nth-child(3) {
+    animation-delay: 60ms;
+  }
+  [data-grid-stagger] > *:nth-child(4) {
+    animation-delay: 90ms;
+  }
+  [data-grid-stagger] > *:nth-child(5) {
+    animation-delay: 120ms;
+  }
+  [data-grid-stagger] > *:nth-child(6) {
+    animation-delay: 150ms;
+  }
+  [data-grid-stagger] > *:nth-child(7) {
+    animation-delay: 180ms;
+  }
+  [data-grid-stagger] > *:nth-child(n + 8) {
+    animation-delay: 210ms;
+  }
+}
+
+@keyframes cardGridEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Typing indicator dots (ai-elements/typing-dots) — shown before the first
+ * streamed token. Gated by motion-safe at the utility level. */
+@keyframes yb-typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* Hero terminal demo — per-line cascade when the API tab changes. The line
+ * container is keyed by endpoint (hero-terminal-demo.tsx) so it remounts on
+ * tab change and the lines stagger in. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-terminal-lines] > * {
+    animation: terminalLineIn var(--dur-base) var(--ease-out) both;
+  }
+  [data-terminal-lines] > *:nth-child(2) {
+    animation-delay: 35ms;
+  }
+  [data-terminal-lines] > *:nth-child(3) {
+    animation-delay: 70ms;
+  }
+  [data-terminal-lines] > *:nth-child(4) {
+    animation-delay: 105ms;
+  }
+  [data-terminal-lines] > *:nth-child(5) {
+    animation-delay: 140ms;
+  }
+  [data-terminal-lines] > *:nth-child(n + 6) {
+    animation-delay: 175ms;
+  }
+}
+
+@keyframes terminalLineIn {
   from {
     opacity: 0;
     transform: translateY(4px);
@@ -626,4 +740,21 @@ For commercial licensing, please contact support@quantumnous.com
   .terminal-demo-pulse {
     animation: none !important;
   }
+}
+
+/* ── Theme-switch circular reveal (View Transitions API) ──
+ * Disable the default root cross-fade so the JS-driven clip-path animation on
+ * the incoming snapshot (see theme-switch.tsx) performs the reveal. The new
+ * theme is layered above the old and wiped in as an expanding circle from the
+ * click point. Guarded by feature detection + reduced-motion in JS. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root) {
+  z-index: 1;
+}
+::view-transition-old(root) {
+  z-index: 0;
 }

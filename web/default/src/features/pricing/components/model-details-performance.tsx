@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, HeartPulse, Timer } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -31,6 +31,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { GroupBadge } from '@/components/group-badge'
+import { SegmentedControl } from '@/components/patterns'
 import { getPerfMetrics } from '@/features/performance-metrics/api'
 import {
   formatLatency,
@@ -84,14 +85,22 @@ type PerformanceRow = {
   avg_tps: number
 }
 
-function toLatencySeries(groups: PerformanceGroup[]) {
+const SECONDS_PER_DAY = 86400
+
+/** Floor a unix-seconds timestamp to its UTC-day bucket (for long ranges). */
+function bucketTs(ts: number, daily: boolean): number {
+  return daily ? Math.floor(ts / SECONDS_PER_DAY) * SECONDS_PER_DAY : ts
+}
+
+function toLatencySeries(groups: PerformanceGroup[], daily: boolean) {
   const byTs = new Map<number, number[]>()
   for (const group of groups) {
     for (const point of group.series) {
       if (point.avg_ttft_ms <= 0) continue
-      const current = byTs.get(point.ts) ?? []
+      const key = bucketTs(point.ts, daily)
+      const current = byTs.get(key) ?? []
       current.push(point.avg_ttft_ms)
-      byTs.set(point.ts, current)
+      byTs.set(key, current)
     }
   }
 
@@ -106,16 +115,20 @@ function toLatencySeries(groups: PerformanceGroup[]) {
     }))
 }
 
-function toUptimeSeries(groups: PerformanceGroup[]): UptimeDayPoint[] {
+function toUptimeSeries(
+  groups: PerformanceGroup[],
+  daily: boolean
+): UptimeDayPoint[] {
   const byTs = new Map<number, { rates: number[]; incidents: number }>()
   for (const group of groups) {
     for (const point of group.series) {
-      const current = byTs.get(point.ts) ?? { rates: [], incidents: 0 }
+      const key = bucketTs(point.ts, daily)
+      const current = byTs.get(key) ?? { rates: [], incidents: 0 }
       if (Number.isFinite(point.success_rate)) {
         current.rates.push(point.success_rate)
         if (point.success_rate < 100) current.incidents += 1
       }
-      byTs.set(point.ts, current)
+      byTs.set(key, current)
     }
   }
   return Array.from(byTs.entries())
@@ -155,11 +168,23 @@ function average(
   )
 }
 
+// Selectable performance windows (hours). Daily aggregation kicks in for the
+// multi-day ranges so the charts stay readable.
+const RANGE_OPTIONS = [
+  { value: '24', hours: 24, daily: false, labelKey: '24h' },
+  { value: '168', hours: 168, daily: true, labelKey: '7d' },
+  { value: '720', hours: 720, daily: true, labelKey: '30d' },
+] as const
+
 export function ModelDetailsPerformance(props: { model: PricingModel }) {
   const { t } = useTranslation()
+  const [range, setRange] = useState<string>('24')
+  const activeRange =
+    RANGE_OPTIONS.find((option) => option.value === range) ?? RANGE_OPTIONS[0]
+
   const metricsQuery = useQuery({
-    queryKey: ['perf-metrics', props.model.model_name],
-    queryFn: () => getPerfMetrics(props.model.model_name, 24),
+    queryKey: ['perf-metrics', props.model.model_name, activeRange.hours],
+    queryFn: () => getPerfMetrics(props.model.model_name, activeRange.hours),
     staleTime: 60 * 1000,
   })
   const groups = useMemo(
@@ -177,8 +202,15 @@ export function ModelDetailsPerformance(props: { model: PricingModel }) {
       })),
     [groups]
   )
-  const latencySeries = useMemo(() => toLatencySeries(groups), [groups])
-  const uptimeSeries = useMemo(() => toUptimeSeries(groups), [groups])
+  const latencySeries = useMemo(
+    () => toLatencySeries(groups, activeRange.daily),
+    [groups, activeRange.daily]
+  )
+  const uptimeSeries = useMemo(
+    () => toUptimeSeries(groups, activeRange.daily),
+    [groups, activeRange.daily]
+  )
+  const rangeLabel = t(activeRange.labelKey)
   const uptimeByGroup = useMemo<Record<string, UptimeDayPoint[]>>(() => {
     const map: Record<string, UptimeDayPoint[]> = {}
     for (const group of groups) {
@@ -189,8 +221,23 @@ export function ModelDetailsPerformance(props: { model: PricingModel }) {
 
   if (metricsQuery.isLoading || performances.length === 0) {
     return (
-      <div className='text-muted-foreground rounded-lg border p-6 text-center text-sm'>
-        {t('Performance data is not yet available for this model.')}
+      <div className='flex flex-col gap-4'>
+        <div className='flex items-center justify-end'>
+          <SegmentedControl
+            options={RANGE_OPTIONS.map((option) => ({
+              value: option.value,
+              label: t(option.labelKey),
+            }))}
+            value={range}
+            onChange={setRange}
+            ariaLabel={t('Performance window')}
+          />
+        </div>
+        <div className='text-muted-foreground rounded-lg border p-6 text-center text-sm'>
+          {metricsQuery.isLoading
+            ? t('Loading performance data…')
+            : t('Performance data is not yet available for this model.')}
+        </div>
       </div>
     )
   }
@@ -224,6 +271,18 @@ export function ModelDetailsPerformance(props: { model: PricingModel }) {
 
   return (
     <div className='flex flex-col gap-4'>
+      <div className='flex items-center justify-end'>
+        <SegmentedControl
+          options={RANGE_OPTIONS.map((option) => ({
+            value: option.value,
+            label: t(option.labelKey),
+          }))}
+          value={range}
+          onChange={setRange}
+          ariaLabel={t('Performance window')}
+        />
+      </div>
+
       <div className='grid grid-cols-1 gap-2 sm:grid-cols-3'>
         <StatCard
           icon={Timer}
@@ -242,10 +301,11 @@ export function ModelDetailsPerformance(props: { model: PricingModel }) {
           value={formatUptimePct(successRate)}
           hint={
             incidentCount > 0
-              ? t('{{count}} incidents in the last 24 hours', {
+              ? t('{{count}} incident buckets in the last {{range}}', {
                   count: incidentCount,
+                  range: rangeLabel,
                 })
-              : t('No incidents in the last 24 hours')
+              : t('No incidents in the last {{range}}', { range: rangeLabel })
           }
           intent={intent}
         />
@@ -323,7 +383,7 @@ export function ModelDetailsPerformance(props: { model: PricingModel }) {
       <section>
         <SectionHeader
           icon={Timer}
-          title={t('Latency trend (last 24h)')}
+          title={t('Latency trend ({{range}})', { range: rangeLabel })}
           description={t('Average TTFT')}
         />
         <LatencyTrendChart series={latencySeries} />
@@ -332,16 +392,19 @@ export function ModelDetailsPerformance(props: { model: PricingModel }) {
       <section>
         <SectionHeader
           icon={HeartPulse}
-          title={t('Availability (last 24h)')}
+          title={t('Availability ({{range}})', { range: rangeLabel })}
           description={
             incidentCount > 0
               ? t(
-                  'Request success rate; {{incidents}} incident buckets in the last 24 hours',
+                  'Request success rate; {{incidents}} incident buckets in the last {{range}}',
                   {
                     incidents: incidentCount,
+                    range: rangeLabel,
                   }
                 )
-              : t('Request success rate sampled over the last 24 hours')
+              : t('Request success rate sampled over the last {{range}}', {
+                  range: rangeLabel,
+                })
           }
           accent={
             incidentCount > 0 ? (
