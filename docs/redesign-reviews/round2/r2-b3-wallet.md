@@ -10,7 +10,7 @@
 | 1 | 两列 1.3fr/1fr | **pass** — `xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]`;左 hero+充值,右 Transactions+订阅+Affiliate;全部 dialog 装配保留 |
 | 2 | Balance hero | **pass/adapted** — Panel + `// balance` eyebrow + display 40px 余额 + Used/Requests Metric(原三卡信息并入)+ 健康 DeltaBadge(7d 用量 runway)+ `~N days at current rate`;token 估算无混合费率 → Metric 替代(已记录);实测兑换后余额实时更新($200→$201) |
 | 3 | Add credits | **pass/adapted** — PresetChip(含折扣角标)+ CurrencyInput + `// pay with` ChipGroup(method:/waffo:/creem: 编码,min_topup 不足 disabled)+ `Add {{amount}} →` 联动 CTA(选中才触发原四种支付确认流程);货币 select → 静态站点货币;No markup badge 不做(已记录)。本验证实例未配置任何支付方式 → 正确渲染「Online topup is not enabled」InlineAlert(空态/禁用态即设计的 InlineAlert 形态);chips 完整形态已在 Design Lab A3 验收 |
-| 4 | Auto top-up | **adapted(不实现)** — 后端无能力,不做假开关;已记录 |
+| 4 | Auto top-up | **pass(已补,后续更正)** — 初版因后端无能力标记为不实现;之后后端能力落地(be4cf51a:`auto_topup_enabled`/`auto_topup_threshold`/`auto_topup_amount`),现已在 Profile → 通知设置 tab 接入(开关 + `When balance is below` 阈值 + `Suggested top-up` 金额),见 `notification-tab.tsx`;同步见 `frontend-audit.md` 第二轮更正 |
 | 5 | Transactions Panel | **pass/adapted** — TransactionRow 前 5 条 + View all → BillingHistoryDialog;`?show_history=true` 实测打开 dialog;消费流水无接口 → 充值订单历史(已记录) |
 | 6 | 兑换码(SCREENS.redemption 形态) | **pass** — `// redeem code` eyebrow + mono input + Redeem;合规未确认时 warning InlineAlert 门控;实测确认合规后表单出现,创建码→兑换成功 toast + 余额更新 |
 | 7 | 订阅/Affiliate 右列 | **pass** — SubscriptionPlansCard 列表项 PlanCard 化(购买流程不变),AffiliateRewardsCard 保留(划转 dialog 保留) |

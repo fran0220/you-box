@@ -18,8 +18,11 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useState } from 'react'
 import { ChevronDown, RotateCcw, Share2, Zap } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ai-elements/code-block'
 import { ConversationRailItem } from '@/components/ai-elements/conversation-rail-item'
+import { SpeakerMessage } from '@/components/ai-elements/message'
 import {
   ModelMetaTag,
   ModelSelectorHeader,
@@ -36,10 +39,7 @@ import {
   SourcesContent,
   SourcesTrigger,
 } from '@/components/ai-elements/sources'
-import { SpeakerMessage } from '@/components/ai-elements/message'
 import { StreamingCursor } from '@/components/ai-elements/streaming-cursor'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { DemoBlock } from '../components/demo-block'
 
 const SNIPPET = `export async function retry<T>(
@@ -95,7 +95,10 @@ export default function AiCodeDemos() {
           <Sources>
             <SourcesTrigger count={2} />
             <SourcesContent>
-              <Source href='https://example.com/backoff' title='Exponential backoff and jitter' />
+              <Source
+                href='https://example.com/backoff'
+                title='Exponential backoff and jitter'
+              />
               <Source href='https://example.com/retry' title='Retry patterns' />
             </SourcesContent>
           </Sources>
@@ -111,7 +114,9 @@ export default function AiCodeDemos() {
           trigger={
             <Button variant='outline' className='gap-2.5 font-mono text-[13px]'>
               <Avatar className='size-5'>
-                <AvatarFallback className='text-[9px] font-semibold'>AN</AvatarFallback>
+                <AvatarFallback className='text-[9px] font-semibold'>
+                  AN
+                </AvatarFallback>
               </Avatar>
               anthropic/claude-opus-4.6
               <ChevronDown className='text-muted-foreground' />
@@ -125,7 +130,11 @@ export default function AiCodeDemos() {
           }
           actions={
             <>
-              <Button variant='ghost' size='icon' aria-label='Reset conversation'>
+              <Button
+                variant='ghost'
+                size='icon'
+                aria-label='Reset conversation'
+              >
                 <RotateCcw />
               </Button>
               <Button variant='ghost' size='icon' aria-label='Share'>

@@ -120,9 +120,7 @@ function DetailSection(props: {
       <div
         className={cn(
           'min-w-0 space-y-1 overflow-hidden rounded-md border p-2.5 max-sm:p-2',
-          isDanger
-            ? 'border-destructive/30 bg-[var(--danger-subtle)]'
-            : 'bg-muted/30'
+          isDanger ? 'border-destructive/30 bg-danger-subtle' : 'bg-muted/30'
         )}
       >
         {props.children}
@@ -634,7 +632,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                   aria-label={t('Copy to clipboard')}
                 >
                   {copiedText === conversionLabel ? (
-                    <Check className='size-3 text-success' />
+                    <Check className='text-success size-3' />
                   ) : (
                     <Copy className='size-3' />
                   )}
@@ -1059,7 +1057,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                   aria-label={t('Copy to clipboard')}
                 >
                   {copiedText === details ? (
-                    <Check className='size-3 text-success' />
+                    <Check className='text-success size-3' />
                   ) : (
                     <Copy className='size-3' />
                   )}

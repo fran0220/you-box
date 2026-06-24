@@ -27,18 +27,21 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const inlineAlertVariants = cva('flex items-start gap-3 rounded-lg border p-4', {
-  variants: {
-    tone: {
-      success: 'border-success/35 bg-[var(--success-subtle)]',
-      warning: 'border-warning/35 bg-[var(--warning-subtle)]',
-      danger: 'border-destructive/35 bg-[var(--danger-subtle)]',
-      info: 'border-info/35 bg-[var(--info-subtle)]',
-      brand: 'border-brand-border bg-brand-subtle',
+const inlineAlertVariants = cva(
+  'flex items-start gap-3 rounded-lg border p-4',
+  {
+    variants: {
+      tone: {
+        success: 'border-success/35 bg-success-subtle',
+        warning: 'border-warning/35 bg-warning-subtle',
+        danger: 'border-destructive/35 bg-danger-subtle',
+        info: 'border-info/35 bg-info-subtle',
+        brand: 'border-brand-border bg-brand-subtle',
+      },
     },
-  },
-  defaultVariants: { tone: 'info' },
-})
+    defaultVariants: { tone: 'info' },
+  }
+)
 
 const TONE_ICON = {
   success: CheckCircle2,
@@ -85,14 +88,21 @@ export function InlineAlert({
   return (
     <div
       data-slot='inline-alert'
-      role={resolvedTone === 'danger' || resolvedTone === 'warning' ? 'alert' : 'status'}
+      role={
+        resolvedTone === 'danger' || resolvedTone === 'warning'
+          ? 'alert'
+          : 'status'
+      }
       className={cn(inlineAlertVariants({ tone }), className)}
       {...props}
     >
       {icon !== null && (
         <span
           aria-hidden='true'
-          className={cn('mt-0.5 shrink-0 [&>svg]:size-5', TONE_TEXT[resolvedTone])}
+          className={cn(
+            'mt-0.5 shrink-0 [&>svg]:size-5',
+            TONE_TEXT[resolvedTone]
+          )}
         >
           {icon ?? <Icon />}
         </span>
@@ -108,7 +118,9 @@ export function InlineAlert({
         )}
       </div>
       {actions != null && (
-        <div className='flex shrink-0 items-center gap-2 self-center'>{actions}</div>
+        <div className='flex shrink-0 items-center gap-2 self-center'>
+          {actions}
+        </div>
       )}
     </div>
   )

@@ -61,7 +61,9 @@ export function FilterChips<T extends string>({
         >
           {item.label}
           {item.count != null && (
-            <span className='font-mono text-[11px] opacity-60'>{item.count}</span>
+            <span className='font-mono text-[11px] opacity-60'>
+              {item.count}
+            </span>
           )}
         </Chip>
       ))}

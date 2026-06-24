@@ -116,7 +116,11 @@ export type MessageTileProps = HTMLAttributes<HTMLSpanElement> &
  * Role avatar tile (R2-A5): user = surface-3 initials,
  * assistant = brand-subtle glyph (✦).
  */
-export const MessageTile = ({ role, className, ...props }: MessageTileProps) => (
+export const MessageTile = ({
+  role,
+  className,
+  ...props
+}: MessageTileProps) => (
   <span
     aria-hidden='true'
     className={cn(messageTileVariants({ role }), className)}

@@ -90,7 +90,11 @@ export function GeneralError({
           <Button
             variant='secondary'
             render={
-              <a href={FEEDBACK_URL} target='_blank' rel='noopener noreferrer' />
+              <a
+                href={FEEDBACK_URL}
+                target='_blank'
+                rel='noopener noreferrer'
+              />
             }
           >
             {t('Report an issue')}

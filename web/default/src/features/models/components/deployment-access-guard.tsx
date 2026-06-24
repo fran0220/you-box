@@ -65,7 +65,7 @@ function LoadingStep({
       {status === 'loading' && (
         <Loader2 className='text-primary h-5 w-5 animate-spin' />
       )}
-      {status === 'done' && <CheckCircle2 className='h-5 w-5 text-success' />}
+      {status === 'done' && <CheckCircle2 className='text-success h-5 w-5' />}
       {status === 'pending' && (
         <Circle className='text-muted-foreground/40 h-5 w-5' />
       )}

@@ -19,6 +19,10 @@ For commercial licensing, please contact support@quantumnous.com
 import { dataScheme as vchartDefaultDataScheme } from '@visactor/vchart/esm/theme/color-scheme/builtin/default'
 import { getCurrencyDisplay } from '@/lib/currency'
 import { formatChartTime, type TimeGranularity } from '@/lib/time'
+import {
+  getThemeChartColors,
+  resolveVChartThemeColors,
+} from '@/lib/vchart-theme'
 import { MAX_CHART_TREND_POINTS } from '@/features/dashboard/constants'
 import type {
   QuotaDataItem,
@@ -36,28 +40,6 @@ type TooltipLineItem = {
   shapeFill?: string
   shapeStroke?: string
   shapeSize?: number
-}
-
-const THEME_CHART_COLOR_VARIABLES = [
-  '--chart-1',
-  '--chart-2',
-  '--chart-3',
-  '--chart-4',
-  '--chart-5',
-] as const
-
-function getThemeChartColors(themeKey?: string): string[] {
-  if (typeof document === 'undefined') return []
-  void themeKey
-
-  const bodyStyle = window.getComputedStyle(document.body)
-  const rootStyle = window.getComputedStyle(document.documentElement)
-
-  return THEME_CHART_COLOR_VARIABLES.map((name) => {
-    return (
-      bodyStyle.getPropertyValue(name) || rootStyle.getPropertyValue(name)
-    ).trim()
-  }).filter(Boolean)
 }
 
 function getVChartDefaultColors(domainLength: number, themeKey?: string) {
@@ -102,6 +84,7 @@ export function processChartData(
   chartCornerRadius?: number
 ): ProcessedChartData {
   const tt: TFunction = t ?? ((x) => x)
+  const { hoverStroke } = resolveVChartThemeColors(themeKey)
   const otherLabel = tt('Other')
 
   const formatInt = (value: number) =>
@@ -494,8 +477,8 @@ export function processChartData(
         style:
           chartCornerRadius == null ? {} : { cornerRadius: chartCornerRadius },
         state: {
-          hover: { outerRadius: 0.85, stroke: '#000', lineWidth: 1 },
-          selected: { outerRadius: 0.85, stroke: '#000', lineWidth: 1 },
+          hover: { outerRadius: 0.85, stroke: hoverStroke, lineWidth: 1 },
+          selected: { outerRadius: 0.85, stroke: hoverStroke, lineWidth: 1 },
         },
       },
       title: {
@@ -530,7 +513,7 @@ export function processChartData(
       color: modelColor,
       bar: {
         state: {
-          hover: { stroke: '#000', lineWidth: 1 },
+          hover: { stroke: hoverStroke, lineWidth: 1 },
         },
       },
       tooltip: {
@@ -697,7 +680,7 @@ export function processChartData(
       },
       bar: {
         state: {
-          hover: { stroke: '#000', lineWidth: 1 },
+          hover: { stroke: hoverStroke, lineWidth: 1 },
         },
       },
       tooltip: {
@@ -740,6 +723,7 @@ export function processUserChartData(
   themeKey?: string
 ): ProcessedUserChartData {
   const tt: TFunction = t ?? ((x) => x)
+  const { hoverStroke } = resolveVChartThemeColors(themeKey)
   const { config } = getCurrencyDisplay()
   const quotaPerUnit = config.quotaPerUnit
   const themeUserColors = getThemeChartColors(themeKey)
@@ -867,7 +851,7 @@ export function processUserChartData(
       },
       legends: { visible: false },
       bar: {
-        state: { hover: { stroke: '#000', lineWidth: 1 } },
+        state: { hover: { stroke: hoverStroke, lineWidth: 1 } },
       },
       label: {
         visible: true,

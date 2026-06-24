@@ -98,6 +98,12 @@ For commercial licensing, please contact support@quantumnous.com
   --color-brand-border: var(--brand-border);
   --color-teal: var(--teal);
   --color-teal-subtle: var(--teal-subtle);
+  /* Semantic status tints — first-class utilities for the bg-*-subtle pattern
+   * used across status badges, filter chips and callouts. */
+  --color-success-subtle: var(--success-subtle);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-info-subtle: var(--info-subtle);
   --color-border-strong: var(--border-strong);
   --color-border-faint: var(--border-faint);
   --color-divider: var(--divider);

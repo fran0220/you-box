@@ -159,9 +159,7 @@ export function useApiKeysColumns(): ColumnDef<ApiKey>[] {
           return (
             <MonoCell align='left'>
               ∞{' '}
-              <span className='text-muted-foreground'>
-                / {t('Unlimited')}
-              </span>
+              <span className='text-muted-foreground'>/ {t('Unlimited')}</span>
             </MonoCell>
           )
         }

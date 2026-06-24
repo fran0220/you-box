@@ -13,8 +13,8 @@
   --shadow-xl:  0 32px 80px rgba(0, 0, 0, 0.60);
 
   /* Brand glow — used on primary CTAs / focus moments */
-  --glow-brand: 0 0 0 1px var(--brand-border), 0 6px 24px rgba(254, 106, 53, 0.28);
-  --glow-soft:  0 0 40px rgba(254, 106, 53, 0.18);
+  --glow-brand: 0 0 0 1px var(--brand-border), 0 6px 24px rgba(0, 144, 255, 0.24);
+  --glow-soft:  0 0 40px rgba(0, 144, 255, 0.14);
 
   /* Focus ring */
   --ring:       0 0 0 3px var(--brand-ring);
@@ -52,6 +52,6 @@
   --shadow-md:  0 10px 30px rgba(20, 20, 25, 0.10);
   --shadow-lg:  0 20px 50px rgba(20, 20, 25, 0.12);
   --shadow-xl:  0 32px 80px rgba(20, 20, 25, 0.16);
-  --glow-brand: 0 0 0 1px var(--brand-border), 0 8px 24px rgba(254, 106, 53, 0.22);
-  --glow-soft:  0 0 40px rgba(254, 106, 53, 0.14);
+  --glow-brand: 0 0 0 1px var(--brand-border), 0 8px 24px rgba(0, 144, 255, 0.16);
+  --glow-soft:  0 0 40px rgba(0, 144, 255, 0.10);
 }

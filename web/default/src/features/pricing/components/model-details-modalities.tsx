@@ -119,9 +119,7 @@ export function ModalitiesMatrix(props: {
             <span
               className={cn(
                 'inline-flex items-center justify-center',
-                enabled
-                  ? 'text-success'
-                  : 'text-muted-foreground/40'
+                enabled ? 'text-success' : 'text-muted-foreground/40'
               )}
               aria-label={
                 enabled

@@ -65,11 +65,18 @@ export function StickySaveBar({
             {children}
           </p>
           <div className='flex shrink-0 items-center gap-2'>
-            <Button variant='ghost' size='sm' onClick={onDiscard} disabled={saving}>
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={onDiscard}
+              disabled={saving}
+            >
               {t('Discard')}
             </Button>
             <Button size='sm' onClick={onSave} disabled={saving}>
-              {saving && <Loader2 className='animate-spin' data-icon='inline-start' />}
+              {saving && (
+                <Loader2 className='animate-spin' data-icon='inline-start' />
+              )}
               {t('Save Changes')}
             </Button>
           </div>

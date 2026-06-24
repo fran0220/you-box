@@ -65,6 +65,12 @@ export const STATIC_I18N_KEYS = [
   'More...',
   'Less',
 
+  // Pricing — sort + modality additions (OpenRouter parity)
+  'Context: High to Low',
+  'Newest',
+  'All Modalities',
+  'Input Modality',
+
   // Roles
   'Super Admin',
   'Admin',
@@ -146,6 +152,9 @@ export const STATIC_I18N_KEYS = [
   'AI models supported',
   'uptime',
   'active users',
+  'model providers',
+  'access tiers',
+  'models available',
   'Lightning Fast',
   'Optimized network architecture ensures millisecond response times',
   'Secure & Reliable',
@@ -420,6 +429,7 @@ export const STATIC_I18N_KEYS = [
   'AI model testing environment',
   'Chat session management',
   'Console Area',
+  'Developer',
   'Data management and log viewing',
   'Dashboard',
   'System data statistics',
@@ -477,6 +487,18 @@ export const STATIC_I18N_KEYS = [
   'Detection complete: {{add}} to add, {{remove}} to remove',
   'Batch detection failed',
   'Batch detection complete: {{channels}} channels, {{add}} to add, {{remove}} to remove, {{fails}} failed',
+
+  // Playground — reasoning effort (option labels)
+  'Use effort level',
+  'Minimal',
+  'Medium',
+
+  // API key — limit reset schedule (option labels)
+  'Limit reset',
+  'No automatic reset',
+  'Every day',
+  'Every week',
+  'Every month',
 
   // Misc
   'Cancel',

@@ -64,7 +64,7 @@ export function PromptDialog({
                 title={t('Copy to clipboard')}
               >
                 {copiedText === prompt ? (
-                  <Check className='size-4 text-success' />
+                  <Check className='text-success size-4' />
                 ) : (
                   <Copy className='size-4' />
                 )}
@@ -90,7 +90,7 @@ export function PromptDialog({
                   title={t('Copy to clipboard')}
                 >
                   {copiedText === promptEn ? (
-                    <Check className='size-4 text-success' />
+                    <Check className='text-success size-4' />
                   ) : (
                     <Copy className='size-4' />
                   )}

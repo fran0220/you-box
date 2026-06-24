@@ -136,12 +136,9 @@ export function createDurationColumn<T>(config: {
         duration.durationSec > warningThresholdSec ? 'danger' : 'success'
 
       const durationBgMap: Record<string, string> = {
-        success:
-          'border-teal/20 bg-teal-subtle/50 border',
-        warning:
-          'border border-warning/30 bg-[var(--warning-subtle)]',
-        danger:
-          'border-destructive/20 bg-[var(--danger-subtle)]/50 border',
+        success: 'border-teal/20 bg-teal-subtle/50 border',
+        warning: 'border border-warning/30 bg-warning-subtle',
+        danger: 'border-destructive/20 bg-danger-subtle/50 border',
       }
 
       return (
@@ -223,7 +220,7 @@ export function createFailReasonColumn<T>(config: {
             onClick={() => setDialogOpen(true)}
             title={cellTitle}
           >
-            <span className='truncate leading-snug text-destructive group-hover:underline'>
+            <span className='text-destructive truncate leading-snug group-hover:underline'>
               {failReason}
             </span>
           </button>

@@ -27,10 +27,10 @@ const notificationTileVariants = cva(
     variants: {
       tone: {
         brand: 'bg-brand-subtle text-brand',
-        success: 'bg-[var(--success-subtle)] text-success',
-        warning: 'bg-[var(--warning-subtle)] text-warning',
-        danger: 'bg-[var(--danger-subtle)] text-destructive',
-        info: 'bg-[var(--info-subtle)] text-info',
+        success: 'bg-success-subtle text-success',
+        warning: 'bg-warning-subtle text-warning',
+        danger: 'bg-danger-subtle text-destructive',
+        info: 'bg-info-subtle text-info',
         accent: 'bg-teal-subtle text-teal',
       },
     },

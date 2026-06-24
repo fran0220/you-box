@@ -35,7 +35,11 @@ type StepIndicatorProps = {
  * connector lines (setup wizard form). Done = success check,
  * active = brand, pending = muted.
  */
-export function StepIndicator({ steps, current, className }: StepIndicatorProps) {
+export function StepIndicator({
+  steps,
+  current,
+  className,
+}: StepIndicatorProps) {
   return (
     <ol
       data-slot='step-indicator'
@@ -59,7 +63,11 @@ export function StepIndicator({ steps, current, className }: StepIndicatorProps)
                 state === 'pending' && 'bg-surface-3 text-muted-foreground'
               )}
             >
-              {state === 'done' ? <Check className='size-3.5' strokeWidth={3} /> : index + 1}
+              {state === 'done' ? (
+                <Check className='size-3.5' strokeWidth={3} />
+              ) : (
+                index + 1
+              )}
             </span>
             <span
               className={cn(
@@ -74,7 +82,10 @@ export function StepIndicator({ steps, current, className }: StepIndicatorProps)
               {step.label}
             </span>
             {index < steps.length - 1 && (
-              <span aria-hidden='true' className='bg-divider h-px min-w-4 flex-1' />
+              <span
+                aria-hidden='true'
+                className='bg-divider h-px min-w-4 flex-1'
+              />
             )}
           </li>
         )

@@ -93,79 +93,81 @@ export type ShellGroupConfig = {
   sections: { id: string; titleKey: string }[]
 }
 
-export const SETTINGS_SHELL_GROUPS: Record<SettingsShellGroup, ShellGroupConfig> =
-  {
-    site: {
-      labelKey: 'Site & Branding',
-      icon: Settings,
-      route: '/system-settings/site/$section',
-      defaultSection: SITE_DEFAULT_SECTION,
-      sections: SITE_SECTION_IDS.map((id) => ({
-        id,
-        titleKey: getSiteSectionMeta(id).titleKey,
-      })),
-    },
-    auth: {
-      labelKey: 'Authentication',
-      icon: Shield,
-      route: '/system-settings/auth/$section',
-      defaultSection: AUTH_DEFAULT_SECTION,
-      sections: AUTH_SECTION_IDS.map((id) => ({
-        id,
-        titleKey: getAuthSectionMeta(id).titleKey,
-      })),
-    },
-    billing: {
-      labelKey: 'Billing & Payment',
-      icon: CreditCard,
-      route: '/system-settings/billing/$section',
-      defaultSection: BILLING_DEFAULT_SECTION,
-      sections: BILLING_SECTION_IDS.map((id) => ({
-        id,
-        titleKey: getBillingSectionMeta(id).titleKey,
-      })),
-    },
-    models: {
-      labelKey: 'Models & Routing',
-      icon: Box,
-      route: '/system-settings/models/$section',
-      defaultSection: MODELS_DEFAULT_SECTION,
-      sections: MODELS_SECTION_IDS.map((id) => ({
-        id,
-        titleKey: getModelsSectionMeta(id).titleKey,
-      })),
-    },
-    security: {
-      labelKey: 'Security & Limits',
-      icon: ShieldAlert,
-      route: '/system-settings/security/$section',
-      defaultSection: SECURITY_DEFAULT_SECTION,
-      sections: SECURITY_SECTION_IDS.map((id) => ({
-        id,
-        titleKey: getSecuritySectionMeta(id).titleKey,
-      })),
-    },
-    content: {
-      labelKey: 'Console Content',
-      icon: Layout,
-      route: '/system-settings/content/$section',
-      defaultSection: CONTENT_DEFAULT_SECTION,
-      sections: CONTENT_SECTION_IDS.map((id) => ({
-        id,
-        titleKey: getContentSectionMeta(id).titleKey,
-      })),
-    },
-    operations: {
-      labelKey: 'Operations',
-      icon: Wrench,
-      route: '/system-settings/operations/$section',
-      defaultSection: OPERATIONS_DEFAULT_SECTION,
-      sections: OPERATIONS_SECTION_IDS.map((id) => ({
-        id,
-        titleKey: getOperationsSectionMeta(id).titleKey,
-      })),
-    },
-  }
+export const SETTINGS_SHELL_GROUPS: Record<
+  SettingsShellGroup,
+  ShellGroupConfig
+> = {
+  site: {
+    labelKey: 'Site & Branding',
+    icon: Settings,
+    route: '/system-settings/site/$section',
+    defaultSection: SITE_DEFAULT_SECTION,
+    sections: SITE_SECTION_IDS.map((id) => ({
+      id,
+      titleKey: getSiteSectionMeta(id).titleKey,
+    })),
+  },
+  auth: {
+    labelKey: 'Authentication',
+    icon: Shield,
+    route: '/system-settings/auth/$section',
+    defaultSection: AUTH_DEFAULT_SECTION,
+    sections: AUTH_SECTION_IDS.map((id) => ({
+      id,
+      titleKey: getAuthSectionMeta(id).titleKey,
+    })),
+  },
+  billing: {
+    labelKey: 'Billing & Payment',
+    icon: CreditCard,
+    route: '/system-settings/billing/$section',
+    defaultSection: BILLING_DEFAULT_SECTION,
+    sections: BILLING_SECTION_IDS.map((id) => ({
+      id,
+      titleKey: getBillingSectionMeta(id).titleKey,
+    })),
+  },
+  models: {
+    labelKey: 'Models & Routing',
+    icon: Box,
+    route: '/system-settings/models/$section',
+    defaultSection: MODELS_DEFAULT_SECTION,
+    sections: MODELS_SECTION_IDS.map((id) => ({
+      id,
+      titleKey: getModelsSectionMeta(id).titleKey,
+    })),
+  },
+  security: {
+    labelKey: 'Security & Limits',
+    icon: ShieldAlert,
+    route: '/system-settings/security/$section',
+    defaultSection: SECURITY_DEFAULT_SECTION,
+    sections: SECURITY_SECTION_IDS.map((id) => ({
+      id,
+      titleKey: getSecuritySectionMeta(id).titleKey,
+    })),
+  },
+  content: {
+    labelKey: 'Console Content',
+    icon: Layout,
+    route: '/system-settings/content/$section',
+    defaultSection: CONTENT_DEFAULT_SECTION,
+    sections: CONTENT_SECTION_IDS.map((id) => ({
+      id,
+      titleKey: getContentSectionMeta(id).titleKey,
+    })),
+  },
+  operations: {
+    labelKey: 'Operations',
+    icon: Wrench,
+    route: '/system-settings/operations/$section',
+    defaultSection: OPERATIONS_DEFAULT_SECTION,
+    sections: OPERATIONS_SECTION_IDS.map((id) => ({
+      id,
+      titleKey: getOperationsSectionMeta(id).titleKey,
+    })),
+  },
+}
 
 export function isSettingsShellGroup(
   value: string

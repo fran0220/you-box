@@ -52,7 +52,8 @@ export function useFilters(models: PricingModel[]) {
   const endpointTypeFilter = search.endpointType || ENDPOINT_TYPES.ALL
   const modalityFilter = search.modality || MODALITY_FILTERS.ALL
   const tagFilter = search.tag || FILTER_ALL
-  const tokenUnit: TokenUnit = search.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
+  const tokenUnit: TokenUnit =
+    search.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
   const viewMode = normalizeViewMode(search.view)
   const showRechargePrice = search.rechargePrice === true
 

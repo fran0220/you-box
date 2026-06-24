@@ -97,7 +97,8 @@ export function getApiKeyFormDefaultValues(
  * Transform form data to API payload
  */
 export function transformFormDataToPayload(
-  data: ApiKeyFormValues
+  data: ApiKeyFormValues,
+  original?: ApiKey
 ): ApiKeyFormData {
   const remainQuota = data.unlimited_quota
     ? 0
@@ -112,9 +113,25 @@ export function transformFormDataToPayload(
     data.reset_period !== 'none' &&
     remainQuota > 0
 
+  // When editing an already-recurring key, the credit field reflects the
+  // per-period budget (spend_limit), not the live remaining quota. If the
+  // budget amount is unchanged, preserve the live remaining quota so an
+  // unrelated edit (rename, IP list, group, …) doesn't refund the quota
+  // already spent this period.
+  let remainToSend = remainQuota
+  if (
+    original &&
+    recurring &&
+    (original.reset_period ?? 'none') !== 'none' &&
+    (original.spend_limit ?? 0) > 0 &&
+    remainQuota === (original.spend_limit ?? 0)
+  ) {
+    remainToSend = original.remain_quota
+  }
+
   return {
     name: data.name,
-    remain_quota: remainQuota,
+    remain_quota: remainToSend,
     expired_time: data.expired_time
       ? Math.floor(data.expired_time.getTime() / 1000)
       : -1,
@@ -138,13 +155,14 @@ export function transformApiKeyToFormDefaults(
   apiKey: ApiKey
 ): ApiKeyFormValues {
   const resetPeriod = apiKey.reset_period || 'none'
-  const recurring =
-    resetPeriod !== 'none' && (apiKey.spend_limit ?? 0) > 0
+  const recurring = resetPeriod !== 'none' && (apiKey.spend_limit ?? 0) > 0
   // For a recurring key the credit-limit field reflects the spend budget, not
   // the (possibly partially-spent) current remaining quota.
   const creditDollars = apiKey.unlimited_quota
     ? 0
-    : quotaUnitsToDollars(recurring ? apiKey.spend_limit ?? 0 : apiKey.remain_quota)
+    : quotaUnitsToDollars(
+        recurring ? (apiKey.spend_limit ?? 0) : apiKey.remain_quota
+      )
 
   return {
     name: apiKey.name,

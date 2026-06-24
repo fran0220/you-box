@@ -13,6 +13,7 @@ const PUBLIC_ROUTES = [
   ['pricing-table', '/pricing?view=table'],
   ['model-details', '/pricing/gpt-4o'],
   ['rankings', '/rankings'],
+  ['apps', '/apps'],
   ['privacy-policy', '/privacy-policy'],
   ['user-agreement', '/user-agreement'],
   ['sign-in', '/sign-in'],

@@ -407,7 +407,7 @@ function ModelHeader(props: { model: PricingModel }) {
         {model.billing_mode === 'tiered_expr' && model.billing_expr && (
           <>
             <span className='text-muted-foreground/30'>·</span>
-            <span className='text-warning rounded bg-[var(--warning-subtle)] px-1.5 py-0.5 text-[10px] font-medium'>
+            <span className='text-warning bg-warning-subtle rounded px-1.5 py-0.5 text-[10px] font-medium'>
               {isSpecialExpression
                 ? t('Special billing expression')
                 : t('Dynamic Pricing')}
@@ -503,7 +503,7 @@ function PriceSection(props: {
       return (
         <section>
           <SectionTitle>{t('Base Price')}</SectionTitle>
-          <div className='border-warning/30 rounded-lg border bg-[var(--warning-subtle)] p-3'>
+          <div className='border-warning/30 bg-warning-subtle rounded-lg border p-3'>
             <div className='text-warning text-sm font-medium'>
               {t('Special billing expression')}
             </div>
@@ -753,7 +753,7 @@ function GroupPricingSection(props: {
         <section>
           <SectionTitle>{t('Pricing by Group')}</SectionTitle>
           <AutoGroupChain model={props.model} autoGroups={props.autoGroups} />
-          <div className='border-warning/30 rounded-lg border bg-[var(--warning-subtle)] p-3'>
+          <div className='border-warning/30 bg-warning-subtle rounded-lg border p-3'>
             <div className='text-warning text-sm font-medium'>
               {t('Special billing expression')}
             </div>

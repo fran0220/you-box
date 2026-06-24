@@ -26,8 +26,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 import { CodeBlock } from '@/components/ai-elements/code-block'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
@@ -152,11 +152,7 @@ export function ApiDocs() {
         { skipErrorHandler: true } as Record<string, unknown>
       )
       const content = res.data?.choices?.[0]?.message?.content
-      setResult(
-        content
-          ? String(content)
-          : JSON.stringify(res.data, null, 2)
-      )
+      setResult(content ? String(content) : JSON.stringify(res.data, null, 2))
     } catch (error: unknown) {
       const err = error as {
         response?: { data?: { error?: { message?: string }; message?: string } }
@@ -293,7 +289,9 @@ export function ApiDocs() {
               {t('Run')}
             </Button>
             <p className='text-muted-foreground/70 text-xs'>
-              {t('Running uses your session; sign in if the request is rejected.')}
+              {t(
+                'Running uses your session; sign in if the request is rejected.'
+              )}
             </p>
 
             {result && (

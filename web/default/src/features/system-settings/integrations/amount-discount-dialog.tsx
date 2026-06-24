@@ -194,7 +194,7 @@ export function AmountDiscountDialog({
                 <FormDescription>
                   {t('Final price multiplier (0.95 = 5% discount')}
                   {discountPercentage > 0 && (
-                    <span className='ml-1 font-medium text-success'>
+                    <span className='text-success ml-1 font-medium'>
                       = {discountPercentage}
                       {t('% off')}
                     </span>

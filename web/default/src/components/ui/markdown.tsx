@@ -67,7 +67,11 @@ const headingIdComponents: Components = {
   ),
 }
 
-export function Markdown({ children, className, withHeadingIds }: MarkdownProps) {
+export function Markdown({
+  children,
+  className,
+  withHeadingIds,
+}: MarkdownProps) {
   return (
     <div
       className={cn(

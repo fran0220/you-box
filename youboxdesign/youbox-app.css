@@ -211,8 +211,8 @@
 .code__copy svg{width:14px;height:14px}
 .code pre{margin:0;padding:18px 18px;font-family:var(--font-mono);font-size:var(--text-sm);line-height:1.7;
   color:var(--ink-150);overflow:auto;white-space:pre}
-.k-key{color:var(--orange-300)} .k-str{color:var(--teal-300)} .k-fn{color:var(--blue-500)}
-.k-com{color:var(--text-faint)} .k-num{color:var(--orange-200)}
+.k-key{color:var(--azure-300)} .k-str{color:var(--teal-300)} .k-fn{color:var(--blue-500)}
+.k-com{color:var(--text-faint)} .k-num{color:var(--azure-200)}
 
 /* ---- misc ---------------------------------------------------------- */
 .divider{height:1px;background:var(--divider);border:none;margin:0}
@@ -221,7 +221,7 @@
 .secondary{color:var(--text-secondary)}
 .strong{color:var(--text-strong)}
 .glow{position:absolute;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle, rgba(254,106,53,0.16), transparent 62%);filter:blur(10px)}
+  background:radial-gradient(circle, rgba(0,144,255,0.16), transparent 62%);filter:blur(10px)}
 .bar{height:6px;border-radius:var(--radius-pill);background:var(--surface-3);overflow:hidden}
 .bar > i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--brand)}
 .bar--teal > i{background:var(--accent)}

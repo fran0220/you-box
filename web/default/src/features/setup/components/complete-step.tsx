@@ -50,7 +50,7 @@ export function CompleteStep({ status, values }: CompleteStepProps) {
 
   return (
     <div className='flex flex-col items-center gap-6 text-center'>
-      <div className='bg-[var(--success-subtle)] text-success rounded-2xl p-4'>
+      <div className='bg-success-subtle text-success rounded-2xl p-4'>
         <CheckCircle2 className='size-8' />
       </div>
       <div className='space-y-2'>

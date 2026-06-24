@@ -184,7 +184,10 @@ export function LegalDocument({
         )}
       >
         <div className='space-y-2'>
-          <p className='yb-eyebrow'>{'// '}{t('Legal')}</p>
+          <p className='yb-eyebrow'>
+            {'// '}
+            {t('Legal')}
+          </p>
           <h1 className='font-display text-3xl font-bold tracking-[-0.025em]'>
             {title}
           </h1>

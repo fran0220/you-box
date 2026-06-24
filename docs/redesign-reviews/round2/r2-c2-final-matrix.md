@@ -103,6 +103,16 @@
 | `/system-settings/security/sensitive-words` | pass | pass | pass | pass | [r2-b12-system-settings-tables.md](r2-b12-system-settings-tables.md) |
 | `/system-settings/security/ssrf` | pass | pass | pass | pass | [r2-b12-system-settings-tables.md](r2-b12-system-settings-tables.md) |
 
+## 补充路由 — `/apps`(本矩阵之后新增)
+
+> **诚实记录**:`/apps`(应用排行榜,PublicLayout 公开页)在本矩阵首跑后由 commit `57523454` 引入,故不在上方 80 路由 harness 运行内 —— 当时该路由尚不存在,矩阵无遗漏。已将其补入 `verify-harness.mjs` 的 `PUBLIC_ROUTES`(80 → 81),下一轮 harness 重跑即纳入。
+
+| Route | 现状(代码/接线核验) | Dark/Light | Keyboard | i18n | States | 结构对照 |
+|---|---|---|---|---|---|---|
+| `/apps` | wired — 复用 `AppsLeaderboardTable`(与 `/pricing/$id` apps tab 同源组件);typecheck 通过 | 复用已验收 token 主题 | 表格语义(复用已验收 Table 原语) | 全 6 语言已补译(App rankings / Top apps / 空态文案等) | loading(`Loading…`)+ dashed 空态 + 数据态 | 见 `frontend-audit.md` 第二轮「apps leaderboard verified wired」 |
+
+附注(UX,非阻断):`/apps` 为公开页,但当前唯一导航入口在登录后侧栏 `Developer` 分组;未登录用户需直接输入 URL 或经外链到达(与 OpenRouter 行为一致)。从 App shell 侧栏跳入会切到 PublicLayout,存在轻微壳体割裂,后续可评估在公开 header 增加入口。
+
 ## 最终完成定义核对
 
 1. Phase A 全部组件 Design Lab 可演示且被页面实际消费(A1–A5 review + C1 消费方扫描)— ✅

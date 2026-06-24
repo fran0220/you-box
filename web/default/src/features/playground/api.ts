@@ -90,7 +90,9 @@ interface PricingRow {
  * Fetch per-model pricing and reduce it to the fields needed to derive a USD
  * cost from token usage. Keyed by model name.
  */
-export async function getModelPricingMap(): Promise<Record<string, ModelPricing>> {
+export async function getModelPricingMap(): Promise<
+  Record<string, ModelPricing>
+> {
   const res = await api.get(API_ENDPOINTS.PRICING)
   const { data } = res
   const rows: PricingRow[] = Array.isArray(data?.data) ? data.data : []
@@ -126,7 +128,10 @@ export async function getPresets(): Promise<PlaygroundPreset[]> {
   return res.data?.success && Array.isArray(res.data.data) ? res.data.data : []
 }
 
-export async function createPreset(name: string, config: string): Promise<void> {
+export async function createPreset(
+  name: string,
+  config: string
+): Promise<void> {
   await api.post('/api/preset/', { name, config })
 }
 

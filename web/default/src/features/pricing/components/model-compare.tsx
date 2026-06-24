@@ -38,21 +38,18 @@ import {
 } from '@/components/ui/popover'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
-import { LoadingSkeleton } from './loading-skeleton'
-import { ModelDetailsCapabilities } from './model-details-capabilities'
-import { ModalityIcons } from './model-details-modalities'
-import {
-  formatPrice,
-  formatRequestPrice,
-} from '../lib/price'
+import { MAX_COMPARE_MODELS } from '../constants'
+import { usePricingData } from '../hooks/use-pricing-data'
 import {
   formatTokenCount,
   formatYearMonth,
   inferModelMetadata,
 } from '../lib/model-metadata'
-import { usePricingData } from '../hooks/use-pricing-data'
-import { MAX_COMPARE_MODELS } from '../constants'
+import { formatPrice, formatRequestPrice } from '../lib/price'
 import type { PricingModel } from '../types'
+import { LoadingSkeleton } from './loading-skeleton'
+import { ModelDetailsCapabilities } from './model-details-capabilities'
+import { ModalityIcons } from './model-details-modalities'
 
 interface ComparePricingContext {
   priceRate: number
@@ -107,7 +104,9 @@ const COMPARE_ROWS: CompareRow[] = [
   },
   {
     label: 'Input',
-    render: (_model, meta) => <ModalityIcons modalities={meta.input_modalities} />,
+    render: (_model, meta) => (
+      <ModalityIcons modalities={meta.input_modalities} />
+    ),
   },
   {
     label: 'Output',
@@ -159,13 +158,21 @@ function AddModelButton(props: {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
-          <Button type='button' variant='outline' size='sm' disabled={props.disabled} />
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            disabled={props.disabled}
+          />
         }
       >
         <Plus className='size-4' />
         {t('Add model')}
       </PopoverTrigger>
-      <PopoverContent align='start' className='w-72 overflow-hidden rounded-xl p-0'>
+      <PopoverContent
+        align='start'
+        className='w-72 overflow-hidden rounded-xl p-0'
+      >
         <Command shouldFilter={false}>
           <CommandInput
             placeholder={t('Search models...')}

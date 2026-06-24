@@ -151,7 +151,9 @@ export function CompareModelsSelector({
                         checked ? 'opacity-100' : 'opacity-0'
                       )}
                     />
-                    <span className='min-w-0 flex-1 truncate'>{model.label}</span>
+                    <span className='min-w-0 flex-1 truncate'>
+                      {model.label}
+                    </span>
                   </CommandItem>
                 )
               })}

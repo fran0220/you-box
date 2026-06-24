@@ -113,7 +113,7 @@
         <div style="flex:1;overflow:hidden;padding:6px 24px">
           ${msg('user','JD','给我写一个 TypeScript 函数，用指数退避重试一个 promise。')}
           ${msg('assistant','✦','Here\'s a typed <span class="mono" style="color:var(--text)">retry</span> helper with exponential backoff and jitter — it resolves on the first success and rethrows after the final attempt:')}
-          ${msg('assistant','✦','<span style="color:var(--orange-300)">export async function</span> <span style="color:var(--blue-500)">retry</span>&lt;T&gt;(fn, opts) { … <span style="color:var(--text-faint)">// streaming…</span><span style="display:inline-block;width:8px;height:15px;background:var(--brand);margin-left:2px;vertical-align:-2px"></span>',true)}
+          ${msg('assistant','✦','<span style="color:var(--azure-300)">export async function</span> <span style="color:var(--blue-500)">retry</span>&lt;T&gt;(fn, opts) { … <span style="color:var(--text-faint)">// streaming…</span><span style="display:inline-block;width:8px;height:15px;background:var(--brand);margin-left:2px;vertical-align:-2px"></span>',true)}
         </div>
         <div style="padding:16px 24px;border-top:1px solid var(--border)">
           <div class="input" style="height:auto;padding:12px 14px;align-items:flex-start"><span class="ph" style="flex:1">Send a message…  (⌘↵ to send)</span><a class="btn btn--primary btn--sm"><i data-lucide="arrow-up"></i></a></div>

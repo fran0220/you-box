@@ -25,6 +25,7 @@ import {
   TrendingUp,
   Zap,
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   FilterChips,
   InlineAlert,
@@ -37,7 +38,6 @@ import {
   StepIndicator,
   TransactionRow,
 } from '@/components/patterns'
-import { Button } from '@/components/ui/button'
 import { StatusBadge, statusVariantFor } from '@/components/status-badge'
 import { DemoBlock, DemoRow } from '../components/demo-block'
 
@@ -61,7 +61,9 @@ export default function FeedbackDemos() {
           <InlineAlert tone='danger' title='Provider degraded'>
             Together AI returned elevated errors.
           </InlineAlert>
-          <InlineAlert tone='info'>Plain info body without a title.</InlineAlert>
+          <InlineAlert tone='info'>
+            Plain info body without a title.
+          </InlineAlert>
           <InlineAlert
             tone='brand'
             title='New key created — copy it now'
@@ -96,7 +98,7 @@ export default function FeedbackDemos() {
 
       <DemoBlock
         title='StatusBadge appearances + vocabulary'
-        description="text (legacy) / soft / solid; statusVariantFor maps 200·429·500, Active·Limited·Revoked, Operational·Degraded·Down"
+        description='text (legacy) / soft / solid; statusVariantFor maps 200·429·500, Active·Limited·Revoked, Operational·Degraded·Down'
       >
         <DemoRow label='soft — http codes'>
           {['200', '429', '500'].map((code) => (
@@ -110,21 +112,36 @@ export default function FeedbackDemos() {
           ))}
         </DemoRow>
         <DemoRow label='soft — key & provider states'>
-          {['Active', 'Limited', 'Revoked', 'Operational', 'Degraded', 'Down'].map(
-            (term) => (
-              <StatusBadge
-                key={term}
-                appearance='soft'
-                variant={statusVariantFor(term)}
-                label={term}
-                copyable={false}
-              />
-            )
-          )}
+          {[
+            'Active',
+            'Limited',
+            'Revoked',
+            'Operational',
+            'Degraded',
+            'Down',
+          ].map((term) => (
+            <StatusBadge
+              key={term}
+              appearance='soft'
+              variant={statusVariantFor(term)}
+              label={term}
+              copyable={false}
+            />
+          ))}
         </DemoRow>
         <DemoRow label='solid / text(legacy)'>
-          <StatusBadge appearance='solid' variant='success' label='Paid' copyable={false} />
-          <StatusBadge appearance='solid' variant='danger' label='Down' copyable={false} />
+          <StatusBadge
+            appearance='solid'
+            variant='success'
+            label='Paid'
+            copyable={false}
+          />
+          <StatusBadge
+            appearance='solid'
+            variant='danger'
+            label='Down'
+            copyable={false}
+          />
           <StatusBadge variant='success' label='Active' copyable={false} />
         </DemoRow>
       </DemoBlock>
@@ -135,7 +152,11 @@ export default function FeedbackDemos() {
       >
         <div className='w-full max-w-xl'>
           <StepIndicator
-            steps={[{ label: 'Database' }, { label: 'Admin account' }, { label: 'Site config' }]}
+            steps={[
+              { label: 'Database' },
+              { label: 'Admin account' },
+              { label: 'Site config' },
+            ]}
             current={step}
           />
           <Button
@@ -213,10 +234,7 @@ export default function FeedbackDemos() {
         </div>
       </DemoBlock>
 
-      <DemoBlock
-        title='PlanCard'
-        description='current (brand) vs choosable'
-      >
+      <DemoBlock title='PlanCard' description='current (brand) vs choosable'>
         <div className='flex w-full max-w-md flex-col gap-2.5'>
           <PlanCard
             name='Free'
@@ -228,7 +246,13 @@ export default function FeedbackDemos() {
               </Button>
             }
           />
-          <PlanCard name='Pro' price='$20' unit='/ mo' description='Current plan' current />
+          <PlanCard
+            name='Pro'
+            price='$20'
+            unit='/ mo'
+            description='Current plan'
+            current
+          />
           <PlanCard
             name='Enterprise'
             price='Custom'

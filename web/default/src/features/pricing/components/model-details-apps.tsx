@@ -17,47 +17,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useQuery } from '@tanstack/react-query'
-import { Trophy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { cn } from '@/lib/utils'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { formatCompactNumber } from '@/lib/format'
 import { getApps } from '@/features/apps/api'
+import { AppsLeaderboardTable } from '@/features/apps/components/apps-leaderboard'
 import type { PricingModel } from '../types'
-
-const COMPACT_NUMBER = new Intl.NumberFormat(undefined, {
-  notation: 'compact',
-  maximumFractionDigits: 1,
-})
-
-function RankBadge(props: { rank: number }) {
-  const rank = props.rank
-  const isPodium = rank <= 3
-  const palette =
-    rank === 1
-      ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
-      : rank === 2
-        ? 'bg-slate-100 text-slate-700 dark:bg-slate-500/20 dark:text-slate-300'
-        : rank === 3
-          ? 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300'
-          : 'bg-muted text-muted-foreground'
-  return (
-    <span
-      className={cn(
-        'inline-flex size-7 shrink-0 items-center justify-center rounded-md font-mono text-xs font-bold tabular-nums',
-        palette
-      )}
-    >
-      {isPodium ? <Trophy className='size-3.5' /> : rank}
-    </span>
-  )
-}
 
 export function ModelDetailsApps(props: { model: PricingModel }) {
   const { t } = useTranslation()
@@ -87,8 +51,6 @@ export function ModelDetailsApps(props: { model: PricingModel }) {
 
   const totalTokens = apps.reduce((sum, a) => sum + a.total_tokens, 0)
   const top = apps[0]
-  const headerCellClass =
-    'text-muted-foreground py-2 text-[10px] font-medium tracking-wider uppercase'
 
   return (
     <div className='flex flex-col gap-4'>
@@ -106,7 +68,7 @@ export function ModelDetailsApps(props: { model: PricingModel }) {
             {t('Total tokens')}
           </div>
           <div className='text-foreground mt-1 font-mono text-lg font-semibold tabular-nums'>
-            {COMPACT_NUMBER.format(totalTokens)}
+            {formatCompactNumber(totalTokens)}
           </div>
         </div>
         <div className='bg-muted/20 rounded-lg border p-3'>
@@ -119,42 +81,7 @@ export function ModelDetailsApps(props: { model: PricingModel }) {
         </div>
       </div>
 
-      <div className='overflow-x-auto rounded-lg border'>
-        <Table className='text-sm'>
-          <TableHeader>
-            <TableRow className='hover:bg-transparent'>
-              <TableHead className={cn(headerCellClass, 'w-12')}>#</TableHead>
-              <TableHead className={headerCellClass}>{t('App')}</TableHead>
-              <TableHead className={`${headerCellClass} text-right`}>
-                {t('Requests')}
-              </TableHead>
-              <TableHead className={`${headerCellClass} text-right`}>
-                {t('Tokens')}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {apps.map((app, index) => (
-              <TableRow key={`${app.app}-${index}`}>
-                <TableCell className='py-2.5'>
-                  <RankBadge rank={index + 1} />
-                </TableCell>
-                <TableCell className='py-2.5'>
-                  <span className='text-sm font-medium break-all'>
-                    {app.app}
-                  </span>
-                </TableCell>
-                <TableCell className='py-2.5 text-right font-mono tabular-nums'>
-                  {app.request_count.toLocaleString()}
-                </TableCell>
-                <TableCell className='py-2.5 text-right font-mono tabular-nums'>
-                  {COMPACT_NUMBER.format(app.total_tokens)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <AppsLeaderboardTable apps={apps} rounded='lg' />
     </div>
   )
 }

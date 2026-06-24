@@ -51,12 +51,12 @@ const ACCENT_CLASSES: Record<
   amber: {
     activeText: 'text-warning',
     activeBorder: 'border-warning',
-    badge: 'bg-[var(--warning-subtle)] text-warning',
+    badge: 'bg-warning-subtle text-warning',
   },
   blue: {
     activeText: 'text-info',
     activeBorder: 'border-info',
-    badge: 'bg-[var(--info-subtle)] text-info',
+    badge: 'bg-info-subtle text-info',
   },
   violet: {
     activeText: 'text-brand',

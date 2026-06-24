@@ -76,11 +76,11 @@ export const textColorMap = {
 export type StatusVariant = keyof typeof dotColorMap
 
 const softColorMap: Partial<Record<StatusVariant, string>> = {
-  success: 'bg-[var(--success-subtle)]',
-  warning: 'bg-[var(--warning-subtle)]',
-  danger: 'bg-[var(--danger-subtle)]',
-  red: 'bg-[var(--danger-subtle)]',
-  info: 'bg-[var(--info-subtle)]',
+  success: 'bg-success-subtle',
+  warning: 'bg-warning-subtle',
+  danger: 'bg-danger-subtle',
+  red: 'bg-danger-subtle',
+  info: 'bg-info-subtle',
   neutral: 'bg-surface-3',
   grey: 'bg-surface-3',
   brand: 'bg-[var(--brand-subtle)]',

@@ -12,11 +12,13 @@ This document is the system of record for the audit. Every finding is listed wit
 
 | Status | Count |
 | --- | --- |
-| Fixed | 33 |
-| Deferred / By design | 45 |
-| **Total** | **78** |
+| Fixed (first pass) | 33 |
+| Deferred / By design (first pass) | 45 |
+| **Total (first pass)** | **78** |
 
 > Two clusters independently reported the same `faq-section.tsx:435` and `announcements-section.tsx:628` strings, so the raw total of 78 includes 2 duplicate entries (noted in §D).
+
+> **Second pass (current):** all 4 follow-up backlog items (§B/§C/§D/§E) are now **Fixed**, the OpenRouter-parity backends were verified wired into the frontend, and a focused re-audit of the new feature areas fixed 4 functional + 3 design issues. Full write-up in [§ Second pass](#second-pass--backlog-cleared--new-findings) at the end of this doc.
 
 ---
 
@@ -97,12 +99,12 @@ The redesign uses deliberate sub-scale sizes that have no Tailwind default step:
 | `auth/{sign-in,sign-up,otp,forgot-password,reset-password-confirm}/index.tsx:35` | `text-[28px]` heading |
 | `setup/setup-wizard.tsx:310` | `text-[28px]` heading |
 
-### B. `bg-[var(--*-subtle)]` — **By design** (already token-driven)
+### B. `bg-[var(--*-subtle)]` — **By design** (already token-driven) → **Resolved (second pass)**: registered as first-class `bg-*-subtle` utilities.
 These reference real theme CSS variables (`--danger-subtle`, `--warning-subtle`, `--success-subtle`, `--info-subtle`) through Tailwind arbitrary-property syntax. They *are* using design tokens; the suggested first-class `bg-danger-subtle` utilities don't exist in the theme yet. Functionally correct and theme-reactive. Optional future polish: register these as named utilities in `theme.css`.
 
 `keys/components/api-key-group-combobox.tsx:64` · `usage-logs/components/usage-logs-table.tsx:55` · `setup/components/database-step.tsx:108,120,136,150` · `setup/components/admin-step.tsx:38`
 
-### C. Chart colors — **Deferred** (needs VChart theme mapping)
+### C. Chart colors — ~~**Deferred** (needs VChart theme mapping)~~ → **Resolved (second pass)**: `src/lib/vchart-theme.ts` token resolver.
 VChart specs take literal color strings (not CSS vars) and must react to dark/light mode. The correct fix is a shared VChart theme object that resolves semantic tokens → colors at render time; piecemeal hex swaps wouldn't respond to theme changes. Track as a dedicated charts-theming task.
 
 | File:line | Hardcoded |
@@ -112,7 +114,7 @@ VChart specs take literal color strings (not CSS vars) and must react to dark/li
 | `pricing/components/model-details-charts.tsx:315` | `#6366f1` (throughput bars) |
 | `dashboard/lib/charts.ts:497` | `#000` (hover/selected states) |
 
-### D. Missing i18n — **Deferred** (single locale batch)
+### D. Missing i18n — ~~**Deferred** (single locale batch)~~ → **Resolved (second pass)**: all 6 sites wrapped in `t()` + synced.
 Real i18n gaps: delete-confirmation bodies and one stat label not wrapped in `t()`. Grouped so the locale-file churn (`en/zh/fr/ru/ja/vi` via `bun run i18n:sync`) happens in one pass.
 
 | File:line | Untranslated |
@@ -126,7 +128,7 @@ Real i18n gaps: delete-confirmation bodies and one stat label not wrapped in `t(
 
 *(`faq-section.tsx:435` and `announcements-section.tsx:628` were each reported twice — once per cluster — accounting for 2 of the 78 raw entries.)*
 
-### E. Legacy / dead routes — **Deferred** (routing-cleanup task)
+### E. Legacy / dead routes — ~~**Deferred** (routing-cleanup task)~~ → **Resolved (second pass)**: dead `(auth)/oauth` route removed + tree regenerated.
 | File | Note |
 | --- | --- |
 | `routes/(auth)/oauth.tsx:60` | Unreachable duplicate OAuth route — confirmed no navigation targets it, but removal needs route-tree regeneration + deep-link check. |
@@ -152,8 +154,56 @@ Real i18n gaps: delete-confirmation bodies and one stat label not wrapped in `t(
 
 ---
 
-## Follow-up backlog (suggested)
-1. **Charts theming** (§C) — one VChart theme object mapping semantic tokens → resolved colors, reactive to dark/light.
-2. **i18n batch** (§D) — wrap the 6 sites in `t()`, run `bun run i18n:sync`.
-3. **Routing cleanup** (§E) — remove the dead `(auth)/oauth` route + regenerate the route tree.
-4. **Optional token polish** (§B) — register `*-subtle` colors as first-class Tailwind utilities.
+## Backend-dependent gaps
+
+These design-spec sections remain **blocked on backend API** — no fake UI switches or placeholder buttons. Adaptation decisions are recorded in [`docs/redesign-reviews/round2/r2-00-gap-index.md`](redesign-reviews/round2/r2-00-gap-index.md) (🔵 rows) and the per-page R2-Bx tables.
+
+| Feature | Page / area | Gap index | Adaptation |
+| --- | --- | --- | --- |
+| Dashboard Export | `/dashboard/overview` | B1 §1 | No export endpoint → button omitted |
+| Usage logs Export CSV | `/usage-logs/*` | B6 §1 | No export endpoint → button omitted |
+| Users Export | `/users` | B8 §1 | No user-export endpoint → button omitted |
+| ~~Auto top-up~~ | ~~`/wallet`~~ | B3 §4 | **Resolved** — backend landed (`be4cf51a`); now wired in the profile **Notification** tab (enable switch + threshold + suggested amount). See second pass below. |
+| Playground Share | `/playground` | B4 §2 | No share/session API → share action omitted |
+| Notification Preferences | Notification popover | B6 §7 | No per-user notification-prefs API → Preferences omitted |
+| User subscription invoices | `/subscriptions` (user view) | B10 §3 | No user invoice model → invoices table not built; admin plan management retained |
+
+**Policy:** Ship only what the API supports. When endpoints land, wire UI from these rows — do not add disabled controls that imply future behavior.
+
+---
+
+## Second pass — backlog cleared + new findings
+
+All four follow-up backlog items are now **done**, the OpenRouter-parity backends (`be4cf51a`) were verified wired into the frontend, and a focused functional/design re-audit of the newly-wired areas surfaced (and fixed) several issues. Re-verified: `go build ./controller/... ./model/...` ✓ · `tsc -b` ✓ · `eslint .` ✓ · `bun run build` ✓ · dist CSS confirms `.bg-{success,warning,danger,info}-subtle` compiled.
+
+### Backlog — cleared
+| Item | Status | What shipped |
+| --- | --- | --- |
+| **Charts theming** (§C) | Fixed | Added `src/lib/vchart-theme.ts` — a DOM-probe resolver that maps semantic CSS vars → literal colors for VChart, reactive to light/dark + theme presets. Replaced all hardcoded chart `#000`/`rgba(…)` hover/point/axis/grid colors in `dashboard/lib/charts.ts`, `pricing/components/model-details-charts.tsx`, and (newly) `rankings/{market-share,models}-section.tsx`. Deleted the duplicated local `getChartThemeTokens`; axis text now resolves `--muted-foreground`, grid lines `--border`. |
+| **i18n batch** (§D) | Fixed | The 6 delete-confirm / label sites wrapped in `t()` with `{{count}}` plurals; `bun run i18n:sync` propagated keys across `en/zh/fr/ru/ja/vi`. |
+| **Routing cleanup** (§E) | Fixed | Deleted the dead `(auth)/oauth.tsx` (active OAuth callback is `routes/oauth/$provider.tsx`); regenerated `routeTree.gen.ts`. No remaining references. |
+| **Token polish** (§B) | Fixed | Registered `--color-{success,warning,danger,info}-subtle` in `theme.css` `@theme inline`; migrated ~40 `bg-[var(--*-subtle)]` arbitrary usages (incl. `/40`,`/50` opacity variants) across 26 files to first-class `bg-*-subtle` utilities. |
+
+### OpenRouter-parity features — verified wired (no longer "blocked")
+The `be4cf51a` backend added apps/presets/auto-topup/spend-limits; the redesign frontend wired all four. Verified functional: **apps** leaderboard (`/api/apps`, real query + loading/empty states), **playground presets** (`/api/preset` CRUD, mutations invalidate), **auto top-up** (profile Notification tab), **API-key recurring spend limits** (keys drawer). Two real bugs found in spend-limits and fixed (below).
+
+### New functional fixes (this pass)
+| File:line | Issue | Fix |
+| --- | --- | --- |
+| `controller/token.go:294` | **Editing an existing key never persisted `spend_limit`/`reset_period`/`next_reset_time`** — the update branch copied every other field but these, so `cleanToken` (loaded from DB) rewrote stale values. Recurring spend limits could be set at create but never changed/removed. | Copy the three fields onto `cleanToken`; only re-arm `next_reset_time=0` when the period actually changes (preserves the billing clock on unrelated edits). |
+| `keys/lib/api-key-form.ts:99` + `keys/components/api-keys-mutate-drawer.tsx` | After the backend fix, any edit of a recurring key would **refund spent quota** — the credit field reflects the per-period budget, and submit rewrote `remain_quota` to the full budget. | Thread the freshly-fetched original key into `transformFormDataToPayload`; preserve the live `remain_quota` when the budget amount is unchanged. |
+| `profile/.../notification-tab.tsx:113,177` | Server requires `quota_warning_threshold > 0`; the input allowed `0`/empty, so **saving the whole Notification tab (incl. auto top-up) failed with a generic error**. | Added a precise client guard before save + input `min={1}` (the `>0` rule is upstream code, left untouched per fork strategy). |
+| `pricing/.../model-details-api.tsx:710` | The **Rate limits** table renders seeded-random RPM/TPM/RPD as authoritative model metadata with no disclaimer. | Footnote now states figures are representative defaults that may differ from the account's actual limits (lightweight, policy-aligned; no real per-model limits endpoint exists). |
+
+### New design-conformance fixes (this pass)
+| File:line | Was → Now |
+| --- | --- |
+| `rankings/components/{market-share,models}-section.tsx` | Hardcoded `rgba(255,255,255,…)` / `rgba(15,23,42,…)` axis+grid colors → `useVChartThemeColors().{axisLabel,gridLine}` (token-driven, theme-reactive) |
+| `pricing/components/model-details-charts.tsx` | Local `getChartThemeTokens` hardcoded rgba → shared `vchart-theme` `axisLabel`/`gridLine` tokens |
+| `dashboard/.../overview-insights.tsx:425` | `text-[9px]` avatar-initials (below the documented 10px floor) → `text-[10px]` |
+
+### Re-audited but kept (By design)
+- `dashboard/.../overview-insights.tsx:524` `text-[34px]`, `wallet/.../balance-hero-card.tsx:104` `text-[40px]` — deliberate large display numbers (same rationale as the §A 28px headings); converting would shift layout.
+- `overview-insights.tsx:560` `rounded-[2px]` — intentional thin-bar micro-radius on the mini daily-spend chart (`rounded-xs`=4px would over-round 1px-wide bars).
+- `overview-dashboard.tsx:202` `text-[9px]` — `aria-hidden`, gradient-masked decorative code watermark (not content).
+- `rankings` vendor palette / `wallet` payment-brand colors — brand-identity colors, no semantic token (same disposition as §F `apps` RankBadge).

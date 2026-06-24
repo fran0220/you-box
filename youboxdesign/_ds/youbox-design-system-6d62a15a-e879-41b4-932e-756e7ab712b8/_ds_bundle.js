@@ -261,7 +261,7 @@ function injectStyles() {
   document.head.appendChild(el);
 }
 injectStyles();
-const PALETTE = ['#FE6A35', '#1FBEA3', '#4D9FFF', '#A974FF', '#F0B429', '#F5483B', '#34C759', '#FF7FB0'];
+const PALETTE = ['#0090ff', '#1FBEA3', '#4D9FFF', '#A974FF', '#F0B429', '#F5483B', '#34C759', '#FF7FB0'];
 function colorFor(name = '') {
   let h = 0;
   for (let i = 0; i < name.length; i++) h = h * 31 + name.charCodeAt(i) >>> 0;
@@ -1077,11 +1077,11 @@ const res = await yb.chat.completions.create({
     code: code
   }, /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "import"), " OpenAI ", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "from"), " ", /*#__PURE__*/React.createElement("span", {
     style: {
@@ -1089,11 +1089,11 @@ const res = await yb.chat.completions.create({
     }
   }, "\"openai\""), ";", "\n\n", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "const"), " yb = ", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "new"), " ", /*#__PURE__*/React.createElement("span", {
     style: {
@@ -1109,11 +1109,11 @@ const res = await yb.chat.completions.create({
     }
   }, "YOUBOX_KEY"), ",", "\n", "}", ");", "\n\n", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "const"), " res = ", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "await"), " yb.chat.completions.", /*#__PURE__*/React.createElement("span", {
     style: {
@@ -1525,7 +1525,7 @@ curl https://api.youbox.dev/v1/chat/completions \\
     }
   }, "# install nothing new \u2014 reuse the OpenAI SDK"), "\n", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "export"), " YOUBOX_KEY=", /*#__PURE__*/React.createElement("span", {
     style: {
@@ -1533,7 +1533,7 @@ curl https://api.youbox.dev/v1/chat/completions \\
     }
   }, "\"yb-sk-...\""), "\n\n", "curl https://api.youbox.dev/v1/chat/completions ", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "\\"), "\n", "  ", "-H ", /*#__PURE__*/React.createElement("span", {
     style: {
@@ -1541,7 +1541,7 @@ curl https://api.youbox.dev/v1/chat/completions \\
     }
   }, "\"Authorization: Bearer $YOUBOX_KEY\""), " ", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "\\"), "\n", "  ", "-H ", /*#__PURE__*/React.createElement("span", {
     style: {
@@ -1549,7 +1549,7 @@ curl https://api.youbox.dev/v1/chat/completions \\
     }
   }, "\"Content-Type: application/json\""), " ", /*#__PURE__*/React.createElement("span", {
     style: {
-      color: 'var(--orange-300)'
+      color: 'var(--azure-300)'
     }
   }, "\\"), "\n", "  ", "-d ", /*#__PURE__*/React.createElement("span", {
     style: {

@@ -17,9 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useContext, useEffect, useMemo, type ReactNode } from 'react'
-import { createPortal } from 'react-dom'
 import { useFormContext, useFormState } from 'react-hook-form'
-
+import { createPortal } from 'react-dom'
 import {
   noopRegister,
   SettingsPageContext,
@@ -34,9 +33,7 @@ type SettingsPageProviderProps = {
   children: ReactNode
   suppressSectionHeader?: boolean
   sectionEyebrow?: string | null
-  registerFormActions?: (
-    entry: SettingsFormActionsRegistration | null
-  ) => void
+  registerFormActions?: (entry: SettingsFormActionsRegistration | null) => void
 }
 
 export function SettingsPageProvider(props: SettingsPageProviderProps) {
@@ -180,10 +177,7 @@ function FormActionsRegistrar(entry: SettingsFormActionsRegistration) {
     registerFormActions({ dirty, saving, save, discard })
   })
 
-  useEffect(
-    () => () => registerFormActions(null),
-    [registerFormActions]
-  )
+  useEffect(() => () => registerFormActions(null), [registerFormActions])
 
   return null
 }

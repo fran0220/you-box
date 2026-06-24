@@ -2187,7 +2187,7 @@ export function ChannelMutateDrawer({
                               </FormControl>
                               {modelMappingGuardrail.exposedTargetModels
                                 .length > 0 && (
-                                <Alert className='border-warning/30 bg-[var(--warning-subtle)] text-warning'>
+                                <Alert className='border-warning/30 bg-warning-subtle text-warning'>
                                   <AlertDescription className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
                                     <span>
                                       {t('The mapped upstream model(s)')}{' '}
@@ -2427,7 +2427,7 @@ export function ChannelMutateDrawer({
                               )}
                               {modelMappingGuardrail.missingSourceModels
                                 .length > 0 && (
-                                <Alert className='border-warning/30 bg-[var(--warning-subtle)] text-warning'>
+                                <Alert className='border-warning/30 bg-warning-subtle text-warning'>
                                   <AlertDescription className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
                                     <span>
                                       {t('Add')}{' '}

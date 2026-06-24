@@ -26,14 +26,15 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: 'bg-card text-card-foreground',
-        brand: 'border-brand-border/50 bg-brand-subtle text-foreground *:[svg]:text-brand',
+        brand:
+          'border-brand-border/50 bg-brand-subtle text-foreground *:[svg]:text-brand',
         destructive:
-          'border-destructive/30 bg-[var(--danger-subtle)] text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current',
+          'border-destructive/30 bg-danger-subtle text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current',
         success:
-          'border-success/30 bg-[var(--success-subtle)] text-success *:data-[slot=alert-description]:text-success/90 *:[svg]:text-current',
+          'border-success/30 bg-success-subtle text-success *:data-[slot=alert-description]:text-success/90 *:[svg]:text-current',
         warning:
-          'border-warning/30 bg-[var(--warning-subtle)] text-warning *:data-[slot=alert-description]:text-warning/90 *:[svg]:text-current',
-        info: 'border-info/30 bg-[var(--info-subtle)] text-info *:data-[slot=alert-description]:text-info/90 *:[svg]:text-current',
+          'border-warning/30 bg-warning-subtle text-warning *:data-[slot=alert-description]:text-warning/90 *:[svg]:text-current',
+        info: 'border-info/30 bg-info-subtle text-info *:data-[slot=alert-description]:text-info/90 *:[svg]:text-current',
       },
     },
     defaultVariants: {

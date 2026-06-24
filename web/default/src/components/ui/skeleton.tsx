@@ -23,7 +23,7 @@ function Skeleton({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot='skeleton'
       className={cn(
-        'skeleton-shimmer bg-[var(--skeleton-base)] rounded-md',
+        'skeleton-shimmer rounded-md bg-[var(--skeleton-base)]',
         className
       )}
       {...props}

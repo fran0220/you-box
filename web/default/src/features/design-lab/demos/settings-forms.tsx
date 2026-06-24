@@ -29,15 +29,6 @@ import {
   Table2,
   Wallet,
 } from 'lucide-react'
-import {
-  Chip,
-  ChipGroup,
-  CurrencyInput,
-  MonoInput,
-  ParameterSlider,
-  SegmentedControl,
-  ThresholdInput,
-} from '@/components/patterns'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -47,6 +38,15 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import {
+  Chip,
+  ChipGroup,
+  CurrencyInput,
+  MonoInput,
+  ParameterSlider,
+  SegmentedControl,
+  ThresholdInput,
+} from '@/components/patterns'
 import {
   SettingRow,
   SettingsPanel,
@@ -141,7 +141,10 @@ export default function SettingsFormsDemos() {
                 description='New users start in this language.'
                 control={
                   <Select defaultValue='zh'>
-                    <SelectTrigger className='w-40' aria-label='Default language'>
+                    <SelectTrigger
+                      className='w-40'
+                      aria-label='Default language'
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -160,7 +163,10 @@ export default function SettingsFormsDemos() {
         title='StickySaveBar'
         description='appears while dirty; Discard resets, Save shows the spinner'
       >
-        <DemoRow label='toggle any control above to dirty the form' className='block'>
+        <DemoRow
+          label='toggle any control above to dirty the form'
+          className='block'
+        >
           <div className='relative h-20 overflow-hidden rounded-md border'>
             <div className='text-muted-foreground p-3 text-xs'>
               page content…
@@ -297,11 +303,17 @@ export default function SettingsFormsDemos() {
         title='MonoInput / CurrencyInput / ThresholdInput'
         description='mono field with prefix/suffix addons; amount + currency; threshold pair'
       >
-        <DemoRow label='mono with prefix / suffix' className='max-w-md flex-col'>
+        <DemoRow
+          label='mono with prefix / suffix'
+          className='max-w-md flex-col'
+        >
           <MonoInput prefix='$' defaultValue='50.00' aria-label='Amount' />
           <MonoInput suffix='/s' defaultValue='100' aria-label='Rate limit' />
         </DemoRow>
-        <DemoRow label='currency input + selector' className='max-w-md flex-col'>
+        <DemoRow
+          label='currency input + selector'
+          className='max-w-md flex-col'
+        >
           <CurrencyInput
             defaultValue='50.00'
             aria-label='Top-up amount'
@@ -320,8 +332,16 @@ export default function SettingsFormsDemos() {
         </DemoRow>
         <DemoRow label='threshold pair (auto top-up form)'>
           <div className='flex max-w-md gap-2.5'>
-            <ThresholdInput operator='≤ $' defaultValue='25' aria-label='Threshold' />
-            <ThresholdInput operator='+ $' defaultValue='50' aria-label='Top-up by' />
+            <ThresholdInput
+              operator='≤ $'
+              defaultValue='25'
+              aria-label='Threshold'
+            />
+            <ThresholdInput
+              operator='+ $'
+              defaultValue='50'
+              aria-label='Top-up by'
+            />
           </div>
         </DemoRow>
         <DemoRow label='inside a SettingRow' className='block'>
@@ -341,11 +361,7 @@ export default function SettingsFormsDemos() {
           </div>
         </DemoRow>
         <DemoRow label='extra actions' className='block'>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => setDirty(true)}
-          >
+          <Button variant='outline' size='sm' onClick={() => setDirty(true)}>
             Mark form dirty
           </Button>
         </DemoRow>

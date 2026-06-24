@@ -422,7 +422,7 @@ export function OverviewInsights() {
                 <div key={name}>
                   <div className='mb-1.5 flex items-center gap-2.5'>
                     <Avatar className='size-6'>
-                      <AvatarFallback className='font-display text-[9px] font-semibold'>
+                      <AvatarFallback className='font-display text-[10px] font-semibold'>
                         {modelInitials(name)}
                       </AvatarFallback>
                     </Avatar>

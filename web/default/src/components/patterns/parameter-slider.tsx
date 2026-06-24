@@ -50,7 +50,10 @@ export function ParameterSlider({
 }: ParameterSliderProps) {
   const id = useId()
   return (
-    <div data-slot='parameter-slider' className={cn('flex flex-col gap-2', className)}>
+    <div
+      data-slot='parameter-slider'
+      className={cn('flex flex-col gap-2', className)}
+    >
       <div className='flex items-baseline justify-between gap-3'>
         <label
           htmlFor={id}

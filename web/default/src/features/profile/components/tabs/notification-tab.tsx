@@ -111,6 +111,16 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
   }
 
   const handleSave = async () => {
+    // The server requires a positive warning threshold; surface a precise
+    // message here so an unrelated edit (e.g. auto top-up) isn't blocked by a
+    // generic save error when the field is empty or zero.
+    if (
+      !settings.quota_warning_threshold ||
+      settings.quota_warning_threshold <= 0
+    ) {
+      toast.error(t('Quota Warning Threshold must be greater than 0'))
+      return
+    }
     try {
       setLoading(true)
       const response = await updateUserSettings(settings)
@@ -174,7 +184,7 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
         <Input
           id='threshold'
           type='number'
-          min={0}
+          min={1}
           className='h-9'
           value={settings.quota_warning_threshold}
           onChange={(e) =>

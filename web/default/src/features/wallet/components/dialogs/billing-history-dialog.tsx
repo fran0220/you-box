@@ -251,7 +251,7 @@ export function BillingHistoryDialog({
                           <Label className='text-muted-foreground text-xs'>
                             {t('Payment')}
                           </Label>
-                          <div className='text-sm font-semibold text-destructive'>
+                          <div className='text-destructive text-sm font-semibold'>
                             {formatNumber(record.money)}
                           </div>
                         </div>

@@ -40,7 +40,11 @@ type SettingsShellProps = {
  * strips below `lg`. Selection drives router navigation; the global
  * sidebar entry remains untouched (sidebar = global nav, rail = in-page).
  */
-export function SettingsShell({ group, section, children }: SettingsShellProps) {
+export function SettingsShell({
+  group,
+  section,
+  children,
+}: SettingsShellProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const activeGroup = SETTINGS_SHELL_GROUPS[group]
@@ -56,12 +60,10 @@ export function SettingsShell({ group, section, children }: SettingsShellProps) 
       }
     })
 
-  const sectionItems: SettingsRailItem[] = activeGroup.sections.map(
-    (item) => ({
-      value: item.id,
-      label: t(item.titleKey),
-    })
-  )
+  const sectionItems: SettingsRailItem[] = activeGroup.sections.map((item) => ({
+    value: item.id,
+    label: t(item.titleKey),
+  }))
 
   const handleGroupChange = (next: SettingsShellGroup) => {
     if (next === group) return

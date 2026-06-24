@@ -11,7 +11,7 @@ components into a runtime library (`_ds_bundle.js`) and indexes the CSS tokens.
 
 - **Category:** AI infrastructure · developer tooling (model aggregation, à la an OpenRouter-style marketplace)
 - **Primary surface:** Marketing website
-- **Aesthetic:** Dark-mode-first, technical, data-dense, monospace accents — a developer-marketplace look. Warm signature orange against near-black ink.
+- **Aesthetic:** Dark-mode-first, technical, data-dense, monospace accents — a developer-marketplace look. Azure brand accent (`#0090ff`) against near-black ink — aligned with the shipped `web/default` theme.
 - **Sources:** No existing codebase or Figma was provided. This system was **designed from scratch** in the model-aggregation genre. It is an original brand — not a recreation of any existing product's visuals.
 
 ---
@@ -22,7 +22,7 @@ How YouBox writes copy.
 
 - **Voice:** Confident, technical, plainspoken. Talks to developers as peers. No hype, no fluff. Claims are concrete ("no markup on tokens", "drop-in OpenAI-compatible SDK") rather than vague ("revolutionary AI platform").
 - **Person:** Second person ("**you** write one integration"). The product is "YouBox" or "we". The reader is always "you".
-- **Casing:** Sentence case for all headings and buttons ("Get your API key", not "Get Your API Key"). The brand name is always **camel case: `YouBox`** — never "Youbox", "youbox", or "YOUBOX". The "Box" half is often tinted brand-orange in the wordmark.
+- **Casing:** Sentence case for all headings and buttons ("Get your API key", not "Get Your API Key"). The brand name is always **camel case: `YouBox`** — never "Youbox", "youbox", or "YOUBOX". The "Box" half is often tinted `--brand` (azure) in the wordmark.
 - **Headline style:** Short, punchy, often two beats with a line break and a colored payoff. The anchor line is **"Every model, one box."** Others: "Route to any LLM.", "One catalog. Every model.", "Live in three steps."
 - **Eyebrows:** Mono, uppercase, prefixed with a `//` comment slash — e.g. `// MARKETPLACE`, `// WHY YOUBOX`. This is a recurring signature that reinforces the developer-tool feel.
 - **Numbers & units:** Specific and mono-set. "312 models", "1.4T tokens/day", "99.98% uptime", "$3.00 / 1M". Units sit in the mono font, dimmed.
@@ -37,17 +37,17 @@ How YouBox writes copy.
 
 ## Visual Foundations
 
-- **Color:** Dark-mode-first. The canvas is near-black warm ink (`--ink-950 #0B0B0F`); surfaces step up through `--surface` → `--surface-2` → `--surface-3`. The signature is **YouBox Orange `#FE6A35`** (`--brand`), used sparingly for primary CTAs, the wordmark's "Box", eyebrows, active states, and the hero glow. **Teal `#1FBEA3`** (`--accent`) is the secondary, reserved for data/status dots and model categories. A light theme exists (`[data-theme="light"]`) but dark is the brand's home.
+- **Color:** Dark-mode-first. The canvas is near-black warm ink (`--ink-950 #0B0B0F`); surfaces step up through `--surface` → `--surface-2` → `--surface-3`. The signature is **YouBox Azure `#0090ff`** (`--brand`), used sparingly for primary CTAs, the wordmark's "Box", eyebrows, active states, and the hero glow. **Teal `#1FBEA3`** (`--accent`) is the secondary, reserved for data/status dots and model categories. A light theme exists (`[data-theme="light"]`) but dark is the brand's home. *(Design tokens updated to match `web/default/src/styles/theme.css`; legacy orange docs superseded.)*
 - **Type:** Three families. **Space Grotesk** (display/headings) — geometric grotesque, tight negative tracking. **Hanken Grotesk** (body/UI) — warm, neutral, readable. **JetBrains Mono** (code, eyebrows, technical labels, units). Headlines run large with `-0.025em`–`-0.035em` tracking; mono eyebrows run uppercase with `+0.08em–0.1em` tracking.
 - **Spacing:** 4px base grid (`--space-1`…`--space-40`). Sections breathe at 96px vertical padding; cards pad at 20–30px.
-- **Backgrounds:** Flat near-black. **No photographic imagery, no busy patterns.** The single decorative move is a soft radial **brand glow** behind the hero (`radial-gradient` of orange at ~18% alpha). Glass/blur is used only on the sticky nav (`backdrop-filter: blur`). Avoid full-page gradients.
+- **Backgrounds:** Flat near-black. **No photographic imagery, no busy patterns.** The single decorative move is a soft radial **brand glow** behind the hero (`radial-gradient` of azure at ~16% alpha). Glass/blur is used only on the sticky nav (`backdrop-filter: blur`). Avoid full-page gradients.
 - **Borders:** Hairline, low-contrast — `rgba(255,255,255,0.09)` on dark. Elevation reads through borders + a faint glow more than heavy drop shadows. Border-radius scale: cards use **md (10px)** / **lg (14px)**; pills and tags use **pill (999px)**; plans use **xl (20px)**.
 - **Cards:** `--surface-card` fill, 1px hairline border, `--radius-lg`. Interactive cards lift `translateY(-2px)` and gain a brand-glow border on hover. No colored left-border accents, no emoji.
-- **Shadows:** Subtle on dark (`--shadow-sm`…`--shadow-xl` are deep-but-soft black). The hero CTA and feature cards use `--glow-brand` (a 1px brand border ring + soft orange shadow) for emphasis.
+- **Shadows:** Subtle on dark (`--shadow-sm`…`--shadow-xl` are deep-but-soft black). The hero CTA and feature cards use `--glow-brand` (a 1px brand border ring + soft azure shadow) for emphasis.
 - **Motion:** Signature easing is `--ease-out: cubic-bezier(0.16,1,0.3,1)` for entrances; `--ease-spring` adds a gentle overshoot (used on the switch thumb). Durations: fast 140ms, base 220ms, slow 400ms. Respect `prefers-reduced-motion`.
 - **Hover states:** Buttons lighten (primary → `--brand-hover`); ghost/secondary gain a `--surface-hover` fill; links/icons brighten toward `--text`. **Press states:** scale down slightly (`scale(0.985)` on buttons, `scale(0.92)` on icon buttons).
 - **Transparency & blur:** Used deliberately — sticky nav glass, subtle tints (`--brand-subtle`, semantic `*-subtle` fills at ~12–15% alpha). Not decorative.
-- **Imagery vibe:** Code is the hero imagery. Code blocks have a chrome bar (three dots + filename/lang + copy), warm syntax tints (orange keywords, teal strings, blue function names) on `--code-bg`.
+- **Imagery vibe:** Code is the hero imagery. Code blocks have a chrome bar (three dots + filename/lang + copy), syntax tints (azure keywords, teal strings, blue function names) on `--code-bg`.
 
 ---
 
@@ -58,7 +58,7 @@ How YouBox writes copy.
 - **Sizes:** 15–18px inline; 21px in feature tiles; 16–17px in buttons.
 - **Emoji:** Never used.
 - **Unicode:** The `//` in eyebrows and `★` favorite glyph are the only non-icon glyphs; otherwise prefer Lucide.
-- **Brand mark:** `assets/youbox-mark.svg` — an original isometric **open box** in two orange shades. `assets/youbox-mark-mono.svg` is a single-`currentColor` variant. The wordmark sets "You" in `--text-strong` and "Box" in `--brand`, Space Grotesk 700.
+- **Brand mark:** `assets/youbox-mark.svg` — an original isometric **open box** in two azure shades. `assets/youbox-mark-mono.svg` is a single-`currentColor` variant. The wordmark sets "You" in `--text-strong` and "Box" in `--brand`, Space Grotesk 700.
 
 ---
 

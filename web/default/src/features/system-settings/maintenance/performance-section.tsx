@@ -700,9 +700,7 @@ export function PerformanceSection(props: Props) {
                           <SelectItem value='minute'>
                             {t('1 minute')}
                           </SelectItem>
-                          <SelectItem value='5min'>
-                            {t('5 minutes')}
-                          </SelectItem>
+                          <SelectItem value='5min'>{t('5 minutes')}</SelectItem>
                           <SelectItem value='hour'>{t('1 hour')}</SelectItem>
                         </SelectGroup>
                       </SelectContent>
@@ -1023,7 +1021,9 @@ export function PerformanceSection(props: Props) {
                     {stats.memory_stats.num_gc}
                   </div>
                   <div>
-                    <span className='text-muted-foreground'>Goroutines:</span>{' '}
+                    <span className='text-muted-foreground'>
+                      {t('Goroutines:')}
+                    </span>{' '}
                     {stats.memory_stats.num_goroutine}
                   </div>
                 </div>

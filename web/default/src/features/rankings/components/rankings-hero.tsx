@@ -64,7 +64,11 @@ export function RankingsHero(props: RankingsHeroProps) {
           className='border-border/60 w-full justify-start gap-0 border-b group-data-horizontal/tabs:h-auto'
         >
           {PERIODS.map((p) => (
-            <TabsTrigger key={p.id} value={p.id} className='flex-none px-3 py-2'>
+            <TabsTrigger
+              key={p.id}
+              value={p.id}
+              className='flex-none px-3 py-2'
+            >
               {t(p.labelKey)}
             </TabsTrigger>
           ))}

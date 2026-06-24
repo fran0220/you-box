@@ -57,6 +57,14 @@ level; data-populated variants (seeded models, chat presets, live streams,
 fresh-install setup) re-verifiable once such data exists — all of their
 components are the shared, already-verified primitives.
 
+**Post-sweep addition — `/apps`:** the public apps-leaderboard route was
+introduced after this sweep (commit `57523454`) and so is not a row above —
+it did not exist at review time. It renders via `PublicLayout` and the shared
+`AppsLeaderboardTable` (same component as the per-model apps tab), with
+loading + dashed-empty states; typecheck clean and all six locales translated.
+It has been added to `verify-harness.mjs` `PUBLIC_ROUTES` for the next harness
+run; see the `/apps` section in `round2/r2-c2-final-matrix.md`.
+
 ## Final gate results
 
 - `bun run typecheck` — pass

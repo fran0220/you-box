@@ -57,7 +57,10 @@ interface PresetsMenuProps {
   config: PlaygroundConfig
   parameterEnabled: ParameterEnabled
   /** Apply a loaded preset to the live playground state. */
-  onApply: (config: Partial<PlaygroundConfig>, enabled?: ParameterEnabled) => void
+  onApply: (
+    config: Partial<PlaygroundConfig>,
+    enabled?: ParameterEnabled
+  ) => void
   disabled?: boolean
 }
 

@@ -65,13 +65,13 @@ function getRatioBadgeClassName(ratio: ApiKeyGroupOption['ratio']) {
   }
 
   if (ratio > 5) {
-    return 'border-destructive/30 bg-[var(--danger-subtle)] text-destructive'
+    return 'border-destructive/30 bg-danger-subtle text-destructive'
   }
   if (ratio > 3) {
-    return 'border-warning/30 bg-[var(--warning-subtle)] text-warning'
+    return 'border-warning/30 bg-warning-subtle text-warning'
   }
   if (ratio > 1) {
-    return 'border-info/30 bg-[var(--info-subtle)] text-info'
+    return 'border-info/30 bg-info-subtle text-info'
   }
   return 'border-teal/30 bg-teal-subtle text-teal'
 }

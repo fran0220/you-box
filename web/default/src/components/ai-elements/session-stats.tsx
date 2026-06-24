@@ -32,7 +32,11 @@ type SessionStatsProps = HTMLAttributes<HTMLDListElement> & {
  * SessionStats (R2-A5) — `// this session` k/v rows: muted label left,
  * mono value right (Tokens / Cost / Latency).
  */
-export const SessionStats = ({ items, className, ...props }: SessionStatsProps) => (
+export const SessionStats = ({
+  items,
+  className,
+  ...props
+}: SessionStatsProps) => (
   <dl
     data-slot='session-stats'
     className={cn('flex flex-col gap-2', className)}

@@ -1203,7 +1203,7 @@ export function PaymentSettingsSection({
               </p>
             </div>
 
-            <div className='text-info rounded-md bg-[var(--info-subtle)] p-4 text-sm'>
+            <div className='text-info bg-info-subtle rounded-md p-4 text-sm'>
               <p className='mb-2 font-medium'>{t('Webhook Configuration:')}</p>
               <ul className='list-inside list-disc space-y-1'>
                 <li>
@@ -1389,7 +1389,7 @@ export function PaymentSettingsSection({
               </p>
             </div>
 
-            <div className='text-info rounded-md bg-[var(--info-subtle)] p-4 text-sm'>
+            <div className='text-info bg-info-subtle rounded-md p-4 text-sm'>
               <p className='mb-2 font-medium'>{t('Webhook Configuration:')}</p>
               <ul className='list-inside list-disc space-y-1'>
                 <li>

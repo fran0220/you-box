@@ -347,7 +347,7 @@ export function FetchModelsDialog({
                   {redirectOnlySet.has(normalizeModelName(model)) && (
                     <Tooltip>
                       <TooltipTrigger
-                        render={<Info className='h-3.5 w-3.5 text-warning' />}
+                        render={<Info className='text-warning h-3.5 w-3.5' />}
                       ></TooltipTrigger>
                       <TooltipContent>
                         {t('From model redirect, not yet added to models list')}

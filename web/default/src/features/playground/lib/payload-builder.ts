@@ -79,7 +79,9 @@ export function buildChatCompletionPayload(
       : messages
 
   // Filter and format valid messages
-  const processedMessages = scoped.filter(isValidMessage).map(formatMessageForAPI)
+  const processedMessages = scoped
+    .filter(isValidMessage)
+    .map(formatMessageForAPI)
 
   // Prepend the system prompt, if set, so it applies to every model.
   const systemPrompt = config.systemPrompt?.trim()

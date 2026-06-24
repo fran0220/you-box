@@ -327,7 +327,7 @@ function CopyableField(props: {
           onClick={() => copyToClipboard(text)}
         >
           {hasCopied ? (
-            <Check className='h-3 w-3 text-success' />
+            <Check className='text-success h-3 w-3' />
           ) : (
             <Copy className='h-3 w-3' />
           )}
@@ -436,7 +436,7 @@ export function CodexUsageDialog({
     >
       <div className='space-y-4'>
         {errorMessage && (
-          <div className='rounded-lg border border-destructive/30 bg-[var(--danger-subtle)] px-4 py-3 text-sm text-destructive'>
+          <div className='border-destructive/30 bg-danger-subtle text-destructive rounded-lg border px-4 py-3 text-sm'>
             {errorMessage}
           </div>
         )}
@@ -575,7 +575,7 @@ export function CodexUsageDialog({
                   disabled={!rawJsonText}
                 >
                   {copiedText === rawJsonText ? (
-                    <Check className='mr-1.5 h-3.5 w-3.5 text-success' />
+                    <Check className='text-success mr-1.5 h-3.5 w-3.5' />
                   ) : (
                     <Copy className='mr-1.5 h-3.5 w-3.5' />
                   )}

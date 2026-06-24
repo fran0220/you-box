@@ -105,10 +105,15 @@ export function useChatHandler({
 
   const sendStreamingTo = useCallback(
     (messages: Message[], target: ChatTarget) => {
-      const payload = buildChatCompletionPayload(messages, config, parameterEnabled, {
-        model: target.model,
-        scopeHistoryToModel: true,
-      })
+      const payload = buildChatCompletionPayload(
+        messages,
+        config,
+        parameterEnabled,
+        {
+          model: target.model,
+          scopeHistoryToModel: true,
+        }
+      )
       requestStartRef.current.set(target.key, Date.now())
 
       sendStreamRequest(target.key, payload, {
@@ -144,7 +149,8 @@ export function useChatHandler({
         },
         onComplete: (usage) => {
           const startedAt = requestStartRef.current.get(target.key)
-          const latencyMs = startedAt != null ? Date.now() - startedAt : undefined
+          const latencyMs =
+            startedAt != null ? Date.now() - startedAt : undefined
           requestStartRef.current.delete(target.key)
           onMessageUpdate((prev) =>
             updateMessageByKey(prev, target.key, (message) =>
@@ -177,10 +183,15 @@ export function useChatHandler({
 
   const sendNonStreamingTo = useCallback(
     async (messages: Message[], target: ChatTarget) => {
-      const payload = buildChatCompletionPayload(messages, config, parameterEnabled, {
-        model: target.model,
-        scopeHistoryToModel: true,
-      })
+      const payload = buildChatCompletionPayload(
+        messages,
+        config,
+        parameterEnabled,
+        {
+          model: target.model,
+          scopeHistoryToModel: true,
+        }
+      )
       const startedAt = Date.now()
       setPendingCount((c) => c + 1)
       try {
@@ -195,11 +206,17 @@ export function useChatHandler({
             const withContent: Message = {
               ...message,
               versions: [
-                { ...message.versions[0], content: choice.message?.content || '' },
+                {
+                  ...message.versions[0],
+                  content: choice.message?.content || '',
+                },
               ],
             }
             return {
-              ...finalizeMessage(withContent, choice.message?.reasoning_content),
+              ...finalizeMessage(
+                withContent,
+                choice.message?.reasoning_content
+              ),
               status: MESSAGE_STATUS.COMPLETE,
               usage: response.usage,
               costUsd: costFor(target.model, response.usage),

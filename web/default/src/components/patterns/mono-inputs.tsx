@@ -25,10 +25,7 @@ import {
   InputGroupText,
 } from '@/components/ui/input-group'
 
-type MonoInputProps = Omit<
-  ComponentProps<typeof InputGroupInput>,
-  'prefix'
-> & {
+type MonoInputProps = Omit<ComponentProps<typeof InputGroupInput>, 'prefix'> & {
   /** Leading addon (currency symbol, `≤`, icon). */
   prefix?: ReactNode
   /** Trailing addon (unit, `%`, `/s`, currency select). */

@@ -71,7 +71,11 @@ export const ModelMetaTag = ({
   children,
   ...props
 }: ModelMetaTagProps) => (
-  <Badge variant='outline' className={cn('h-6 gap-1.5 px-2.5', className)} {...props}>
+  <Badge
+    variant='outline'
+    className={cn('h-6 gap-1.5 px-2.5', className)}
+    {...props}
+  >
     {icon != null && (
       <span aria-hidden='true' className='[&>svg]:size-3'>
         {icon}

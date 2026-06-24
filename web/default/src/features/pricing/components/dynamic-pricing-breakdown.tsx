@@ -197,7 +197,7 @@ export function DynamicPricingBreakdown({
     return (
       <section className='min-w-0 py-4'>
         <div className='mb-3 flex items-center gap-2'>
-          <span className='bg-[var(--warning-subtle)] text-warning inline-flex size-6 items-center justify-center rounded-lg shadow-sm'>
+          <span className='bg-warning-subtle text-warning inline-flex size-6 items-center justify-center rounded-lg shadow-sm'>
             <TagIcon className='size-3.5' />
           </span>
           <div>
@@ -230,7 +230,7 @@ export function DynamicPricingBreakdown({
   return (
     <section className='min-w-0 py-3 sm:py-4'>
       <div className='mb-3 flex items-start gap-2 sm:mb-4'>
-        <span className='mt-0.5 bg-[var(--warning-subtle)] text-warning inline-flex size-6 items-center justify-center rounded-lg shadow-sm'>
+        <span className='bg-warning-subtle text-warning mt-0.5 inline-flex size-6 items-center justify-center rounded-lg shadow-sm'>
           <TagIcon className='size-3.5' />
         </span>
         <div>
@@ -266,7 +266,7 @@ export function DynamicPricingBreakdown({
                   <div className='mb-1.5 flex flex-wrap items-center gap-1.5'>
                     <Badge
                       variant='secondary'
-                      className='bg-[var(--info-subtle)] text-info'
+                      className='bg-info-subtle text-info'
                     >
                       {tier.label || t('Default')}
                     </Badge>
@@ -343,7 +343,7 @@ export function DynamicPricingBreakdown({
                         <div className='flex flex-wrap items-center gap-1.5'>
                           <Badge
                             variant='secondary'
-                            className='bg-[var(--info-subtle)] text-info'
+                            className='bg-info-subtle text-info'
                           >
                             {tier.label || t('Default')}
                           </Badge>
@@ -406,7 +406,7 @@ export function DynamicPricingBreakdown({
                 </span>
                 <Badge
                   variant='secondary'
-                  className='shrink-0 bg-[var(--warning-subtle)] text-warning'
+                  className='bg-warning-subtle text-warning shrink-0'
                 >
                   {group.multiplier}x
                 </Badge>

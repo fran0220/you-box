@@ -2,9 +2,9 @@
   
   <path d="M50 22 L74 35 L50 48 L26 35 Z" fill="#0B0B0F"></path>
   
-  <path d="M50 14 L86 34 L50 54 L14 34 Z M50 22 L26 35 L50 48 L74 35 Z" fill="#FF9E73" fill-rule="evenodd"></path>
+  <path d="M50 14 L86 34 L50 54 L14 34 Z M50 22 L26 35 L50 48 L74 35 Z" fill="#8ec8f6" fill-rule="evenodd"></path>
   
-  <path d="M14 34 L50 54 L50 84 L14 64 Z" fill="#ED5421"></path>
+  <path d="M14 34 L50 54 L50 84 L14 64 Z" fill="#0588f0"></path>
   
-  <path d="M86 34 L50 54 L50 84 L86 64 Z" fill="#FE6A35"></path>
+  <path d="M86 34 L50 54 L50 84 L86 64 Z" fill="#0090ff"></path>
 </svg>

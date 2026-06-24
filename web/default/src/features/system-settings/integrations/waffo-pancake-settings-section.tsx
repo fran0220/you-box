@@ -383,7 +383,7 @@ export function WaffoPancakeSettingsSection({
       </div>
       <div className='grid min-w-0 gap-x-5 gap-y-4 lg:grid-cols-2'>
         {/* Blue box — webhook configuration only. */}
-        <div className='bg-[var(--info-subtle)] text-info rounded-md p-4 text-sm lg:col-span-2'>
+        <div className='bg-info-subtle text-info rounded-md p-4 text-sm lg:col-span-2'>
           <p className='mb-2 font-medium'>{t('Webhook Configuration:')}</p>
           <ul className='list-inside list-disc space-y-1'>
             <li>
@@ -472,7 +472,7 @@ export function WaffoPancakeSettingsSection({
               for. Subscriptions reuse the same Store but get their own
               per-plan product, configured in the Subscriptions admin.
             */}
-          <div className='border-info/30 bg-[var(--info-subtle)] text-info rounded-md border p-3 text-xs'>
+          <div className='border-info/30 bg-info-subtle text-info rounded-md border p-3 text-xs'>
             <p className='mb-1 font-medium'>
               {t('Why only one store + product?')}
             </p>

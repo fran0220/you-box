@@ -52,8 +52,8 @@ import { UsageLogsMobileList } from './usage-logs-mobile-card'
 const route = getRouteApi('/_authenticated/usage-logs/$section')
 
 const logTypeRowTint: Record<number, string> = {
-  [LOG_TYPE_ENUM.ERROR]: 'bg-[var(--danger-subtle)]/40',
-  [LOG_TYPE_ENUM.REFUND]: 'bg-[var(--info-subtle)]/40',
+  [LOG_TYPE_ENUM.ERROR]: 'bg-danger-subtle/40',
+  [LOG_TYPE_ENUM.REFUND]: 'bg-info-subtle/40',
 }
 
 function deserializeLogTypeFilter(value: unknown): unknown[] {

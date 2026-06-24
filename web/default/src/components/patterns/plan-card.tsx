@@ -61,7 +61,9 @@ export function PlanCard({
       {...props}
     >
       <div className='min-w-0 flex-1'>
-        <div className='text-foreground truncate text-sm font-semibold'>{name}</div>
+        <div className='text-foreground truncate text-sm font-semibold'>
+          {name}
+        </div>
         {description != null && (
           <div className='text-muted-foreground mt-0.5 truncate text-xs'>
             {description}

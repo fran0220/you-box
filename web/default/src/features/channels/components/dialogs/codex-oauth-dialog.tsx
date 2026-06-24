@@ -185,7 +185,7 @@ export function CodexOAuthDialog({
             title={t('Copy authorization link')}
           >
             {copiedText === state.authorizeUrl ? (
-              <Check className='mr-2 h-4 w-4 text-success' />
+              <Check className='text-success mr-2 h-4 w-4' />
             ) : (
               <Copy className='mr-2 h-4 w-4' />
             )}

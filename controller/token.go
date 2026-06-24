@@ -302,6 +302,16 @@ func UpdateToken(c *gin.Context) {
 		cleanToken.AllowIps = token.AllowIps
 		cleanToken.Group = token.Group
 		cleanToken.CrossGroupRetry = token.CrossGroupRetry
+		cleanToken.SpendLimit = token.SpendLimit
+		// Only re-arm the reset schedule when the recurring period actually
+		// changes; preserve the existing NextResetTime otherwise so unrelated
+		// edits (rename, IP list, …) don't restart the billing clock. The
+		// client always sends next_reset_time=0 and lets the reset task
+		// initialize it (see model.ResetDueTokenSpendLimits).
+		if cleanToken.ResetPeriod != token.ResetPeriod {
+			cleanToken.ResetPeriod = token.ResetPeriod
+			cleanToken.NextResetTime = 0
+		}
 	}
 	err = cleanToken.Update()
 	if err != nil {

@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm, type SubmitErrorHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
@@ -140,15 +140,22 @@ export function ApiKeysMutateDrawer({
     defaultValues: getApiKeyFormDefaultValues(defaultUseAutoGroup),
   })
 
+  // Snapshot of the freshly-fetched key being edited, so the submit transform
+  // can preserve the live remaining quota of a recurring key (avoids refunding
+  // spent quota on unrelated edits).
+  const originalKeyRef = useRef<ApiKey | null>(null)
+
   // Load existing data when updating
   useEffect(() => {
     if (open && isUpdate && currentRow) {
       getApiKey(currentRow.id).then((result) => {
         if (result.success && result.data) {
+          originalKeyRef.current = result.data
           form.reset(transformApiKeyToFormDefaults(result.data))
         }
       })
     } else if (open && !isUpdate) {
+      originalKeyRef.current = null
       form.reset(
         getApiKeyFormDefaultValues(defaultUseAutoGroup && backendHasAuto)
       )
@@ -174,7 +181,10 @@ export function ApiKeysMutateDrawer({
   const onSubmit = async (data: ApiKeyFormValues) => {
     setIsSubmitting(true)
     try {
-      const basePayload = transformFormDataToPayload(data)
+      const basePayload = transformFormDataToPayload(
+        data,
+        isUpdate ? (originalKeyRef.current ?? undefined) : undefined
+      )
 
       if (isUpdate && currentRow) {
         const result = await updateApiKey({

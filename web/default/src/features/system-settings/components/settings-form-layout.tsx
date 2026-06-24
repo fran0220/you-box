@@ -200,10 +200,7 @@ export function SettingRowFormItem({
   return (
     <FormItem
       data-settings-form-span='full'
-      className={cn(
-        'border-divider block border-b last:border-b-0',
-        className
-      )}
+      className={cn('border-divider block border-b last:border-b-0', className)}
     >
       <SettingRow
         className='border-b-0'

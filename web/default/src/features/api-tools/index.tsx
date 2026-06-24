@@ -25,8 +25,8 @@ import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 import { getUserModels } from '@/features/playground/api'
 
 const PG = {
@@ -97,10 +97,16 @@ interface EmbeddingResponse {
   usage?: { prompt_tokens?: number; total_tokens?: number }
 }
 
-function EmbeddingsTab({ models }: { models: { label: string; value: string }[] }) {
+function EmbeddingsTab({
+  models,
+}: {
+  models: { label: string; value: string }[]
+}) {
   const { t } = useTranslation()
   const [model, setModel] = useState('text-embedding-3-small')
-  const [input, setInput] = useState('The quick brown fox jumps over the lazy dog.')
+  const [input, setInput] = useState(
+    'The quick brown fox jumps over the lazy dog.'
+  )
   const [running, setRunning] = useState(false)
   const [result, setResult] = useState<EmbeddingResponse | null>(null)
 
@@ -139,8 +145,16 @@ function EmbeddingsTab({ models }: { models: { label: string; value: string }[] 
           rows={4}
         />
       </div>
-      <Button onClick={run} disabled={running || !input.trim()} className='gap-1.5 self-start'>
-        {running ? <Loader2 className='size-4 animate-spin' /> : <Play className='size-4' />}
+      <Button
+        onClick={run}
+        disabled={running || !input.trim()}
+        className='gap-1.5 self-start'
+      >
+        {running ? (
+          <Loader2 className='size-4 animate-spin' />
+        ) : (
+          <Play className='size-4' />
+        )}
         {t('Generate embedding')}
       </Button>
       {vector && (
@@ -151,7 +165,11 @@ function EmbeddingsTab({ models }: { models: { label: string; value: string }[] 
               ` · ${result.usage.total_tokens} ${t('tokens')}`}
           </div>
           <code className='text-muted-foreground block max-h-32 overflow-auto font-mono text-xs'>
-            [{vector.slice(0, 16).map((v) => v.toFixed(5)).join(', ')}
+            [
+            {vector
+              .slice(0, 16)
+              .map((v) => v.toFixed(5))
+              .join(', ')}
             {vector.length > 16 ? ', …' : ''}]
           </code>
         </div>
@@ -169,7 +187,9 @@ interface ImageResponse {
 function ImagesTab({ models }: { models: { label: string; value: string }[] }) {
   const { t } = useTranslation()
   const [model, setModel] = useState('dall-e-3')
-  const [prompt, setPrompt] = useState('A serene watercolor of a lighthouse at dawn.')
+  const [prompt, setPrompt] = useState(
+    'A serene watercolor of a lighthouse at dawn.'
+  )
   const [size, setSize] = useState('1024x1024')
   const [running, setRunning] = useState(false)
   const [images, setImages] = useState<string[]>([])
@@ -230,8 +250,16 @@ function ImagesTab({ models }: { models: { label: string; value: string }[] }) {
           className='w-40'
         />
       </div>
-      <Button onClick={run} disabled={running || !prompt.trim()} className='gap-1.5 self-start'>
-        {running ? <Loader2 className='size-4 animate-spin' /> : <Play className='size-4' />}
+      <Button
+        onClick={run}
+        disabled={running || !prompt.trim()}
+        className='gap-1.5 self-start'
+      >
+        {running ? (
+          <Loader2 className='size-4 animate-spin' />
+        ) : (
+          <Play className='size-4' />
+        )}
         {t('Generate image')}
       </Button>
       {images.length > 0 && (
@@ -270,7 +298,10 @@ function RerankTab({ models }: { models: { label: string; value: string }[] }) {
   const [running, setRunning] = useState(false)
   const [results, setResults] = useState<RerankResponse['results']>([])
 
-  const docList = documents.split('\n').map((d) => d.trim()).filter(Boolean)
+  const docList = documents
+    .split('\n')
+    .map((d) => d.trim())
+    .filter(Boolean)
 
   const run = async () => {
     setRunning(true)
@@ -330,7 +361,11 @@ function RerankTab({ models }: { models: { label: string; value: string }[] }) {
         disabled={running || !query.trim() || docList.length === 0}
         className='gap-1.5 self-start'
       >
-        {running ? <Loader2 className='size-4 animate-spin' /> : <Play className='size-4' />}
+        {running ? (
+          <Loader2 className='size-4 animate-spin' />
+        ) : (
+          <Play className='size-4' />
+        )}
         {t('Rerank')}
       </Button>
       {results && results.length > 0 && (

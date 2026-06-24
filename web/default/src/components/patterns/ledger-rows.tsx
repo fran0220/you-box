@@ -51,7 +51,9 @@ export function TransactionRow({
       {...props}
     >
       <div className='min-w-0 flex-1'>
-        <div className='text-foreground truncate text-sm font-medium'>{title}</div>
+        <div className='text-foreground truncate text-sm font-medium'>
+          {title}
+        </div>
         {sub != null && (
           <div className='text-muted-foreground truncate font-mono text-xs'>
             {sub}
@@ -101,7 +103,9 @@ export function InvoiceRow({
       {...props}
     >
       <div className='min-w-0 flex-1'>
-        <div className='text-foreground truncate text-sm font-medium'>{title}</div>
+        <div className='text-foreground truncate text-sm font-medium'>
+          {title}
+        </div>
         {sub != null && (
           <div className='text-muted-foreground truncate font-mono text-xs'>
             {sub}

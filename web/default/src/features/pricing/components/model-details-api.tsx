@@ -709,7 +709,7 @@ function RateLimitsSection(props: { model: PricingModel }) {
       </div>
       <p className='text-muted-foreground mt-2 text-[11px] leading-relaxed'>
         {t(
-          'RPM = requests per minute, TPM = tokens per minute, RPD = requests per day. Limits apply per token group.'
+          'RPM = requests per minute, TPM = tokens per minute, RPD = requests per day. Limits apply per token group. Figures shown are representative defaults — your account’s actual limits may differ.'
         )}
       </p>
     </section>

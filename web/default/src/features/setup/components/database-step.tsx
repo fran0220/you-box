@@ -105,9 +105,9 @@ export function DatabaseStep({ status }: DatabaseStepProps) {
       </div>
 
       {status?.database_type === 'sqlite' && (
-        <Alert className='border-warning/30 bg-[var(--warning-subtle)]'>
+        <Alert className='border-warning/30 bg-warning-subtle'>
           <AlertTitle className='flex items-center gap-2'>
-            <HardDrive className='size-4 text-warning' />
+            <HardDrive className='text-warning size-4' />
             {t('Persist your data file')}
           </AlertTitle>
           <AlertDescription>
@@ -117,7 +117,7 @@ export function DatabaseStep({ status }: DatabaseStepProps) {
               )}
             </p>
             {isElectron && electronDataDir && (
-              <p className='mt-3 bg-[var(--warning-subtle)] text-warning rounded-md px-3 py-2 font-mono text-xs'>
+              <p className='bg-warning-subtle text-warning mt-3 rounded-md px-3 py-2 font-mono text-xs'>
                 {t('Data directory:')} {electronDataDir}
               </p>
             )}
@@ -133,9 +133,9 @@ export function DatabaseStep({ status }: DatabaseStepProps) {
       )}
 
       {status?.database_type === 'mysql' && (
-        <Alert className='border-success/30 bg-[var(--success-subtle)]'>
+        <Alert className='border-success/30 bg-success-subtle'>
           <AlertTitle className='flex items-center gap-2'>
-            <Server className='size-4 text-success' />
+            <Server className='text-success size-4' />
             {t('MySQL detected')}
           </AlertTitle>
           <AlertDescription>
@@ -147,9 +147,9 @@ export function DatabaseStep({ status }: DatabaseStepProps) {
       )}
 
       {status?.database_type === 'postgres' && (
-        <Alert className='border-info/30 bg-[var(--info-subtle)]'>
+        <Alert className='border-info/30 bg-info-subtle'>
           <AlertTitle className='flex items-center gap-2'>
-            <Server className='size-4 text-info' />
+            <Server className='text-info size-4' />
             {t('PostgreSQL detected')}
           </AlertTitle>
           <AlertDescription>

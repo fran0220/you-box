@@ -36,9 +36,7 @@ export type SettingsPageContextValue = {
   suppressSectionHeader: boolean
   /** i18n key of the owning settings group, used as the panel eyebrow. */
   sectionEyebrow: string | null
-  registerFormActions: (
-    entry: SettingsFormActionsRegistration | null
-  ) => void
+  registerFormActions: (entry: SettingsFormActionsRegistration | null) => void
 }
 
 export const noopRegister = () => {}

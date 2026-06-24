@@ -553,16 +553,15 @@ const getOperationSummary = (
 }
 
 const getModeTagTailwind = (mode: string): string => {
-  if (mode.includes('header'))
-    return 'bg-[var(--info-subtle)] text-info border-info/30'
+  if (mode.includes('header')) return 'bg-info-subtle text-info border-info/30'
   if (mode.includes('replace') || mode.includes('trim'))
     return 'bg-brand-subtle text-brand border-brand-border/40'
   if (mode.includes('copy') || mode.includes('move'))
-    return 'bg-[var(--info-subtle)] text-info border-info/20'
+    return 'bg-info-subtle text-info border-info/20'
   if (mode.includes('error') || mode.includes('prune'))
-    return 'bg-[var(--danger-subtle)] text-destructive border-destructive/30'
+    return 'bg-danger-subtle text-destructive border-destructive/30'
   if (mode.includes('sync'))
-    return 'bg-[var(--success-subtle)] text-success border-success/30'
+    return 'bg-success-subtle text-success border-success/30'
   return 'bg-muted text-muted-foreground'
 }
 

@@ -4,20 +4,23 @@
    surface). [data-theme="light"] re-maps the semantic aliases.
    Base ramps stay constant across themes; only the semantic
    layer flips.
+
+   Brand accent aligned with web/default theme.css (Radix Blue /
+   azure #0090ff). Teal remains the data/status support color.
    ============================================================ */
 
 :root {
-  /* -------- Brand: YouBox Orange (signature) -------- */
-  --orange-50:  #FFF3ED;
-  --orange-100: #FFE2D2;
-  --orange-200: #FFC2A4;
-  --orange-300: #FF9E73;
-  --orange-400: #FF7F4D;
-  --orange-500: #FE6A35; /* base brand */
-  --orange-600: #ED5421;
-  --orange-700: #C53F15;
-  --orange-800: #9B3315;
-  --orange-900: #7C2C16;
+  /* -------- Brand: Azure (signature; matches web/default) -------- */
+  --azure-50:  #f4faff;
+  --azure-100: #e6f4fe;
+  --azure-200: #c2e5ff;
+  --azure-300: #8ec8f6;
+  --azure-400: #5eb1ef;
+  --azure-500: #0090ff; /* base brand */
+  --azure-600: #0588f0;
+  --azure-700: #0d74ce;
+  --azure-800: #0a5aa6;
+  --azure-900: #113264;
 
   /* -------- Support: Teal (data / online / secondary) -------- */
   --teal-50:  #E6FBF6;
@@ -63,13 +66,13 @@
      ============================================================ */
 
   /* Brand */
-  --brand:            var(--orange-500);
-  --brand-hover:      var(--orange-400);
-  --brand-active:     var(--orange-600);
-  --brand-subtle:     rgba(254, 106, 53, 0.14);
-  --brand-border:     rgba(254, 106, 53, 0.40);
-  --brand-on:         #1A0E07; /* text/icon on a brand-filled surface */
-  --brand-ring:       rgba(254, 106, 53, 0.35);
+  --brand:            var(--azure-500);
+  --brand-hover:      #3b9eff;
+  --brand-active:     var(--azure-600);
+  --brand-subtle:     rgba(0, 144, 255, 0.16);
+  --brand-border:     rgba(0, 144, 255, 0.40);
+  --brand-on:         #ffffff;
+  --brand-ring:       rgba(0, 144, 255, 0.40);
 
   --accent:           var(--teal-400);
   --accent-subtle:    rgba(31, 190, 163, 0.14);
@@ -91,7 +94,7 @@
   --text-muted:       var(--ink-400);
   --text-faint:       var(--ink-500);
   --text-on-brand:    var(--brand-on);
-  --text-link:        var(--orange-300);
+  --text-link:        var(--azure-300);
 
   /* Borders & lines */
   --border:           rgba(255, 255, 255, 0.09);
@@ -123,13 +126,13 @@
    SEMANTIC ALIASES — light theme
    ============================================================ */
 [data-theme="light"] {
-  --brand:            var(--orange-600);
-  --brand-hover:      var(--orange-500);
-  --brand-active:     var(--orange-700);
-  --brand-subtle:     rgba(254, 106, 53, 0.12);
-  --brand-border:     rgba(254, 106, 53, 0.40);
+  --brand:            var(--azure-500);
+  --brand-hover:      var(--azure-600);
+  --brand-active:     var(--azure-700);
+  --brand-subtle:     rgba(0, 144, 255, 0.10);
+  --brand-border:     rgba(0, 144, 255, 0.32);
   --brand-on:         #FFFFFF;
-  --brand-ring:       rgba(254, 106, 53, 0.30);
+  --brand-ring:       rgba(0, 144, 255, 0.32);
 
   --accent:           var(--teal-600);
   --accent-subtle:    rgba(17, 163, 140, 0.12);
@@ -149,7 +152,7 @@
   --text-muted:       var(--ink-400);
   --text-faint:       var(--ink-300);
   --text-on-brand:    #FFFFFF;
-  --text-link:        var(--orange-700);
+  --text-link:        var(--azure-700);
 
   --border:           rgba(15, 15, 20, 0.10);
   --border-strong:    rgba(15, 15, 20, 0.18);
