@@ -31,14 +31,16 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { useDebounce } from '@/hooks'
-import { Database } from 'lucide-react'
+import { AlertTriangle, Database } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { formatQuota } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
+import { Button } from '@/components/ui/button'
 import {
   Empty,
+  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -100,14 +102,43 @@ function ApiKeysMobileSkeleton() {
 function ApiKeysMobileList({
   table,
   isLoading,
+  isError,
+  onRetry,
 }: {
   table: ReturnType<typeof useReactTable<ApiKey>>
   isLoading: boolean
+  isError?: boolean
+  onRetry?: () => void
 }) {
   const { t } = useTranslation()
   const rows = table.getRowModel().rows
 
   if (isLoading) return <ApiKeysMobileSkeleton />
+
+  if (isError && !rows.length) {
+    return (
+      <div className='rounded-lg border p-8'>
+        <Empty className='border-none p-0'>
+          <EmptyHeader>
+            <EmptyMedia variant='icon'>
+              <AlertTriangle className='text-destructive size-6' />
+            </EmptyMedia>
+            <EmptyTitle>{t('Failed to load')}</EmptyTitle>
+            <EmptyDescription>
+              {t('Could not load data. Please try again.')}
+            </EmptyDescription>
+          </EmptyHeader>
+          {onRetry && (
+            <EmptyContent>
+              <Button variant='outline' size='sm' onClick={onRetry}>
+                {t('Try again')}
+              </Button>
+            </EmptyContent>
+          )}
+        </Empty>
+      </div>
+    )
+  }
 
   if (!rows.length) {
     return (
@@ -257,7 +288,7 @@ export function ApiKeysTable() {
 
   // Fetch data with React Query
   // eslint-disable-next-line @tanstack/query/exhaustive-deps
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: [
       'keys',
       pagination.pageIndex + 1,
@@ -341,6 +372,10 @@ export function ApiKeysTable() {
       columns={columns}
       isLoading={isLoading}
       isFetching={isFetching}
+      isError={isError}
+      onRetry={() => {
+        void refetch()
+      }}
       emptyTitle={t('No API Keys Found')}
       emptyDescription={t(
         'No API keys available. Create your first API key to get started.'
@@ -372,7 +407,16 @@ export function ApiKeysTable() {
           },
         ],
       }}
-      mobile={<ApiKeysMobileList table={table} isLoading={isLoading} />}
+      mobile={
+        <ApiKeysMobileList
+          table={table}
+          isLoading={isLoading}
+          isError={isError}
+          onRetry={() => {
+            void refetch()
+          }}
+        />
+      }
       getRowClassName={(row) =>
         isDisabledApiKeyRow(row.original) ? DISABLED_ROW_DESKTOP : undefined
       }

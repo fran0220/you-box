@@ -132,3 +132,38 @@ export const SIDEBAR_ITEM_VARIANTS: Variants = {
   initial: { opacity: 0, x: -8 },
   animate: { opacity: 1, x: 0, transition: MOTION_TRANSITION.fast },
 }
+
+/**
+ * Overlay motion SSOT (Base UI `data-starting-style` / `data-ending-style`
+ * transition strings).
+ *
+ * Contract: every Base UI overlay primitive (dialog/sheet + popover/dropdown/
+ * select/tooltip/toast) shares ONE motion language so a backdrop and the panel
+ * it dims animate on the SAME timing curve and the SAME duration token
+ * (`duration-base`). Historically these drifted — dialog hardcoded
+ * `duration-100` on content while sheet ran a `duration-fast` backdrop against
+ * a `duration-base` panel, so the backdrop finished before the panel and the
+ * close felt unglued. Importing these constants instead of re-spelling the
+ * class strings fixes the desync at the source.
+ *
+ * Exception: the vaul bottom-drawer (components/ui/drawer.tsx) owns its own
+ * drag-/spring-driven slide and keeps a tw-animate-css backdrop fade, so it is
+ * deliberately NOT wired to these constants (it still reads the `--z-overlay`
+ * token for stacking).
+ *
+ * Layering pairs with the `--z-*` scale in styles/theme.css: the backdrop sits
+ * at `--z-overlay`; anchored popups add their own `z-[var(--z-popover|...)]`.
+ * Callers append their own transform recipe (scale/translate) on top of
+ * {@link overlayPopupMotionClassName}.
+ */
+
+/** Backdrop recipe for modal overlays (dialog/sheet/drawer). Fades opacity on
+ * the shared `duration-base` token and blurs behind where supported. */
+export const overlayBackdropClassName =
+  'fixed inset-0 z-[var(--z-overlay)] bg-[var(--overlay)] transition-opacity duration-base ease-out data-starting-style:opacity-0 data-ending-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs'
+
+/** Shared transition base for overlay popups (panels, menus, popovers,
+ * tooltips). Handles the opacity fade on `duration-base`; callers add their own
+ * scale/translate transform classes for the directional motion. */
+export const overlayPopupMotionClassName =
+  'duration-base ease-out transition data-starting-style:opacity-0 data-ending-style:opacity-0'

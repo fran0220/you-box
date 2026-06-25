@@ -21,6 +21,10 @@ For commercial licensing, please contact support@quantumnous.com
 import * as React from 'react'
 import { AlertDialog as AlertDialogPrimitive } from '@base-ui/react/alert-dialog'
 import { cn } from '@/lib/utils'
+import {
+  overlayBackdropClassName,
+  overlayPopupMotionClassName,
+} from '@/lib/motion'
 import { Button } from '@/components/ui/button'
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
@@ -46,10 +50,10 @@ function AlertDialogOverlay({
   return (
     <AlertDialogPrimitive.Backdrop
       data-slot='alert-dialog-overlay'
-      className={cn(
-        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 duration-fast fixed inset-0 isolate z-50 bg-[var(--overlay)] supports-backdrop-filter:backdrop-blur-xs',
-        className
-      )}
+      // Backdrop + content share ONE duration token (`duration-base`) via the
+      // motion SSOT so they animate in lockstep. `isolate` keeps the modal
+      // stacking context.
+      className={cn('isolate', overlayBackdropClassName, className)}
       {...props}
     />
   )
@@ -68,8 +72,14 @@ function AlertDialogContent({
       <AlertDialogPrimitive.Popup
         data-slot='alert-dialog-content'
         data-size={size}
+        // Content motion shares the backdrop's `duration-base` token via
+        // `overlayPopupMotionClassName`; the scale recipe is layered on with
+        // Base UI's `data-starting-style`/`data-ending-style`. Resting
+        // transform keeps the centering translate plus `scale-100`.
         className={cn(
-          'group/alert-dialog-content bg-popover text-popover-foreground ring-border data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 duration-fast fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 ring-1 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm',
+          'group/alert-dialog-content bg-popover text-popover-foreground ring-border fixed top-1/2 left-1/2 z-[var(--z-overlay)] grid w-full -translate-x-1/2 -translate-y-1/2 scale-100 gap-4 rounded-xl p-4 ring-1 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm',
+          overlayPopupMotionClassName,
+          'data-starting-style:-translate-x-1/2 data-starting-style:-translate-y-1/2 data-starting-style:scale-95 data-ending-style:-translate-x-1/2 data-ending-style:-translate-y-1/2 data-ending-style:scale-95',
           className
         )}
         {...props}
@@ -101,8 +111,13 @@ function AlertDialogFooter({
   return (
     <div
       data-slot='alert-dialog-footer'
+      // Shared footer shape (matches DialogFooter / DrawerFooter): default-size
+      // is a mobile full-width stack with the primary action on top
+      // (`flex-col-reverse` + full-width children) → desktop right-aligned row.
+      // The `size=sm` variant keeps its compact two-column grid (children fill
+      // their cells), so the full-width child rule is scoped to the flex layout.
       className={cn(
-        'bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end',
+        'bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 not-group-data-[size=sm]/alert-dialog-content:[&>button]:w-full sm:flex-row sm:justify-end sm:not-group-data-[size=sm]/alert-dialog-content:[&>button]:w-auto',
         className
       )}
       {...props}

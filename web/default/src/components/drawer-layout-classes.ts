@@ -16,8 +16,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { createElement, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+
+// ---------------------------------------------------------------------------
+// Drawer/Sheet class-string helpers (the legacy `sideDrawer*` recipes).
+//
+// These pure class-string builders live in their own module (no component
+// exports) so the composed `Drawer*` shell in `drawer-layout.tsx` can stay a
+// components-only module (clean React Fast Refresh). They remain the SSOT for
+// the bare class recipes and are still consumed by the handful of Sheet-based
+// surfaces that are not form mutate-drawers (config-drawer, channel-test-dialog,
+// group-ratio-form, model-pricing-sheet, the marketplace mobile filter sheet).
+// ---------------------------------------------------------------------------
 
 export const sideDrawerContentClassName = (className?: string) =>
   cn(
@@ -33,7 +43,12 @@ export const sideDrawerHeaderClassName = (className?: string) =>
 
 export const sideDrawerFormClassName = (className?: string) =>
   cn(
-    'flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-5',
+    // Direct children must not shrink: the scroll container is a flex column,
+    // and its children are often Panel cards with `overflow-hidden`. Per spec,
+    // a flex item with non-visible overflow resolves `min-height: auto` to 0,
+    // so without `shrink-0` the cards collapse to fit the viewport and clip
+    // their content instead of letting the container scroll.
+    'flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-5 [&>*]:shrink-0',
     className
   )
 
@@ -54,52 +69,3 @@ export const sideDrawerSwitchItemClassName = (className?: string) =>
     'border-border/60 flex min-h-16 flex-row items-center justify-between gap-3 border-y py-3',
     className
   )
-
-export function SideDrawerSection(props: {
-  children: ReactNode
-  className?: string
-}) {
-  return createElement(
-    'section',
-    { className: sideDrawerSectionClassName(props.className) },
-    props.children
-  )
-}
-
-export function SideDrawerSectionHeader(props: {
-  title: ReactNode
-  description?: ReactNode
-  icon?: ReactNode
-  className?: string
-}) {
-  return createElement(
-    'div',
-    { className: cn('flex items-start gap-3', props.className) },
-    props.icon
-      ? createElement(
-          'span',
-          {
-            className:
-              'bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-md',
-          },
-          props.icon
-        )
-      : null,
-    createElement(
-      'div',
-      { className: 'min-w-0 flex-1' },
-      createElement(
-        'h3',
-        { className: 'text-sm leading-none font-semibold tracking-tight' },
-        props.title
-      ),
-      props.description
-        ? createElement(
-            'p',
-            { className: 'text-muted-foreground mt-1 text-xs leading-5' },
-            props.description
-          )
-        : null
-    )
-  )
-}

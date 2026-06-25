@@ -17,33 +17,45 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { type ColumnDef } from '@tanstack/react-table'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
+import { cn } from '@/lib/utils'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { GroupBadge } from '@/components/group-badge'
 import { StatusBadge, StatusBadgeList } from '@/components/status-badge'
-import { DEFAULT_TOKEN_UNIT, QUOTA_TYPE_VALUES } from '../constants'
+import {
+  DEFAULT_TOKEN_UNIT,
+  QUOTA_TYPE_VALUES,
+  SORT_OPTIONS,
+  type SortOption,
+} from '../constants'
 import {
   getDynamicDisplayGroupRatio,
   getDynamicPricingSummary,
 } from '../lib/dynamic-price'
 import { parseTags } from '../lib/filters'
 import { isTokenBasedModel } from '../lib/model-helpers'
+import { formatTokenCount } from '../lib/model-metadata'
 import {
   formatPrice,
   formatRequestPrice,
   stripTrailingZeros,
 } from '../lib/price'
-import type { PricingModel, TokenUnit } from '../types'
+import type { EnrichedPricingModel, TokenUnit } from '../types'
 
 // ----------------------------------------------------------------------------
 // Pricing Table Columns
+//
+// Sorting is GENUINELY wired to the catalog's external sort state (the same
+// `useFilters().sortBy` that drives the list/cards) rather than TanStack's own
+// client sort. Clicking a sortable header dispatches the matching SORT_OPTIONS
+// value; the data passed to the table is already sorted by the hook.
 // ----------------------------------------------------------------------------
 
 export interface PricingColumnsOptions {
@@ -51,6 +63,44 @@ export interface PricingColumnsOptions {
   priceRate?: number
   usdExchangeRate?: number
   showRechargePrice?: boolean
+  sortBy: string
+  onSortChange: (value: string) => void
+}
+
+/** Header button wired to the external sort. For price-low/price-high it cycles
+ * low → high; for the others it toggles ascending/descending where a partner
+ * sort exists, else just applies the single sort. */
+function SortableHeader(props: {
+  title: string
+  /** The sort option(s) this column owns, in toggle order. */
+  options: SortOption[]
+  sortBy: string
+  onSortChange: (value: string) => void
+}) {
+  const activeIndex = props.options.indexOf(props.sortBy as SortOption)
+  const isActive = activeIndex >= 0
+  const next =
+    props.options[(activeIndex + 1) % props.options.length] ?? props.options[0]
+
+  return (
+    <button
+      type='button'
+      onClick={() => props.onSortChange(next)}
+      className={cn(
+        'hover:text-foreground -ml-1 inline-flex items-center gap-1 rounded px-1 py-0.5 font-medium transition-colors',
+        isActive ? 'text-foreground' : 'text-muted-foreground'
+      )}
+    >
+      {props.title}
+      {isActive &&
+        (props.sortBy === SORT_OPTIONS.PRICE_HIGH ||
+        props.sortBy === SORT_OPTIONS.CONTEXT_HIGH ? (
+          <ArrowDown className='size-3.5' />
+        ) : (
+          <ArrowUp className='size-3.5' />
+        ))}
+    </button>
+  )
 }
 
 function renderLimitedTags(
@@ -84,25 +134,32 @@ function renderLimitedGroupBadges(
 }
 
 export function usePricingColumns(
-  options: PricingColumnsOptions = {}
-): ColumnDef<PricingModel>[] {
+  options: PricingColumnsOptions
+): ColumnDef<EnrichedPricingModel>[] {
   const { t } = useTranslation()
   const {
     tokenUnit = DEFAULT_TOKEN_UNIT,
     priceRate = 1,
     usdExchangeRate = 1,
     showRechargePrice = false,
+    sortBy,
+    onSortChange,
   } = options
 
   const tokenUnitLabel = tokenUnit === 'K' ? '1K' : '1M'
 
   return [
-    // Model column
+    // Model column (sortable: name)
     {
       accessorKey: 'model_name',
       meta: { label: t('Model') },
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('Model')} />
+      header: () => (
+        <SortableHeader
+          title={t('Model')}
+          options={[SORT_OPTIONS.NAME]}
+          sortBy={sortBy}
+          onSortChange={onSortChange}
+        />
       ),
       cell: ({ row }) => {
         const model = row.original
@@ -140,12 +197,38 @@ export function usePricingColumns(
       enableSorting: false,
     },
 
-    // Price column
+    // Context column (sortable: context-high)
+    {
+      id: 'context',
+      meta: { label: t('Context') },
+      header: () => (
+        <SortableHeader
+          title={t('Context')}
+          options={[SORT_OPTIONS.CONTEXT_HIGH]}
+          sortBy={sortBy}
+          onSortChange={onSortChange}
+        />
+      ),
+      cell: ({ row }) => (
+        <span className='font-mono text-sm tabular-nums'>
+          {formatTokenCount(row.original.meta.contextLength)}
+        </span>
+      ),
+      size: 100,
+      enableSorting: false,
+    },
+
+    // Price column (sortable: cycles low → high)
     {
       accessorKey: 'price',
       meta: { label: t('Price') },
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('Price')} />
+      header: () => (
+        <SortableHeader
+          title={t('Price')}
+          options={[SORT_OPTIONS.PRICE_LOW, SORT_OPTIONS.PRICE_HIGH]}
+          sortBy={sortBy}
+          onSortChange={onSortChange}
+        />
       ),
       cell: ({ row }) => {
         const model = row.original
@@ -266,7 +349,7 @@ export function usePricingColumns(
       enableSorting: false,
     },
 
-    // Cached price column (Vercel AI Gateway style)
+    // Cached price column
     {
       id: 'cached_price',
       meta: { label: t('Cached') },

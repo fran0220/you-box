@@ -17,23 +17,28 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
+import { KeyRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { SettingsPanel } from '@/components/settings'
+import { DrawerSection, DrawerSectionHeader } from '@/components/drawer-layout'
 
 type ChannelApiAccessSectionProps = {
   children: ReactNode
 }
 
 /**
- * API Access section — SettingsPanel container form (r2-B7 §5).
+ * API Access section — unified drawer `card` section.
  * Fields and validation are untouched; only the wrapper changed.
  */
 export function ChannelApiAccessSection(props: ChannelApiAccessSectionProps) {
   const { t } = useTranslation()
 
   return (
-    <SettingsPanel eyebrow={t('api access')} title={t('API Access')}>
-      <div className='flex flex-col gap-4 py-3'>{props.children}</div>
-    </SettingsPanel>
+    <DrawerSection variant='card'>
+      <DrawerSectionHeader
+        title={t('API Access')}
+        icon={<KeyRound className='size-4' />}
+      />
+      <div className='flex flex-col gap-4'>{props.children}</div>
+    </DrawerSection>
   )
 }

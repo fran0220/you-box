@@ -14,6 +14,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// validateAndNormalizeSpendLimit validates the recurring spend-limit fields
+// supplied by the client. ResetPeriod is normalized ("" -> the "none"/no-reset
+// value) and rejected if otherwise invalid; SpendLimit must be within the same
+// [0, max] bound used for RemainQuota. Returns false (after writing the
+// standard validation error response) when the input is invalid.
+func validateAndNormalizeSpendLimit(c *gin.Context, token *model.Token) bool {
+	if token.ResetPeriod == "" {
+		token.ResetPeriod = model.ResetPeriodNone
+	} else if token.ResetPeriod != model.ResetPeriodNone && !model.IsValidResetPeriod(token.ResetPeriod) {
+		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+		return false
+	}
+	if token.SpendLimit < 0 {
+		common.ApiErrorI18n(c, i18n.MsgTokenQuotaNegative)
+		return false
+	}
+	maxQuotaValue := int((1000000000 * common.QuotaPerUnit))
+	if token.SpendLimit > maxQuotaValue {
+		common.ApiErrorI18n(c, i18n.MsgTokenQuotaExceedMax, map[string]any{"Max": maxQuotaValue})
+		return false
+	}
+	return true
+}
+
 func buildMaskedTokenResponse(token *model.Token) *model.Token {
 	if token == nil {
 		return nil
@@ -187,6 +211,9 @@ func AddToken(c *gin.Context) {
 			return
 		}
 	}
+	if !validateAndNormalizeSpendLimit(c, &token) {
+		return
+	}
 	// 检查用户令牌数量是否已达上限
 	maxTokens := operation_setting.GetMaxUserTokens()
 	count, err := model.CountUserTokens(c.GetInt("id"))
@@ -223,7 +250,9 @@ func AddToken(c *gin.Context) {
 		CrossGroupRetry:    token.CrossGroupRetry,
 		SpendLimit:         token.SpendLimit,
 		ResetPeriod:        token.ResetPeriod,
-		NextResetTime:      token.NextResetTime,
+		// NextResetTime is server-owned: it is initialized by the recurring
+		// reset task (model.ResetDueTokenSpendLimits), never set by the client.
+		NextResetTime: 0,
 	}
 	err = cleanToken.Insert()
 	if err != nil {
@@ -292,6 +321,9 @@ func UpdateToken(c *gin.Context) {
 	if statusOnly != "" {
 		cleanToken.Status = token.Status
 	} else {
+		if !validateAndNormalizeSpendLimit(c, &token) {
+			return
+		}
 		// If you add more fields, please also update token.Update()
 		cleanToken.Name = token.Name
 		cleanToken.ExpiredTime = token.ExpiredTime

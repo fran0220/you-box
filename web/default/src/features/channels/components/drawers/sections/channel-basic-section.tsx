@@ -17,23 +17,28 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
+import { Info } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { SettingsPanel } from '@/components/settings'
+import { DrawerSection, DrawerSectionHeader } from '@/components/drawer-layout'
 
 type ChannelBasicSectionProps = {
   children: ReactNode
 }
 
 /**
- * Basic Information section — SettingsPanel container form (r2-B7 §5).
+ * Basic Information section — unified drawer `card` section.
  * Fields and validation are untouched; only the wrapper changed.
  */
 export function ChannelBasicSection(props: ChannelBasicSectionProps) {
   const { t } = useTranslation()
 
   return (
-    <SettingsPanel eyebrow={t('basic')} title={t('Basic Information')}>
-      <div className='flex flex-col gap-4 py-3'>{props.children}</div>
-    </SettingsPanel>
+    <DrawerSection variant='card'>
+      <DrawerSectionHeader
+        title={t('Basic Information')}
+        icon={<Info className='size-4' />}
+      />
+      <div className='flex flex-col gap-4'>{props.children}</div>
+    </DrawerSection>
   )
 }

@@ -16,7 +16,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import type { Modality, ModelCapability, PricingModel } from '../types'
+import type {
+  DerivedModelMetadata,
+  Modality,
+  ModelCapability,
+  PricingModel,
+} from '../types'
 import { hashStringToSeed, seededRandom } from './seed'
 
 // ----------------------------------------------------------------------------
@@ -349,6 +354,91 @@ export function inferModelMetadata(model: PricingModel): ModelMetadata {
     input_modalities: inputs,
     output_modalities: outputs,
     capabilities,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Series derivation + canonical derived metadata
+// ---------------------------------------------------------------------------
+//
+// `series` is the model FAMILY label used by the catalog "Series" facet, e.g.
+// "GPT", "Claude", "Gemini", "Llama". Derived purely from the model name. The
+// order matters: more specific patterns first.
+
+const SERIES_PATTERNS: Array<{ re: RegExp; label: string }> = [
+  { re: /^gpt|^chatgpt|davinci|babbage/i, label: 'GPT' },
+  { re: /^o[1-4](?:[-:_.]|$)/i, label: 'OpenAI o-series' },
+  { re: /dall.?e/i, label: 'DALL·E' },
+  { re: /whisper|^tts|^omni-moderation/i, label: 'OpenAI Audio' },
+  { re: /^sora/i, label: 'Sora' },
+  { re: /claude/i, label: 'Claude' },
+  { re: /gemini/i, label: 'Gemini' },
+  { re: /gemma/i, label: 'Gemma' },
+  { re: /imagen/i, label: 'Imagen' },
+  { re: /^veo/i, label: 'Veo' },
+  { re: /llama|^codellama/i, label: 'Llama' },
+  { re: /mixtral/i, label: 'Mixtral' },
+  { re: /codestral|magistral|pixtral|^mistral|^ministral/i, label: 'Mistral' },
+  { re: /qwq|qvq|qwen/i, label: 'Qwen' },
+  { re: /deepseek/i, label: 'DeepSeek' },
+  { re: /grok/i, label: 'Grok' },
+  { re: /command|^aya/i, label: 'Command' },
+  { re: /ernie|wenxin/i, label: 'ERNIE' },
+  { re: /glm|chatglm|cogview|cogvideo/i, label: 'GLM' },
+  { re: /kimi|moonshot/i, label: 'Kimi' },
+  { re: /abab|minimax|hailuo/i, label: 'MiniMax' },
+  { re: /hunyuan/i, label: 'Hunyuan' },
+  { re: /doubao|^seed|jimeng/i, label: 'Doubao' },
+  { re: /midjourney|niji/i, label: 'Midjourney' },
+  { re: /^sd-|stable[-_]?diffusion|sdxl/i, label: 'Stable Diffusion' },
+  { re: /^flux/i, label: 'FLUX' },
+  { re: /kling/i, label: 'Kling' },
+  { re: /^jina/i, label: 'Jina' },
+]
+
+/**
+ * Derive the model series / family label from its name. Falls back to the
+ * first dash-delimited token (title-cased) when no known family matches, and
+ * to "Other" for empty names.
+ */
+export function deriveSeries(modelName: string): string {
+  const name = (modelName || '').trim()
+  if (!name) return 'Other'
+  for (const { re, label } of SERIES_PATTERNS) {
+    if (re.test(name)) return label
+  }
+  const token = name.split(/[-_/:]/)[0] || name
+  return token.charAt(0).toUpperCase() + token.slice(1)
+}
+
+/**
+ * Build the canonical, always-populated {@link DerivedModelMetadata} for a
+ * model. Wraps {@link inferModelMetadata} (which already prefers explicit
+ * `model.*` fields and falls back to seeded inference) and layers on the
+ * derived `series` + supported-parameter NAMES (the catalog facet only needs
+ * names; the detail page still uses {@link buildSupportedParameters} for the
+ * full param spec).
+ *
+ * @param supportedParameters canonical param names from
+ *   `buildSupportedParameters(model).map(p => p.name)`, injected by the caller
+ *   to avoid a circular import between metadata and mock-stats.
+ */
+export function deriveModelMetadata(
+  model: PricingModel,
+  supportedParameters: string[]
+): DerivedModelMetadata {
+  const inferred = inferModelMetadata(model)
+  return {
+    series: deriveSeries(model.model_name || ''),
+    contextLength: inferred.context_length,
+    maxOutputTokens: inferred.max_output_tokens,
+    inputModalities: inferred.input_modalities,
+    outputModalities: inferred.output_modalities,
+    supportedParameters,
+    capabilities: inferred.capabilities,
+    knowledgeCutoff: inferred.knowledge_cutoff,
+    releaseDate: inferred.release_date,
+    parameterCount: inferred.parameter_count,
   }
 }
 

@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import i18next from 'i18next'
 import { api, get2FAStatus } from '@/lib/api'
 import {
   buildAssertionResult,
@@ -95,7 +96,7 @@ async function verifyTwoFA(code?: string | null): Promise<void> {
   })
 
   if (!res.data?.success) {
-    throw new Error(res.data?.message || 'Verification failed')
+    throw new Error(res.data?.message || i18next.t('Verification failed'))
   }
 }
 
@@ -110,7 +111,9 @@ async function verifyPasskey(): Promise<void> {
   try {
     const beginResponse = await beginPasskeyVerification()
     if (!beginResponse.success) {
-      throw new Error(beginResponse.message || 'Failed to start verification')
+      throw new Error(
+        beginResponse.message || i18next.t('Failed to start verification')
+      )
     }
 
     const publicKey = prepareCredentialRequestOptions(
@@ -132,7 +135,9 @@ async function verifyPasskey(): Promise<void> {
 
     const finishResponse = await finishPasskeyVerification(assertion)
     if (!finishResponse.success) {
-      throw new Error(finishResponse.message || 'Passkey verification failed')
+      throw new Error(
+        finishResponse.message || i18next.t('Passkey verification failed')
+      )
     }
 
     const verifyResponse = await api.post('/api/verify', {

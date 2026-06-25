@@ -23,8 +23,19 @@ import {
   type Row,
   type Table as TanstackTable,
 } from '@tanstack/react-table'
+import { AlertTriangle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useMediaQuery } from '@/hooks'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
 import {
   Table,
   TableBody,
@@ -69,6 +80,18 @@ export type DataTablePageProps<TData> = {
    * Refetch / background loading — dims the table without removing rows.
    */
   isFetching?: boolean
+
+  /**
+   * Load-failure state. When true (and not loading), renders an error
+   * placeholder with a retry action instead of the empty state, so a failed
+   * fetch is visually distinct from "no data".
+   */
+  isError?: boolean
+
+  /**
+   * Retry handler for the error state — typically the query's `refetch`.
+   */
+  onRetry?: () => void
 
   /**
    * Empty-state title (used for both desktop {@link TableEmpty} and mobile fallback).
@@ -290,6 +313,8 @@ function renderMobile<TData>(
     <MobileCardList
       table={props.table}
       isLoading={props.isLoading}
+      isError={props.isError}
+      onRetry={props.onRetry}
       emptyTitle={props.emptyTitle}
       emptyDescription={props.emptyDescription}
       getRowKey={props.mobileProps?.getRowKey}
@@ -346,6 +371,11 @@ function renderDesktop<TData>(
               table={props.table}
               keyPrefix={props.skeletonKeyPrefix}
             />
+          ) : props.isError && rows.length === 0 ? (
+            <TableErrorRow
+              colSpan={props.columns.length}
+              onRetry={props.onRetry}
+            />
           ) : rows.length === 0 ? (
             <TableEmpty
               colSpan={props.columns.length}
@@ -372,6 +402,42 @@ function renderDesktop<TData>(
         </TableBody>
       </Table>
     </div>
+  )
+}
+
+function TableErrorRow({
+  colSpan,
+  onRetry,
+}: {
+  colSpan: number
+  onRetry?: () => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <TableRow>
+      <TableCell colSpan={colSpan} className='h-[400px] p-0'>
+        <div className='sticky left-0 w-[100cqw]'>
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant='icon'>
+                <AlertTriangle className='text-destructive size-6' />
+              </EmptyMedia>
+              <EmptyTitle>{t('Failed to load')}</EmptyTitle>
+              <EmptyDescription>
+                {t('Could not load data. Please try again.')}
+              </EmptyDescription>
+            </EmptyHeader>
+            {onRetry && (
+              <EmptyContent>
+                <Button variant='outline' size='sm' onClick={onRetry}>
+                  {t('Try again')}
+                </Button>
+              </EmptyContent>
+            )}
+          </Empty>
+        </div>
+      </TableCell>
+    </TableRow>
   )
 }
 

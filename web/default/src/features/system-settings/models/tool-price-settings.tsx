@@ -50,7 +50,9 @@ const DEFAULT_PRICES: Record<string, number> = {
 type ToolPriceRow = {
   id: number
   key: string
-  price: number
+  // Raw input string while editing (so in-progress decimals like "0." aren't
+  // collapsed to 0 per keystroke); normalized to a number on blur / serialize.
+  price: number | string
 }
 
 function rowsToObject(rows: ToolPriceRow[]): Record<string, number> {
@@ -300,8 +302,11 @@ export const ToolPriceSettings = memo(function ToolPriceSettings({
                         type='number'
                         min={0}
                         step={0.5}
-                        value={row.price}
+                        value={String(row.price)}
                         onChange={(e) =>
+                          updateRow(row.id, 'price', e.target.value)
+                        }
+                        onBlur={(e) =>
                           updateRow(
                             row.id,
                             'price',

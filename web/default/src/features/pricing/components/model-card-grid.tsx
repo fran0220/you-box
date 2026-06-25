@@ -18,39 +18,34 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
 import { getPerfMetricsSummary } from '@/features/performance-metrics/api'
-import { DEFAULT_PRICING_PAGE_SIZE, DEFAULT_TOKEN_UNIT } from '../constants'
-import type { PricingModel, TokenUnit } from '../types'
+import { DEFAULT_TOKEN_UNIT } from '../constants'
+import type { EnrichedPricingModel, TokenUnit } from '../types'
 import { ModelCard } from './model-card'
 import type { ModelPerfBadgeData } from './model-perf-badge'
 
 export interface ModelCardGridProps {
-  models: PricingModel[]
-  onModelClick: (modelName: string) => void
+  models: EnrichedPricingModel[]
   priceRate?: number
   usdExchangeRate?: number
   tokenUnit?: TokenUnit
   showRechargePrice?: boolean
 }
 
+/**
+ * Optional card-grid view (demoted from the default). Renders the FULL filtered
+ * catalog with no pagination — the dense list is the primary surface; cards are
+ * a visual alternative the user opts into.
+ */
 export function ModelCardGrid(props: ModelCardGridProps) {
-  const { t } = useTranslation()
-  const [page, setPage] = useState(1)
-  // One-shot stagger: mark the grid as "staggering" only for a short window
-  // after mount (and on view-switch remount), so cards added later by
-  // filtering/search don't re-animate on every keystroke.
+  // One-shot stagger: animate cards only briefly after mount / view-switch so
+  // filtering/search doesn't re-animate on every keystroke.
   const [staggering, setStaggering] = useState(true)
   useEffect(() => {
     const timer = setTimeout(() => setStaggering(false), 700)
     return () => clearTimeout(timer)
   }, [])
-  const pageSize = DEFAULT_PRICING_PAGE_SIZE
   const tokenUnit = props.tokenUnit ?? DEFAULT_TOKEN_UNIT
-  const totalPages = Math.max(1, Math.ceil(props.models.length / pageSize))
-  const currentPage = Math.min(page, totalPages)
 
   const perfQuery = useQuery({
     queryKey: ['perf-metrics-summary', 24],
@@ -58,11 +53,6 @@ export function ModelCardGrid(props: ModelCardGridProps) {
     staleTime: 60 * 1000,
     retry: false,
   })
-
-  const pagedModels = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return props.models.slice(start, start + pageSize)
-  }, [currentPage, pageSize, props.models])
 
   const perfMap = useMemo(() => {
     const map = new Map<string, ModelPerfBadgeData>()
@@ -77,61 +67,21 @@ export function ModelCardGrid(props: ModelCardGridProps) {
   }
 
   return (
-    <div className='space-y-4 sm:space-y-5'>
-      <div
-        className='grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3'
-        data-grid-stagger={staggering ? '' : undefined}
-      >
-        {pagedModels.map((model) => (
-          <ModelCard
-            key={model.id ?? model.model_name}
-            model={model}
-            tokenUnit={tokenUnit}
-            priceRate={props.priceRate}
-            usdExchangeRate={props.usdExchangeRate}
-            showRechargePrice={props.showRechargePrice}
-            perf={perfMap.get(model.model_name || '')}
-            onClick={() => props.onModelClick(model.model_name || '')}
-          />
-        ))}
-      </div>
-
-      {totalPages > 1 && (
-        <div className='text-muted-foreground flex flex-col items-center justify-between gap-3 border-t px-4 py-3 text-sm sm:flex-row'>
-          <p className='text-muted-foreground'>
-            {t('Page {{current}} of {{total}}', {
-              current: currentPage,
-              total: totalPages,
-            })}
-          </p>
-          <div className='flex items-center gap-2'>
-            <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-              disabled={currentPage <= 1}
-              className='gap-1.5'
-            >
-              <ChevronLeft className='size-4' />
-              {t('Previous page')}
-            </Button>
-            <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              onClick={() =>
-                setPage((current) => Math.min(totalPages, current + 1))
-              }
-              disabled={currentPage >= totalPages}
-              className='gap-1.5'
-            >
-              {t('Next page')}
-              <ChevronRight className='size-4' />
-            </Button>
-          </div>
-        </div>
-      )}
+    <div
+      className='grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3'
+      data-grid-stagger={staggering ? '' : undefined}
+    >
+      {props.models.map((model) => (
+        <ModelCard
+          key={model.id ?? model.model_name}
+          model={model}
+          tokenUnit={tokenUnit}
+          priceRate={props.priceRate}
+          usdExchangeRate={props.usdExchangeRate}
+          showRechargePrice={props.showRechargePrice}
+          perf={perfMap.get(model.model_name || '')}
+        />
+      ))}
     </div>
   )
 }

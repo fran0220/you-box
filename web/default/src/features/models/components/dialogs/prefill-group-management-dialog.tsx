@@ -151,16 +151,16 @@ export function PrefillGroupManagementDialog({
     try {
       const response = await deletePrefillGroup(deleteState.group.id)
       if (response.success) {
-        toast.success(`Deleted "${deleteState.group.name}"`)
+        toast.success(t('Deleted "{{name}}"', { name: deleteState.group.name }))
         queryClient.invalidateQueries({
           queryKey: prefillGroupsQueryKeys.lists(),
         })
         setDeleteState({ open: false, group: null })
       } else {
-        toast.error(response.message || 'Failed to delete group')
+        toast.error(response.message || t('Failed to delete group'))
       }
     } catch (err: unknown) {
-      toast.error((err as Error)?.message || 'Failed to delete group')
+      toast.error((err as Error)?.message || t('Failed to delete group'))
     } finally {
       setIsDeleting(false)
     }

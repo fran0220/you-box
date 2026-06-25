@@ -20,6 +20,13 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useStatus } from '@/hooks/use-status'
 import { getPricing } from '../api'
+import { buildModelStats, buildSupportedParameters } from '../lib/mock-stats'
+import { deriveModelMetadata } from '../lib/model-metadata'
+import {
+  getInputPriceUsdPerM,
+  getOutputPriceUsdPerM,
+} from '../lib/model-helpers'
+import type { EnrichedPricingModel } from '../types'
 
 export function usePricingData() {
   const { status } = useStatus()
@@ -40,7 +47,14 @@ export function usePricingData() {
     [status?.usd_exchange_rate, priceRate]
   )
 
-  const models = useMemo(() => {
+  // Models are enriched with derived metadata (series/context/modalities/
+  // supported-params) and PLACEHOLDER usage stats (tokens/week, growth,
+  // latency) so the OpenRouter-style list can render without a metrics
+  // backend. Raw PricingModel fields are preserved verbatim, so existing
+  // consumers that read `model.model_name`, `model.model_ratio`, etc. keep
+  // working. New consumers read `model.stats` / `model.meta` / the flattened
+  // `promptPriceUsdPerM`. Stats are seeded by model name → stable on refresh.
+  const models = useMemo<EnrichedPricingModel[]>(() => {
     if (!data?.data || !data?.vendors) return []
 
     const vendorMap = new Map(data.vendors.map((v) => [v.id, v]))
@@ -49,13 +63,23 @@ export function usePricingData() {
       const vendor = model.vendor_id
         ? vendorMap.get(model.vendor_id)
         : undefined
-      return {
+      const base = {
         ...model,
         key: model.model_name,
         vendor_name: vendor?.name,
         vendor_icon: vendor?.icon,
         vendor_description: vendor?.description,
         group_ratio: data.group_ratio,
+      }
+      const supportedParameters = buildSupportedParameters(base).map(
+        (p) => p.name
+      )
+      return {
+        ...base,
+        stats: buildModelStats(base),
+        meta: deriveModelMetadata(base, supportedParameters),
+        promptPriceUsdPerM: getInputPriceUsdPerM(base),
+        completionPriceUsdPerM: getOutputPriceUsdPerM(base),
       }
     })
   }, [data])

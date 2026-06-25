@@ -112,7 +112,7 @@ export async function exportCommonLogsCsv(
 
   for (const log of items.slice(0, MAX_EXPORT_ROWS)) {
     rows.push([
-      new Date(log.created_at).toISOString(),
+      new Date(log.created_at * 1000).toISOString(),
       String(log.type),
       log.model_name,
       log.token_name,

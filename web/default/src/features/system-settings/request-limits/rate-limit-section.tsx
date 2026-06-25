@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -42,7 +42,9 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { useResetForm } from '../hooks/use-reset-form'
 import { useUpdateOption } from '../hooks/use-update-option'
+import { safeNumberFieldProps } from '../utils/numeric-field'
 import { RateLimitVisualEditor } from './rate-limit-visual-editor'
 
 const isValidJSON = (value: string | undefined) => {
@@ -97,9 +99,7 @@ export function RateLimitSection({ defaultValues }: RateLimitSectionProps) {
     defaultValues,
   })
 
-  useEffect(() => {
-    form.reset(defaultValues)
-  }, [defaultValues, form])
+  useResetForm(form, defaultValues)
 
   const onSubmit = async (values: RateLimitFormValues) => {
     const updates = Object.entries(values).filter(
@@ -158,10 +158,7 @@ export function RateLimitSection({ defaultValues }: RateLimitSectionProps) {
                           type='number'
                           min={0}
                           step={1}
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value) || 0)
-                          }
+                          {...safeNumberFieldProps(field)}
                         />
                         <span className='text-muted-foreground text-sm'>
                           {t('minutes')}
@@ -189,10 +186,7 @@ export function RateLimitSection({ defaultValues }: RateLimitSectionProps) {
                           min={0}
                           max={100000000}
                           step={1}
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value) || 0)
-                          }
+                          {...safeNumberFieldProps(field)}
                         />
                         <span className='text-muted-foreground text-sm'>
                           {t('times')}
@@ -220,10 +214,7 @@ export function RateLimitSection({ defaultValues }: RateLimitSectionProps) {
                           min={1}
                           max={100000000}
                           step={1}
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value) || 1)
-                          }
+                          {...safeNumberFieldProps(field)}
                         />
                         <span className='text-muted-foreground text-sm'>
                           {t('times')}

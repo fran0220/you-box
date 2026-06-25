@@ -17,7 +17,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useState } from 'react'
-import { ArrowUpDown, Check, Filter, Grid2X2, Star, Table2 } from 'lucide-react'
+import {
+  ArrowUpDown,
+  Check,
+  Filter,
+  Grid2X2,
+  List,
+  Star,
+  Table2,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -39,21 +47,21 @@ import {
   sideDrawerContentClassName,
   sideDrawerFormClassName,
   sideDrawerHeaderClassName,
-} from '@/components/drawer-layout'
+} from '@/components/drawer-layout-classes'
 import { SegmentedControl } from '@/components/patterns'
 import {
+  SORT_OPTION_ORDER,
   VIEW_MODES,
   getSortLabels,
+  type FilterSection,
   type SortOption,
   type ViewMode,
 } from '../constants'
-import type { PricingModel, PricingVendor, TokenUnit } from '../types'
+import type { EnrichedPricingModel, TokenUnit } from '../types'
 import { PricingSidebar } from './pricing-sidebar'
 
 export interface PricingToolbarProps {
-  filteredCount: number
-  totalCount?: number
-  /** Favorites-only filter (R2-B14 #1, localStorage-backed). */
+  /** Favorites-only filter (localStorage-backed). */
   showFavoritesOnly: boolean
   onShowFavoritesOnlyChange: (value: boolean) => void
   sortBy: string
@@ -64,25 +72,19 @@ export interface PricingToolbarProps {
   onRechargePriceChange: (value: boolean) => void
   viewMode: ViewMode
   onViewModeChange: (value: ViewMode) => void
-  quotaTypeFilter: string
-  endpointTypeFilter: string
-  modalityFilter: string
-  vendorFilter: string
-  groupFilter: string
-  tagFilter: string
-  onQuotaTypeChange: (value: string) => void
-  onEndpointTypeChange: (value: string) => void
-  onModalityChange: (value: string) => void
-  onVendorChange: (value: string) => void
-  onGroupChange: (value: string) => void
-  onTagChange: (value: string) => void
-  vendors: PricingVendor[]
-  groups: string[]
-  groupRatios?: Record<string, number>
-  tags: string[]
-  models: PricingModel[]
-  hasActiveFilters: boolean
   activeFilterCount: number
+  // Mobile filter Sheet hosts the same sidebar — pass the facet contract through.
+  models: EnrichedPricingModel[]
+  facetState: Record<FilterSection, string[]>
+  toggleFacetValue: (facet: FilterSection, value: string) => void
+  vendorIcons: Record<string, string | undefined>
+  groupRatios?: Record<string, number>
+  contextRange: [number, number]
+  promptPriceRange: [number, number]
+  priceCeiling: number
+  onContextRangeChange: (value: [number, number]) => void
+  onPromptPriceRangeChange: (value: [number, number]) => void
+  hasActiveFilters: boolean
   onClearFilters: () => void
 }
 
@@ -107,170 +109,133 @@ export function PricingToolbar(props: PricingToolbarProps) {
   )
 
   return (
-    <div className='rounded-xl border p-3'>
-      <div className='flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between'>
-        <div className='flex items-center gap-2'>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            onClick={() => setMobileFiltersOpen(true)}
-            className='gap-1.5 xl:hidden'
-          >
-            <Filter className='size-4' />
-            {t('Filter')}
-            {props.activeFilterCount > 0 && (
-              <Badge className='ml-0.5 size-5 justify-center p-0 text-[10px]'>
-                {props.activeFilterCount}
-              </Badge>
-            )}
-          </Button>
+    <div className='flex flex-wrap items-center gap-2'>
+      {/* Mobile filter trigger */}
+      <Button
+        type='button'
+        variant='outline'
+        size='sm'
+        onClick={() => setMobileFiltersOpen(true)}
+        className='h-8 gap-1.5 px-3 text-xs xl:hidden'
+      >
+        <Filter className='size-3.5' />
+        {t('Filters')}
+        {props.activeFilterCount > 0 && (
+          <Badge className='ml-0.5 size-4 justify-center p-0 text-[10px]'>
+            {props.activeFilterCount}
+          </Badge>
+        )}
+      </Button>
 
-          <button
-            type='button'
-            onClick={() =>
-              props.onShowFavoritesOnlyChange(!props.showFavoritesOnly)
-            }
-            aria-pressed={props.showFavoritesOnly}
-            className={cn(
-              'inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors',
-              props.showFavoritesOnly
-                ? 'border-brand-border/50 bg-brand-subtle text-brand'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted bg-muted/60'
-            )}
-          >
-            <Star
-              className={cn(
-                'size-3.5',
-                props.showFavoritesOnly && 'fill-current'
-              )}
-              aria-hidden='true'
-            />
-            {t('Favorites')}
-          </button>
+      <button
+        type='button'
+        onClick={() => props.onShowFavoritesOnlyChange(!props.showFavoritesOnly)}
+        aria-pressed={props.showFavoritesOnly}
+        className={cn(
+          'inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors',
+          props.showFavoritesOnly
+            ? 'border-brand-border/50 bg-brand-subtle text-brand'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted bg-muted/60'
+        )}
+      >
+        <Star
+          className={cn('size-3.5', props.showFavoritesOnly && 'fill-current')}
+          aria-hidden='true'
+        />
+        {t('Favorites')}
+      </button>
 
-          <div className='text-muted-foreground flex items-baseline gap-1 text-sm'>
-            <span className='text-foreground font-semibold tabular-nums'>
-              {props.filteredCount.toLocaleString()}
-            </span>
-            <span>{props.filteredCount === 1 ? t('model') : t('models')}</span>
-            {(props.hasActiveFilters || props.showFavoritesOnly) &&
-              props.totalCount && (
-                <span className='text-muted-foreground/60 text-xs'>
-                  / {props.totalCount.toLocaleString()}
-                </span>
-              )}
-          </div>
-        </div>
-
-        <div className='flex flex-wrap items-center gap-2'>
-          <div className='hidden items-center gap-2 sm:flex'>
-            <SegmentedControl
-              options={[
-                { value: 'standard', label: t('Standard') },
-                { value: 'recharge', label: t('Recharge') },
-              ]}
-              value={props.showRechargePrice ? 'recharge' : 'standard'}
-              onChange={handleRechargePriceChange}
-              ariaLabel={t('Price display mode')}
-            />
-            <SegmentedControl
-              options={[
-                { value: 'M', label: '/1M' },
-                { value: 'K', label: '/1K' },
-              ]}
-              value={props.tokenUnit}
-              onChange={handleTokenUnitChange}
-              ariaLabel={t('Token unit')}
-            />
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  className='h-8 gap-1.5 px-3 text-xs'
-                />
-              }
-            >
-              <ArrowUpDown className='size-3.5' />
-              <span>{sortLabels[props.sortBy as SortOption] || t('Sort')}</span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-44'>
-              {Object.entries(sortLabels).map(([value, label]) => (
-                <DropdownMenuItem
-                  key={value}
-                  onClick={() => props.onSortChange(value)}
-                  className='gap-2'
-                >
-                  <Check
-                    className={cn(
-                      'size-4 shrink-0',
-                      props.sortBy === value ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                  {label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <SegmentedControl
-            options={[
-              {
-                value: VIEW_MODES.CARD,
-                icon: Grid2X2,
-                tooltip: t('Card view'),
-              },
-              {
-                value: VIEW_MODES.TABLE,
-                icon: Table2,
-                tooltip: t('Table view'),
-              },
-            ]}
-            value={props.viewMode}
-            onChange={handleViewModeChange}
-            ariaLabel={t('View mode')}
-          />
-        </div>
+      <div className='hidden items-center gap-2 sm:flex'>
+        <SegmentedControl
+          options={[
+            { value: 'standard', label: t('Standard') },
+            { value: 'recharge', label: t('Recharge') },
+          ]}
+          value={props.showRechargePrice ? 'recharge' : 'standard'}
+          onChange={handleRechargePriceChange}
+          ariaLabel={t('Price display mode')}
+        />
+        <SegmentedControl
+          options={[
+            { value: 'M', label: '/1M' },
+            { value: 'K', label: '/1K' },
+          ]}
+          value={props.tokenUnit}
+          onChange={handleTokenUnitChange}
+          ariaLabel={t('Token unit')}
+        />
       </div>
 
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              type='button'
+              variant='outline'
+              size='sm'
+              className='h-8 gap-1.5 px-3 text-xs'
+            />
+          }
+        >
+          <ArrowUpDown className='size-3.5' />
+          <span>{sortLabels[props.sortBy as SortOption] || t('Sort')}</span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='w-48'>
+          {SORT_OPTION_ORDER.map((value) => (
+            <DropdownMenuItem
+              key={value}
+              onClick={() => props.onSortChange(value)}
+              className='gap-2'
+            >
+              <Check
+                className={cn(
+                  'size-4 shrink-0',
+                  props.sortBy === value ? 'opacity-100' : 'opacity-0'
+                )}
+              />
+              {sortLabels[value]}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <SegmentedControl
+        options={[
+          { value: VIEW_MODES.LIST, icon: List, tooltip: t('List view') },
+          { value: VIEW_MODES.CARD, icon: Grid2X2, tooltip: t('Card view') },
+          { value: VIEW_MODES.TABLE, icon: Table2, tooltip: t('Table view') },
+        ]}
+        value={props.viewMode}
+        onChange={handleViewModeChange}
+        ariaLabel={t('View mode')}
+      />
+
+      {/* Mobile / tablet filter Sheet hosts the full sidebar */}
       <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
         <SheetContent
           side='right'
           className={sideDrawerContentClassName('sm:max-w-md')}
         >
           <SheetHeader className={sideDrawerHeaderClassName()}>
-            <SheetTitle>{t('Filter')}</SheetTitle>
+            <SheetTitle>{t('Filters')}</SheetTitle>
             <SheetDescription>
-              {t('Filter models by provider, group, type, endpoint, and tags.')}
+              {t('Refine the catalog by provider, modality, price, and more.')}
             </SheetDescription>
           </SheetHeader>
           <div className={sideDrawerFormClassName('gap-0')}>
             <PricingSidebar
-              quotaTypeFilter={props.quotaTypeFilter}
-              endpointTypeFilter={props.endpointTypeFilter}
-              modalityFilter={props.modalityFilter}
-              vendorFilter={props.vendorFilter}
-              groupFilter={props.groupFilter}
-              tagFilter={props.tagFilter}
-              onQuotaTypeChange={props.onQuotaTypeChange}
-              onEndpointTypeChange={props.onEndpointTypeChange}
-              onModalityChange={props.onModalityChange}
-              onVendorChange={props.onVendorChange}
-              onGroupChange={props.onGroupChange}
-              onTagChange={props.onTagChange}
-              vendors={props.vendors}
-              groups={props.groups}
-              groupRatios={props.groupRatios}
-              tags={props.tags}
               models={props.models}
+              facetState={props.facetState}
+              toggleFacetValue={props.toggleFacetValue}
+              vendorIcons={props.vendorIcons}
+              groupRatios={props.groupRatios}
+              contextRange={props.contextRange}
+              promptPriceRange={props.promptPriceRange}
+              priceCeiling={props.priceCeiling}
+              onContextRangeChange={props.onContextRangeChange}
+              onPromptPriceRangeChange={props.onPromptPriceRangeChange}
               hasActiveFilters={props.hasActiveFilters}
               onClearFilters={props.onClearFilters}
-              className='border-0 bg-transparent p-0 shadow-none'
             />
           </div>
         </SheetContent>

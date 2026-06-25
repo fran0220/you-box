@@ -21,6 +21,10 @@ import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { cn } from '@/lib/utils'
+import {
+  overlayBackdropClassName,
+  overlayPopupMotionClassName,
+} from '@/lib/motion'
 import { Button } from '@/components/ui/button'
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
@@ -46,10 +50,10 @@ function DialogOverlay({
   return (
     <DialogPrimitive.Backdrop
       data-slot='dialog-overlay'
-      className={cn(
-        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 duration-fast fixed inset-0 isolate z-50 bg-[var(--overlay)] supports-backdrop-filter:backdrop-blur-xs',
-        className
-      )}
+      // Backdrop + content share ONE duration token (`duration-base`) via the
+      // motion SSOT so they animate in lockstep (no more `duration-fast`/
+      // `duration-100` desync). `isolate` keeps the modal stacking context.
+      className={cn('isolate', overlayBackdropClassName, className)}
       {...props}
     />
   )
@@ -68,8 +72,15 @@ function DialogContent({
       <DialogOverlay />
       <DialogPrimitive.Popup
         data-slot='dialog-content'
+        // Content motion shares the backdrop's `duration-base` token via
+        // `overlayPopupMotionClassName` (opacity fade); the scale recipe is
+        // layered on with Base UI's `data-starting-style`/`data-ending-style`.
+        // The resting transform keeps the centering translate plus `scale-100`
+        // so the starting/ending `scale-95` transition has a stable origin.
         className={cn(
-          'bg-popover text-popover-foreground ring-border data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 duration-fast fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 text-sm ring-1 outline-none sm:max-w-sm',
+          'bg-popover text-popover-foreground ring-border fixed top-1/2 left-1/2 z-[var(--z-overlay)] grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 scale-100 gap-4 rounded-xl p-4 text-sm ring-1 outline-none sm:max-w-sm',
+          overlayPopupMotionClassName,
+          'data-starting-style:-translate-x-1/2 data-starting-style:-translate-y-1/2 data-starting-style:scale-95 data-ending-style:-translate-x-1/2 data-ending-style:-translate-y-1/2 data-ending-style:scale-95',
           className
         )}
         {...props}
@@ -116,8 +127,11 @@ function DialogFooter({
   return (
     <div
       data-slot='dialog-footer'
+      // Shared footer shape (also followed by DrawerFooter): mobile is a
+      // full-width stack with the primary action on top (`flex-col-reverse` +
+      // full-width children); desktop is a right-aligned row (`justify-end`).
       className={cn(
-        'bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end',
+        'bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end [&>button]:w-full sm:[&>button]:w-auto',
         className
       )}
       {...props}

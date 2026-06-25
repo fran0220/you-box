@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Dialog } from '@/components/dialog'
+import { safeNumberFieldProps } from '../utils/numeric-field'
 
 const rateLimitDialogSchema = z.object({
   groupName: z.string().min(1, 'Group name is required'),
@@ -169,10 +170,7 @@ export function RateLimitDialog({
                       min={0}
                       max={2147483647}
                       step={1}
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value) || 0)
-                      }
+                      {...safeNumberFieldProps(field)}
                     />
                     <span className='text-muted-foreground text-sm'>
                       {t('times')}
@@ -200,10 +198,7 @@ export function RateLimitDialog({
                       min={1}
                       max={2147483647}
                       step={1}
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value) || 1)
-                      }
+                      {...safeNumberFieldProps(field)}
                     />
                     <span className='text-muted-foreground text-sm'>
                       {t('times')}

@@ -277,6 +277,8 @@ export function OverviewInsights() {
   }, [window.mid, window.end_timestamp, rangeDays])
 
   const loading = trendQuery.isLoading
+  const trendError = trendQuery.isError
+  const logsError = logsQuery.isError
   const maxDailySpend = Math.max(...dailySpend, 1)
 
   const metricTitle: Record<MetricKey, string> = {
@@ -392,14 +394,31 @@ export function OverviewInsights() {
           <PanelBody>
             {loading ? (
               <div className='bg-surface-2 h-[170px] rounded-md motion-safe:animate-pulse' />
+            ) : trendError ? (
+              <div className='flex h-[170px] flex-col items-center justify-center gap-2 text-center'>
+                <p className='text-muted-foreground text-sm'>
+                  {t('Failed to load')}
+                </p>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => {
+                    void trendQuery.refetch()
+                  }}
+                >
+                  {t('Try again')}
+                </Button>
+              </div>
             ) : (
               <Sparkline data={chartSeries} height={170} />
             )}
-            <div className='text-muted-foreground mt-3 flex justify-between font-mono text-[11px]'>
-              {dateLabels.map((label, index) => (
-                <span key={index}>{label}</span>
-              ))}
-            </div>
+            {!trendError && (
+              <div className='text-muted-foreground mt-3 flex justify-between font-mono text-[11px]'>
+                {dateLabels.map((label, index) => (
+                  <span key={index}>{label}</span>
+                ))}
+              </div>
+            )}
           </PanelBody>
         </Panel>
 
@@ -413,7 +432,22 @@ export function OverviewInsights() {
             }
           />
           <PanelBody className='flex flex-col gap-4'>
-            {spendByModel.rows.length === 0 ? (
+            {trendError ? (
+              <div className='flex flex-col items-center gap-2 py-6 text-center'>
+                <p className='text-muted-foreground text-sm'>
+                  {t('Failed to load')}
+                </p>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => {
+                    void trendQuery.refetch()
+                  }}
+                >
+                  {t('Try again')}
+                </Button>
+              </div>
+            ) : spendByModel.rows.length === 0 ? (
               <p className='text-muted-foreground py-6 text-center text-sm'>
                 {t('No usage in this period')}
               </p>
@@ -461,7 +495,22 @@ export function OverviewInsights() {
             }
           />
           <div>
-            {(logsQuery.data ?? []).length === 0 ? (
+            {logsError ? (
+              <div className='flex flex-col items-center gap-2 px-5 py-8 text-center'>
+                <p className='text-muted-foreground text-sm'>
+                  {t('Failed to load')}
+                </p>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => {
+                    void logsQuery.refetch()
+                  }}
+                >
+                  {t('Try again')}
+                </Button>
+              </div>
+            ) : (logsQuery.data ?? []).length === 0 ? (
               <p className='text-muted-foreground px-5 py-8 text-center text-sm'>
                 {logsQuery.isLoading ? t('Loading') : t('No recent requests')}
               </p>

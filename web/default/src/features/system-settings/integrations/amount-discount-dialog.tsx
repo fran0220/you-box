@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Dialog } from '@/components/dialog'
+import { safeNumberFieldProps } from '../utils/numeric-field'
 
 const createAmountDiscountDialogSchema = (t: (key: string) => string) =>
   z.object({
@@ -153,10 +154,7 @@ export function AmountDiscountDialog({
                     step='1'
                     min='1'
                     placeholder={t('e.g., 100')}
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(parseInt(e.target.value) || 0)
-                    }
+                    {...safeNumberFieldProps(field)}
                     disabled={isEditMode}
                   />
                 </FormControl>
@@ -185,10 +183,7 @@ export function AmountDiscountDialog({
                     min='0.01'
                     max='1'
                     placeholder={t('e.g., 0.95')}
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(parseFloat(e.target.value) || 0)
-                    }
+                    {...safeNumberFieldProps(field)}
                   />
                 </FormControl>
                 <FormDescription>

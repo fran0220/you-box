@@ -24,7 +24,7 @@ export interface LoadingSkeletonProps {
 }
 
 export function LoadingSkeleton(props: LoadingSkeletonProps) {
-  const viewMode = props.viewMode ?? VIEW_MODES.CARD
+  const viewMode = props.viewMode ?? VIEW_MODES.LIST
 
   return (
     <div className='space-y-5'>
@@ -36,9 +36,36 @@ export function LoadingSkeleton(props: LoadingSkeletonProps) {
       <FilterBarSkeleton />
       {viewMode === VIEW_MODES.TABLE ? (
         <TableContentSkeleton />
-      ) : (
+      ) : viewMode === VIEW_MODES.CARD ? (
         <CardContentSkeleton />
+      ) : (
+        <ListContentSkeleton />
       )}
+    </div>
+  )
+}
+
+function ListContentSkeleton() {
+  return (
+    <div className='divide-y overflow-hidden rounded-xl border'>
+      {Array.from({ length: 12 }).map((_, i) => (
+        <div key={i} className='flex items-start gap-4 px-4 py-3.5'>
+          <Skeleton className='size-9 shrink-0 rounded-lg' />
+          <div className='flex-1 space-y-2'>
+            <Skeleton className='h-4 w-48' />
+            <Skeleton className='h-3.5 w-full max-w-md' />
+            <div className='flex gap-3'>
+              <Skeleton className='h-3 w-16' />
+              <Skeleton className='h-3 w-20' />
+              <Skeleton className='h-3 w-12' />
+            </div>
+          </div>
+          <div className='hidden space-y-1.5 sm:block'>
+            <Skeleton className='h-4 w-16' />
+            <Skeleton className='h-4 w-16' />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

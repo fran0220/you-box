@@ -1,0 +1,225 @@
+/*
+Copyright (C) 2023-2026 QuantumNous
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+For commercial licensing, please contact support@quantumnous.com
+*/
+import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
+import { Panel, PanelBody } from '@/components/patterns'
+import { getPerfMetrics } from '@/features/performance-metrics/api'
+import {
+  formatLatency,
+  formatThroughput,
+  formatUptimePct,
+} from '@/features/performance-metrics/lib/format'
+import { getDynamicPricingSummary } from '../lib/dynamic-price'
+import { isTokenBasedModel } from '../lib/model-helpers'
+import { formatFixedPrice, formatGroupPrice } from '../lib/price'
+import type { PricingModel, TokenUnit } from '../types'
+
+// ----------------------------------------------------------------------------
+// Spec card — display-font key numbers at the top of Overview.
+// ----------------------------------------------------------------------------
+//
+// Shows the base Input/Output (or per-request) price plus the live TPS /
+// latency / 24h success-rate metrics. Context window / max output are not
+// available from the pricing API, so only obtainable items render; the 24h
+// success rate is the availability signal.
+
+function SpecItem(props: {
+  label: React.ReactNode
+  value: React.ReactNode
+  intent?: 'default' | 'warning' | 'success'
+}) {
+  const intent = props.intent ?? 'default'
+  return (
+    <div className='min-w-0'>
+      <div className='text-muted-foreground truncate font-mono text-[9px] tracking-[0.06em] uppercase'>
+        {props.label}
+      </div>
+      <div
+        className={cn(
+          'font-display text-foreground mt-1 truncate text-xl font-bold tracking-[-0.02em] tabular-nums',
+          intent === 'warning' && 'text-warning',
+          intent === 'success' && 'text-success'
+        )}
+      >
+        {props.value}
+      </div>
+    </div>
+  )
+}
+
+export function ModelSpecCard(props: {
+  model: PricingModel
+  priceRate: number
+  usdExchangeRate: number
+  tokenUnit: TokenUnit
+  showRechargePrice: boolean
+}) {
+  const { t } = useTranslation()
+  const metricsQuery = useQuery({
+    queryKey: ['perf-metrics', props.model.model_name],
+    queryFn: () => getPerfMetrics(props.model.model_name, 24),
+    staleTime: 60 * 1000,
+  })
+
+  const tokenUnitLabel = props.tokenUnit === 'K' ? '1K' : '1M'
+  const baseGroupKey = '_base'
+  const baseGroupRatioMap = { [baseGroupKey]: 1 }
+  const isTokenBased = isTokenBasedModel(props.model)
+  const dynamicSummary = getDynamicPricingSummary(props.model, {
+    tokenUnit: props.tokenUnit,
+    showRechargePrice: props.showRechargePrice,
+    priceRate: props.priceRate,
+    usdExchangeRate: props.usdExchangeRate,
+    groupRatioMultiplier: 1,
+  })
+
+  const items: {
+    key: string
+    label: React.ReactNode
+    value: React.ReactNode
+    intent?: 'default' | 'warning' | 'success'
+  }[] = []
+
+  if (dynamicSummary) {
+    if (!dynamicSummary.isSpecialExpression) {
+      for (const entry of dynamicSummary.primaryEntries.slice(0, 2)) {
+        items.push({
+          key: `price-${entry.key}`,
+          label: `${t(entry.shortLabel)} / ${tokenUnitLabel}`,
+          value: entry.formatted,
+        })
+      }
+    }
+  } else if (isTokenBased) {
+    items.push(
+      {
+        key: 'price-input',
+        label: `${t('Input')} / ${tokenUnitLabel}`,
+        value: formatGroupPrice(
+          props.model,
+          baseGroupKey,
+          'input',
+          props.tokenUnit,
+          props.showRechargePrice,
+          props.priceRate,
+          props.usdExchangeRate,
+          baseGroupRatioMap
+        ),
+      },
+      {
+        key: 'price-output',
+        label: `${t('Output')} / ${tokenUnitLabel}`,
+        value: formatGroupPrice(
+          props.model,
+          baseGroupKey,
+          'output',
+          props.tokenUnit,
+          props.showRechargePrice,
+          props.priceRate,
+          props.usdExchangeRate,
+          baseGroupRatioMap
+        ),
+      }
+    )
+  } else {
+    items.push({
+      key: 'price-request',
+      label: t('Per request'),
+      value: formatFixedPrice(
+        props.model,
+        baseGroupKey,
+        props.showRechargePrice,
+        props.priceRate,
+        props.usdExchangeRate,
+        baseGroupRatioMap
+      ),
+    })
+  }
+
+  const groups = metricsQuery.data?.data.groups ?? []
+  if (groups.length > 0) {
+    const tpsValues = groups
+      .map((group) => group.avg_tps)
+      .filter((value) => value > 0)
+    const avgTps =
+      tpsValues.length > 0
+        ? tpsValues.reduce((sum, value) => sum + value, 0) / tpsValues.length
+        : 0
+    const latencyValues = groups
+      .map((group) => group.avg_latency_ms)
+      .filter((value) => value > 0)
+    const avgLatency =
+      latencyValues.length > 0
+        ? Math.round(
+            latencyValues.reduce((sum, value) => sum + value, 0) /
+              latencyValues.length
+          )
+        : 0
+    const successRates = groups
+      .map((group) => group.success_rate)
+      .filter((rate) => Number.isFinite(rate))
+    const successRate =
+      successRates.length > 0
+        ? successRates.reduce((sum, rate) => sum + rate, 0) /
+          successRates.length
+        : Number.NaN
+
+    items.push(
+      { key: 'tps', label: 'TPS', value: formatThroughput(avgTps) },
+      {
+        key: 'latency',
+        label: t('Average latency'),
+        value: formatLatency(avgLatency),
+      }
+    )
+
+    if (Number.isFinite(successRate)) {
+      let successIntent: 'default' | 'warning' | 'success' = 'warning'
+      if (successRate >= 99.9) {
+        successIntent = 'success'
+      } else if (successRate >= 99) {
+        successIntent = 'default'
+      }
+      items.push({
+        key: 'success',
+        label: t('Success rate'),
+        value: formatUptimePct(successRate),
+        intent: successIntent,
+      })
+    }
+  }
+
+  if (items.length === 0) return null
+
+  return (
+    <Panel>
+      <PanelBody className='grid grid-cols-2 gap-4 sm:grid-cols-3'>
+        {items.map((item) => (
+          <SpecItem
+            key={item.key}
+            label={item.label}
+            value={item.value}
+            intent={item.intent}
+          />
+        ))}
+      </PanelBody>
+    </Panel>
+  )
+}

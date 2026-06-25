@@ -17,23 +17,28 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
+import { Boxes } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { SettingsPanel } from '@/components/settings'
+import { DrawerSection, DrawerSectionHeader } from '@/components/drawer-layout'
 
 type ChannelModelsSectionProps = {
   children: ReactNode
 }
 
 /**
- * Models & Groups section — SettingsPanel container form (r2-B7 §5).
+ * Models & Groups section — unified drawer `card` section.
  * Fields and validation are untouched; only the wrapper changed.
  */
 export function ChannelModelsSection(props: ChannelModelsSectionProps) {
   const { t } = useTranslation()
 
   return (
-    <SettingsPanel eyebrow={t('models & groups')} title={t('Models & Groups')}>
-      <div className='flex flex-col gap-4 py-3'>{props.children}</div>
-    </SettingsPanel>
+    <DrawerSection variant='card'>
+      <DrawerSectionHeader
+        title={t('Models & Groups')}
+        icon={<Boxes className='size-4' />}
+      />
+      <div className='flex flex-col gap-4'>{props.children}</div>
+    </DrawerSection>
   )
 }

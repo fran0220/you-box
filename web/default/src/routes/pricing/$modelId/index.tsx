@@ -22,18 +22,29 @@ import { useAuthStore } from '@/stores/auth-store'
 import { getFreshModuleAccess } from '@/lib/nav-modules'
 import { ModelDetails } from '@/features/pricing/components/model-details'
 
+// Mirrors the catalog index route's search schema so the detail page can carry
+// the active filters/sort/view back to `/pricing` ("Back to Models"). All array
+// facets are comma-joined strings owned by the filter hook; ranges are numbers.
 const modelDetailsSearchSchema = z.object({
-  search: z.string().optional(),
-  sort: z.string().optional(),
-  vendor: z.string().optional(),
-  group: z.string().optional(),
-  quotaType: z.string().optional(),
-  endpointType: z.string().optional(),
-  modality: z.string().optional(),
-  tag: z.string().optional(),
-  tokenUnit: z.enum(['M', 'K']).optional(),
+  search: z.string().optional().catch(undefined),
+  sort: z.string().optional().catch(undefined),
+  providers: z.string().optional().catch(undefined),
+  groups: z.string().optional().catch(undefined),
+  categories: z.string().optional().catch(undefined),
+  inputModalities: z.string().optional().catch(undefined),
+  outputModalities: z.string().optional().catch(undefined),
+  series: z.string().optional().catch(undefined),
+  supportedParameters: z.string().optional().catch(undefined),
+  endpointTypes: z.string().optional().catch(undefined),
+  quotaTypes: z.string().optional().catch(undefined),
+  ctxMin: z.number().optional().catch(undefined),
+  ctxMax: z.number().optional().catch(undefined),
+  priceMin: z.number().optional().catch(undefined),
+  priceMax: z.number().optional().catch(undefined),
+  tokenUnit: z.enum(['M', 'K']).optional().catch(undefined),
   view: z.enum(['card', 'table']).optional().catch(undefined),
-  rechargePrice: z.boolean().optional(),
+  rechargePrice: z.boolean().optional().catch(undefined),
+  model: z.string().optional().catch(undefined),
 })
 
 export const Route = createFileRoute('/pricing/$modelId/')({

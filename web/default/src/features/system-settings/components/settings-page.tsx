@@ -19,6 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { SectionPageLayout } from '@/components/layout'
 import { StickySaveBar } from '@/components/settings'
 import { useSystemOptions, getOptionValue } from '../hooks/use-system-options'
@@ -199,7 +201,7 @@ export function SettingsPage<
   resolveSettings,
 }: SettingsPageProps<TSettings, TSectionId, TExtraArgs>) {
   const { t } = useTranslation()
-  const { data, isLoading } = useSystemOptions()
+  const { data, isLoading, isError, refetch } = useSystemOptions()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const params = useParams({ from: routePath as any })
   const activeSection = (params?.section ?? defaultSection) as TSectionId
@@ -226,6 +228,33 @@ export function SettingsPage<
         <div className='text-muted-foreground flex min-h-40 items-center justify-center text-sm'>
           {t(loadingMessage)}
         </div>
+      </SettingsPageFrame>
+    )
+  }
+
+  if (isError) {
+    return (
+      <SettingsPageFrame
+        title={t(sectionMeta.titleKey)}
+        group={group}
+        section={activeSection}
+      >
+        <Alert variant='destructive'>
+          <AlertTitle>{t('Failed to load')}</AlertTitle>
+          <AlertDescription>
+            {t('Could not load settings. Please try again.')}
+          </AlertDescription>
+          <Button
+            variant='outline'
+            size='sm'
+            className='mt-3 w-fit'
+            onClick={() => {
+              void refetch()
+            }}
+          >
+            {t('Try again')}
+          </Button>
+        </Alert>
       </SettingsPageFrame>
     )
   }

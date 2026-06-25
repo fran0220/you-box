@@ -21,7 +21,9 @@ import { useTranslation } from 'react-i18next'
 import { getSelf } from '@/lib/api'
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
+import { Button } from '@/components/ui/button'
 import { SectionPageLayout } from '@/components/layout'
+import { InlineAlert } from '@/components/patterns'
 import { AffiliateRewardsCard } from './components/affiliate-rewards-card'
 import { BalanceHeroCard } from './components/balance-hero-card'
 import { BillingHistoryDialog } from './components/dialogs/billing-history-dialog'
@@ -62,6 +64,7 @@ export function Wallet(props: WalletProps) {
   const { t } = useTranslation()
   const [user, setUser] = useState<UserWalletData | null>(null)
   const [userLoading, setUserLoading] = useState(true)
+  const [userError, setUserError] = useState(false)
   const [topupAmount, setTopupAmount] = useState(0)
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -79,7 +82,13 @@ export function Wallet(props: WalletProps) {
 
   const { status } = useStatus()
   const { currency } = useSystemConfig()
-  const { topupInfo, presetAmounts, loading: topupLoading } = useTopupInfo()
+  const {
+    topupInfo,
+    presetAmounts,
+    loading: topupLoading,
+    error: topupError,
+    refetch: refetchTopupInfo,
+  } = useTopupInfo()
 
   // Calculate effective exchange rate - when display type is USD, use rate of 1
   const effectiveUsdExchangeRate = useMemo(() => {
@@ -109,14 +118,18 @@ export function Wallet(props: WalletProps) {
   // Fetch user data (no synchronous setState: safe to call from the mount
   // effect; `userLoading` already starts as true for the initial fetch)
   const loadUser = useCallback(async () => {
+    setUserError(false)
     try {
       const response = await getSelf()
       if (response.success && response.data) {
         setUser(response.data as UserWalletData)
+      } else {
+        setUserError(true)
       }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Failed to fetch user data:', error)
+      setUserError(true)
     } finally {
       setUserLoading(false)
     }
@@ -305,6 +318,32 @@ export function Wallet(props: WalletProps) {
       <SectionPageLayout>
         <SectionPageLayout.Title>{t('Wallet')}</SectionPageLayout.Title>
         <SectionPageLayout.Content>
+          {(userError || topupError) && (
+            <div className='mx-auto mb-4 w-full max-w-7xl'>
+              <InlineAlert
+                tone='danger'
+                title={t('Failed to load')}
+                actions={
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => {
+                      if (userError) {
+                        void fetchUser()
+                      }
+                      if (topupError) {
+                        void refetchTopupInfo()
+                      }
+                    }}
+                  >
+                    {t('Try again')}
+                  </Button>
+                }
+              >
+                {t('Could not load your wallet. Please try again.')}
+              </InlineAlert>
+            </div>
+          )}
           <div className='mx-auto grid w-full max-w-7xl gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] xl:items-start'>
             <div className='flex flex-col gap-4'>
               <BalanceHeroCard user={user} loading={userLoading} />

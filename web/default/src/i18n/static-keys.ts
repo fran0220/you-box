@@ -112,6 +112,13 @@ export const STATIC_I18N_KEYS = [
   'Failed to delete user',
   'No user selected',
 
+  // User third-party binding fields (BINDING_FIELDS labels, dynamic via t())
+  'GitHub ID',
+  'Discord ID',
+  'OIDC ID',
+  'WeChat ID',
+  'Telegram ID',
+
   // Redemption codes
   'Unused',
   'Disabled',

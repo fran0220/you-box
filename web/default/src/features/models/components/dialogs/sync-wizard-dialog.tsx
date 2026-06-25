@@ -94,7 +94,9 @@ export function SyncWizardDialog({
       const previewRes = await previewUpstreamDiff({ locale, source })
 
       if (!previewRes.success) {
-        throw new Error(previewRes.message || 'Failed to preview upstream diff')
+        throw new Error(
+          previewRes.message || t('Failed to preview upstream diff')
+        )
       }
 
       const conflicts = previewRes.data?.conflicts || []
@@ -121,10 +123,10 @@ export function SyncWizardDialog({
         queryClient.invalidateQueries({ queryKey: vendorsQueryKeys.lists() })
         onOpenChange(false)
       } else {
-        toast.error(response.message || 'Sync failed')
+        toast.error(response.message || t('Sync failed'))
       }
     } catch (error: unknown) {
-      toast.error((error as Error)?.message || 'Sync failed')
+      toast.error((error as Error)?.message || t('Sync failed'))
     } finally {
       setIsSyncing(false)
     }

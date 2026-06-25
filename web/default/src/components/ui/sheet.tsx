@@ -22,6 +22,10 @@ import * as React from 'react'
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  overlayBackdropClassName,
+  overlayPopupMotionClassName,
+} from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
@@ -45,10 +49,11 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
   return (
     <SheetPrimitive.Backdrop
       data-slot='sheet-overlay'
-      className={cn(
-        'duration-fast fixed inset-0 z-50 bg-[var(--overlay)] transition-opacity ease-out data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs',
-        className
-      )}
+      // Backdrop motion + z-index come from the overlay SSOT in lib/motion.ts
+      // (z-[var(--z-overlay)] + duration-base) so the backdrop and the panel
+      // animate on ONE shared timing curve and the backdrop no longer finishes
+      // before the panel (was duration-fast vs duration-base).
+      className={cn(overlayBackdropClassName, className)}
       {...props}
     />
   )
@@ -76,7 +81,11 @@ function SheetContent({
         data-slot='sheet-content'
         data-side={side}
         className={cn(
-          'bg-card text-card-foreground duration-base fixed z-50 flex flex-col gap-4 overflow-hidden bg-clip-padding text-sm shadow-none transition ease-out data-ending-style:opacity-0 data-starting-style:opacity-0',
+          // Panel shares the overlay popup motion SSOT (opacity fade on
+          // duration-base) so it stays in lockstep with the backdrop; the side
+          // recipes below add the directional translate on top.
+          'bg-card text-card-foreground fixed z-[var(--z-overlay)] flex flex-col gap-4 overflow-hidden bg-clip-padding text-sm shadow-none',
+          overlayPopupMotionClassName,
           side === 'right' &&
             'inset-y-0 right-0 h-full w-3/4 border-l data-ending-style:translate-x-[2.5rem] data-starting-style:translate-x-[2.5rem] sm:max-w-sm',
           side === 'left' &&

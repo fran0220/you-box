@@ -17,13 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, type SubmitErrorHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
+import { Layers } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -42,22 +41,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  SideDrawerSection,
-  sideDrawerContentClassName,
-  sideDrawerFooterClassName,
-  sideDrawerFormClassName,
-  sideDrawerHeaderClassName,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerSection,
+  DrawerSectionHeader,
+  DrawerShell,
 } from '@/components/drawer-layout'
 import { JsonEditor } from '@/components/json-editor'
 import { StatusBadge } from '@/components/status-badge'
@@ -172,113 +163,146 @@ export function PrefillGroupFormDrawer({
         })
         onClose()
       } else {
-        toast.error(response.message || 'Operation failed')
+        toast.error(response.message || t('Operation failed'))
       }
     } catch (err: unknown) {
-      toast.error((err as Error)?.message || 'Operation failed')
+      toast.error((err as Error)?.message || t('Operation failed'))
     } finally {
       setIsSaving(false)
     }
   }
 
+  const onInvalid: SubmitErrorHandler<PrefillGroupFormValues> = () => {
+    toast.error(t('Please fix the highlighted fields before saving'))
+  }
+
   const meta =
     PREFILL_GROUP_TYPE_META[selectedType] || PREFILL_GROUP_TYPE_META.model
 
+  const drawerTitle = isEdit
+    ? t('Edit Prefill Group')
+    : t('Create Prefill Group')
+  const drawerDescription = isEdit
+    ? t('Update the reusable bundle below.')
+    : t('Capture a reusable bundle of models, tags, or endpoints.')
+
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent className={sideDrawerContentClassName('sm:max-w-2xl')}>
-        <SheetHeader className={sideDrawerHeaderClassName()}>
-          <SheetTitle>
-            {isEdit ? t('Edit Prefill Group') : t('Create Prefill Group')}
-          </SheetTitle>
-          <SheetDescription>
-            {isEdit
-              ? t('Update the reusable bundle below.')
-              : t('Capture a reusable bundle of models, tags, or endpoints.')}
-          </SheetDescription>
-        </SheetHeader>
+    <DrawerShell
+      open={open}
+      onOpenChange={handleOpenChange}
+      size='lg'
+      ariaTitle={drawerTitle}
+      ariaDescription={drawerDescription}
+    >
+      <DrawerHeader
+        title={drawerTitle}
+        description={drawerDescription}
+        icon={<Layers className='size-4' />}
+      />
 
-        <Form {...form}>
-          <form
-            id='prefill-group-form'
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className={sideDrawerFormClassName()}
-          >
-            <SideDrawerSection>
-              <div className='flex flex-col gap-1'>
-                <h3 className='text-sm font-semibold'>{t('Group details')}</h3>
-                <p className='text-muted-foreground text-sm'>
-                  {t(
-                    'Give the group a recognizable name and optional description.'
-                  )}
-                </p>
-              </div>
+      <Form {...form}>
+        <DrawerBody
+          asForm
+          formProps={{
+            id: 'prefill-group-form',
+            onSubmit: form.handleSubmit(handleSubmit, onInvalid),
+          }}
+        >
+          <DrawerSection variant='card'>
+            <DrawerSectionHeader
+              title={t('Group details')}
+              description={t(
+                'Give the group a recognizable name and optional description.'
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name='name'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Group Name')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('Premium chat models')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Give this group a recognizable name.')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name='name'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Group Name')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t('Premium chat models')} {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    {t('Give this group a recognizable name.')}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name='description'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Description')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder={t(
-                          'Optional notes about when to use this group'
-                        )}
-                        rows={3}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Make it easier for teammates to pick the right group.'
+            <FormField
+              control={form.control}
+              name='description'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Description')}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={t(
+                        'Optional notes about when to use this group'
                       )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </SideDrawerSection>
+                      rows={3}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t('Make it easier for teammates to pick the right group.')}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </DrawerSection>
 
-            <SideDrawerSection>
-              <div className='flex flex-col gap-1'>
-                <h3 className='text-sm font-semibold'>{t('Configuration')}</h3>
-                <p className='text-muted-foreground text-sm'>
-                  {t('Choose the bundle type and define the items inside it.')}
-                </p>
-              </div>
+          <DrawerSection variant='card'>
+            <DrawerSectionHeader
+              title={t('Configuration')}
+              description={t(
+                'Choose the bundle type and define the items inside it.'
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name='type'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Group Type</FormLabel>
-                    <Select
-                      items={[
-                        ...PREFILL_GROUP_TYPES.map((type) => ({
-                          value: type.value,
-                          label: (
+            <FormField
+              control={form.control}
+              name='type'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Group Type</FormLabel>
+                  <Select
+                    items={[
+                      ...PREFILL_GROUP_TYPES.map((type) => ({
+                        value: type.value,
+                        label: (
+                          <div className='flex flex-col text-left'>
+                            <span className='font-medium'>{type.label}</span>
+                            <span
+                              data-prefill-description
+                              className='text-muted-foreground text-xs'
+                            >
+                              {type.description}
+                            </span>
+                          </div>
+                        ),
+                      })),
+                    ]}
+                    value={field.value}
+                    onValueChange={(value) =>
+                      value !== null &&
+                      field.onChange(value as PrefillGroupType)
+                    }
+                  >
+                    <FormControl>
+                      <SelectTrigger className='[&_[data-slot=select-value]_[data-prefill-description]]:hidden'>
+                        <SelectValue placeholder={t('Select a group type')} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent alignItemWithTrigger={false}>
+                      <SelectGroup>
+                        {PREFILL_GROUP_TYPES.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
                             <div className='flex flex-col text-left'>
                               <span className='font-medium'>{type.label}</span>
                               <span
@@ -288,123 +312,82 @@ export function PrefillGroupFormDrawer({
                                 {type.description}
                               </span>
                             </div>
-                          ),
-                        })),
-                      ]}
-                      value={field.value}
-                      onValueChange={(value) =>
-                        value !== null &&
-                        field.onChange(value as PrefillGroupType)
-                      }
-                    >
-                      <FormControl>
-                        <SelectTrigger className='[&_[data-slot=select-value]_[data-prefill-description]]:hidden'>
-                          <SelectValue placeholder={t('Select a group type')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent alignItemWithTrigger={false}>
-                        <SelectGroup>
-                          {PREFILL_GROUP_TYPES.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              <div className='flex flex-col text-left'>
-                                <span className='font-medium'>
-                                  {type.label}
-                                </span>
-                                <span
-                                  data-prefill-description
-                                  className='text-muted-foreground text-xs'
-                                >
-                                  {type.description}
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    {t('Determines how this group is applied elsewhere.')}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className='border-border/60 flex flex-col gap-3 border-y py-4'>
+              <div className='flex items-center gap-2'>
+                <h4 className='text-sm font-medium'>{t('Project')}</h4>
+                <StatusBadge
+                  label={meta.label}
+                  variant={meta.badge}
+                  size='sm'
+                  copyable={false}
+                />
+              </div>
+              <FormField
+                control={form.control}
+                name='items'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='sr-only'>{t('Items')}</FormLabel>
+                    <FormControl>
+                      {selectedType === 'endpoint' ? (
+                        <JsonEditor
+                          value={(field.value as string) || ''}
+                          onChange={field.onChange}
+                          keyPlaceholder='provider'
+                          valuePlaceholder='{"path": "/v1/...","method": "POST"}'
+                          keyLabel={t('Provider')}
+                          valueLabel={t('Endpoint config')}
+                          valueType='any'
+                          template={ENDPOINT_TEMPLATES}
+                          emptyMessage={t(
+                            'Define endpoint mappings for each provider.'
+                          )}
+                        />
+                      ) : (
+                        <TagInput
+                          value={Array.isArray(field.value) ? field.value : []}
+                          onChange={field.onChange}
+                          placeholder={t('Enter a value and press Enter')}
+                        />
+                      )}
+                    </FormControl>
                     <FormDescription>
-                      {t('Determines how this group is applied elsewhere.')}
+                      {selectedType === 'endpoint'
+                        ? t(
+                            'Provide a JSON object where each key maps to an endpoint definition.'
+                          )
+                        : t('Add each model or tag you want to include.')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+          </DrawerSection>
+        </DrawerBody>
+      </Form>
 
-              <div className='border-border/60 flex flex-col gap-3 border-y py-4'>
-                <div className='flex items-center gap-2'>
-                  <h4 className='text-sm font-medium'>{t('Project')}</h4>
-                  <StatusBadge
-                    label={meta.label}
-                    variant={meta.badge}
-                    size='sm'
-                    copyable={false}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name='items'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className='sr-only'>{t('Items')}</FormLabel>
-                      <FormControl>
-                        {selectedType === 'endpoint' ? (
-                          <JsonEditor
-                            value={(field.value as string) || ''}
-                            onChange={field.onChange}
-                            keyPlaceholder='provider'
-                            valuePlaceholder='{"path": "/v1/...","method": "POST"}'
-                            keyLabel={t('Provider')}
-                            valueLabel={t('Endpoint config')}
-                            valueType='any'
-                            template={ENDPOINT_TEMPLATES}
-                            emptyMessage={t(
-                              'Define endpoint mappings for each provider.'
-                            )}
-                          />
-                        ) : (
-                          <TagInput
-                            value={
-                              Array.isArray(field.value) ? field.value : []
-                            }
-                            onChange={field.onChange}
-                            placeholder={t('Enter a value and press Enter')}
-                          />
-                        )}
-                      </FormControl>
-                      <FormDescription>
-                        {selectedType === 'endpoint'
-                          ? t(
-                              'Provide a JSON object where each key maps to an endpoint definition.'
-                            )
-                          : t('Add each model or tag you want to include.')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </SideDrawerSection>
-          </form>
-        </Form>
-
-        <SheetFooter className={sideDrawerFooterClassName()}>
-          <SheetClose
-            render={
-              <Button type='button' variant='outline' disabled={isSaving} />
-            }
-          >
-            {t('Cancel')}
-          </SheetClose>
-          <Button type='submit' form='prefill-group-form' disabled={isSaving}>
-            {isSaving && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-            {isSaving
-              ? t('Saving...')
-              : isEdit
-                ? t('Save changes')
-                : t('Create')}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+      <DrawerFooter
+        isSubmitting={isSaving}
+        submitLabel={isEdit ? t('Save changes') : t('Create')}
+        submittingLabel={t('Saving...')}
+        onCancel={onClose}
+        cancelLabel={t('Cancel')}
+        formId='prefill-group-form'
+      />
+    </DrawerShell>
   )
 }

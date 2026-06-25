@@ -21,7 +21,12 @@ For commercial licensing, please contact support@quantumnous.com
  */
 
 /**
- * Animation variants for mobile drawer
+ * @deprecated The mobile navigation drawer is now hosted on the shared Base UI
+ * `Sheet` shell (see `components/mobile-drawer.tsx`), which owns its own
+ * enter/exit motion, focus trap, scroll-lock, ESC handling and overlay token.
+ * These hand-rolled `motion` variants are no longer consumed by the drawer and
+ * are retained only for the public `layout` barrel export's backward
+ * compatibility; a later cleanup wave removes them.
  */
 export const MOBILE_DRAWER_ANIMATION = {
   overlay: {
@@ -55,11 +60,19 @@ export const MOBILE_DRAWER_ANIMATION = {
 } as const
 
 /**
- * Mobile drawer configuration
+ * @deprecated Superseded by the shared `Sheet` shell used by
+ * `components/mobile-drawer.tsx`. The drawer now renders its surface with the
+ * canonical `bg-card` token and its overlay with `bg-[var(--overlay)]` +
+ * backdrop-blur (from the Sheet primitive), replacing the divergent
+ * `bg-black/50 backdrop-blur-sm`. Retained only for the public `layout` barrel
+ * export's backward compatibility; a later cleanup wave removes it. The overlay
+ * class string here is aligned to the canonical overlay token so any incidental
+ * reader stays consistent with the rest of the overlay system.
  */
 export const MOBILE_DRAWER_CONFIG = {
   overlayTransitionDuration: 0.2,
   drawerClassName:
-    'fixed inset-x-0 bottom-3 z-50 mx-auto w-[95%] rounded-xl border border-border bg-background p-4 shadow-lg md:hidden',
-  overlayClassName: 'fixed inset-0 z-40 bg-black/50 backdrop-blur-sm',
+    'fixed inset-y-0 left-0 z-[var(--z-overlay)] w-[88%] max-w-sm border-r border-border bg-card p-4 shadow-none md:hidden',
+  overlayClassName:
+    'fixed inset-0 z-[var(--z-overlay)] bg-[var(--overlay)] supports-backdrop-filter:backdrop-blur-xs',
 } as const

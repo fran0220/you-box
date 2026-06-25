@@ -208,7 +208,7 @@ export function ChannelSelectorDialog({
 
           return (
             <StatusBadge
-              label={config.label}
+              label={t(config.label)}
               variant={config.variant}
               size='sm'
               copyable={false}

@@ -19,16 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { deleteApiKey } from '../api'
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants'
 import { useApiKeys } from './api-keys-provider'
@@ -59,32 +50,22 @@ export function ApiKeysDeleteDialog() {
   }
 
   return (
-    <AlertDialog
+    <ConfirmDialog
+      destructive
       open={open === 'delete'}
-      onOpenChange={(open) => !open && setOpen(null)}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t('Are you sure?')}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {t('This will permanently delete API key')}{' '}
-            <span className='font-semibold'>{currentRow?.name}</span>
-            {t('. This action cannot be undone.')}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
-            {t('Cancel')}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
-          >
-            {isDeleting ? t('Deleting...') : t('Delete')}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      onOpenChange={(isOpen) => !isOpen && setOpen(null)}
+      handleConfirm={handleDelete}
+      isLoading={isDeleting}
+      title={t('Are you sure?')}
+      desc={
+        <>
+          {t('This will permanently delete API key')}{' '}
+          <span className='font-semibold'>{currentRow?.name}</span>
+          {t('. This action cannot be undone.')}
+        </>
+      }
+      confirmText={t('Delete')}
+      busyLabel={t('Deleting...')}
+    />
   )
 }

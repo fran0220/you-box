@@ -20,6 +20,7 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { FileWarning } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { sanitizeHtml } from '@/lib/sanitize'
 import { cn, slugifyHeading } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -229,7 +230,7 @@ export function LegalDocument({
             {isHtml ? (
               <div
                 className='prose prose-neutral dark:prose-invert max-w-none'
-                dangerouslySetInnerHTML={{ __html: rawContent }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(rawContent) }}
               />
             ) : (
               <Markdown

@@ -108,7 +108,7 @@ export function UsersTable() {
   // arrays, which covers the `statusFilter[0]` / `roleFilter[0]` accesses
   // the exhaustive-deps rule flags (same pattern as channels-table).
   // eslint-disable-next-line @tanstack/query/exhaustive-deps
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: [
       'users',
       pagination.pageIndex + 1,
@@ -245,6 +245,10 @@ export function UsersTable() {
       columns={columns}
       isLoading={isLoading}
       isFetching={isFetching}
+      isError={isError}
+      onRetry={() => {
+        void refetch()
+      }}
       emptyTitle={t('No Users Found')}
       emptyDescription={t(
         'No users available. Try adjusting your search or filters.'

@@ -17,7 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { memo } from 'react'
-import { ChevronRight, Copy, Star } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Copy, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
@@ -33,12 +34,11 @@ import {
 import { parseTags } from '../lib/filters'
 import { isTokenBasedModel } from '../lib/model-helpers'
 import { formatPrice, formatRequestPrice } from '../lib/price'
-import type { PricingModel, TokenUnit } from '../types'
+import type { EnrichedPricingModel, TokenUnit } from '../types'
 import { ModelPerfBadge, type ModelPerfBadgeData } from './model-perf-badge'
 
 export interface ModelCardProps {
-  model: PricingModel
-  onClick: () => void
+  model: EnrichedPricingModel
   priceRate?: number
   usdExchangeRate?: number
   tokenUnit?: TokenUnit
@@ -85,19 +85,17 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
     Math.max(tags.length - 2, 0)
 
   const handleCopy = (e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation()
     copyToClipboard(props.model.model_name || '')
   }
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
-    // Star must never bubble into card/details navigation.
+    e.preventDefault()
     e.stopPropagation()
     toggleFavorite(props.model.model_name)
   }
 
-  // Footer price metrics (R2-B14 #2): patterns Metric k/v pairs. The key
-  // carries the active token-unit label so the 1K/1M toolbar switch stays
-  // reflected in the card.
   const renderPriceMetrics = () => {
     if (dynamicSummary) {
       if (dynamicSummary.isSpecialExpression) {
@@ -184,13 +182,17 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   }
 
   return (
-    <div
+    <Link
+      to='/pricing/$modelId'
+      params={{ modelId: props.model.model_name }}
+      // Retain catalog filter/sort/view/unit URL state across navigation.
+      search={(prev) => prev}
       className={cn(
-        'group bg-card border-border duration-base relative flex flex-col rounded-lg border p-3 transition-all ease-out sm:p-5',
+        'group bg-card border-border duration-base focus-visible:ring-ring/40 relative flex flex-col rounded-lg border p-3 transition-all ease-out outline-none focus-visible:ring-2 sm:p-4',
         'hover:border-brand-border hover:shadow-[var(--glow-brand)] motion-safe:hover:-translate-y-0.5'
       )}
     >
-      {/* Header: icon + name + meta + actions (star / details / copy) */}
+      {/* Header: icon + name + meta + hover actions (star / copy) */}
       <div className='flex items-start justify-between gap-2.5 sm:gap-3'>
         <div className='flex min-w-0 items-start gap-2.5 sm:gap-3'>
           <div className='bg-muted/40 flex size-9 shrink-0 items-center justify-center rounded-lg sm:size-10 sm:rounded-xl'>
@@ -204,15 +206,17 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
             <h3 className='text-foreground truncate font-mono text-[15px] leading-tight font-bold'>
               {props.model.model_name}
             </h3>
-            <div className='mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:mt-1'>
-              {primaryGroup && (
-                <span className='text-muted-foreground text-xs font-medium'>
-                  {primaryGroup} {t('Groups')}
+            <div className='mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5'>
+              {props.model.vendor_name && (
+                <span className='text-muted-foreground/80 text-xs'>
+                  {t('by {{vendor}}', { vendor: props.model.vendor_name })}
                 </span>
               )}
-              <span className='text-muted-foreground text-xs font-medium'>
-                {isTokenBased ? t('Token-based') : t('Per Request')}
-              </span>
+              {primaryGroup && (
+                <span className='text-muted-foreground text-xs font-medium'>
+                  {primaryGroup}
+                </span>
+              )}
               {isDynamicPricing && (
                 <StatusBadge
                   label={t('Dynamic Pricing')}
@@ -225,7 +229,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           </div>
         </div>
 
-        <div className='flex shrink-0 items-center gap-1.5'>
+        <div className='flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100'>
           <button
             type='button'
             onClick={handleToggleFavorite}
@@ -237,35 +241,23 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
               favorited ? t('Remove from favorites') : t('Add to favorites')
             }
             className={cn(
-              'rounded-md border p-1.5 transition-colors',
+              'rounded-md p-1.5 transition-colors',
               favorited
-                ? 'text-brand hover:bg-brand-subtle border-brand-border/40'
+                ? 'text-brand hover:bg-brand-subtle'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             )}
           >
             <Star
-              key={favorited ? 'on' : 'off'}
-              className={cn(
-                'size-3.5',
-                favorited &&
-                  'motion-safe:animate-in motion-safe:zoom-in-50 duration-fast ease-spring fill-current'
-              )}
+              className={cn('size-3.5', favorited && 'fill-current')}
               aria-hidden='true'
             />
           </button>
           <button
             type='button'
-            onClick={props.onClick}
-            className='text-muted-foreground hover:text-foreground hover:bg-muted inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs transition-colors sm:px-2.5 sm:py-1.5'
-          >
-            {t('Details')}
-            <ChevronRight className='size-3.5' />
-          </button>
-          <button
-            type='button'
             onClick={handleCopy}
-            className='text-muted-foreground hover:text-foreground hover:bg-muted rounded-md border p-1.5 transition-colors'
-            title={t('Copy')}
+            className='text-muted-foreground hover:text-foreground hover:bg-muted rounded-md p-1.5 transition-colors'
+            title={t('Copy model name')}
+            aria-label={t('Copy model name')}
           >
             <Copy className='size-3.5' />
           </button>
@@ -273,19 +265,18 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
       </div>
 
       {/* Description */}
-      <p className='text-muted-foreground mt-2 line-clamp-1 flex-1 text-[13px] leading-relaxed sm:mt-4 sm:line-clamp-2 sm:min-h-[2.5rem]'>
+      <p className='text-muted-foreground mt-2 line-clamp-2 flex-1 text-[13px] leading-relaxed sm:mt-3 sm:min-h-[2.5rem]'>
         {props.model.description || t('No description available.')}
       </p>
 
-      {/* Footer: price Metrics on the left and performance summary on the
-          right share row alignment; endpoint/tag chips sit below. */}
-      <div className='mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1.5 sm:mt-4'>
+      {/* Footer: price Metrics + perf summary; endpoint/tag chips below. */}
+      <div className='mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1.5 sm:mt-3'>
         <div className='flex min-w-0 flex-wrap items-start gap-x-4 gap-y-1.5 sm:gap-x-5'>
           {renderPriceMetrics()}
         </div>
         <ModelPerfBadge perf={props.perf} className='row-span-2 self-start' />
 
-        <div className='flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-0.5 sm:gap-x-3 sm:gap-y-1'>
+        <div className='flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-0.5 sm:gap-x-3'>
           {bottomTags.map((item) => (
             <span key={item} className='text-muted-foreground/70 text-xs'>
               {item}
@@ -298,6 +289,6 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   )
 })

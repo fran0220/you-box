@@ -58,14 +58,21 @@ func resolveApp(title, referer string) string {
 	return truncate(referer, 255)
 }
 
-// RecordFromHeaders extracts attribution headers (case-insensitive keys are
-// expected to already be lowercased by the caller) and records a sample.
+// RecordFromHeaders extracts attribution headers and records a sample. Header
+// key casing is normalized internally, so canonical MIME keys (e.g. "X-Title",
+// "Http-Referer" from net/http) and already-lowercased keys both work.
 func RecordFromHeaders(headers map[string]string, modelName string, tokens int64) {
-	if headers == nil {
+	if len(headers) == 0 {
 		return
 	}
-	title := firstNonEmpty(headers["x-title"], headers["x-openrouter-title"])
-	referer := firstNonEmpty(headers["referer"], headers["http-referer"])
+	// Build a lowercased-key view without mutating the caller's map. Later keys
+	// of the same normalized name win; in practice attribution keys are unique.
+	lower := make(map[string]string, len(headers))
+	for k, v := range headers {
+		lower[strings.ToLower(k)] = v
+	}
+	title := firstNonEmpty(lower["x-title"], lower["x-openrouter-title"])
+	referer := firstNonEmpty(lower["referer"], lower["http-referer"])
 	Record(title, referer, modelName, tokens)
 }
 

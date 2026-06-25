@@ -16,73 +16,74 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import type { ReactNode } from 'react'
-import { ChevronDown, RotateCcw } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { ChevronDown, RotateCcw, Search, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
 import {
-  ENDPOINT_TYPES,
-  FILTER_ALL,
-  MODALITY_FILTERS,
+  FILTER_SECTIONS,
+  FILTER_SECTION_ORDER,
+  MAX_FILTER_ITEMS,
   QUOTA_TYPES,
   getEndpointTypeLabels,
   getModalityLabels,
   getQuotaTypeLabels,
+  type FilterSection,
+  type ModalityFilterOption,
 } from '../constants'
-import { parseTags } from '../lib/filters'
-import type { Modality, PricingModel, PricingVendor } from '../types'
-
-type FilterOption = {
-  value: string
-  label: string
-  count?: number
-  suffix?: string
-  icon?: ReactNode
-}
-
-type FilterSectionProps = {
-  title: string
-  value: string
-  options: FilterOption[]
-  onChange: (value: string) => void
-}
+import {
+  extractEndpointTypes,
+  extractGroups,
+  extractInputModalities,
+  extractOutputModalities,
+  extractProviders,
+  extractSeries,
+  extractSupportedParameters,
+  extractTagFacets,
+  type FacetOption,
+} from '../lib/filters'
+import type { EnrichedPricingModel } from '../types'
+import {
+  ContextLengthSlider,
+  PromptPriceSlider,
+} from './pricing-range-filters'
 
 export interface PricingSidebarProps {
-  quotaTypeFilter: string
-  endpointTypeFilter: string
-  modalityFilter: string
-  vendorFilter: string
-  groupFilter: string
-  tagFilter: string
-  onQuotaTypeChange: (value: string) => void
-  onEndpointTypeChange: (value: string) => void
-  onModalityChange: (value: string) => void
-  onVendorChange: (value: string) => void
-  onGroupChange: (value: string) => void
-  onTagChange: (value: string) => void
-  vendors: PricingVendor[]
-  groups: string[]
+  models: EnrichedPricingModel[]
+  /** Selected values per facet (from useFilters().facetState). */
+  facetState: Record<FilterSection, string[]>
+  toggleFacetValue: (facet: FilterSection, value: string) => void
+  /** Vendor icon lookup is by vendor name → icon key. */
+  vendorIcons: Record<string, string | undefined>
   groupRatios?: Record<string, number>
-  tags: string[]
-  models: PricingModel[]
+  contextRange: [number, number]
+  promptPriceRange: [number, number]
+  priceCeiling: number
+  onContextRangeChange: (value: [number, number]) => void
+  onPromptPriceRangeChange: (value: [number, number]) => void
   hasActiveFilters: boolean
   onClearFilters: () => void
   className?: string
 }
 
-function countBy(
-  models: PricingModel[],
-  predicate: (model: PricingModel) => boolean
-): number {
-  return models.reduce((count, model) => count + (predicate(model) ? 1 : 0), 0)
+const SECTION_TITLES: Record<FilterSection, string> = {
+  [FILTER_SECTIONS.PROVIDER]: 'Providers',
+  [FILTER_SECTIONS.INPUT_MODALITY]: 'Input Modality',
+  [FILTER_SECTIONS.OUTPUT_MODALITY]: 'Output Modality',
+  [FILTER_SECTIONS.SERIES]: 'Series',
+  [FILTER_SECTIONS.CATEGORY]: 'Categories',
+  [FILTER_SECTIONS.SUPPORTED_PARAMETER]: 'Supported Parameters',
+  [FILTER_SECTIONS.PRICING_TYPE]: 'Pricing Type',
+  [FILTER_SECTIONS.ENDPOINT_TYPE]: 'Endpoint Type',
+  [FILTER_SECTIONS.GROUP]: 'Groups',
 }
 
 function formatGroupRatio(ratio: number | undefined): string | undefined {
@@ -93,200 +94,82 @@ function formatGroupRatio(ratio: number | undefined): string | undefined {
   return `x${formatted}`
 }
 
-function FilterChip(props: {
-  option: FilterOption
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type='button'
-      onClick={props.onClick}
-      className={cn(
-        'group inline-flex max-w-full items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-all',
-        props.active
-          ? 'border-foreground/30 bg-foreground/5 text-foreground shadow-sm'
-          : 'border-border/70 bg-background text-muted-foreground hover:border-border hover:bg-muted/50 hover:text-foreground'
-      )}
-      title={props.option.label}
-    >
-      {props.option.icon && (
-        <span className='shrink-0'>{props.option.icon}</span>
-      )}
-      <span className='truncate'>{props.option.label}</span>
-      {(props.option.suffix || props.option.count != null) && (
-        <span
-          className={cn(
-            'rounded-md px-1.5 py-0.5 text-[10px]',
-            props.active
-              ? 'bg-background text-foreground'
-              : 'bg-muted text-muted-foreground'
-          )}
-        >
-          {props.option.suffix ?? props.option.count}
-        </span>
-      )}
-    </button>
-  )
-}
-
-function FilterSection(props: FilterSectionProps) {
-  return (
-    <Collapsible
-      defaultOpen
-      className='border-border/70 border-b pb-3 last:border-b-0'
-    >
-      <CollapsibleTrigger className='group flex w-full items-center justify-between py-2.5 text-left'>
-        <span className='text-foreground text-sm font-semibold'>
-          {props.title}
-        </span>
-        <ChevronDown className='text-muted-foreground size-4 transition-transform group-data-[panel-open]:rotate-180' />
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div className='flex flex-wrap gap-1.5'>
-          {props.options.map((option) => (
-            <FilterChip
-              key={option.value}
-              option={option}
-              active={props.value === option.value}
-              onClick={() => props.onChange(option.value)}
-            />
-          ))}
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  )
-}
-
 export function PricingSidebar(props: PricingSidebarProps) {
   const { t } = useTranslation()
-  const quotaTypeLabels = getQuotaTypeLabels(t)
-  const endpointTypeLabels = getEndpointTypeLabels(t)
+  const [filterQuery, setFilterQuery] = useState('')
   const modalityLabels = getModalityLabels(t)
+  const endpointLabels = getEndpointTypeLabels(t)
+  const quotaLabels = getQuotaTypeLabels(t)
 
-  const modalityHasModel = (modality: Modality) => (model: PricingModel) => {
-    const modalities: Modality[] = model.input_modalities?.length
-      ? model.input_modalities
-      : ['text']
-    return modalities.includes(modality)
-  }
-
-  const vendorOptions: FilterOption[] = [
-    {
-      value: FILTER_ALL,
-      label: t('All Vendors'),
-      count: props.models.length,
-    },
-    ...props.vendors
-      .map((vendor) => ({
-        value: vendor.name,
-        label: vendor.name,
-        count: countBy(
-          props.models,
-          (model) => model.vendor_name === vendor.name
-        ),
-        icon: vendor.icon ? getLobeIcon(vendor.icon, 14) : undefined,
+  // Build each facet's option list (value/label/count) from the live catalog.
+  // Modality + endpoint + pricing options localize their labels here; the rest
+  // use the extractor's label (the raw value).
+  const facetOptions = useMemo<
+    Record<FilterSection, Array<FacetOption & { iconKey?: string; suffix?: string }>>
+  >(() => {
+    const models = props.models
+    const localizeModality = (opts: FacetOption[]) =>
+      opts.map((o) => ({
+        ...o,
+        label: modalityLabels[o.value as ModalityFilterOption] ?? o.value,
       }))
-      .filter((vendor) => vendor.count > 0),
-  ]
 
-  const groupOptions: FilterOption[] = [
-    {
-      value: FILTER_ALL,
-      label: t('All Groups'),
-    },
-    ...props.groups.map((group) => ({
-      value: group,
-      label: group,
-      suffix: formatGroupRatio(props.groupRatios?.[group]),
-    })),
-  ]
+    const providers = extractProviders(models).map((o) => ({
+      ...o,
+      iconKey: props.vendorIcons[o.value],
+    }))
+    const groups = extractGroups(models).map((o) => ({
+      ...o,
+      suffix: formatGroupRatio(props.groupRatios?.[o.value]),
+    }))
+    const endpoints = extractEndpointTypes(models).map((o) => ({
+      ...o,
+      label:
+        (endpointLabels as Record<string, string>)[o.value] ?? o.value,
+    }))
+    const pricing: FacetOption[] = [
+      {
+        value: QUOTA_TYPES.TOKEN,
+        label: quotaLabels[QUOTA_TYPES.TOKEN],
+        count: models.filter((m) => m.quota_type === 0).length,
+      },
+      {
+        value: QUOTA_TYPES.REQUEST,
+        label: quotaLabels[QUOTA_TYPES.REQUEST],
+        count: models.filter((m) => m.quota_type === 1).length,
+      },
+    ].filter((o) => o.count > 0)
 
-  const quotaOptions: FilterOption[] = [
-    {
-      value: QUOTA_TYPES.ALL,
-      label: quotaTypeLabels[QUOTA_TYPES.ALL],
-      count: props.models.length,
-    },
-    {
-      value: QUOTA_TYPES.TOKEN,
-      label: quotaTypeLabels[QUOTA_TYPES.TOKEN],
-      count: countBy(props.models, (model) => model.quota_type === 0),
-    },
-    {
-      value: QUOTA_TYPES.REQUEST,
-      label: quotaTypeLabels[QUOTA_TYPES.REQUEST],
-      count: countBy(props.models, (model) => model.quota_type === 1),
-    },
-  ]
-
-  const tagOptions: FilterOption[] = [
-    {
-      value: FILTER_ALL,
-      label: t('All Tags'),
-      count: props.models.length,
-    },
-    ...props.tags.map((tag) => ({
-      value: tag,
-      label: tag,
-      count: countBy(props.models, (model) =>
-        parseTags(model.tags)
-          .map((item) => item.toLowerCase())
-          .includes(tag.toLowerCase())
+    return {
+      [FILTER_SECTIONS.PROVIDER]: providers,
+      [FILTER_SECTIONS.INPUT_MODALITY]: localizeModality(
+        extractInputModalities(models)
       ),
-    })),
-  ]
+      [FILTER_SECTIONS.OUTPUT_MODALITY]: localizeModality(
+        extractOutputModalities(models)
+      ),
+      [FILTER_SECTIONS.SERIES]: extractSeries(models),
+      [FILTER_SECTIONS.CATEGORY]: extractTagFacets(models),
+      [FILTER_SECTIONS.SUPPORTED_PARAMETER]: extractSupportedParameters(models),
+      [FILTER_SECTIONS.PRICING_TYPE]: pricing,
+      [FILTER_SECTIONS.ENDPOINT_TYPE]: endpoints,
+      [FILTER_SECTIONS.GROUP]: groups,
+    }
+  }, [
+    props.models,
+    props.vendorIcons,
+    props.groupRatios,
+    modalityLabels,
+    endpointLabels,
+    quotaLabels,
+  ])
 
-  const endpointOptions: FilterOption[] = [
-    {
-      value: ENDPOINT_TYPES.ALL,
-      label: endpointTypeLabels[ENDPOINT_TYPES.ALL],
-      count: props.models.length,
-    },
-    ...Object.entries(endpointTypeLabels)
-      .filter(([value]) => value !== ENDPOINT_TYPES.ALL)
-      .map(([value, label]) => ({
-        value,
-        label,
-        count: countBy(
-          props.models,
-          (model) => model.supported_endpoint_types?.includes(value) ?? false
-        ),
-      })),
-  ]
-
-  const modalityOptions: FilterOption[] = [
-    {
-      value: MODALITY_FILTERS.ALL,
-      label: modalityLabels[MODALITY_FILTERS.ALL],
-      count: props.models.length,
-    },
-    ...(
-      [
-        MODALITY_FILTERS.TEXT,
-        MODALITY_FILTERS.IMAGE,
-        MODALITY_FILTERS.AUDIO,
-        MODALITY_FILTERS.VIDEO,
-        MODALITY_FILTERS.FILE,
-      ] as Modality[]
-    )
-      .map((modality) => ({
-        value: modality,
-        label: modalityLabels[modality],
-        count: countBy(props.models, modalityHasModel(modality)),
-      }))
-      .filter((option) => option.count > 0),
-  ]
+  const q = filterQuery.trim().toLowerCase()
 
   return (
-    <aside className={cn('rounded-xl border p-3', props.className)}>
-      <div className='mb-2.5 flex items-center justify-between gap-2'>
-        <div>
-          <h2 className='text-foreground text-sm font-bold'>{t('Filter')}</h2>
-          <p className='text-muted-foreground mt-1 text-xs'>
-            {t('Refine models by provider, group, type, and tags.')}
-          </p>
-        </div>
+    <aside className={cn('flex flex-col', props.className)}>
+      <div className='mb-3 flex items-center justify-between gap-2'>
+        <h2 className='text-foreground text-sm font-bold'>{t('Filters')}</h2>
         <Button
           type='button'
           variant='ghost'
@@ -300,52 +183,187 @@ export function PricingSidebar(props: PricingSidebarProps) {
         </Button>
       </div>
 
-      {props.hasActiveFilters && (
-        <Badge variant='secondary' className='mb-3'>
-          {t('Filters active')}
-        </Badge>
-      )}
+      {/* In-rail filter search */}
+      <div className='relative mb-2'>
+        <Search className='text-muted-foreground/60 pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2' />
+        <input
+          type='text'
+          value={filterQuery}
+          onChange={(e) => setFilterQuery(e.target.value)}
+          placeholder={t('Filter options...')}
+          className='border-border/60 bg-background placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-primary/20 h-8 w-full rounded-md border pr-7 pl-8 text-xs outline-none focus:ring-2'
+          aria-label={t('Filter options')}
+        />
+        {filterQuery && (
+          <button
+            type='button'
+            onClick={() => setFilterQuery('')}
+            className='text-muted-foreground/60 hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2'
+            aria-label={t('Clear')}
+          >
+            <X className='size-3.5' />
+          </button>
+        )}
+      </div>
 
       <div className='space-y-1'>
-        <FilterSection
-          title={t('Groups')}
-          value={props.groupFilter}
-          options={groupOptions}
-          onChange={props.onGroupChange}
-        />
-        <FilterSection
-          title={t('All Vendors')}
-          value={props.vendorFilter}
-          options={vendorOptions}
-          onChange={props.onVendorChange}
-        />
-        <FilterSection
-          title={t('Model Tags')}
-          value={props.tagFilter}
-          options={tagOptions}
-          onChange={props.onTagChange}
-        />
-        <FilterSection
-          title={t('Pricing Type')}
-          value={props.quotaTypeFilter}
-          options={quotaOptions}
-          onChange={props.onQuotaTypeChange}
-        />
-        {modalityOptions.length > 1 && (
-          <FilterSection
-            title={t('Input Modality')}
-            value={props.modalityFilter}
-            options={modalityOptions}
-            onChange={props.onModalityChange}
+        {/* Context-length range */}
+        <RangeSection title={t('Context length')}>
+          <ContextLengthSlider
+            value={props.contextRange}
+            onChange={props.onContextRangeChange}
           />
-        )}
-        <FilterSection
-          title={t('Endpoint Type')}
-          value={props.endpointTypeFilter}
-          options={endpointOptions}
-          onChange={props.onEndpointTypeChange}
-        />
+        </RangeSection>
+
+        {/* Prompt-pricing range */}
+        <RangeSection title={t('Prompt pricing')}>
+          <PromptPriceSlider
+            value={props.promptPriceRange}
+            ceiling={props.priceCeiling}
+            onChange={props.onPromptPriceRangeChange}
+          />
+        </RangeSection>
+
+        {/* Multi-select facets (OpenRouter order) */}
+        {FILTER_SECTION_ORDER.map((facet) => {
+          const options = facetOptions[facet] ?? []
+          if (options.length === 0) return null
+          return (
+            <CheckboxFacetSection
+              key={facet}
+              title={t(SECTION_TITLES[facet])}
+              options={options}
+              selected={props.facetState[facet] ?? []}
+              onToggle={(value) => props.toggleFacetValue(facet, value)}
+              query={q}
+            />
+          )
+        })}
       </div>
     </aside>
+  )
+}
+
+function RangeSection(props: { title: string; children: React.ReactNode }) {
+  return (
+    <Collapsible
+      defaultOpen
+      className='border-border/60 border-b pb-3 last:border-b-0'
+    >
+      <CollapsibleTrigger className='group flex w-full items-center justify-between py-2.5 text-left'>
+        <span className='text-foreground text-sm font-semibold'>
+          {props.title}
+        </span>
+        <ChevronDown className='text-muted-foreground size-4 transition-transform group-data-[panel-open]:rotate-180' />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className='pt-1.5'>{props.children}</div>
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
+
+function CheckboxFacetSection(props: {
+  title: string
+  options: Array<FacetOption & { iconKey?: string; suffix?: string }>
+  selected: string[]
+  onToggle: (value: string) => void
+  query: string
+}) {
+  const { t } = useTranslation()
+  const [expanded, setExpanded] = useState(false)
+
+  const filtered = useMemo(() => {
+    if (!props.query) return props.options
+    return props.options.filter((o) =>
+      o.label.toLowerCase().includes(props.query)
+    )
+  }, [props.options, props.query])
+
+  // Keep selected-but-filtered-out items visible, and never collapse below the
+  // selected set so a checked box is always reachable.
+  const visible = useMemo(() => {
+    if (expanded || props.query) return filtered
+    const selectedSet = new Set(props.selected)
+    const head = filtered.slice(0, MAX_FILTER_ITEMS)
+    const headSet = new Set(head.map((o) => o.value))
+    const extraSelected = filtered.filter(
+      (o) => selectedSet.has(o.value) && !headSet.has(o.value)
+    )
+    return [...head, ...extraSelected]
+  }, [expanded, filtered, props.query, props.selected])
+
+  const hiddenCount = filtered.length - visible.length
+
+  if (filtered.length === 0) return null
+
+  return (
+    <Collapsible
+      defaultOpen
+      className='border-border/60 border-b pb-3 last:border-b-0'
+    >
+      <CollapsibleTrigger className='group flex w-full items-center justify-between py-2.5 text-left'>
+        <span className='text-foreground flex items-center gap-1.5 text-sm font-semibold'>
+          {props.title}
+          {props.selected.length > 0 && (
+            <span className='bg-brand text-brand-foreground rounded-full px-1.5 text-[10px] font-medium tabular-nums'>
+              {props.selected.length}
+            </span>
+          )}
+        </span>
+        <ChevronDown className='text-muted-foreground size-4 transition-transform group-data-[panel-open]:rotate-180' />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className='space-y-0.5 pt-0.5'>
+          {visible.map((option) => {
+            const checked = props.selected.includes(option.value)
+            return (
+              <label
+                key={option.value}
+                className='hover:bg-muted/50 group flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1'
+              >
+                <Checkbox
+                  checked={checked}
+                  onCheckedChange={() => props.onToggle(option.value)}
+                />
+                {option.iconKey && (
+                  <span className='shrink-0'>
+                    {getLobeIcon(option.iconKey, 14)}
+                  </span>
+                )}
+                <span
+                  className={cn(
+                    'min-w-0 flex-1 truncate text-xs',
+                    checked ? 'text-foreground font-medium' : 'text-muted-foreground'
+                  )}
+                  title={option.label}
+                >
+                  {option.label}
+                </span>
+                {option.suffix && (
+                  <span className='text-muted-foreground/60 shrink-0 font-mono text-[10px]'>
+                    {option.suffix}
+                  </span>
+                )}
+                <span className='text-muted-foreground/50 shrink-0 text-[11px] tabular-nums'>
+                  {option.count}
+                </span>
+              </label>
+            )
+          })}
+          {!props.query && (hiddenCount > 0 || expanded) && (
+            <button
+              type='button'
+              onClick={() => setExpanded((v) => !v)}
+              className='text-brand hover:text-brand-hover px-1.5 py-1 text-xs font-medium'
+            >
+              {expanded
+                ? t('Show less')
+                : t('Show {{count}} more', { count: hiddenCount })}
+            </button>
+          )}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

@@ -206,6 +206,26 @@ For commercial licensing, please contact support@quantumnous.com
   --dur-base: 220ms;
   --dur-slow: 400ms;
 
+  /* -------- Overlay layering (theme-invariant) --------
+   * Single source of truth for overlay stacking, consumed via
+   * `z-[var(--z-*)]` by every overlay primitive (dialog/sheet/drawer/
+   * popover/dropdown-menu/select/context-menu/tooltip/toast). These are
+   * structural (not color) tokens, so they live only in :root — no dark
+   * override needed.
+   *
+   * Tiering contract: anchored surfaces (popover/dropdown/select/tooltip)
+   * MUST sit ABOVE modal backdrops + panels so e.g. a Select opened inside a
+   * Sheet stays visible regardless of React portal mount order. The order is
+   * therefore: modal layer (50) < anchored menus & popovers (70) < tooltip
+   * (80) < toast (90). Nested modals (a dialog opened from within a
+   * sheet/drawer) intentionally share the modal layer and stack by portal
+   * mount order — the later-opened dialog mounts last and paints on top. */
+  --z-overlay: 50; /* modal backdrops + modal panels (dialog/sheet/drawer) */
+  --z-dropdown: 70; /* dropdown-menu / select / context-menu */
+  --z-popover: 70; /* popover */
+  --z-tooltip: 80; /* tooltip — always on top */
+  --z-toast: 90;
+
   /* -------- Layout -------- */
   --radius: 14px;
   --app-header-height: 3rem;

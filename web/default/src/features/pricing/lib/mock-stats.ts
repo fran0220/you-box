@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import type { PricingModel } from '../types'
+import type { ModelStats, PricingModel } from '../types'
 import {
   hashStringToSeed,
   randomInRange,
@@ -286,6 +286,56 @@ function rangeFromSeed(
   [min, max]: [number, number]
 ): number {
   return randomInRange(rand, min, max)
+}
+
+// ---------------------------------------------------------------------------
+// Per-model headline stats (tokens/week, weekly growth, latency)
+// ---------------------------------------------------------------------------
+//
+// PLACEHOLDER: these power the OpenRouter-style list row (tokens/week, growth
+// %, latency) and the default "Top Weekly" sort. Seeded by model name so the
+// numbers are stable across renders/refresh. Replace with a real metrics API
+// when the backend ships one.
+
+/** Per-profile weekly-token volume range (in tokens). */
+const PROFILE_TOKENS_PER_WEEK: Record<string, [number, number]> = {
+  embedding: [4_000_000_000, 60_000_000_000],
+  image: [200_000_000, 6_000_000_000],
+  audio: [120_000_000, 3_000_000_000],
+  reasoning: [1_500_000_000, 40_000_000_000],
+  fast: [6_000_000_000, 180_000_000_000],
+  large: [3_000_000_000, 90_000_000_000],
+  standard: [1_000_000_000, 50_000_000_000],
+}
+
+/**
+ * Build deterministic headline stats for a single model, seeded by model name.
+ *
+ * - `tokensPerWeek`: profile-weighted volume (drives the default Top Weekly sort).
+ * - `weeklyGrowthPct`: week-over-week change, can be negative (~ -40%..+160%).
+ * - `latencyMs`: median TTFT, anchored to the same profile ranges used by the
+ *   per-group performance builder so the row and detail page stay consistent.
+ * - `throughputTps`: 0 for image/audio/embedding (non token-streaming).
+ */
+export function buildModelStats(model: PricingModel): ModelStats {
+  const profile = PROFILE_BY_NAME(model.model_name)
+  const spec = PROFILE_SPECS[profile]
+  const rand = seededRandom(hashStringToSeed(`${model.model_name}:stats`))
+
+  const tokensPerWeek = Math.round(
+    rangeFromSeed(rand, PROFILE_TOKENS_PER_WEEK[profile] ?? [
+      1_000_000_000, 50_000_000_000,
+    ])
+  )
+  // Skewed so most models trend mildly up, a minority decline.
+  const growthRaw = randomInRange(rand, -40, 160)
+  const weeklyGrowthPct = Math.round(growthRaw * 10) / 10
+  const latencyMs = Math.round(rangeFromSeed(rand, spec.ttftRange))
+  const throughputRaw = rangeFromSeed(rand, spec.throughputRange)
+  const throughputTps =
+    throughputRaw === 0 ? 0 : Math.round(throughputRaw * 10) / 10
+
+  return { tokensPerWeek, weeklyGrowthPct, latencyMs, throughputTps }
 }
 
 function applyGroupFactor(value: number, factor: number): number {

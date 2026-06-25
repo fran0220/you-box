@@ -26,16 +26,17 @@ import { Button } from '@/components/ui/button'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import {
-  LoadingSkeleton,
   EmptyState,
-  SearchBar,
-  PricingTable,
-  PricingSidebar,
-  PricingToolbar,
+  LoadingSkeleton,
   ModelCardGrid,
-  ModelDetailsDrawer,
+  ModelList,
+  PricingFilterPills,
+  PricingSidebar,
+  PricingTable,
+  PricingToolbar,
+  SearchBar,
 } from './components'
-import { EXCLUDED_GROUPS, VIEW_MODES } from './constants'
+import { VIEW_MODES, computePromptPriceCeiling } from './constants'
 import { useFavorites } from './hooks/use-favorites'
 import { useFilters } from './hooks/use-filters'
 import { usePricingData } from './hooks/use-pricing-data'
@@ -43,13 +44,8 @@ import { usePricingData } from './hooks/use-pricing-data'
 export function Pricing() {
   const { t } = useTranslation()
   const reduceMotion = useReducedMotion()
-  const [selectedModelName, setSelectedModelName] = useState<string | null>(
-    null
-  )
-  // Favorites filter (R2-B14 #1): local-only star set; the toggle lives in
-  // the toolbar and narrows whatever the regular filters produced. Table
-  // view intentionally has no per-row star (cards are the favoriting
-  // surface; the table stays a dense comparison grid).
+  // Favorites filter: local-only star set; narrows whatever the regular
+  // filters produced.
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
   const { favorites, isFavorite } = useFavorites()
 
@@ -57,9 +53,6 @@ export function Pricing() {
     models,
     vendors,
     groupRatio,
-    usableGroup,
-    endpointMap,
-    autoGroups,
     isLoading,
     priceRate,
     usdExchangeRate,
@@ -68,60 +61,41 @@ export function Pricing() {
   const {
     searchInput,
     sortBy,
-    vendorFilter,
-    groupFilter,
-    quotaTypeFilter,
-    endpointTypeFilter,
-    modalityFilter,
-    tagFilter,
     tokenUnit,
     viewMode,
     showRechargePrice,
+    facetState,
+    toggleFacetValue,
+    contextRange,
+    promptPriceRange,
     setSearchInput,
     setSortBy,
-    setVendorFilter,
-    setGroupFilter,
-    setQuotaTypeFilter,
-    setEndpointTypeFilter,
-    setModalityFilter,
-    setTagFilter,
+    setContextRange,
+    setPromptPriceRange,
     setTokenUnit,
     setViewMode,
     setShowRechargePrice,
     filteredModels,
-    hasActiveFilters,
+    activeFilters,
     activeFilterCount,
-    availableTags,
+    hasActiveFilters,
     clearFilters,
+    clearAll,
     clearSearch,
-  } = useFilters(models || [])
+  } = useFilters(models)
 
-  const handleModelClick = useCallback((modelName: string) => {
-    setSelectedModelName(modelName)
-  }, [])
+  // Vendor name -> icon key, for the sidebar provider checkboxes.
+  const vendorIcons = useMemo(() => {
+    const map: Record<string, string | undefined> = {}
+    for (const v of vendors) map[v.name] = v.icon
+    return map
+  }, [vendors])
 
-  const selectedModel = useMemo(
-    () =>
-      selectedModelName
-        ? (models || []).find(
-            (model) => model.model_name === selectedModelName
-          ) || null
-        : null,
-    [models, selectedModelName]
+  // Prompt-price slider ceiling adapts to the live catalog.
+  const priceCeiling = useMemo(
+    () => computePromptPriceCeiling(models.map((m) => m.promptPriceUsdPerM)),
+    [models]
   )
-
-  const availableGroups = useMemo(
-    () =>
-      Object.keys(usableGroup || {}).filter(
-        (g) => !EXCLUDED_GROUPS.includes(g)
-      ),
-    [usableGroup]
-  )
-
-  const handleClearAll = useCallback(() => {
-    clearFilters()
-    clearSearch()
-  }, [clearFilters, clearSearch])
 
   const displayedModels = useMemo(
     () =>
@@ -131,17 +105,38 @@ export function Pricing() {
     [filteredModels, isFavorite, showFavoritesOnly]
   )
 
+  const handleClearAll = useCallback(() => {
+    clearAll()
+    setShowFavoritesOnly(false)
+  }, [clearAll])
+
+  // The toolbar and sidebar share the same facet contract.
+  const sidebarProps = {
+    models,
+    facetState,
+    toggleFacetValue,
+    vendorIcons,
+    groupRatios: groupRatio,
+    contextRange,
+    promptPriceRange,
+    priceCeiling,
+    onContextRangeChange: setContextRange,
+    onPromptPriceRangeChange: setPromptPriceRange,
+    hasActiveFilters,
+    onClearFilters: clearFilters,
+  }
+
   const renderPricingContent = () => {
     if (showFavoritesOnly && displayedModels.length === 0) {
       return (
-        <div className='flex min-h-[320px] flex-col items-center justify-center rounded-lg border border-dashed px-6 py-12 text-center'>
+        <div className='flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed px-6 py-12 text-center'>
           <Star className='text-muted-foreground/40 mb-3 size-10' />
           <h3 className='text-foreground mb-1 text-base font-semibold'>
             {t('No favorite models yet')}
           </h3>
           <p className='text-muted-foreground mb-5 max-w-xs text-sm'>
             {favorites.size === 0
-              ? t('Tap the star on a model card to pin it here.')
+              ? t('Tap the star on a model to pin it here.')
               : t('No favorites match your current filters.')}
           </p>
           <Button
@@ -155,7 +150,7 @@ export function Pricing() {
       )
     }
 
-    if (filteredModels.length === 0) {
+    if (displayedModels.length === 0) {
       return (
         <EmptyState
           searchQuery={searchInput}
@@ -169,7 +164,6 @@ export function Pricing() {
       return (
         <ModelCardGrid
           models={displayedModels}
-          onModelClick={handleModelClick}
           priceRate={priceRate}
           usdExchangeRate={usdExchangeRate}
           tokenUnit={tokenUnit}
@@ -178,14 +172,28 @@ export function Pricing() {
       )
     }
 
+    if (viewMode === VIEW_MODES.TABLE) {
+      return (
+        <PricingTable
+          models={displayedModels}
+          priceRate={priceRate}
+          usdExchangeRate={usdExchangeRate}
+          tokenUnit={tokenUnit}
+          showRechargePrice={showRechargePrice}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+      )
+    }
+
+    // Default: the dense, OpenRouter-style virtualized list.
     return (
-      <PricingTable
+      <ModelList
         models={displayedModels}
         priceRate={priceRate}
         usdExchangeRate={usdExchangeRate}
         tokenUnit={tokenUnit}
         showRechargePrice={showRechargePrice}
-        onModelClick={handleModelClick}
       />
     )
   }
@@ -193,7 +201,7 @@ export function Pricing() {
   if (isLoading) {
     return (
       <PublicLayout showMainContainer={false}>
-        <div className='mx-auto w-full max-w-[1800px] px-3 pt-16 pb-8 sm:px-6 sm:pt-20 sm:pb-10 xl:px-8'>
+        <div className='mx-auto w-full max-w-[1600px] px-3 pt-8 pb-8 sm:px-6 sm:pt-10 xl:px-8'>
           <LoadingSkeleton viewMode={viewMode} />
         </div>
       </PublicLayout>
@@ -202,154 +210,99 @@ export function Pricing() {
 
   return (
     <PublicLayout showMainContainer={false}>
-      <div className='relative'>
-        <div
-          aria-hidden
-          className='pointer-events-none absolute -top-48 left-1/2 size-[560px] -translate-x-1/2 rounded-full blur-[10px]'
-          style={{
-            background:
-              'radial-gradient(circle, color-mix(in oklch, var(--brand) 14%, transparent), transparent 62%)',
-          }}
-        />
-        <PageTransition className='relative mx-auto w-full max-w-[1800px] px-3 pt-16 pb-8 sm:px-6 sm:pt-20 sm:pb-10 xl:px-8'>
-          <header className='mx-auto mb-5 max-w-3xl pt-5 text-center sm:mb-10 sm:pt-10'>
-            <p className='yb-eyebrow mb-3'>
-              {'// '}
-              {t('This site currently has {{count}} models enabled', {
-                count: models?.length || 0,
+      <PageTransition className='mx-auto w-full max-w-[1600px] px-3 pt-8 pb-10 sm:px-6 sm:pt-10 xl:px-8'>
+        {/* Slim, left-aligned header */}
+        <header className='mb-4 flex flex-wrap items-end justify-between gap-3'>
+          <div>
+            <h1 className='font-display text-2xl font-bold tracking-[-0.02em] sm:text-3xl'>
+              {t('Models')}
+            </h1>
+            <p className='text-muted-foreground mt-1 text-sm'>
+              {t('{{count}} models from {{vendors}} providers', {
+                count: models.length,
+                vendors: vendors.length,
               })}
             </p>
-            <h1 className='font-display text-[clamp(2rem,5vw,3.25rem)] leading-[1.08] font-bold tracking-[-0.035em]'>
-              {t('Model Square')}
-            </h1>
-            <p className='text-muted-foreground/60 mx-auto mt-2 max-w-2xl text-xs leading-relaxed sm:text-sm'>
-              {t(
-                'Discover curated AI models, compare pricing and capabilities, and choose the right model for every scenario.'
-              )}
-            </p>
+          </div>
+          <Button
+            render={
+              <Link to='/pricing/compare' search={{ models: undefined }} />
+            }
+            variant='outline'
+            size='sm'
+            className='gap-1.5'
+          >
+            <Scale className='size-4' />
+            {t('Compare models')}
+          </Button>
+        </header>
+
+        {/* Sticky control strip: search + toolbar + pills */}
+        <div className='bg-background/80 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-10 -mx-3 mb-4 space-y-2.5 px-3 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 xl:-mx-8 xl:px-8'>
+          <div className='flex flex-col gap-2.5 lg:flex-row lg:items-center'>
             <SearchBar
               value={searchInput}
               onChange={setSearchInput}
               onClear={clearSearch}
-              placeholder={t(
-                'Search model name, provider, endpoint, or tag...'
-              )}
-              className='mx-auto mt-4 max-w-2xl sm:mt-6'
+              placeholder={t('Search models by name, provider, or capability…')}
+              className='lg:flex-1'
             />
-            <div className='mt-3 flex justify-center'>
-              <Button
-                render={
-                  <Link to='/pricing/compare' search={{ models: undefined }} />
-                }
-                variant='outline'
-                size='sm'
-                className='gap-1.5'
-              >
-                <Scale className='size-4' />
-                {t('Compare models')}
-              </Button>
-            </div>
-          </header>
-
-          <div className='grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]'>
-            <PricingSidebar
-              quotaTypeFilter={quotaTypeFilter}
-              endpointTypeFilter={endpointTypeFilter}
-              modalityFilter={modalityFilter}
-              vendorFilter={vendorFilter}
-              groupFilter={groupFilter}
-              tagFilter={tagFilter}
-              onQuotaTypeChange={setQuotaTypeFilter}
-              onEndpointTypeChange={setEndpointTypeFilter}
-              onModalityChange={setModalityFilter}
-              onVendorChange={setVendorFilter}
-              onGroupChange={setGroupFilter}
-              onTagChange={setTagFilter}
-              vendors={vendors || []}
-              groups={availableGroups}
-              groupRatios={groupRatio}
-              tags={availableTags}
-              models={models || []}
-              hasActiveFilters={hasActiveFilters}
-              onClearFilters={clearFilters}
-              className='hover-scrollbar sticky top-4 hidden max-h-[calc(100dvh-2rem)] self-start overflow-y-auto xl:block'
-            />
-
-            <main className='min-w-0 space-y-4'>
-              <PricingToolbar
-                filteredCount={displayedModels.length}
-                totalCount={models?.length}
-                showFavoritesOnly={showFavoritesOnly}
-                onShowFavoritesOnlyChange={setShowFavoritesOnly}
-                sortBy={sortBy}
-                onSortChange={setSortBy}
-                tokenUnit={tokenUnit}
-                onTokenUnitChange={setTokenUnit}
-                showRechargePrice={showRechargePrice}
-                onRechargePriceChange={setShowRechargePrice}
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-                quotaTypeFilter={quotaTypeFilter}
-                endpointTypeFilter={endpointTypeFilter}
-                modalityFilter={modalityFilter}
-                vendorFilter={vendorFilter}
-                groupFilter={groupFilter}
-                tagFilter={tagFilter}
-                onQuotaTypeChange={setQuotaTypeFilter}
-                onEndpointTypeChange={setEndpointTypeFilter}
-                onModalityChange={setModalityFilter}
-                onVendorChange={setVendorFilter}
-                onGroupChange={setGroupFilter}
-                onTagChange={setTagFilter}
-                vendors={vendors || []}
-                groups={availableGroups}
-                groupRatios={groupRatio}
-                tags={availableTags}
-                models={models || []}
-                hasActiveFilters={hasActiveFilters}
-                activeFilterCount={activeFilterCount}
-                onClearFilters={clearFilters}
-              />
-
-              {/* Crossfade card ↔ table on view switch (keyed on viewMode so
-                  it fires on switch, not on every search/filter change). */}
-              <m.div
-                key={viewMode}
-                initial={reduceMotion ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={
-                  reduceMotion ? { duration: 0 } : MOTION_TRANSITION.fast
-                }
-              >
-                {renderPricingContent()}
-              </m.div>
-            </main>
-          </div>
-
-          {selectedModel && (
-            <ModelDetailsDrawer
-              open={Boolean(selectedModel)}
-              onOpenChange={(open) => {
-                if (!open) setSelectedModelName(null)
-              }}
-              model={selectedModel}
-              groupRatio={groupRatio || {}}
-              usableGroup={usableGroup || {}}
-              endpointMap={
-                (endpointMap as Record<
-                  string,
-                  { path?: string; method?: string }
-                >) || {}
-              }
-              autoGroups={autoGroups || []}
-              priceRate={priceRate ?? 1}
-              usdExchangeRate={usdExchangeRate ?? 1}
+            <PricingToolbar
+              showFavoritesOnly={showFavoritesOnly}
+              onShowFavoritesOnlyChange={setShowFavoritesOnly}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
               tokenUnit={tokenUnit}
+              onTokenUnitChange={setTokenUnit}
               showRechargePrice={showRechargePrice}
+              onRechargePriceChange={setShowRechargePrice}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              activeFilterCount={activeFilterCount}
+              {...sidebarProps}
             />
-          )}
-        </PageTransition>
-      </div>
+          </div>
+          <PricingFilterPills
+            activeFilters={activeFilters}
+            searchInput={searchInput}
+            onClearSearch={clearSearch}
+            onClearAll={handleClearAll}
+          />
+        </div>
+
+        <div className='grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]'>
+          <PricingSidebar
+            {...sidebarProps}
+            className='hover-scrollbar sticky top-20 hidden max-h-[calc(100dvh-6rem)] self-start overflow-y-auto pr-1 xl:flex'
+          />
+
+          <main className='min-w-0'>
+            <div className='text-muted-foreground mb-2.5 text-sm'>
+              <span className='text-foreground font-semibold tabular-nums'>
+                {displayedModels.length.toLocaleString()}
+              </span>{' '}
+              {displayedModels.length === 1 ? t('model') : t('models')}
+              {(hasActiveFilters || showFavoritesOnly) &&
+                models.length > 0 && (
+                  <span className='text-muted-foreground/60'>
+                    {' / '}
+                    {models.length.toLocaleString()}
+                  </span>
+                )}
+            </div>
+            {/* Crossfade on view switch (keyed on viewMode so it fires on
+                switch, not on every search/filter change). */}
+            <m.div
+              key={viewMode}
+              initial={reduceMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={reduceMotion ? { duration: 0 } : MOTION_TRANSITION.fast}
+            >
+              {renderPricingContent()}
+            </m.div>
+          </main>
+        </div>
+      </PageTransition>
     </PublicLayout>
   )
 }

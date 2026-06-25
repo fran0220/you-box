@@ -82,7 +82,7 @@ export function RedemptionsTable() {
   })
 
   // Fetch data with React Query
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: [
       'redemptions',
       pagination.pageIndex + 1,
@@ -162,6 +162,10 @@ export function RedemptionsTable() {
       columns={columns}
       isLoading={isLoading}
       isFetching={isFetching}
+      isError={isError}
+      onRetry={() => {
+        void refetch()
+      }}
       emptyTitle={t('No Redemption Codes Found')}
       emptyDescription={t(
         'No redemption codes available. Create your first redemption code to get started.'

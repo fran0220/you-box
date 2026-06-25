@@ -83,6 +83,7 @@ export function ApiKeysMultiDeleteDialog<TData>({
         </>
       }
       confirmText={t('Delete')}
+      busyLabel={t('Deleting...')}
     />
   )
 }

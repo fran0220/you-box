@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
-import { DeltaBadge, ProgressBar } from '@/components/patterns'
+import { DeltaBadge, ProgressBar, RankBadge } from '@/components/patterns'
 import { formatTokens } from '../lib/format'
 import type { ModelRanking } from '../types'
 import { ModelLink, VendorLink } from './entity-links'
@@ -102,9 +102,7 @@ function ModelList(props: {
               : 'flex items-center gap-3 py-2.5'
           }
         >
-          <span className='text-muted-foreground/80 w-6 shrink-0 text-right font-mono text-xs tabular-nums'>
-            {row.rank}.
-          </span>
+          <RankBadge rank={row.rank} />
           <span className='shrink-0'>
             {getLobeIcon(row.vendor_icon, compact ? 20 : 22)}
           </span>

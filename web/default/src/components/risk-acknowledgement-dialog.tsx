@@ -19,19 +19,10 @@ For commercial licensing, please contact support@quantumnous.com
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 
 type RequiredTextPart = {
   type: 'input' | 'static'
@@ -63,6 +54,16 @@ type RiskAcknowledgementDialogProps = {
   className?: string
 }
 
+/**
+ * RiskAcknowledgementDialog is a thin configuration of the single destructive
+ * {@link ConfirmDialog} implementation. ConfirmDialog owns the dialog shell,
+ * footer, busy/disabled handling, and confirm button; this wrapper supplies the
+ * richer acknowledgement body (a numbered statements list, a multi-item
+ * checklist, and an optional segmented confirmation-text input) and contributes
+ * the combined gate result via ConfirmDialog's `extraGatePassed` escape hatch.
+ *
+ * The public props/behavior are preserved so existing consumers keep compiling.
+ */
 export function RiskAcknowledgementDialog({
   open,
   onOpenChange,
@@ -160,8 +161,6 @@ export function RiskAcknowledgementDialog({
     ? typedTextParts.some((part) => part.trim() !== '')
     : typedText.length > 0
 
-  const canConfirm = allChecked && typedMatched && !isLoading
-
   const handleChecklistChange = (index: number, checked: boolean) => {
     setCheckedItems((previous) => {
       const next = [...previous]
@@ -179,143 +178,129 @@ export function RiskAcknowledgementDialog({
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        className={cn(
-          'flex max-h-[min(88dvh,760px)] w-[calc(100vw-1.5rem)] !max-w-[44rem] grid-rows-none flex-col gap-0 overflow-hidden !p-0 sm:w-[min(44rem,calc(100vw-3rem))]',
-          className
-        )}
-      >
-        <AlertDialogHeader className='shrink-0 px-4 pt-4 pb-3 text-left sm:px-6 sm:pt-6'>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          {description ? (
-            <AlertDialogDescription
-              render={<div />}
-              className='mt-1 text-left leading-5'
-            >
-              {description}
-            </AlertDialogDescription>
-          ) : null}
-        </AlertDialogHeader>
+    <ConfirmDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title}
+      desc={description ?? ''}
+      destructive={destructive}
+      isLoading={isLoading}
+      handleConfirm={onConfirm}
+      extraGatePassed={allChecked && typedMatched}
+      confirmText={confirmText ?? t('Confirm')}
+      cancelBtnText={cancelText ?? t('Cancel')}
+      headerClassName='shrink-0 px-4 pt-4 pb-3 sm:px-6 sm:pt-6'
+      descClassName='mt-1 text-left leading-5'
+      className={cn(
+        'flex max-h-[min(88dvh,760px)] w-[calc(100vw-1.5rem)] !max-w-[44rem] grid-rows-none flex-col gap-0 overflow-hidden !p-0 sm:w-[min(44rem,calc(100vw-3rem))]',
+        className
+      )}
+      footerClassName='mx-0 mb-0 shrink-0 rounded-b-xl border-t p-3 sm:p-4'
+    >
+      <div className='min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pt-1 pb-4 sm:px-6'>
+        {items.length > 0 ? (
+          <ol className='border-border/70 bg-muted/30 text-foreground list-decimal space-y-2 rounded-lg border px-4 py-3 pl-8 text-sm leading-6 sm:px-5 sm:py-4 sm:pl-9'>
+            {items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ol>
+        ) : null}
 
-        <div className='min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4 sm:px-6'>
-          {items.length > 0 ? (
-            <ol className='border-border/70 bg-muted/30 text-foreground list-decimal space-y-2 rounded-lg border px-4 py-3 pl-8 text-sm leading-6 sm:px-5 sm:py-4 sm:pl-9'>
-              {items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ol>
-          ) : null}
-
-          {checklist.length > 0 ? (
-            <div className='border-border/70 bg-muted/30 space-y-3 rounded-lg border p-3 sm:p-4'>
-              {checklist.map((item, index) => {
-                const id = `risk-acknowledgement-${index}`
-                return (
-                  <div key={item} className='flex items-start gap-3'>
-                    <Checkbox
-                      id={id}
-                      checked={checkedItems[index] ?? false}
-                      onCheckedChange={(checked) =>
-                        handleChecklistChange(index, checked === true)
-                      }
-                      className='mt-0.5'
-                    />
-                    <Label
-                      htmlFor={id}
-                      className='text-muted-foreground text-sm leading-5 font-normal'
-                    >
-                      {item}
-                    </Label>
-                  </div>
-                )
-              })}
-            </div>
-          ) : null}
-
-          {requiredTextToDisplay ? (
-            <div className='border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-3 sm:p-4'>
-              <Label className='text-sm font-medium'>
-                {inputPrompt ?? t('Please type the following text to confirm:')}
-              </Label>
-              <div className='bg-background border-border rounded-md border px-3 py-2 font-mono text-sm break-all'>
-                {requiredTextToDisplay}
-              </div>
-              {hasSegmentedRequiredText ? (
-                <div className='flex flex-wrap items-center gap-2'>
-                  {normalizedRequiredTextParts.map((part, index) =>
-                    part.type === 'static' ? (
-                      <span
-                        key={`static-${index}`}
-                        className='text-muted-foreground bg-background/70 border-border rounded-md border px-2 py-1.5 font-mono text-sm select-none'
-                      >
-                        {part.text}
-                      </span>
-                    ) : (
-                      <Input
-                        key={`input-${index}`}
-                        value={typedTextParts[part.inputIndex ?? 0] ?? ''}
-                        onChange={(event) =>
-                          handleTextPartChange(
-                            part.inputIndex ?? 0,
-                            event.target.value
-                          )
-                        }
-                        placeholder={
-                          part.placeholder ??
-                          part.text ??
-                          inputPlaceholder ??
-                          t('Type the confirmation text here')
-                        }
-                        autoFocus={open && part.inputIndex === 0}
-                        onCopy={(event) => event.preventDefault()}
-                        onCut={(event) => event.preventDefault()}
-                        onPaste={(event) => event.preventDefault()}
-                        onDrop={(event) => event.preventDefault()}
-                        aria-invalid={hasTypedRequiredText && !typedMatched}
-                        className='w-full font-mono sm:w-64'
-                      />
-                    )
-                  )}
+        {checklist.length > 0 ? (
+          <div className='border-border/70 bg-muted/30 space-y-3 rounded-lg border p-3 sm:p-4'>
+            {checklist.map((item, index) => {
+              const id = `risk-acknowledgement-${index}`
+              return (
+                <div key={item} className='flex items-start gap-3'>
+                  <Checkbox
+                    id={id}
+                    checked={checkedItems[index] ?? false}
+                    onCheckedChange={(checked) =>
+                      handleChecklistChange(index, checked === true)
+                    }
+                    className='mt-0.5'
+                  />
+                  <Label
+                    htmlFor={id}
+                    className='text-muted-foreground text-sm leading-5 font-normal'
+                  >
+                    {item}
+                  </Label>
                 </div>
-              ) : (
-                <Input
-                  value={typedText}
-                  onChange={(event) => setTypedText(event.target.value)}
-                  placeholder={
-                    inputPlaceholder ?? t('Type the confirmation text here')
-                  }
-                  autoFocus={open}
-                  onCopy={(event) => event.preventDefault()}
-                  onCut={(event) => event.preventDefault()}
-                  onPaste={(event) => event.preventDefault()}
-                  onDrop={(event) => event.preventDefault()}
-                  aria-invalid={hasTypedRequiredText && !typedMatched}
-                />
-              )}
-              {hasTypedRequiredText && !typedMatched ? (
-                <p className='text-destructive text-xs'>
-                  {mismatchHint ??
-                    t('The entered text does not match the required text.')}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+              )
+            })}
+          </div>
+        ) : null}
 
-        <AlertDialogFooter className='mx-0 mb-0 shrink-0 rounded-b-xl border-t p-3 sm:p-4'>
-          <AlertDialogCancel disabled={isLoading}>
-            {cancelText ?? t('Cancel')}
-          </AlertDialogCancel>
-          <Button
-            variant={destructive ? 'destructive' : 'default'}
-            disabled={!canConfirm}
-            onClick={onConfirm}
-          >
-            {confirmText ?? t('Confirm')}
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        {requiredTextToDisplay ? (
+          <div className='border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-3 sm:p-4'>
+            <Label className='text-sm font-medium'>
+              {inputPrompt ?? t('Please type the following text to confirm:')}
+            </Label>
+            <div className='bg-background border-border rounded-md border px-3 py-2 font-mono text-sm break-all'>
+              {requiredTextToDisplay}
+            </div>
+            {hasSegmentedRequiredText ? (
+              <div className='flex flex-wrap items-center gap-2'>
+                {normalizedRequiredTextParts.map((part, index) =>
+                  part.type === 'static' ? (
+                    <span
+                      key={`static-${index}`}
+                      className='text-muted-foreground bg-background/70 border-border rounded-md border px-2 py-1.5 font-mono text-sm select-none'
+                    >
+                      {part.text}
+                    </span>
+                  ) : (
+                    <Input
+                      key={`input-${index}`}
+                      value={typedTextParts[part.inputIndex ?? 0] ?? ''}
+                      onChange={(event) =>
+                        handleTextPartChange(
+                          part.inputIndex ?? 0,
+                          event.target.value
+                        )
+                      }
+                      placeholder={
+                        part.placeholder ??
+                        part.text ??
+                        inputPlaceholder ??
+                        t('Type the confirmation text here')
+                      }
+                      autoFocus={open && part.inputIndex === 0}
+                      onCopy={(event) => event.preventDefault()}
+                      onCut={(event) => event.preventDefault()}
+                      onPaste={(event) => event.preventDefault()}
+                      onDrop={(event) => event.preventDefault()}
+                      aria-invalid={hasTypedRequiredText && !typedMatched}
+                      className='w-full font-mono sm:w-64'
+                    />
+                  )
+                )}
+              </div>
+            ) : (
+              <Input
+                value={typedText}
+                onChange={(event) => setTypedText(event.target.value)}
+                placeholder={
+                  inputPlaceholder ?? t('Type the confirmation text here')
+                }
+                autoFocus={open}
+                onCopy={(event) => event.preventDefault()}
+                onCut={(event) => event.preventDefault()}
+                onPaste={(event) => event.preventDefault()}
+                onDrop={(event) => event.preventDefault()}
+                aria-invalid={hasTypedRequiredText && !typedMatched}
+              />
+            )}
+            {hasTypedRequiredText && !typedMatched ? (
+              <p className='text-destructive text-xs'>
+                {mismatchHint ??
+                  t('The entered text does not match the required text.')}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </ConfirmDialog>
   )
 }

@@ -22,11 +22,13 @@ import {
   type Row,
   type Table,
 } from '@tanstack/react-table'
-import { Database } from 'lucide-react'
+import { AlertTriangle, Database } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
   Empty,
+  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -37,6 +39,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 interface MobileCardListProps<TData> {
   table: Table<TData>
   isLoading?: boolean
+  isError?: boolean
+  onRetry?: () => void
   emptyTitle?: string
   emptyDescription?: string
   getRowKey?: (row: Row<TData>) => string | number
@@ -255,6 +259,8 @@ export function MobileCardList<TData>(props: MobileCardListProps<TData>) {
   const {
     table,
     isLoading = false,
+    isError = false,
+    onRetry,
     emptyTitle,
     emptyDescription,
     getRowKey,
@@ -275,6 +281,31 @@ export function MobileCardList<TData>(props: MobileCardListProps<TData>) {
   }
 
   const rows = table.getRowModel().rows
+
+  if (isError && (!rows || rows.length === 0)) {
+    return (
+      <div className='rounded-lg border p-6'>
+        <Empty className='border-none p-0'>
+          <EmptyHeader>
+            <EmptyMedia variant='icon'>
+              <AlertTriangle className='text-destructive size-6' />
+            </EmptyMedia>
+            <EmptyTitle>{t('Failed to load')}</EmptyTitle>
+            <EmptyDescription>
+              {t('Could not load data. Please try again.')}
+            </EmptyDescription>
+          </EmptyHeader>
+          {onRetry && (
+            <EmptyContent>
+              <Button variant='outline' size='sm' onClick={onRetry}>
+                {t('Try again')}
+              </Button>
+            </EmptyContent>
+          )}
+        </Empty>
+      </div>
+    )
+  }
 
   if (!rows || rows.length === 0) {
     return (

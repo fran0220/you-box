@@ -74,7 +74,7 @@ export function CodexOAuthDialog({
     try {
       const res = await startCodexOAuth()
       if (!res.success) {
-        throw new Error(res.message || 'Failed to start OAuth')
+        throw new Error(res.message || t('Failed to start OAuth'))
       }
 
       const url = res.data?.authorize_url || ''
@@ -106,7 +106,7 @@ export function CodexOAuthDialog({
     try {
       const res = await completeCodexOAuth(state.callbackUrl.trim())
       if (!res.success) {
-        throw new Error(res.message || 'OAuth failed')
+        throw new Error(res.message || t('OAuth failed'))
       }
 
       const rawKey = res.data?.key || ''

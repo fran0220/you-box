@@ -59,12 +59,15 @@ function PopoverContent({
         collisionPadding={collisionPadding}
         collisionBoundary={collisionBoundary}
         collisionAvoidance={collisionAvoidance}
-        className='isolate z-50'
+        // Anchored tier sits ABOVE modal backdrops/panels (`--z-overlay`) so a
+        // popover opened from inside a Sheet/Dialog stays on top regardless of
+        // portal mount order.
+        className='isolate z-[var(--z-popover)]'
       >
         <PopoverPrimitive.Popup
           data-slot='popover-content'
           className={cn(
-            'bg-popover text-popover-foreground ring-border data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 duration-fast z-50 flex w-72 origin-(--transform-origin) flex-col gap-2.5 rounded-lg p-2.5 text-sm shadow-md ring-1 outline-hidden',
+            'bg-popover text-popover-foreground ring-border data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 duration-fast z-[var(--z-popover)] flex w-72 origin-(--transform-origin) flex-col gap-2.5 rounded-lg p-2.5 text-sm shadow-md ring-1 outline-hidden',
             className
           )}
           {...props}

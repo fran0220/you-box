@@ -18,10 +18,10 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import { useForm, type SubmitErrorHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, Loader2 } from 'lucide-react'
+import { Boxes, ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -50,24 +50,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  SideDrawerSection,
-  sideDrawerContentClassName,
-  sideDrawerFooterClassName,
-  sideDrawerFormClassName,
-  sideDrawerHeaderClassName,
-  sideDrawerSwitchItemClassName,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerLoadingState,
+  DrawerSection,
+  DrawerSectionHeader,
+  DrawerShell,
+  DrawerSwitchGroup,
+  DrawerSwitchRow,
 } from '@/components/drawer-layout'
 import { JsonEditor } from '@/components/json-editor'
 import { TagInput } from '@/components/tag-input'
@@ -142,11 +136,16 @@ export function ModelMutateDrawer({
   const vendors = vendorsData?.data?.items || []
 
   // Fetch model detail if editing
-  const { data: modelData } = useQuery({
+  const { data: modelData, isLoading: isModelDetailLoading } = useQuery({
     queryKey: modelsQueryKeys.detail(currentRow?.id || 0),
     queryFn: () => getModel(currentRow!.id),
     enabled: open && isEditing,
   })
+
+  // Show the loading skeleton while the edit-mode detail fetch is in flight so
+  // the form does not flash default values before `form.reset` runs (the reset
+  // is deferred to a microtask in the effect below).
+  const isEditDetailLoading = isEditing && (isModelDetailLoading || !modelData)
 
   // Fetch system options for ratio configuration
   const { data: systemOptionsData } = useSystemOptions()
@@ -614,10 +613,10 @@ export function ModelMutateDrawer({
           queryClient.invalidateQueries({ queryKey: ['system-options'] })
           onOpenChange(false)
         } else {
-          toast.error(response.message || 'Operation failed')
+          toast.error(response.message || t('Operation failed'))
         }
       } catch (error: unknown) {
-        toast.error((error as Error)?.message || 'Operation failed')
+        toast.error((error as Error)?.message || t('Operation failed'))
       } finally {
         setIsSubmitting(false)
       }
@@ -631,7 +630,39 @@ export function ModelMutateDrawer({
       oldModelName,
       modelSettings,
       updateOption,
+      t,
     ]
+  )
+
+  // On validation failure, reveal the pricing sub-mode that owns the invalid
+  // field so the highlighted control is actually mounted before the shared
+  // FormValidationFocus scroll runs. The advanced ratio fields live inside a
+  // collapsed Collapsible, so expand it too.
+  const onInvalid: SubmitErrorHandler<ExtendedModelFormValues> = useCallback(
+    (errors) => {
+      const perRequestField = errors.price
+      const ratioModeFields = errors.ratio || errors.completionRatio
+      const advancedFields =
+        errors.cacheRatio ||
+        errors.imageRatio ||
+        errors.audioRatio ||
+        errors.audioCompletionRatio
+
+      if (perRequestField) {
+        setPricingMode('per-request')
+      } else if (ratioModeFields || advancedFields) {
+        setPricingMode('per-token')
+        if (ratioModeFields) {
+          setPricingSubMode('ratio')
+        }
+        if (advancedFields) {
+          setAdvancedOpen(true)
+        }
+      }
+
+      toast.error(t('Please fix the highlighted fields before saving'))
+    },
+    [t]
   )
 
   const handleFillEndpointTemplate = (templateKey: string) => {
@@ -642,668 +673,675 @@ export function ModelMutateDrawer({
     }
   }
 
+  const drawerTitle = isEditing ? t('Edit Model') : t('Create Model')
+  const drawerDescription = isEditing
+    ? t("Update model configuration and click save when you're done.")
+    : t('Add a new model to the system by providing the necessary information.')
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className={sideDrawerContentClassName('sm:max-w-2xl')}>
-        <SheetHeader className={sideDrawerHeaderClassName()}>
-          <SheetTitle>
-            {isEditing ? t('Edit Model') : t('Create Model')}
-          </SheetTitle>
-          <SheetDescription>
-            {isEditing
-              ? t("Update model configuration and click save when you're done.")
-              : t(
-                  'Add a new model to the system by providing the necessary information.'
-                )}
-          </SheetDescription>
-        </SheetHeader>
+    <DrawerShell
+      open={open}
+      onOpenChange={onOpenChange}
+      size='lg'
+      ariaTitle={drawerTitle}
+      ariaDescription={drawerDescription}
+    >
+      <DrawerHeader
+        title={drawerTitle}
+        description={drawerDescription}
+        icon={<Boxes className='size-4' />}
+      />
 
-        <Form {...form}>
-          <form
-            id='model-form'
-            onSubmit={form.handleSubmit(
-              onSubmit as Parameters<typeof form.handleSubmit>[0]
-            )}
-            className={sideDrawerFormClassName()}
-          >
-            {/* Basic Information */}
-            <SideDrawerSection>
-              <h3 className='text-sm font-semibold'>
-                {t('Basic Information')}
-              </h3>
-
-              <FormField
-                control={form.control}
-                name='model_name'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Model Name *')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('gpt-4, claude-3-opus, etc.')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('The unique identifier for this model')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='description'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Description')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder={t('Describe this model...')}
-                        rows={3}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='icon'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Icon')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('OpenAI, Anthropic, etc.')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription className='text-xs'>
-                      {t('@lobehub/icons key')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='vendor_id'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Vendor')}</FormLabel>
-                    <Select
-                      items={[
-                        ...vendors.map((vendor) => ({
-                          value: String(vendor.id),
-                          label: vendor.name,
-                        })),
-                      ]}
-                      onValueChange={(value) =>
-                        field.onChange(value ? parseInt(value) : undefined)
-                      }
-                      value={field.value ? String(field.value) : undefined}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('Select vendor')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent alignItemWithTrigger={false}>
-                        <SelectGroup>
-                          {vendors.map((vendor) => (
-                            <SelectItem
-                              key={vendor.id}
-                              value={String(vendor.id)}
-                            >
-                              {vendor.name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='tags'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Tags')}</FormLabel>
-                    <FormControl>
-                      <TagInput
-                        value={field.value || []}
-                        onChange={field.onChange}
-                        placeholder={t('Add tags...')}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Press Enter or comma to add tags')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </SideDrawerSection>
-
-            {/* Matching Configuration */}
-            <SideDrawerSection>
-              <h3 className='text-sm font-semibold'>{t('Matching Rules')}</h3>
-
-              <FormField
-                control={form.control}
-                name='name_rule'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Name Rule')}</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={(value) =>
-                          field.onChange(parseInt(value))
-                        }
-                        value={String(field.value)}
-                        className='grid grid-cols-2 gap-4'
-                      >
-                        {getNameRuleOptions(t).map((option) => (
-                          <div
-                            key={option.value}
-                            className='flex items-center space-x-2'
-                          >
-                            <RadioGroupItem
-                              value={String(option.value)}
-                              id={`rule-${option.value}`}
-                            />
-                            <Label
-                              htmlFor={`rule-${option.value}`}
-                              className='cursor-pointer font-normal'
-                            >
-                              {option.label}
-                            </Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </FormControl>
-                    <FormDescription>
-                      {t('How this model name should match requests')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </SideDrawerSection>
-
-            {/* Endpoints Configuration */}
-            <SideDrawerSection>
-              <div className='flex items-center justify-between'>
-                <h3 className='text-sm font-semibold'>{t('Endpoints')}</h3>
-                <Select<string>
-                  items={[
-                    ...Object.keys(ENDPOINT_TEMPLATES).map((key) => ({
-                      value: key,
-                      label: key,
-                    })),
-                  ]}
-                  onValueChange={(v) =>
-                    v !== null && handleFillEndpointTemplate(v)
-                  }
-                >
-                  <SelectTrigger size='sm' className='w-[200px]'>
-                    <SelectValue placeholder={t('Load template...')} />
-                  </SelectTrigger>
-                  <SelectContent alignItemWithTrigger={false}>
-                    <SelectGroup>
-                      {Object.keys(ENDPOINT_TEMPLATES).map((key) => (
-                        <SelectItem key={key} value={key}>
-                          {key}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <FormField
-                control={form.control}
-                name='endpoints'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Endpoint Configuration')}</FormLabel>
-                    <FormControl>
-                      <JsonEditor
-                        value={field.value || ''}
-                        onChange={field.onChange}
-                        keyPlaceholder='endpoint_type'
-                        valuePlaceholder='{"path": "/v1/...", "method": "POST"}'
-                        keyLabel='Endpoint Type'
-                        valueLabel='Configuration'
-                        valueType='any'
-                        emptyMessage={t(
-                          'No endpoints configured. Switch to JSON mode or add rows to define endpoints.'
-                        )}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Define API endpoints for this model (JSON format)')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </SideDrawerSection>
-
-            {/* Pricing Configuration */}
-            <SideDrawerSection>
-              <h3 className='text-sm font-semibold'>
-                {t('Pricing Configuration')}
-              </h3>
-
-              <div className='space-y-4'>
-                <Label>{t('Pricing mode')}</Label>
-                <RadioGroup
-                  value={pricingMode}
-                  onValueChange={(value) =>
-                    setPricingMode(value as PricingMode)
-                  }
-                >
-                  <div className='flex items-center space-x-2'>
-                    <RadioGroupItem value='per-token' id='per-token' />
-                    <Label htmlFor='per-token' className='font-normal'>
-                      {t('Per-token (ratio based)')}
-                    </Label>
-                  </div>
-                  <div className='flex items-center space-x-2'>
-                    <RadioGroupItem value='per-request' id='per-request' />
-                    <Label htmlFor='per-request' className='font-normal'>
-                      {t('Per-request (fixed price)')}
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              {pricingMode === 'per-request' ? (
+      <Form {...form}>
+        <DrawerBody
+          asForm
+          formProps={{
+            id: 'model-form',
+            onSubmit: form.handleSubmit(
+              onSubmit as Parameters<typeof form.handleSubmit>[0],
+              onInvalid
+            ),
+          }}
+        >
+          {isEditDetailLoading ? (
+            <DrawerLoadingState
+              title={t('Loading model details')}
+              description={t(
+                'Please wait before editing to avoid overwriting saved values.'
+              )}
+            />
+          ) : (
+            <>
+              {/* Basic Information */}
+              <DrawerSection variant='card' title={t('Basic Information')}>
                 <FormField
                   control={form.control}
-                  name='price'
+                  name='model_name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('Fixed price (USD)')}</FormLabel>
+                      <FormLabel>{t('Model Name *')}</FormLabel>
                       <FormControl>
                         <Input
-                          type='text'
-                          placeholder='0.01'
+                          placeholder={t('gpt-4, claude-3-opus, etc.')}
                           {...field}
-                          onChange={(e) => {
-                            const value = e.target.value
-                            if (validateNumber(value)) {
-                              field.onChange(value)
-                            }
-                          }}
                         />
                       </FormControl>
                       <FormDescription>
-                        {t(
-                          'Cost in USD per request, regardless of tokens used.'
-                        )}
+                        {t('The unique identifier for this model')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              ) : (
-                <>
-                  <div className='space-y-4'>
-                    <Label>{t('Input mode')}</Label>
-                    <RadioGroup
-                      value={pricingSubMode}
-                      onValueChange={(value) =>
-                        setPricingSubMode(value as PricingSubMode)
-                      }
-                    >
-                      <div className='flex items-center space-x-2'>
-                        <RadioGroupItem value='ratio' id='ratio' />
-                        <Label htmlFor='ratio' className='font-normal'>
-                          {t('Ratio mode')}
-                        </Label>
-                      </div>
-                      <div className='flex items-center space-x-2'>
-                        <RadioGroupItem value='price' id='price' />
-                        <Label htmlFor='price' className='font-normal'>
-                          {t('Price mode (USD per 1M tokens)')}
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
 
-                  {pricingSubMode === 'ratio' ? (
-                    <>
-                      <FormField
-                        control={form.control}
-                        name='ratio'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('Model ratio')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='text'
-                                placeholder='1.0'
-                                {...field}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  if (validateNumber(value)) {
-                                    field.onChange(value)
-                                    if (value) {
-                                      setPromptPrice(
-                                        (parseFloat(value) * 2).toString()
-                                      )
-                                    } else {
-                                      setPromptPrice('')
-                                    }
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {field.value && !isNaN(parseFloat(field.value))
-                                ? `Calculated price: $${(parseFloat(field.value) * 2).toFixed(4)} per 1M tokens`
-                                : t('Multiplier for prompt tokens.')}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='completionRatio'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('Completion ratio')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='text'
-                                placeholder='1.0'
-                                {...field}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  if (validateNumber(value)) {
-                                    field.onChange(value)
-                                    const ratio = form.getValues('ratio')
-                                    if (value && ratio) {
-                                      const compPrice =
-                                        parseFloat(ratio) *
-                                        2 *
-                                        parseFloat(value)
-                                      setCompletionPrice(compPrice.toString())
-                                    } else {
-                                      setCompletionPrice('')
-                                    }
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {field.value &&
-                              !isNaN(parseFloat(field.value)) &&
-                              promptPrice &&
-                              !isNaN(parseFloat(promptPrice))
-                                ? `Calculated price: $${(parseFloat(promptPrice) * parseFloat(field.value)).toFixed(4)} per 1M tokens`
-                                : t('Multiplier for completion tokens.')}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <div className='space-y-4'>
-                        <div className='space-y-2'>
-                          <Label>{t('Prompt price ($/1M tokens)')}</Label>
-                          <Input
-                            type='text'
-                            placeholder='2.0'
-                            value={promptPrice}
-                            onChange={(e) =>
-                              handlePromptPriceChange(e.target.value)
-                            }
-                          />
-                          <p className='text-muted-foreground text-sm'>
-                            {promptPrice && !isNaN(parseFloat(promptPrice))
-                              ? `Calculated ratio: ${(parseFloat(promptPrice) / 2).toFixed(4)}`
-                              : t('Enter Input price to calculate ratio')}
-                          </p>
-                        </div>
-
-                        <div className='space-y-2'>
-                          <Label>{t('Completion price ($/1M tokens)')}</Label>
-                          <Input
-                            type='text'
-                            placeholder='4.0'
-                            value={completionPrice}
-                            onChange={(e) =>
-                              handleCompletionPriceChange(e.target.value)
-                            }
-                          />
-                          <p className='text-muted-foreground text-sm'>
-                            {completionPrice &&
-                            !isNaN(parseFloat(completionPrice)) &&
-                            promptPrice &&
-                            !isNaN(parseFloat(promptPrice)) &&
-                            parseFloat(promptPrice) > 0
-                              ? `Calculated ratio: ${(parseFloat(completionPrice) / parseFloat(promptPrice)).toFixed(4)}`
-                              : t('Enter Completion price to calculate ratio')}
-                          </p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  <Collapsible
-                    open={advancedOpen}
-                    onOpenChange={setAdvancedOpen}
-                  >
-                    <CollapsibleTrigger
-                      render={
-                        <Button
-                          type='button'
-                          variant='outline'
-                          className='flex w-full items-center justify-between'
+                <FormField
+                  control={form.control}
+                  name='description'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Description')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t('Describe this model...')}
+                          rows={3}
+                          {...field}
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='icon'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Icon')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('OpenAI, Anthropic, etc.')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription className='text-xs'>
+                        {t('@lobehub/icons key')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='vendor_id'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Vendor')}</FormLabel>
+                      <Select
+                        items={[
+                          ...vendors.map((vendor) => ({
+                            value: String(vendor.id),
+                            label: vendor.name,
+                          })),
+                        ]}
+                        onValueChange={(value) =>
+                          field.onChange(value ? parseInt(value) : undefined)
+                        }
+                        value={field.value ? String(field.value) : undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('Select vendor')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            {vendors.map((vendor) => (
+                              <SelectItem
+                                key={vendor.id}
+                                value={String(vendor.id)}
+                              >
+                                {vendor.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='tags'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Tags')}</FormLabel>
+                      <FormControl>
+                        <TagInput
+                          value={field.value || []}
+                          onChange={field.onChange}
+                          placeholder={t('Add tags...')}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t('Press Enter or comma to add tags')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DrawerSection>
+
+              {/* Matching Configuration */}
+              <DrawerSection variant='card' title={t('Matching Rules')}>
+                <FormField
+                  control={form.control}
+                  name='name_rule'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Name Rule')}</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) =>
+                            field.onChange(parseInt(value))
+                          }
+                          value={String(field.value)}
+                          className='grid grid-cols-2 gap-4'
+                        >
+                          {getNameRuleOptions(t).map((option) => (
+                            <div
+                              key={option.value}
+                              className='flex items-center space-x-2'
+                            >
+                              <RadioGroupItem
+                                value={String(option.value)}
+                                id={`rule-${option.value}`}
+                              />
+                              <Label
+                                htmlFor={`rule-${option.value}`}
+                                className='cursor-pointer font-normal'
+                              >
+                                {option.label}
+                              </Label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormDescription>
+                        {t('How this model name should match requests')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DrawerSection>
+
+              {/* Endpoints Configuration */}
+              <DrawerSection variant='card'>
+                <DrawerSectionHeader
+                  title={t('Endpoints')}
+                  actions={
+                    <Select<string>
+                      items={[
+                        ...Object.keys(ENDPOINT_TEMPLATES).map((key) => ({
+                          value: key,
+                          label: key,
+                        })),
+                      ]}
+                      onValueChange={(v) =>
+                        v !== null && handleFillEndpointTemplate(v)
                       }
                     >
-                      {t('Advanced options')}
-                      <ChevronDown
-                        className={`duration-fast h-4 w-4 transition-transform ${
-                          advancedOpen ? 'rotate-180' : ''
-                        }`}
-                      />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className='flex flex-col gap-4 pt-4'>
-                      <FormField
-                        control={form.control}
-                        name='cacheRatio'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('Cache ratio')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='text'
-                                placeholder='0.1'
-                                {...field}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  if (validateNumber(value)) {
-                                    field.onChange(value)
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {t('Discount ratio for cache hits.')}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <SelectTrigger size='sm' className='w-[200px]'>
+                        <SelectValue placeholder={t('Load template...')} />
+                      </SelectTrigger>
+                      <SelectContent alignItemWithTrigger={false}>
+                        <SelectGroup>
+                          {Object.keys(ENDPOINT_TEMPLATES).map((key) => (
+                            <SelectItem key={key} value={key}>
+                              {key}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  }
+                />
 
-                      <FormField
-                        control={form.control}
-                        name='imageRatio'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('Image ratio')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='text'
-                                placeholder='1.0'
-                                {...field}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  if (validateNumber(value)) {
-                                    field.onChange(value)
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {t('Multiplier for image processing.')}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='audioRatio'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('Audio ratio')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='text'
-                                placeholder='1.0'
-                                {...field}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  if (validateNumber(value)) {
-                                    field.onChange(value)
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {t('Multiplier for audio inputs.')}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='audioCompletionRatio'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('Audio completion ratio')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='text'
-                                placeholder='1.0'
-                                {...field}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  if (validateNumber(value)) {
-                                    field.onChange(value)
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {t('Multiplier for audio outputs.')}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </CollapsibleContent>
-                  </Collapsible>
-                </>
-              )}
-            </SideDrawerSection>
-
-            {/* Status & Sync */}
-            <SideDrawerSection>
-              <h3 className='text-sm font-semibold'>{t('Status & Sync')}</h3>
-
-              <FormField
-                control={form.control}
-                name='status'
-                render={({ field }) => (
-                  <FormItem className={sideDrawerSwitchItemClassName()}>
-                    <div className='flex flex-col gap-0.5'>
-                      <FormLabel className='text-base'>
-                        {t('Enabled')}
-                      </FormLabel>
+                <FormField
+                  control={form.control}
+                  name='endpoints'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Endpoint Configuration')}</FormLabel>
+                      <FormControl>
+                        <JsonEditor
+                          value={field.value || ''}
+                          onChange={field.onChange}
+                          keyPlaceholder='endpoint_type'
+                          valuePlaceholder='{"path": "/v1/...", "method": "POST"}'
+                          keyLabel='Endpoint Type'
+                          valueLabel='Configuration'
+                          valueType='any'
+                          emptyMessage={t(
+                            'No endpoints configured. Switch to JSON mode or add rows to define endpoints.'
+                          )}
+                        />
+                      </FormControl>
                       <FormDescription>
-                        {t('Enable or disable this model')}
+                        {t('Define API endpoints for this model (JSON format)')}
                       </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DrawerSection>
 
-              <FormField
-                control={form.control}
-                name='sync_official'
-                render={({ field }) => (
-                  <FormItem className={sideDrawerSwitchItemClassName()}>
-                    <div className='flex flex-col gap-0.5'>
-                      <FormLabel className='text-base'>
-                        {t('Official Sync')}
-                      </FormLabel>
-                      <FormDescription>
-                        {t('Sync this model with official upstream')}
-                      </FormDescription>
+              {/* Pricing Configuration */}
+              <DrawerSection variant='card' title={t('Pricing Configuration')}>
+                <div className='space-y-4'>
+                  <Label>{t('Pricing mode')}</Label>
+                  <RadioGroup
+                    value={pricingMode}
+                    onValueChange={(value) =>
+                      setPricingMode(value as PricingMode)
+                    }
+                  >
+                    <div className='flex items-center space-x-2'>
+                      <RadioGroupItem value='per-token' id='per-token' />
+                      <Label htmlFor='per-token' className='font-normal'>
+                        {t('Per-token (ratio based)')}
+                      </Label>
                     </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </SideDrawerSection>
-          </form>
-        </Form>
+                    <div className='flex items-center space-x-2'>
+                      <RadioGroupItem value='per-request' id='per-request' />
+                      <Label htmlFor='per-request' className='font-normal'>
+                        {t('Per-request (fixed price)')}
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
 
-        <SheetFooter className={sideDrawerFooterClassName()}>
-          <SheetClose
-            render={<Button variant='outline' disabled={isSubmitting} />}
-          >
-            {t('Cancel')}
-          </SheetClose>
-          <Button form='model-form' type='submit' disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-            {isEditing ? t('Update Model') : t('Save changes')}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+                {pricingMode === 'per-request' ? (
+                  <FormField
+                    control={form.control}
+                    name='price'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('Fixed price (USD)')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='text'
+                            placeholder='0.01'
+                            {...field}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              if (validateNumber(value)) {
+                                field.onChange(value)
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          {t(
+                            'Cost in USD per request, regardless of tokens used.'
+                          )}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <>
+                    <div className='space-y-4'>
+                      <Label>{t('Input mode')}</Label>
+                      <RadioGroup
+                        value={pricingSubMode}
+                        onValueChange={(value) =>
+                          setPricingSubMode(value as PricingSubMode)
+                        }
+                      >
+                        <div className='flex items-center space-x-2'>
+                          <RadioGroupItem value='ratio' id='ratio' />
+                          <Label htmlFor='ratio' className='font-normal'>
+                            {t('Ratio mode')}
+                          </Label>
+                        </div>
+                        <div className='flex items-center space-x-2'>
+                          <RadioGroupItem value='price' id='price' />
+                          <Label htmlFor='price' className='font-normal'>
+                            {t('Price mode (USD per 1M tokens)')}
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {pricingSubMode === 'ratio' ? (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name='ratio'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('Model ratio')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type='text'
+                                  placeholder='1.0'
+                                  {...field}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    if (validateNumber(value)) {
+                                      field.onChange(value)
+                                      if (value) {
+                                        setPromptPrice(
+                                          (parseFloat(value) * 2).toString()
+                                        )
+                                      } else {
+                                        setPromptPrice('')
+                                      }
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {field.value && !isNaN(parseFloat(field.value))
+                                  ? `Calculated price: $${(parseFloat(field.value) * 2).toFixed(4)} per 1M tokens`
+                                  : t('Multiplier for prompt tokens.')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name='completionRatio'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('Completion ratio')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type='text'
+                                  placeholder='1.0'
+                                  {...field}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    if (validateNumber(value)) {
+                                      field.onChange(value)
+                                      const ratio = form.getValues('ratio')
+                                      if (value && ratio) {
+                                        const compPrice =
+                                          parseFloat(ratio) *
+                                          2 *
+                                          parseFloat(value)
+                                        setCompletionPrice(compPrice.toString())
+                                      } else {
+                                        setCompletionPrice('')
+                                      }
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {field.value &&
+                                !isNaN(parseFloat(field.value)) &&
+                                promptPrice &&
+                                !isNaN(parseFloat(promptPrice))
+                                  ? `Calculated price: $${(parseFloat(promptPrice) * parseFloat(field.value)).toFixed(4)} per 1M tokens`
+                                  : t('Multiplier for completion tokens.')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div className='space-y-4'>
+                          <div className='space-y-2'>
+                            <Label>{t('Prompt price ($/1M tokens)')}</Label>
+                            <Input
+                              type='text'
+                              placeholder='2.0'
+                              value={promptPrice}
+                              onChange={(e) =>
+                                handlePromptPriceChange(e.target.value)
+                              }
+                            />
+                            <p className='text-muted-foreground text-sm'>
+                              {promptPrice && !isNaN(parseFloat(promptPrice))
+                                ? `Calculated ratio: ${(parseFloat(promptPrice) / 2).toFixed(4)}`
+                                : t('Enter Input price to calculate ratio')}
+                            </p>
+                          </div>
+
+                          <div className='space-y-2'>
+                            <Label>{t('Completion price ($/1M tokens)')}</Label>
+                            <Input
+                              type='text'
+                              placeholder='4.0'
+                              value={completionPrice}
+                              onChange={(e) =>
+                                handleCompletionPriceChange(e.target.value)
+                              }
+                            />
+                            <p className='text-muted-foreground text-sm'>
+                              {completionPrice &&
+                              !isNaN(parseFloat(completionPrice)) &&
+                              promptPrice &&
+                              !isNaN(parseFloat(promptPrice)) &&
+                              parseFloat(promptPrice) > 0
+                                ? `Calculated ratio: ${(parseFloat(completionPrice) / parseFloat(promptPrice)).toFixed(4)}`
+                                : t(
+                                    'Enter Completion price to calculate ratio'
+                                  )}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    <Collapsible
+                      open={advancedOpen}
+                      onOpenChange={setAdvancedOpen}
+                    >
+                      <CollapsibleTrigger
+                        render={
+                          <Button
+                            type='button'
+                            variant='outline'
+                            className='flex w-full items-center justify-between'
+                          />
+                        }
+                      >
+                        {t('Advanced options')}
+                        <ChevronDown
+                          className={`duration-fast h-4 w-4 transition-transform ${
+                            advancedOpen ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className='flex flex-col gap-4 pt-4'>
+                        <FormField
+                          control={form.control}
+                          name='cacheRatio'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('Cache ratio')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type='text'
+                                  placeholder='0.1'
+                                  {...field}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    if (validateNumber(value)) {
+                                      field.onChange(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('Discount ratio for cache hits.')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name='imageRatio'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('Image ratio')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type='text'
+                                  placeholder='1.0'
+                                  {...field}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    if (validateNumber(value)) {
+                                      field.onChange(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('Multiplier for image processing.')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name='audioRatio'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('Audio ratio')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type='text'
+                                  placeholder='1.0'
+                                  {...field}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    if (validateNumber(value)) {
+                                      field.onChange(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('Multiplier for audio inputs.')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name='audioCompletionRatio'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                {t('Audio completion ratio')}
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type='text'
+                                  placeholder='1.0'
+                                  {...field}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    if (validateNumber(value)) {
+                                      field.onChange(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('Multiplier for audio outputs.')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </>
+                )}
+              </DrawerSection>
+
+              {/* Status & Sync */}
+              <DrawerSection variant='card' title={t('Status & Sync')}>
+                <DrawerSwitchGroup>
+                  <FormField
+                    control={form.control}
+                    name='status'
+                    render={({ field }) => (
+                      <FormItem className='space-y-0'>
+                        <DrawerSwitchRow
+                          label={<FormLabel>{t('Enabled')}</FormLabel>}
+                          description={t('Enable or disable this model')}
+                          control={
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          }
+                        />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='sync_official'
+                    render={({ field }) => (
+                      <FormItem className='space-y-0'>
+                        <DrawerSwitchRow
+                          label={<FormLabel>{t('Official Sync')}</FormLabel>}
+                          description={t(
+                            'Sync this model with official upstream'
+                          )}
+                          control={
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          }
+                        />
+                      </FormItem>
+                    )}
+                  />
+                </DrawerSwitchGroup>
+              </DrawerSection>
+            </>
+          )}
+        </DrawerBody>
+      </Form>
+
+      <DrawerFooter
+        isSubmitting={isSubmitting}
+        submitLabel={isEditing ? t('Update Model') : t('Save changes')}
+        submittingLabel={t('Saving...')}
+        onCancel={() => onOpenChange(false)}
+        cancelLabel={t('Cancel')}
+        formId='model-form'
+      />
+    </DrawerShell>
   )
 }

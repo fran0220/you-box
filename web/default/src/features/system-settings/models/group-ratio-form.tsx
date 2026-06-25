@@ -49,7 +49,7 @@ import {
   sideDrawerContentClassName,
   sideDrawerFormClassName,
   sideDrawerHeaderClassName,
-} from '@/components/drawer-layout'
+} from '@/components/drawer-layout-classes'
 import {
   SettingsForm,
   SettingsSwitchContent,

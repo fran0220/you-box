@@ -16,14 +16,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
-  type PaginationState,
 } from '@tanstack/react-table'
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import {
   Table,
@@ -34,23 +33,30 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { TableSkeleton, TableEmpty } from '@/components/data-table'
-import { DataTablePagination } from '@/components/data-table/pagination'
-import { DEFAULT_PRICING_PAGE_SIZE, DEFAULT_TOKEN_UNIT } from '../constants'
-import type { PricingModel, TokenUnit } from '../types'
+import { DEFAULT_TOKEN_UNIT } from '../constants'
+import type { EnrichedPricingModel, TokenUnit } from '../types'
 import { usePricingColumns } from './pricing-columns'
 
 export interface PricingTableProps {
-  models: PricingModel[]
+  models: EnrichedPricingModel[]
   isLoading?: boolean
   priceRate?: number
   usdExchangeRate?: number
   tokenUnit?: TokenUnit
   showRechargePrice?: boolean
-  onModelClick?: (modelName: string) => void
+  sortBy: string
+  onSortChange: (value: string) => void
 }
 
+/**
+ * Optional dense comparison table (demoted from default). No pagination — the
+ * full filtered catalog renders at once (data is client-side); headers are
+ * genuinely sortable via the external catalog sort. Clicking a row navigates to
+ * the model detail page.
+ */
 export function PricingTable(props: PricingTableProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const {
     models,
     isLoading = false,
@@ -58,44 +64,43 @@ export function PricingTable(props: PricingTableProps) {
     usdExchangeRate = 1,
     tokenUnit = DEFAULT_TOKEN_UNIT,
     showRechargePrice = false,
-    onModelClick,
+    sortBy,
+    onSortChange,
   } = props
-
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: DEFAULT_PRICING_PAGE_SIZE,
-  })
 
   const columns = usePricingColumns({
     tokenUnit,
     priceRate,
     usdExchangeRate,
     showRechargePrice,
+    sortBy,
+    onSortChange,
   })
 
   const table = useReactTable({
     data: models,
     columns,
-    pageCount: Math.ceil(models.length / pagination.pageSize),
-    state: { pagination },
-    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: false,
+    // Sorting + filtering happen upstream in useFilters; the table only renders.
+    manualSorting: true,
+    manualPagination: true,
   })
 
   const handleRowClick = useCallback(
-    (model: PricingModel) => {
-      onModelClick?.(model.model_name)
+    (model: EnrichedPricingModel) => {
+      navigate({
+        to: '/pricing/$modelId',
+        params: { modelId: model.model_name },
+        // Retain catalog filter/sort/view/unit URL state across navigation.
+        search: (prev) => prev,
+      })
     },
-    [onModelClick]
+    [navigate]
   )
 
   return (
-    // @container/content gives DataTablePagination its responsive context
-    // (normally provided by the authenticated layout) on this public page
-    <div className='@container/content space-y-4'>
-      <div className='overflow-hidden rounded-lg border'>
+    <div className='@container/content'>
+      <div className='overflow-hidden rounded-xl border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -147,8 +152,6 @@ export function PricingTable(props: PricingTableProps) {
           </TableBody>
         </Table>
       </div>
-
-      {!isLoading && models.length > 0 && <DataTablePagination table={table} />}
     </div>
   )
 }

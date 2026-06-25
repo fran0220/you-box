@@ -73,7 +73,7 @@ import {
   sideDrawerFooterClassName,
   sideDrawerFormClassName,
   sideDrawerHeaderClassName,
-} from '@/components/drawer-layout'
+} from '@/components/drawer-layout-classes'
 import { StatusBadge } from '@/components/status-badge'
 import { formatResponseTime, handleTestChannel } from '../../lib'
 import { useChannels } from '../channels-provider'

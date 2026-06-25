@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Copy, Check, RefreshCw, Edit, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -46,6 +47,7 @@ export function MessageActions({
   alwaysVisible = false,
   className = '',
 }: MessageActionsProps) {
+  const { t } = useTranslation()
   const { copiedText, copyToClipboard } = useCopyToClipboard()
   const { guardAction } = useMessageActionGuard(isGenerating)
 
@@ -58,7 +60,7 @@ export function MessageActions({
 
   const handleCopy = () => {
     if (!content) {
-      toast.warning(MESSAGE_ACTION_LABELS.NO_CONTENT)
+      toast.warning(t(MESSAGE_ACTION_LABELS.NO_CONTENT))
       return
     }
     copyToClipboard(content)

@@ -103,10 +103,10 @@ export function VendorMutateDialog({
         queryClient.invalidateQueries({ queryKey: modelsQueryKeys.lists() })
         onOpenChange(false)
       } else {
-        toast.error(response.message || 'Operation failed')
+        toast.error(response.message || t('Operation failed'))
       }
     } catch (error: unknown) {
-      toast.error((error as Error)?.message || 'Operation failed')
+      toast.error((error as Error)?.message || t('Operation failed'))
     } finally {
       setIsSaving(false)
     }

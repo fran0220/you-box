@@ -202,7 +202,7 @@ export function ChannelsTable() {
 
   // Fetch channels data
   // eslint-disable-next-line @tanstack/query/exhaustive-deps
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: channelsQueryKeys.list({
       keyword: globalFilter,
       model: modelFilter,
@@ -409,6 +409,10 @@ export function ChannelsTable() {
       columns={columns}
       isLoading={isLoading}
       isFetching={isFetching}
+      isError={isError}
+      onRetry={() => {
+        void refetch()
+      }}
       emptyTitle={t('No Channels Found')}
       emptyDescription={t(
         'No channels available. Create your first channel to get started.'

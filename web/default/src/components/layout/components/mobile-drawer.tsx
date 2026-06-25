@@ -17,17 +17,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
-import { X, User, Wallet, LogOut } from 'lucide-react'
-import { AnimatePresence, m, type Variants } from 'motion/react'
+import { User, Wallet, LogOut } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { AuthUser } from '@/stores/auth-store'
 import useDialogState from '@/hooks/use-dialog'
 import { useUserDisplay } from '@/hooks/use-user-display'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SignOutDialog } from '@/components/sign-out-dialog'
-import { MOBILE_DRAWER_ANIMATION, MOBILE_DRAWER_CONFIG } from '../constants'
 import type { TopNavLink } from '../types'
 
 /**
@@ -183,8 +187,19 @@ export interface MobileDrawerProps {
 }
 
 /**
- * Mobile drawer component with bottom slide-up animation
- * Displays navigation links and user profile section
+ * Mobile navigation drawer.
+ *
+ * Re-hosted on the shared Base UI `Sheet` primitive (side="left") instead of a
+ * hand-rolled `motion` overlay. The Sheet supplies the full a11y contract that
+ * the old implementation lacked (B2): focus trap, scroll-lock, ESC-to-close,
+ * `role="dialog"`, and `aria-labelledby`/`aria-describedby` wiring (via the
+ * sr-only `SheetTitle`/`SheetDescription`). Surface uses the canonical `bg-card`
+ * token and the overlay uses `bg-[var(--overlay)]` + backdrop-blur (from the
+ * Sheet primitive), replacing the divergent `bg-black/50 backdrop-blur-sm`.
+ *
+ * The external prop contract (`isOpen`/`onClose` + nav content) is preserved;
+ * `onClose` fires whenever the Sheet requests dismissal (overlay click, ESC,
+ * close button, or link navigation).
  */
 export function MobileDrawer({
   isOpen,
@@ -199,96 +214,73 @@ export function MobileDrawer({
   user,
 }: MobileDrawerProps) {
   const { t } = useTranslation()
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Overlay */}
-          <m.div
-            className={MOBILE_DRAWER_CONFIG.overlayClassName}
-            initial='hidden'
-            animate='visible'
-            exit='exit'
-            variants={MOBILE_DRAWER_ANIMATION.overlay as Variants}
-            transition={{
-              duration: MOBILE_DRAWER_CONFIG.overlayTransitionDuration,
-            }}
-            onClick={onClose}
-          />
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
+      <SheetContent
+        side='left'
+        className='w-[88%] max-w-sm gap-0 p-4 md:hidden'
+      >
+        {/* Accessible name/description for the dialog. Kept visually hidden
+            because the in-flow brand logo serves as the visual heading. */}
+        <SheetTitle className='sr-only'>{t('Navigation menu')}</SheetTitle>
+        <SheetDescription className='sr-only'>
+          {t('Site navigation and account options')}
+        </SheetDescription>
 
-          {/* Drawer Content */}
-          <m.div
-            className={MOBILE_DRAWER_CONFIG.drawerClassName}
-            initial='hidden'
-            animate='visible'
-            exit='exit'
-            variants={MOBILE_DRAWER_ANIMATION.drawer as Variants}
-          >
-            <div className='flex flex-col gap-4'>
-              {/* Header with logo and close button */}
-              <div className='flex items-center justify-between'>
-                <BrandLogo
-                  homeUrl={homeUrl}
-                  displayLogo={displayLogo}
-                  displaySiteName={displaySiteName}
-                  loading={loading}
-                  logoLoaded={logoLoaded}
-                  onClick={onClose}
-                />
-                <Button
-                  variant='ghost'
-                  size='icon-sm'
-                  onClick={onClose}
-                  className='hover:text-primary cursor-pointer'
-                  aria-label={t('Close menu')}
-                >
-                  <X className='size-5' />
-                </Button>
-              </div>
+        <div className='flex flex-col gap-4'>
+          {/* Header with logo (the Sheet renders its own close button) */}
+          <div className='flex items-center justify-between'>
+            <BrandLogo
+              homeUrl={homeUrl}
+              displayLogo={displayLogo}
+              displaySiteName={displaySiteName}
+              loading={loading}
+              logoLoaded={logoLoaded}
+              onClick={onClose}
+            />
+          </div>
 
-              {/* Navigation links */}
-              <m.div
-                className='border-border mb-4 flex flex-col rounded-md border text-sm'
-                variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-              >
-                {loading ? (
-                  <div className='flex flex-col gap-1 p-2'>
-                    {Array.from({ length: 4 }, (_, i) => (
-                      <Skeleton key={i} className='h-8 w-full' />
-                    ))}
-                  </div>
-                ) : (
-                  <AnimatePresence>
-                    {mobileLinksList.map((link, index) => (
-                      <m.div
-                        key={`${link.href}-${index}`}
-                        className='border-border border-b p-2.5 last:border-b-0'
-                        variants={MOBILE_DRAWER_ANIMATION.menuItem as Variants}
-                      >
-                        <Link
-                          to={link.href}
-                          className='text-primary/60 hover:text-primary/80 transition-colors'
-                          onClick={onClose}
-                        >
-                          {link.title}
-                        </Link>
-                      </m.div>
-                    ))}
-                  </AnimatePresence>
-                )}
-              </m.div>
-
-              {/* User profile section */}
-              {showAuthButtons &&
-                (user ? (
-                  <MobileUserProfile user={user} onNavigate={onClose} />
-                ) : (
-                  <MobileSignInButton onNavigate={onClose} />
+          {/* Navigation links */}
+          <div className='border-border mb-4 flex flex-col rounded-md border text-sm'>
+            {loading ? (
+              <div className='flex flex-col gap-1 p-2'>
+                {Array.from({ length: 4 }, (_, i) => (
+                  <Skeleton key={i} className='h-8 w-full' />
                 ))}
-            </div>
-          </m.div>
-        </>
-      )}
-    </AnimatePresence>
+              </div>
+            ) : (
+              mobileLinksList.map((link, index) => (
+                <div
+                  key={`${link.href}-${index}`}
+                  className='border-border border-b p-2.5 last:border-b-0'
+                >
+                  <Link
+                    to={link.href}
+                    className='text-primary/60 hover:text-primary/80 transition-colors'
+                    onClick={onClose}
+                  >
+                    {link.title}
+                  </Link>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* User profile section */}
+          {showAuthButtons &&
+            (user ? (
+              <MobileUserProfile user={user} onNavigate={onClose} />
+            ) : (
+              <MobileSignInButton onNavigate={onClose} />
+            ))}
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }

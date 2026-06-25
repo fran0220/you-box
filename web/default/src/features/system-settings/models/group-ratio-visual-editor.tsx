@@ -63,7 +63,10 @@ type SimpleGroup = {
 type GroupPricingRow = {
   _id: string
   name: string
-  ratio: number
+  // Held as the raw input string while editing so in-progress decimals
+  // (e.g. "0." on the way to "0.5") aren't collapsed to 0 per keystroke;
+  // serializeGroupPricingRows normalizes it back to a number.
+  ratio: number | string
   selectable: boolean
   description: string
 }
@@ -908,6 +911,9 @@ function GroupPricingTable({
                           step={0.1}
                           value={String(row.ratio)}
                           onChange={(event) =>
+                            updateRow(row._id, 'ratio', event.target.value)
+                          }
+                          onBlur={(event) =>
                             updateRow(
                               row._id,
                               'ratio',

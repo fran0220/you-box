@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import i18next from 'i18next'
 import { useCallback, useRef, useState } from 'react'
 import { SSE } from 'sse.js'
 import { getCommonHeaders } from '@/lib/api'
@@ -120,7 +121,7 @@ export function useStreamRequest() {
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error('Failed to parse SSE message:', error)
-          handleError(ERROR_MESSAGES.PARSE_ERROR)
+          handleError(i18next.t(ERROR_MESSAGES.PARSE_ERROR))
         }
       })
 
@@ -129,7 +130,7 @@ export function useStreamRequest() {
         if (source.readyState !== 2) {
           // eslint-disable-next-line no-console
           console.error('SSE Error:', e)
-          let errorMessage = e.data || ERROR_MESSAGES.API_REQUEST_ERROR
+          let errorMessage = e.data || i18next.t(ERROR_MESSAGES.API_REQUEST_ERROR)
           let errorCode: string | undefined
           if (e.data) {
             try {
@@ -158,7 +159,9 @@ export function useStreamRequest() {
             status !== undefined &&
             status !== 200
           ) {
-            handleError(`HTTP ${status}: ${ERROR_MESSAGES.CONNECTION_CLOSED}`)
+            handleError(
+              `HTTP ${status}: ${i18next.t(ERROR_MESSAGES.CONNECTION_CLOSED)}`
+            )
           }
         }
       )
@@ -168,7 +171,7 @@ export function useStreamRequest() {
       } catch (error: unknown) {
         // eslint-disable-next-line no-console
         console.error('Failed to start SSE stream:', error)
-        onError(ERROR_MESSAGES.STREAM_START_ERROR)
+        onError(i18next.t(ERROR_MESSAGES.STREAM_START_ERROR))
         closeStream(streamId)
       }
     },
