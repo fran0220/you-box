@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute } from '@tanstack/react-router'
-import { Header } from '@/components/layout'
+import { Main } from '@/components/layout'
 import { ForbiddenError } from '@/features/errors/forbidden'
 import { GeneralError } from '@/features/errors/general-error'
 import { MaintenanceError } from '@/features/errors/maintenance-error'
@@ -41,11 +41,8 @@ function RouteComponent() {
   const ErrorComponent = errorMap[error] || NotFoundError
 
   return (
-    <>
-      <Header variant='app' />
-      <div className='flex-1 [&>div]:h-full'>
-        <ErrorComponent />
-      </div>
-    </>
+    <Main className='[&>div]:h-full'>
+      <ErrorComponent />
+    </Main>
   )
 }

@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { getSelf } from '@/lib/api'
-import { AuthenticatedLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 
 // 内存中的验证标记，避免同一会话中重复验证
 let sessionVerified = false
@@ -53,5 +53,9 @@ export const Route = createFileRoute('/_authenticated')({
       }
     }
   },
-  component: AuthenticatedLayout,
+  component: AuthenticatedAppLayout,
 })
+
+function AuthenticatedAppLayout() {
+  return <AppShell variant='app' />
+}
