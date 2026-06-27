@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ErrorPageShell } from './error-page-shell'
 
-const FEEDBACK_URL = 'https://github.com/QuantumNous/new-api/issues'
+const FEEDBACK_URL = '/about'
 
 type GeneralErrorProps = React.HTMLAttributes<HTMLDivElement> & {
   minimal?: boolean
