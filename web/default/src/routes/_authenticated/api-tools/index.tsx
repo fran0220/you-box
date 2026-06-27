@@ -17,17 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute } from '@tanstack/react-router'
-import { Main } from '@/components/layout'
 import { ApiTools } from '@/features/api-tools'
 
 export const Route = createFileRoute('/_authenticated/api-tools/')({
-  component: ApiToolsPage,
+  component: ApiTools,
 })
-
-function ApiToolsPage() {
-  return (
-    <Main>
-      <ApiTools />
-    </Main>
-  )
-}

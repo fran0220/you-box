@@ -27,6 +27,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import { SectionPageLayout } from '@/components/layout'
 import { getUserModels } from '@/features/playground/api'
 
 const PG = {
@@ -409,17 +410,16 @@ export function ApiTools() {
   })
 
   return (
-    <div className='mx-auto w-full max-w-3xl px-4 py-6'>
-      <header className='mb-5'>
-        <h1 className='text-xl font-semibold'>{t('API tools')}</h1>
-        <p className='text-muted-foreground mt-1 text-sm'>
+    <SectionPageLayout>
+      <SectionPageLayout.Title>{t('API tools')}</SectionPageLayout.Title>
+      <SectionPageLayout.Content>
+        <p className='text-muted-foreground mb-4 text-sm'>
           {t(
             'Try embeddings, image generation, and rerank against your configured models — authenticated with your session.'
           )}
         </p>
-      </header>
 
-      <Tabs defaultValue='embeddings'>
+        <Tabs defaultValue='embeddings'>
         <TabsList>
           <TabsTrigger value='embeddings' className='gap-1.5'>
             <Layers className='size-4' />
@@ -444,6 +444,7 @@ export function ApiTools() {
           <RerankTab models={models} />
         </TabsContent>
       </Tabs>
-    </div>
+      </SectionPageLayout.Content>
+    </SectionPageLayout>
   )
 }

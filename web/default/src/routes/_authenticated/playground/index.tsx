@@ -32,7 +32,7 @@ export const Route = createFileRoute('/_authenticated/playground/')({
 
 function PlaygroundPage() {
   return (
-    <Main className='p-0'>
+    <Main className='h-full min-h-0 p-0'>
       <Playground />
     </Main>
   )

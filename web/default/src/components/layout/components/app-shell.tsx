@@ -27,6 +27,7 @@ import {
   AppShellContent,
   type AppShellContentMode,
 } from './app-shell-content'
+import { AppContentScrollRestoration } from './app-content-scroll-restoration'
 import { AppSidebar } from './app-sidebar'
 import { Footer } from './footer'
 import { Header, type HeaderVariant } from './header'
@@ -61,6 +62,7 @@ export function AppShell(props: AppShellProps) {
     <LayoutProvider>
       <SearchProvider>
         <SidebarProvider defaultOpen={defaultOpen} className='flex-col'>
+          <AppContentScrollRestoration />
           <SkipToMain />
           <Header variant='app' />
           <div className='flex min-h-0 w-full flex-1'>

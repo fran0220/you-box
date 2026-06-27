@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Main } from '@/components/layout'
 import { ChatShell } from '@/features/chat/components/chat-shell'
 import { useActiveChatKey } from '@/features/chat/hooks/use-active-chat-key'
 import { useChatPresets } from '@/features/chat/hooks/use-chat-presets'
@@ -186,8 +187,10 @@ function ChatRouteComponent() {
   })()
 
   return (
-    <ChatShell activeChatId={chatId} preset={preset} resolvedUrl={iframeSrc}>
-      {content}
-    </ChatShell>
+    <Main className='h-full min-h-0 p-0'>
+      <ChatShell activeChatId={chatId} preset={preset} resolvedUrl={iframeSrc}>
+        {content}
+      </ChatShell>
+    </Main>
   )
 }
