@@ -16,16 +16,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Panel, PanelBody } from '@/components/patterns'
-import { getPerfMetrics } from '@/features/performance-metrics/api'
-import {
-  formatLatency,
-  formatThroughput,
-  formatUptimePct,
-} from '@/features/performance-metrics/lib/format'
 import { getDynamicPricingSummary } from '../lib/dynamic-price'
 import { isTokenBasedModel } from '../lib/model-helpers'
 import { formatFixedPrice, formatGroupPrice } from '../lib/price'
@@ -35,10 +28,8 @@ import type { PricingModel, TokenUnit } from '../types'
 // Spec card — display-font key numbers at the top of Overview.
 // ----------------------------------------------------------------------------
 //
-// Shows the base Input/Output (or per-request) price plus the live TPS /
-// latency / 24h success-rate metrics. Context window / max output are not
-// available from the pricing API, so only obtainable items render; the 24h
-// success rate is the availability signal.
+// Shows base Input/Output (or per-request) price from GET /api/pricing only.
+// Context window / max output are not in the pricing API, so they are omitted.
 
 function SpecItem(props: {
   label: React.ReactNode
@@ -72,11 +63,6 @@ export function ModelSpecCard(props: {
   showRechargePrice: boolean
 }) {
   const { t } = useTranslation()
-  const metricsQuery = useQuery({
-    queryKey: ['perf-metrics', props.model.model_name],
-    queryFn: () => getPerfMetrics(props.model.model_name, 24),
-    staleTime: 60 * 1000,
-  })
 
   const tokenUnitLabel = props.tokenUnit === 'K' ? '1K' : '1M'
   const baseGroupKey = '_base'
@@ -151,59 +137,6 @@ export function ModelSpecCard(props: {
         baseGroupRatioMap
       ),
     })
-  }
-
-  const groups = metricsQuery.data?.data.groups ?? []
-  if (groups.length > 0) {
-    const tpsValues = groups
-      .map((group) => group.avg_tps)
-      .filter((value) => value > 0)
-    const avgTps =
-      tpsValues.length > 0
-        ? tpsValues.reduce((sum, value) => sum + value, 0) / tpsValues.length
-        : 0
-    const latencyValues = groups
-      .map((group) => group.avg_latency_ms)
-      .filter((value) => value > 0)
-    const avgLatency =
-      latencyValues.length > 0
-        ? Math.round(
-            latencyValues.reduce((sum, value) => sum + value, 0) /
-              latencyValues.length
-          )
-        : 0
-    const successRates = groups
-      .map((group) => group.success_rate)
-      .filter((rate) => Number.isFinite(rate))
-    const successRate =
-      successRates.length > 0
-        ? successRates.reduce((sum, rate) => sum + rate, 0) /
-          successRates.length
-        : Number.NaN
-
-    items.push(
-      { key: 'tps', label: 'TPS', value: formatThroughput(avgTps) },
-      {
-        key: 'latency',
-        label: t('Average latency'),
-        value: formatLatency(avgLatency),
-      }
-    )
-
-    if (Number.isFinite(successRate)) {
-      let successIntent: 'default' | 'warning' | 'success' = 'warning'
-      if (successRate >= 99.9) {
-        successIntent = 'success'
-      } else if (successRate >= 99) {
-        successIntent = 'default'
-      }
-      items.push({
-        key: 'success',
-        label: t('Success rate'),
-        value: formatUptimePct(successRate),
-        intent: successIntent,
-      })
-    }
   }
 
   if (items.length === 0) return null

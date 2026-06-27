@@ -18,14 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo } from 'react'
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router'
-import {
-  ArrowLeft,
-  Boxes,
-  Code2,
-  HeartPulse,
-  Info,
-  LayoutGrid,
-} from 'lucide-react'
+import { ArrowLeft, Boxes, Code2, Info, LayoutGrid } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { Button } from '@/components/ui/button'
@@ -47,7 +40,6 @@ import { DynamicPricingBreakdown } from './dynamic-pricing-breakdown'
 import { ModelDetailsApi, ModelDetailsProviderInfo } from './model-details-api'
 import { ModelDetailsApps } from './model-details-apps'
 import { GroupPricingSection } from './model-details-group-pricing'
-import { ModelDetailsPerformance } from './model-details-performance'
 import { PriceSection } from './model-details-price'
 import { ModelDetailsProviders } from './model-details-providers'
 import { ModelSpecCard } from './model-details-spec-card'
@@ -134,7 +126,7 @@ function ModelHeader(props: { model: PricingModel }) {
   )
 }
 
-const TAB_VALUES = ['overview', 'providers', 'performance', 'apps', 'api'] as const
+const TAB_VALUES = ['overview', 'providers', 'apps', 'api'] as const
 type TabValue = (typeof TAB_VALUES)[number]
 
 const TAB_META: Record<
@@ -143,7 +135,6 @@ const TAB_META: Record<
 > = {
   overview: { icon: Info, labelKey: 'Overview' },
   providers: { icon: Boxes, labelKey: 'Providers' },
-  performance: { icon: HeartPulse, labelKey: 'Performance' },
   apps: { icon: LayoutGrid, labelKey: 'Apps' },
   api: { icon: Code2, labelKey: 'API' },
 }
@@ -173,7 +164,7 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
       <ModelHeader model={props.model} />
 
       <Tabs defaultValue='overview' className='gap-4'>
-        <TabsList className='bg-muted/60 grid w-full grid-cols-3 gap-1 rounded-lg p-1 group-data-horizontal/tabs:h-auto @md/details:grid-cols-5'>
+        <TabsList className='bg-muted/60 grid w-full grid-cols-2 gap-1 rounded-lg p-1 group-data-horizontal/tabs:h-auto @md/details:grid-cols-4'>
           {TAB_VALUES.map((value) => {
             const Icon = TAB_META[value].icon
             return (
@@ -235,10 +226,6 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
             tokenUnit={props.tokenUnit}
             showRechargePrice={showRechargePrice}
           />
-        </TabsContent>
-
-        <TabsContent value='performance' className='outline-none'>
-          <ModelDetailsPerformance model={props.model} />
         </TabsContent>
 
         <TabsContent value='apps' className='outline-none'>
@@ -379,7 +366,7 @@ export function ModelDetails() {
           className='text-muted-foreground hover:text-foreground mb-4 h-auto gap-1 px-0 py-1 text-xs'
         >
           <ArrowLeft className='size-3.5' />
-          {t('Back')}
+          {t('Back to Models')}
         </Button>
 
         <ModelDetailsContent
