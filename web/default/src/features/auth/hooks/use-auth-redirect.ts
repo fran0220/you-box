@@ -22,6 +22,7 @@ import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { getSelf } from '@/lib/api'
 import type { User } from '@/features/users/types'
+import { resolveAuthRedirectPath } from '@/lib/auth-redirect-path'
 import { saveUserId } from '../lib/storage'
 
 function getSavedLanguage(user: User): string | undefined {
@@ -101,8 +102,8 @@ export function useAuthRedirect() {
       i18n.changeLanguage(savedLang)
     }
 
-    // Navigate to target page
-    navigate({ to: redirectTo || '/dashboard', replace: true })
+    const target = resolveAuthRedirectPath(redirectTo)
+    navigate({ to: target, replace: true })
   }
 
   /**

@@ -80,17 +80,13 @@ export function useTopNavAuthPrompt() {
       if (link.requiresAuth) {
         event.preventDefault()
         options?.closeMobile?.()
-        setAuthPromptSecondsLeft(AUTH_PROMPT_SECONDS)
-        setAuthPromptTarget({
-          title: t(link.title),
-          href: link.href,
-        })
+        navigate({ to: '/sign-in', search: { redirect: link.href } })
         return
       }
 
       options?.closeMobile?.()
     },
-    [t]
+    [navigate]
   )
 
   return {
