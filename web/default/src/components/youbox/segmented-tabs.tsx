@@ -17,6 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 /**
- * @deprecated Import from `@/components/youbox` — canonical Eyebrow composition.
+ * Segmented (pill) tabs — canonical YouBox composition; implementation is the
+ * reskinned `ui/tabs` pill variant (`--surface-inset` track, active `--surface-2`).
  */
-export { Eyebrow, type EyebrowProps } from '@/components/youbox/eyebrow'
+export {
+  Tabs as SegmentedTabs,
+  TabsList as SegmentedTabsList,
+  TabsTrigger as SegmentedTabsTrigger,
+  TabsContent as SegmentedTabsContent,
+} from '@/components/ui/tabs'

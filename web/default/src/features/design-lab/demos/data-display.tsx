@@ -16,20 +16,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { Activity, Coins, Timer, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DeltaBadge,
-  Eyebrow,
   Metric,
   Panel,
   PanelBody,
   PanelHeader,
   ProgressBar,
   Sparkline,
-  StatCard,
-  StatCardRow,
 } from '@/components/patterns'
 import { DemoBlock, DemoRow } from '../components/demo-block'
 
@@ -39,67 +35,6 @@ const FLAT = [20, 22, 19, 21, 20, 23, 21, 22]
 export default function DataDisplayDemos() {
   return (
     <div className='flex flex-col gap-4'>
-      <DemoBlock
-        title='StatCard / StatCardRow'
-        description='label → display value + unit → sparkline → delta; md/sm; loading'
-      >
-        <DemoRow label='4-up row (md)' className='block'>
-          <StatCardRow columns={4}>
-            <StatCard
-              icon={<Activity />}
-              label='Requests'
-              value='1.28'
-              unit='M'
-              delta={{ direction: 'up', label: '+18% vs last week' }}
-            />
-            <StatCard
-              icon={<Coins />}
-              label='Spend'
-              value='$247.90'
-              delta={{ direction: 'up', label: '+12% vs last week' }}
-            />
-            <StatCard
-              icon={<Zap />}
-              label='Tokens'
-              value='842'
-              unit='M'
-              sparkline={TREND}
-            />
-            <StatCard
-              icon={<Timer />}
-              label='Avg latency'
-              value='0.46'
-              unit='s'
-              delta={{ direction: 'down', label: '−4%', tone: 'success' }}
-            />
-          </StatCardRow>
-        </DemoRow>
-        <DemoRow label='sm size' className='block'>
-          <StatCardRow columns={3} className='max-w-xl'>
-            <StatCard size='sm' label='Codes issued' value='1,240' />
-            <StatCard size='sm' label='Active' value='382' />
-            <StatCard size='sm' label='Value redeemed' value='$42.8K' />
-          </StatCardRow>
-        </DemoRow>
-        <DemoRow label='loading / flat delta' className='block'>
-          <StatCardRow columns={3} className='max-w-xl'>
-            <StatCard label='Loading' value='—' loading />
-            <StatCard
-              label='Models served'
-              value='312'
-              delta={{ direction: 'flat', label: '+0' }}
-            />
-            <StatCard
-              label='Sparkline (teal)'
-              value='99.98'
-              unit='%'
-              sparkline={FLAT}
-              sparklineColor='var(--accent)'
-            />
-          </StatCardRow>
-        </DemoRow>
-      </DemoBlock>
-
       <DemoBlock
         title='Panel'
         description='surface card + header (eyebrow/title/actions) + body; headless'
@@ -129,16 +64,6 @@ export default function DataDisplayDemos() {
               <div className='px-5 py-3 text-sm'>Row two</div>
             </PanelBody>
           </Panel>
-        </DemoRow>
-      </DemoBlock>
-
-      <DemoBlock
-        title='Eyebrow'
-        description='mono uppercase brand section label'
-      >
-        <DemoRow label='default / plain'>
-          <Eyebrow>balance</Eyebrow>
-          <Eyebrow plain>pay with</Eyebrow>
         </DemoRow>
       </DemoBlock>
 

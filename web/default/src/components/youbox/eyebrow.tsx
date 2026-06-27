@@ -16,7 +16,30 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { type ComponentProps } from 'react'
+import { cn } from '@/lib/utils'
+
+export type EyebrowProps = ComponentProps<'p'> & {
+  /** Hide the leading `// ` slashes when embedding in tight spots. */
+  plain?: boolean
+}
+
 /**
- * @deprecated Import from `@/components/youbox` — canonical Eyebrow composition.
+ * Eyebrow — mono uppercase micro-label in brand ink (`yb-eyebrow` tokens).
  */
-export { Eyebrow, type EyebrowProps } from '@/components/youbox/eyebrow'
+export function Eyebrow(props: EyebrowProps) {
+  const { plain, className, children, ...rest } = props
+  return (
+    <p
+      data-slot='youbox-eyebrow'
+      className={cn(
+        'text-brand m-0 font-mono text-[11px] font-medium tracking-[0.08em] uppercase',
+        className
+      )}
+      {...rest}
+    >
+      {plain ? null : <span aria-hidden='true'>{'// '}</span>}
+      {children}
+    </p>
+  )
+}
