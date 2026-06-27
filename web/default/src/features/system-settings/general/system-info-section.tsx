@@ -149,7 +149,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                       <FormControl>
                         <Input
                           className='w-60'
-                          placeholder={t('New API')}
+                          placeholder={t('BoxAI')}
                           {...field}
                         />
                       </FormControl>
@@ -259,7 +259,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                       <FormLabel>{t('Home Page Content')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={t('Welcome to our New API...')}
+                          placeholder={t('Welcome to BoxAI...')}
                           rows={6}
                           {...field}
                         />

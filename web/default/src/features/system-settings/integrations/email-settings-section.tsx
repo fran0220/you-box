@@ -267,7 +267,7 @@ export function EmailSettingsSection({
                       <Input
                         className='w-72 max-w-full'
                         autoComplete='off'
-                        placeholder={t('New API <noreply@example.com>')}
+                        placeholder={t('BoxAI <noreply@example.com>')}
                         {...field}
                         onChange={(event) => field.onChange(event.target.value)}
                       />

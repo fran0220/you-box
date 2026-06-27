@@ -403,7 +403,7 @@ export function genericBaseUrlField(
     label: t('Base URL'),
     placeholder: t(placeholderKey),
     description: t(
-      'Custom API base URL. For official channels, New API has built-in addresses. Only fill this for third-party proxy sites or special endpoints. Do not add /v1 or trailing slash.'
+      'Custom API base URL. For official channels, BoxAI has built-in addresses. Only fill this for third-party proxy sites or special endpoints. Do not add /v1 or trailing slash.'
     ),
   }
 }

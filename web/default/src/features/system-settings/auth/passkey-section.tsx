@@ -227,7 +227,7 @@ export function PasskeySection(props: PasskeySectionProps) {
                     <FormControl>
                       <Input
                         className='w-60 max-w-full'
-                        placeholder={t('e.g. New API Console')}
+                        placeholder={t('e.g. BoxAI Console')}
                         value={field.value ?? ''}
                         onChange={(event) => field.onChange(event.target.value)}
                         name={field.name}
