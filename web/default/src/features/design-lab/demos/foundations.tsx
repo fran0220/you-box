@@ -25,12 +25,12 @@ const SURFACES = [
   ['bg-surface-3', 'bg-surface-3'],
   ['bg-card', 'bg-card'],
   ['bg-brand-subtle', 'bg-brand-subtle'],
-  ['bg-teal-subtle', 'bg-teal-subtle'],
+  ['bg-success-subtle', 'bg-success-subtle'],
 ] as const
 
 const SEMANTIC = [
   ['brand', 'bg-brand'],
-  ['teal / accent', 'bg-teal'],
+  ['accent', 'bg-accent'],
   ['success', 'bg-success'],
   ['warning', 'bg-warning'],
   ['destructive', 'bg-destructive'],

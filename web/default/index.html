@@ -19,6 +19,21 @@
   </head>
 
   <body>
+    <script>
+      (function () {
+        var m = document.cookie.match(/(?:^|; )vite-ui-theme=([^;]*)/);
+        var t = m ? decodeURIComponent(m[1]) : 'dark';
+        var resolved =
+          t === 'system'
+            ? window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+            : t === 'light'
+              ? 'light'
+              : 'dark';
+        document.documentElement.classList.add(resolved);
+      })();
+    </script>
     <div id="root"></div>
   </body>
 </html>

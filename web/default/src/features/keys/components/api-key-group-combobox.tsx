@@ -61,7 +61,7 @@ function formatGroupRatio(
 
 function getRatioBadgeClassName(ratio: ApiKeyGroupOption['ratio']) {
   if (typeof ratio !== 'number') {
-    return 'border-teal/30 bg-teal-subtle text-teal'
+    return 'border-success/30 bg-success-subtle text-success'
   }
 
   if (ratio > 5) {
@@ -73,7 +73,7 @@ function getRatioBadgeClassName(ratio: ApiKeyGroupOption['ratio']) {
   if (ratio > 1) {
     return 'border-info/30 bg-info-subtle text-info'
   }
-  return 'border-teal/30 bg-teal-subtle text-teal'
+  return 'border-success/30 bg-success-subtle text-success'
 }
 
 function GroupRatioBadge({ ratio }: { ratio: ApiKeyGroupOption['ratio'] }) {

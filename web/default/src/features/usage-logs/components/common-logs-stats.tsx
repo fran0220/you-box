@@ -91,7 +91,7 @@ export function CommonLogsStats() {
         value={sensitiveVisible ? formatLogQuota(stats?.quota || 0) : '••••'}
         accent='bg-brand/80'
       />
-      <StatBadge label={t('RPM')} value={stats?.rpm || 0} accent='bg-teal/80' />
+      <StatBadge label={t('RPM')} value={stats?.rpm || 0} accent='bg-success/80' />
       <StatBadge label={t('TPM')} value={stats?.tpm || 0} accent='bg-info/70' />
     </div>
   )

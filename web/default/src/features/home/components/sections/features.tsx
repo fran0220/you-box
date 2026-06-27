@@ -69,14 +69,14 @@ export function Features(_props: FeaturesProps) {
         'Enterprise-grade security with comprehensive permission management'
       ),
       span: 'md:col-span-1',
-      icon: <Shield className='text-teal size-4' />,
+      icon: <Shield className='text-success size-4' />,
       visual: (
         <div className='mt-4 flex items-center justify-center'>
           <div className='relative'>
-            <div className='border-teal/20 bg-teal-subtle flex size-16 items-center justify-center rounded-2xl border'>
-              <Shield className='text-teal/70 size-7' strokeWidth={1.5} />
+            <div className='border-success/20 bg-success-subtle flex size-16 items-center justify-center rounded-2xl border'>
+              <Shield className='text-success/70 size-7' strokeWidth={1.5} />
             </div>
-            <div className='bg-teal absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full'>
+            <div className='bg-success absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full'>
               <svg
                 className='size-2.5 text-white'
                 fill='none'

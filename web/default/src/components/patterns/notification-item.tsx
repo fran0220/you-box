@@ -31,7 +31,7 @@ const notificationTileVariants = cva(
         warning: 'bg-warning-subtle text-warning',
         danger: 'bg-danger-subtle text-destructive',
         info: 'bg-info-subtle text-info',
-        accent: 'bg-teal-subtle text-teal',
+        accent: 'bg-accent-subtle text-accent',
       },
     },
     defaultVariants: { tone: 'brand' },

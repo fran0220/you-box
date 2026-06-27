@@ -124,7 +124,7 @@ export function Header(props: HeaderProps) {
           >
             <span
               aria-hidden='true'
-              className='bg-teal size-1.5 rounded-full'
+              className='bg-success size-1.5 rounded-full'
             />
             {formatQuota(quota)}
           </Link>

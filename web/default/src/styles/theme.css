@@ -17,20 +17,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 /*
- * YouBox theme foundation.
+ * YouBox theme foundation — monochrome ink ramp (dark-first).
  *
- * Token source: youboxdesign/ds/tokens (colors, typography, spacing,
- * effects). Dark-mode-first: the brand's home theme is the near-black warm
- * ink canvas; light is the compatibility theme. The raw ramps live in
- * `:root` and stay constant across themes — only the semantic aliases flip
- * between `:root` (light) and `.dark`, matching the app's `.dark`-class
- * theming convention.
+ * Token source: Design-system/_ds/.../tokens/colors.css. Raw ramps live in
+ * `:root` and stay theme-invariant. Semantic aliases flip between `.light`
+ * (compatibility) and `.dark` (brand home), matching ThemeProvider class
+ * toggling on `<html>`.
  */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* YouBox type system: Space Grotesk display, Hanken Grotesk UI/body,
-   * JetBrains Mono for code/eyebrows/numerics. */
   --font-sans:
     'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui,
     -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
@@ -40,9 +36,6 @@ For commercial licensing, please contact support@quantumnous.com
   --font-mono:
     'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo,
     Consolas, monospace;
-  /* Legacy font axes — kept resolvable so existing `font-serif` /
-   * `font-inter` / `font-manrope` utilities don't break; they all resolve
-   * to YouBox-approved stacks now. */
   --font-serif: Georgia, 'Times New Roman', 'Noto Serif SC', 'Songti SC', serif;
   --font-inter: var(--font-sans);
   --font-manrope: var(--font-sans);
@@ -61,6 +54,7 @@ For commercial licensing, please contact support@quantumnous.com
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-subtle: var(--accent-subtle);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
@@ -88,8 +82,6 @@ For commercial licensing, please contact support@quantumnous.com
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Brand layer — azure blue (#0090ff) is the primary accent; teal is the
-   * data/status support color and must never compete with the accent. */
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-active: var(--brand-active);
@@ -98,8 +90,6 @@ For commercial licensing, please contact support@quantumnous.com
   --color-brand-border: var(--brand-border);
   --color-teal: var(--teal);
   --color-teal-subtle: var(--teal-subtle);
-  /* Semantic status tints — first-class utilities for the bg-*-subtle pattern
-   * used across status badges, filter chips and callouts. */
   --color-success-subtle: var(--success-subtle);
   --color-warning-subtle: var(--warning-subtle);
   --color-danger-subtle: var(--danger-subtle);
@@ -117,7 +107,6 @@ For commercial licensing, please contact support@quantumnous.com
   --color-code: var(--code-bg);
   --color-code-border: var(--code-border);
 
-  /* YouBox radius scale: xs 4 / sm 6 / md 10 / lg 14 / xl 20 / 2xl 28. */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -128,13 +117,6 @@ For commercial licensing, please contact support@quantumnous.com
   --radius-4xl: 36px;
 }
 
-/* Motion easings — theme-invariant. Declared in @theme (not @theme inline)
- * so Tailwind both emits the :root custom properties AND generates the
- * `ease-out` / `ease-in-out` / `ease-spring` transition-timing-function
- * utilities. Those utilities also set `--tw-ease`, which tw-animate-css
- * reads, so the same curve drives CSS transitions, Tailwind utilities, and
- * `animate-in`/`animate-out` overlay animations. Durations live in :root
- * below and are wired to `duration-*` utilities in styles/index.css. */
 @theme {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -142,124 +124,112 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 :root {
-  /* -------- Raw ramps (theme-invariant) --------
-   * OpenRouter-inspired palette: accent = Radix Blue (azure; #0090ff is
-   * the signature solid, identical light & dark); neutral = Radix Sand
-   * (warm gray); semantics = Radix green / red / amber. The accent ramp
-   * keeps the historical `--azure-*` slot names so the rest of the token
-   * graph reads cleanly. */
-  --azure-50: #f4faff;
-  --azure-100: #e6f4fe;
-  --azure-200: #c2e5ff;
-  --azure-300: #8ec8f6;
-  --azure-400: #5eb1ef;
-  --azure-500: #0090ff;
-  --azure-600: #0588f0;
-  --azure-700: #0d74ce;
-  --azure-800: #0a5aa6;
-  --azure-900: #113264;
+  /* -------- Raw ramps (theme-invariant, monochrome DS) -------- */
+  --orange-50: #f4f3f1;
+  --orange-100: #e6e4e1;
+  --orange-200: #cfccc7;
+  --orange-300: #b4b0aa;
+  --orange-400: #97938c;
+  --orange-500: #807c75;
+  --orange-600: #6b6760;
+  --orange-700: #56524c;
+  --orange-800: #43403b;
+  --orange-900: #34312d;
 
-  --teal-50: #e6fbf6;
-  --teal-100: #c2f4e9;
-  --teal-200: #87e8d4;
-  --teal-300: #45d6bc;
-  --teal-400: #1fbea3;
-  --teal-500: #11a38c;
-  --teal-600: #0c8273;
-  --teal-700: #0c685d;
+  --teal-50: #f1f2f3;
+  --teal-100: #e2e4e6;
+  --teal-200: #c7cace;
+  --teal-300: #a7abb1;
+  --teal-400: #8b9097;
+  --teal-500: #71767d;
+  --teal-600: #595e64;
+  --teal-700: #474b50;
 
-  /* Warm neutral — anchored to Radix Sand (dark end = sand dark 1–8,
-   * light end = sand light 2–7) as one smooth dark→light continuum. */
-  --ink-950: #0c0c0b;
-  --ink-900: #111110;
-  --ink-850: #191918;
-  --ink-800: #222221;
-  --ink-750: #2a2a28;
-  --ink-700: #31312e;
-  --ink-600: #3b3a37;
-  --ink-500: #605e58;
-  --ink-400: #7c7b74;
-  --ink-300: #a3a29b;
-  --ink-200: #cfceca;
-  --ink-150: #dad9d6;
-  --ink-100: #e9e8e6;
-  --ink-50: #f1f0ef;
-  --ink-25: #f9f9f8;
+  --ink-950: #0b0b0f;
+  --ink-900: #101015;
+  --ink-850: #16161d;
+  --ink-800: #1c1c24;
+  --ink-750: #23232c;
+  --ink-700: #2c2c36;
+  --ink-600: #3b3b47;
+  --ink-500: #565663;
+  --ink-400: #74747f;
+  --ink-300: #9a9aa4;
+  --ink-200: #c2c2c9;
+  --ink-150: #d9d9de;
+  --ink-100: #e8e8eb;
+  --ink-50: #f4f4f3;
+  --ink-25: #fafaf8;
+  --white: #ffffff;
+  --black: #000000;
 
-  --green-500: #30a46c;
-  --green-600: #2b9a66;
-  --amber-500: #ffc53d;
-  --amber-600: #d9a200;
-  --red-500: #e5484d;
-  --red-600: #dc3e42;
-  --blue-500: #4d9fff;
-  --blue-600: #2d7fe0;
+  --green-500: #8a938c;
+  --green-600: #767e78;
+  --amber-500: #9a958b;
+  --amber-600: #847f75;
+  --red-500: #b5746e;
+  --red-600: #9e5f59;
+  --blue-500: #87909c;
+  --blue-600: #6f7884;
 
-  /* -------- Motion (YouBox effects tokens) --------
-   * Easings live in the @theme block above (so they also generate utilities).
-   * Durations are raw vars here; the matching `duration-instant/fast/base/slow`
-   * utilities are defined in styles/index.css (Tailwind v4 has no
-   * `--duration-*` theme namespace). Keep these in sync with EASE/DUR in
-   * src/lib/motion.ts — that file is the JS-side mirror of these tokens. */
   --dur-instant: 80ms;
   --dur-fast: 140ms;
   --dur-base: 220ms;
   --dur-slow: 400ms;
 
-  /* -------- Overlay layering (theme-invariant) --------
-   * Single source of truth for overlay stacking, consumed via
-   * `z-[var(--z-*)]` by every overlay primitive (dialog/sheet/drawer/
-   * popover/dropdown-menu/select/context-menu/tooltip/toast). These are
-   * structural (not color) tokens, so they live only in :root — no dark
-   * override needed.
-   *
-   * Tiering contract: anchored surfaces (popover/dropdown/select/tooltip)
-   * MUST sit ABOVE modal backdrops + panels so e.g. a Select opened inside a
-   * Sheet stays visible regardless of React portal mount order. The order is
-   * therefore: modal layer (50) < anchored menus & popovers (70) < tooltip
-   * (80) < toast (90). Nested modals (a dialog opened from within a
-   * sheet/drawer) intentionally share the modal layer and stack by portal
-   * mount order — the later-opened dialog mounts last and paints on top. */
-  --z-overlay: 50; /* modal backdrops + modal panels (dialog/sheet/drawer) */
-  --z-dropdown: 70; /* dropdown-menu / select / context-menu */
-  --z-popover: 70; /* popover */
-  --z-tooltip: 80; /* tooltip — always on top */
+  --z-overlay: 50;
+  --z-dropdown: 70;
+  --z-popover: 70;
+  --z-tooltip: 80;
   --z-toast: 90;
 
-  /* -------- Layout -------- */
   --radius: 14px;
   --app-header-height: 3rem;
   --nav-height: 64px;
-  /* Static build-channel fallback consumed when JS hasn't booted yet. */
   --app-rev: '2k6e8r7p';
-  /* Body face. The legacy font axis is frozen on the YouBox UI sans. */
   --font-body: var(--font-sans);
 
-  /* ============================================================
-     Semantic aliases — light theme (compatibility theme)
-     ============================================================ */
-  --brand: var(--azure-500);
-  --brand-hover: var(--azure-600);
-  --brand-active: var(--azure-700);
-  --brand-subtle: rgba(0, 144, 255, 0.1);
-  --brand-border: rgba(0, 144, 255, 0.32);
+  --control-sm: 32px;
+  --control-md: 40px;
+  --control-lg: 48px;
+}
+
+.light {
+  --brand: var(--ink-950);
+  --brand-hover: var(--ink-800);
+  --brand-active: var(--black);
+  --brand-subtle: rgba(15, 15, 20, 0.06);
+  --brand-border: rgba(15, 15, 20, 0.16);
   --brand-on: #ffffff;
-  --brand-ring: rgba(0, 144, 255, 0.32);
+  --brand-ring: rgba(15, 15, 20, 0.22);
   --teal: var(--teal-600);
-  --teal-subtle: rgba(17, 163, 140, 0.12);
+  --teal-subtle: rgba(15, 15, 20, 0.05);
+
+  --accent: var(--ink-500);
+  --accent-subtle: rgba(15, 15, 20, 0.06);
 
   --background: var(--ink-25);
   --foreground: var(--ink-900);
-  --surface: #ffffff;
+  --bg: var(--ink-25);
+  --surface: var(--white);
   --surface-2: var(--ink-50);
   --surface-3: var(--ink-100);
   --surface-hover: var(--ink-50);
   --surface-inset: var(--ink-50);
+  --surface-card: var(--white);
   --overlay: rgba(20, 20, 25, 0.45);
-  --card: #ffffff;
+  --card: var(--white);
   --card-foreground: var(--ink-900);
-  --popover: #ffffff;
+  --popover: var(--white);
   --popover-foreground: var(--ink-900);
+
+  --text: var(--ink-900);
+  --text-strong: var(--ink-950);
+  --text-secondary: var(--ink-500);
+  --text-muted: var(--ink-400);
+  --text-faint: var(--ink-300);
+  --text-on-brand: #ffffff;
+  --text-link: var(--ink-900);
 
   --primary: var(--brand);
   --primary-foreground: var(--brand-on);
@@ -267,42 +237,40 @@ For commercial licensing, please contact support@quantumnous.com
   --secondary-foreground: var(--ink-900);
   --muted: var(--ink-50);
   --muted-foreground: var(--ink-500);
-  --accent: var(--ink-50);
   --accent-foreground: var(--ink-900);
 
   --destructive: var(--red-600);
   --destructive-foreground: #ffffff;
   --success: var(--green-600);
-  --success-foreground: #ffffff;
+  --success-foreground: var(--ink-950);
   --warning: var(--amber-600);
-  --warning-foreground: #ffffff;
+  --warning-foreground: var(--ink-950);
   --info: var(--blue-600);
-  --info-foreground: #ffffff;
+  --info-foreground: var(--ink-950);
   --neutral: var(--ink-400);
   --neutral-foreground: var(--ink-900);
-  --success-subtle: rgba(40, 167, 69, 0.12);
-  --warning-subtle: rgba(214, 154, 26, 0.14);
-  --danger-subtle: rgba(222, 51, 38, 0.1);
-  --info-subtle: rgba(45, 127, 224, 0.12);
+  --success-subtle: rgba(15, 15, 20, 0.05);
+  --warning-subtle: rgba(15, 15, 20, 0.05);
+  --danger-subtle: rgba(158, 95, 89, 0.1);
+  --info-subtle: rgba(15, 15, 20, 0.05);
 
-  --border: rgba(33, 32, 28, 0.12);
-  --border-strong: rgba(33, 32, 28, 0.2);
-  --border-faint: rgba(33, 32, 28, 0.06);
-  --divider: rgba(33, 32, 28, 0.09);
-  --input: rgba(33, 32, 28, 0.18);
+  --border: rgba(15, 15, 20, 0.1);
+  --border-strong: rgba(15, 15, 20, 0.18);
+  --border-faint: rgba(15, 15, 20, 0.05);
+  --divider: rgba(15, 15, 20, 0.08);
+  --input: rgba(15, 15, 20, 0.16);
   --ring: var(--brand-ring);
-  --field-bg: #ffffff;
-  --field-border: rgba(33, 32, 28, 0.18);
+  --field-bg: var(--white);
+  --field-border: rgba(15, 15, 20, 0.16);
   --field-placeholder: var(--ink-300);
-  --code-bg: #f5f4f2;
-  --code-border: rgba(33, 32, 28, 0.1);
+  --code-bg: #f7f7f4;
+  --code-border: rgba(15, 15, 20, 0.1);
 
-  /* Charts: azure/teal lead; grid stays low-contrast. */
-  --chart-1: var(--azure-500);
-  --chart-2: var(--teal-600);
-  --chart-3: var(--blue-600);
+  --chart-1: var(--ink-700);
+  --chart-2: var(--ink-500);
+  --chart-3: var(--ink-400);
   --chart-4: var(--amber-600);
-  --chart-5: var(--ink-400);
+  --chart-5: var(--ink-300);
 
   --sidebar: var(--ink-25);
   --sidebar-foreground: var(--ink-900);
@@ -322,36 +290,46 @@ For commercial licensing, please contact support@quantumnous.com
   --shadow-lg: 0 20px 50px rgba(20, 20, 25, 0.12);
   --shadow-xl: 0 32px 80px rgba(20, 20, 25, 0.16);
   --glow-brand:
-    0 0 0 1px var(--brand-border), 0 8px 24px rgba(0, 144, 255, 0.16);
-  --glow-soft: 0 0 40px rgba(0, 144, 255, 0.1);
+    0 0 0 1px var(--brand-border), 0 6px 20px rgba(15, 15, 20, 0.12);
+  --glow-soft: 0 0 40px rgba(15, 15, 20, 0.06);
 }
 
 .dark {
-  /* ============================================================
-     Semantic aliases — dark theme (the brand's home)
-     ============================================================ */
-  --brand: var(--azure-500);
-  --brand-hover: #3b9eff;
-  --brand-active: var(--azure-600);
-  --brand-subtle: rgba(0, 144, 255, 0.16);
-  --brand-border: rgba(0, 144, 255, 0.4);
-  --brand-on: #ffffff;
-  --brand-ring: rgba(0, 144, 255, 0.4);
+  --brand: var(--ink-50);
+  --brand-hover: var(--white);
+  --brand-active: var(--ink-200);
+  --brand-subtle: rgba(255, 255, 255, 0.08);
+  --brand-border: rgba(255, 255, 255, 0.16);
+  --brand-on: var(--ink-950);
+  --brand-ring: rgba(255, 255, 255, 0.22);
   --teal: var(--teal-400);
-  --teal-subtle: rgba(31, 190, 163, 0.14);
+  --teal-subtle: rgba(255, 255, 255, 0.06);
+
+  --accent: var(--ink-300);
+  --accent-subtle: rgba(255, 255, 255, 0.06);
 
   --background: var(--ink-950);
   --foreground: var(--ink-50);
+  --bg: var(--ink-950);
   --surface: var(--ink-850);
   --surface-2: var(--ink-800);
   --surface-3: var(--ink-750);
   --surface-hover: var(--ink-800);
   --surface-inset: var(--ink-900);
+  --surface-card: var(--ink-850);
   --overlay: rgba(7, 7, 10, 0.72);
   --card: var(--ink-850);
   --card-foreground: var(--ink-50);
   --popover: var(--ink-800);
   --popover-foreground: var(--ink-50);
+
+  --text: var(--ink-50);
+  --text-strong: var(--white);
+  --text-secondary: var(--ink-300);
+  --text-muted: var(--ink-400);
+  --text-faint: var(--ink-500);
+  --text-on-brand: var(--brand-on);
+  --text-link: var(--ink-100);
 
   --primary: var(--brand);
   --primary-foreground: var(--brand-on);
@@ -359,23 +337,22 @@ For commercial licensing, please contact support@quantumnous.com
   --secondary-foreground: var(--ink-100);
   --muted: var(--ink-800);
   --muted-foreground: var(--ink-300);
-  --accent: var(--ink-750);
   --accent-foreground: var(--ink-100);
 
   --destructive: var(--red-500);
   --destructive-foreground: #ffffff;
   --success: var(--green-500);
-  --success-foreground: #102015;
+  --success-foreground: var(--ink-50);
   --warning: var(--amber-500);
-  --warning-foreground: #201a08;
+  --warning-foreground: var(--ink-50);
   --info: var(--blue-500);
-  --info-foreground: #0a1626;
+  --info-foreground: var(--ink-50);
   --neutral: var(--ink-400);
   --neutral-foreground: var(--ink-100);
-  --success-subtle: rgba(52, 199, 89, 0.15);
-  --warning-subtle: rgba(240, 180, 41, 0.15);
-  --danger-subtle: rgba(245, 72, 59, 0.15);
-  --info-subtle: rgba(77, 159, 255, 0.15);
+  --success-subtle: rgba(255, 255, 255, 0.06);
+  --warning-subtle: rgba(255, 255, 255, 0.06);
+  --danger-subtle: rgba(181, 116, 110, 0.15);
+  --info-subtle: rgba(255, 255, 255, 0.06);
 
   --border: rgba(255, 255, 255, 0.09);
   --border-strong: rgba(255, 255, 255, 0.16);
@@ -386,12 +363,12 @@ For commercial licensing, please contact support@quantumnous.com
   --field-bg: var(--ink-900);
   --field-border: rgba(255, 255, 255, 0.12);
   --field-placeholder: var(--ink-500);
-  --code-bg: #0e0e0d;
+  --code-bg: #0c0c11;
   --code-border: rgba(255, 255, 255, 0.08);
 
-  --chart-1: var(--azure-500);
-  --chart-2: var(--teal-400);
-  --chart-3: var(--blue-500);
+  --chart-1: var(--ink-300);
+  --chart-2: var(--ink-500);
+  --chart-3: var(--ink-600);
   --chart-4: var(--amber-500);
   --chart-5: var(--ink-400);
 
@@ -413,6 +390,6 @@ For commercial licensing, please contact support@quantumnous.com
   --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.55);
   --shadow-xl: 0 32px 80px rgba(0, 0, 0, 0.6);
   --glow-brand:
-    0 0 0 1px var(--brand-border), 0 6px 24px rgba(0, 144, 255, 0.24);
-  --glow-soft: 0 0 40px rgba(0, 144, 255, 0.14);
+    0 0 0 1px var(--brand-border), 0 6px 20px rgba(255, 255, 255, 0.1);
+  --glow-soft: 0 0 40px rgba(255, 255, 255, 0.06);
 }
