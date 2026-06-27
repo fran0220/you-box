@@ -234,7 +234,10 @@ export function Pricing() {
         </div>
 
         {/* Sticky control strip: search + toolbar + pills */}
-        <div className='bg-background/80 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-10 -mx-3 mb-4 space-y-2.5 px-3 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 xl:-mx-8 xl:px-8'>
+        <div
+          data-pricing-control-strip
+          className='bg-background/80 supports-[backdrop-filter]:bg-background/70 sticky top-[var(--app-header-height,3rem)] z-10 -mx-3 mb-4 space-y-2.5 px-3 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 xl:-mx-8 xl:px-8'
+        >
           <div className='flex flex-col gap-2.5 lg:flex-row lg:items-center'>
             <SearchBar
               value={searchInput}
