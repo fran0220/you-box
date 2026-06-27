@@ -23,14 +23,14 @@
       (function () {
         var m = document.cookie.match(/(?:^|; )vite-ui-theme=([^;]*)/);
         var t = m ? decodeURIComponent(m[1]) : 'dark';
-        var resolved =
-          t === 'system'
-            ? window.matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light'
-            : t === 'light'
-              ? 'light'
-              : 'dark';
+        var resolved = 'dark';
+        if (t === 'light') {
+          resolved = 'light';
+        } else if (t === 'system') {
+          resolved = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+        }
         document.documentElement.classList.add(resolved);
       })();
     </script>

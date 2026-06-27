@@ -36,7 +36,12 @@ describe('design-lab registry', () => {
       found.add(match[1])
     }
     for (const id of DESIGN_LAB_GALLERY_MARKER_IDS) {
-      expect(found, `missing data-design-lab="${id}"`).toContain(id)
+      expect(
+        combined.includes(`data-design-lab='${id}'`) ||
+          combined.includes(`data-design-lab="${id}"`),
+        `missing data-design-lab marker for id "${id}"`
+      ).toBe(true)
+      expect(found, `regex did not capture marker id "${id}"`).toContain(id)
     }
     expect(DESIGN_LAB_GALLERY_MARKER_IDS).toHaveLength(23)
     expect(found.size).toBe(DESIGN_LAB_GALLERY_MARKER_IDS.length)

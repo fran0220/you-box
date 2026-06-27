@@ -16,7 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { type ComponentProps, type ReactNode } from 'react'
+import {
+  type ComponentProps,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -56,16 +60,44 @@ export function ModelCard(props: ModelCardProps) {
     interactive = true,
     className,
     children,
+    onClick,
+    onKeyDown,
+    role,
+    tabIndex,
     ...rest
   } = props
+
+  const isClickable = onClick != null
+  const showInteractiveChrome = interactive || isClickable
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(event)
+    if (event.defaultPrevented || !isClickable) {
+      return
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onClick(
+        event as unknown as Parameters<
+          NonNullable<ModelCardProps['onClick']>
+        >[0]
+      )
+    }
+  }
 
   return (
     <div
       data-slot='youbox-model-card'
+      role={isClickable ? (role ?? 'button') : role}
+      tabIndex={isClickable ? (tabIndex ?? 0) : tabIndex}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
       className={cn(
         'bg-card border-border flex flex-col rounded-lg border p-4 transition-[border-color,box-shadow,transform] duration-base ease-out',
-        interactive &&
-          'hover:border-brand-border hover:shadow-[var(--glow-brand)] motion-safe:hover:-translate-y-0.5 cursor-pointer',
+        showInteractiveChrome &&
+          'hover:border-brand-border hover:shadow-[var(--glow-brand)] motion-safe:hover:-translate-y-0.5',
+        isClickable &&
+          'cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
         className
       )}
       {...rest}
