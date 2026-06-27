@@ -238,8 +238,8 @@ export function ModelCompare() {
 
   if (isLoading) {
     return (
-      <AppShell variant='public' contentMode='fluid'>
-        <div className='mx-auto w-full max-w-[1400px] px-3 pb-8 sm:px-6'>
+      <AppShell variant='public'>
+        <div className='pb-8'>
           <LoadingSkeleton viewMode='table' />
         </div>
       </AppShell>
@@ -247,8 +247,8 @@ export function ModelCompare() {
   }
 
   return (
-    <AppShell variant='public' contentMode='fluid'>
-      <PageTransition className='mx-auto w-full max-w-[1400px] px-3 pb-10 sm:px-6'>
+    <AppShell variant='public'>
+      <PageTransition className='pb-10'>
         <div className='mb-6'>
           <p className='yb-eyebrow mb-3'>
             {'// '}

@@ -197,8 +197,8 @@ export function Pricing() {
 
   if (isLoading) {
     return (
-      <AppShell variant='public' contentMode='fluid'>
-        <div className='mx-auto w-full max-w-[1600px] px-3 pb-8 sm:px-6 xl:px-8'>
+      <AppShell variant='public'>
+        <div className='pb-8'>
           <LoadingSkeleton viewMode={viewMode} />
         </div>
       </AppShell>
@@ -206,8 +206,8 @@ export function Pricing() {
   }
 
   return (
-    <AppShell variant='public' contentMode='fluid'>
-      <PageTransition className='mx-auto w-full max-w-[1600px] px-3 pb-10 sm:px-6 xl:px-8'>
+    <AppShell variant='public'>
+      <PageTransition className='pb-10'>
         <div className='mb-4 flex flex-wrap items-end justify-between gap-3'>
           <div>
             <h1 className='font-display text-2xl font-bold tracking-[-0.02em] sm:text-3xl'>
@@ -236,7 +236,7 @@ export function Pricing() {
         {/* Sticky control strip: search + toolbar + pills */}
         <div
           data-pricing-control-strip
-          className='bg-background/80 supports-[backdrop-filter]:bg-background/70 sticky top-[var(--app-header-height,3rem)] z-10 -mx-3 mb-4 space-y-2.5 px-3 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 xl:-mx-8 xl:px-8'
+          className='bg-background/80 supports-[backdrop-filter]:bg-background/70 sticky top-[var(--app-header-height,3rem)] z-10 -mx-4 mb-4 space-y-2.5 px-4 py-2.5 backdrop-blur md:-mx-6 md:px-6'
         >
           <div className='flex flex-col gap-2.5 lg:flex-row lg:items-center'>
             <SearchBar

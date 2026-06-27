@@ -32,8 +32,8 @@ export function AppsRankings() {
   })
 
   return (
-    <AppShell variant='public' contentMode='fluid'>
-      <PageTransition className='mx-auto w-full max-w-3xl px-3 pb-12 sm:px-6'>
+    <AppShell variant='public'>
+      <PageTransition className='pb-12'>
         <div className='mb-6'>
           <p className='yb-eyebrow mb-3'>
             {'// '}

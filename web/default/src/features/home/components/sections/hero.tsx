@@ -82,7 +82,7 @@ export function Hero(props: HeroProps) {
   }
 
   return (
-    <section className='relative z-10 overflow-hidden px-6 pt-24 pb-16 md:pt-32 md:pb-24 lg:pt-36 lg:pb-28'>
+    <section className='relative z-10 overflow-hidden pt-16 pb-12 md:pt-24 md:pb-20 lg:pt-28 lg:pb-24'>
       {/* YouBox hero brand glow — the single decorative move on the flat ink canvas */}
       <m.div
         aria-hidden

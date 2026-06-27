@@ -31,8 +31,8 @@ export function Home() {
 
   if (!isLoaded) {
     return (
-      <AppShell variant='public' contentMode='bare'>
-        <div className='flex flex-1 items-center justify-center'>
+      <AppShell variant='public'>
+        <div className='flex min-h-[50vh] flex-1 items-center justify-center'>
           <div className='text-muted-foreground'>{t('Loading...')}</div>
         </div>
       </AppShell>
@@ -41,7 +41,7 @@ export function Home() {
 
   if (content) {
     return (
-      <AppShell variant='public' contentMode='bare'>
+      <AppShell variant='public'>
         <div className='overflow-x-hidden'>
           {isUrl ? (
             <iframe
@@ -50,7 +50,7 @@ export function Home() {
               title={t('Custom Home Page')}
             />
           ) : (
-            <div className='mx-auto max-w-7xl px-4 py-8 md:px-6'>
+            <div className='py-2'>
               <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
                 <Markdown className='custom-home-content'>{content}</Markdown>
               </div>
@@ -62,7 +62,7 @@ export function Home() {
   }
 
   return (
-    <AppShell variant='public' contentMode='bare'>
+    <AppShell variant='public'>
       <Hero isAuthenticated={isAuthenticated} />
       <Stats />
       <Features />

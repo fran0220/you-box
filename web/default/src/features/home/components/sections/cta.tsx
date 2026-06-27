@@ -35,7 +35,7 @@ export function CTA(props: CTAProps) {
   }
 
   return (
-    <section className='relative z-10 overflow-hidden px-6 py-24 md:py-32'>
+    <section className='relative z-10 overflow-hidden py-24 md:py-32'>
       <AnimateInView className='mx-auto max-w-4xl' animation='scale-in'>
         <div className='border-brand-border bg-card relative overflow-hidden rounded-2xl border px-8 py-14 text-center shadow-[var(--glow-soft)] md:px-14'>
           <div

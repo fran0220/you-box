@@ -171,8 +171,8 @@ export function ApiDocs() {
   }
 
   return (
-    <AppShell variant='public' contentMode='fluid'>
-      <PageTransition className='mx-auto w-full max-w-[1200px] px-3 pb-12 sm:px-6'>
+    <AppShell variant='public'>
+      <PageTransition className='pb-12'>
         <div className='mb-6'>
           <p className='yb-eyebrow mb-3'>{'// '}API</p>
           <h1 className='font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] font-bold tracking-[-0.03em]'>

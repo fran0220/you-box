@@ -51,7 +51,7 @@ export function AppShell(props: AppShellProps) {
         <AppShellContent mode={contentMode}>
           {props.children}
         </AppShellContent>
-        {showFooter ? <Footer className='max-w-7xl' /> : null}
+        {showFooter ? <Footer /> : null}
       </div>
     )
   }

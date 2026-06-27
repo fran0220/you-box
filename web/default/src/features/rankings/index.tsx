@@ -55,7 +55,7 @@ export function Rankings() {
   }
 
   return (
-    <AppShell variant='public' contentMode='fluid'>
+    <AppShell variant='public'>
       <div className='relative'>
         <div
           aria-hidden
@@ -65,7 +65,7 @@ export function Rankings() {
               'radial-gradient(circle, color-mix(in oklch, var(--brand) 14%, transparent), transparent 62%)',
           }}
         />
-        <PageTransition className='relative mx-auto w-full max-w-[1280px] space-y-8 px-3 pb-10 sm:px-6 sm:pb-12 xl:px-8'>
+        <PageTransition className='relative space-y-8 pb-10 sm:pb-12'>
           <RankingsHero period={period} onPeriodChange={handlePeriodChange} />
 
           {rankingsQuery.isLoading ? (

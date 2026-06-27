@@ -93,7 +93,7 @@ export function About() {
   if (isLoading) {
     return (
       <AppShell variant='public'>
-        <div className='mx-auto flex max-w-4xl flex-col gap-4 py-12'>
+        <div className='flex flex-col gap-4 py-6'>
           <Skeleton className='h-8 w-[45%]' />
           <Skeleton className='h-4 w-full' />
           <Skeleton className='h-4 w-[90%]' />
@@ -113,7 +113,7 @@ export function About() {
 
   if (isUrl) {
     return (
-      <AppShell variant='public' contentMode='fluid'>
+      <AppShell variant='public'>
         <iframe
           src={rawContent}
           className='min-h-[calc(100svh-var(--app-header-height,3rem))] w-full border-0'
@@ -125,8 +125,8 @@ export function About() {
 
   return (
     <AppShell variant='public'>
-      <div className='mx-auto max-w-6xl px-4 py-8'>
-        <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
+      <div className='py-2'>
+        <div className='bg-card border-border mx-auto max-w-6xl rounded-lg border p-6 md:p-10'>
           {isHtml ? (
             <div
               className='prose prose-neutral dark:prose-invert max-w-none'
