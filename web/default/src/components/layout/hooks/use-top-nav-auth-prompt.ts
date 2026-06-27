@@ -18,7 +18,6 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
 import type { TopNavLink } from '../types'
 
 const AUTH_PROMPT_SECONDS = 5
@@ -29,7 +28,6 @@ type AuthPromptTarget = {
 }
 
 export function useTopNavAuthPrompt() {
-  const { t } = useTranslation()
   const navigate = useNavigate()
   const [authPromptTarget, setAuthPromptTarget] =
     useState<AuthPromptTarget | null>(null)

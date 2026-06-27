@@ -30,7 +30,7 @@ export const Route = createFileRoute('/_authenticated')({
     const { auth } = useAuthStore.getState()
 
     // 如果本地没有用户信息，直接跳转登录页
-    const redirectTarget = `${location.pathname}${location.search}${location.hash}`
+    const redirectTarget = location.href
 
     if (!auth.user) {
       throw redirect({
