@@ -25,27 +25,40 @@ import { ModelDetails } from '@/features/pricing/components/model-details'
 // Mirrors the catalog index route's search schema so the detail page can carry
 // the active filters/sort/view back to `/pricing` ("Back to Models"). All array
 // facets are comma-joined strings owned by the filter hook; ranges are numbers.
-const modelDetailsSearchSchema = z.object({
-  search: z.string().optional().catch(undefined),
-  sort: z.string().optional().catch(undefined),
-  providers: z.string().optional().catch(undefined),
-  groups: z.string().optional().catch(undefined),
-  categories: z.string().optional().catch(undefined),
-  inputModalities: z.string().optional().catch(undefined),
-  outputModalities: z.string().optional().catch(undefined),
-  series: z.string().optional().catch(undefined),
-  supportedParameters: z.string().optional().catch(undefined),
-  endpointTypes: z.string().optional().catch(undefined),
-  quotaTypes: z.string().optional().catch(undefined),
-  ctxMin: z.number().optional().catch(undefined),
-  ctxMax: z.number().optional().catch(undefined),
-  priceMin: z.number().optional().catch(undefined),
-  priceMax: z.number().optional().catch(undefined),
-  tokenUnit: z.enum(['M', 'K']).optional().catch(undefined),
-  view: z.enum(['card', 'table']).optional().catch(undefined),
-  rechargePrice: z.boolean().optional().catch(undefined),
-  model: z.string().optional().catch(undefined),
-})
+const modelDetailsSearchSchema = z.preprocess(
+  (raw) => {
+    if (raw == null || typeof raw !== 'object') return raw
+    const next = { ...(raw as Record<string, unknown>) }
+    const legacyKeys = [
+      'inputModalities',
+      'outputModalities',
+      'series',
+      'supportedParameters',
+      'ctxMin',
+      'ctxMax',
+    ]
+    for (const key of legacyKeys) {
+      delete next[key]
+    }
+    return next
+  },
+  z.object({
+    search: z.string().optional().catch(undefined),
+    sort: z.string().optional().catch(undefined),
+    providers: z.string().optional().catch(undefined),
+    modelTypes: z.string().optional().catch(undefined),
+    groups: z.string().optional().catch(undefined),
+    categories: z.string().optional().catch(undefined),
+    endpointTypes: z.string().optional().catch(undefined),
+    quotaTypes: z.string().optional().catch(undefined),
+    priceMin: z.number().optional().catch(undefined),
+    priceMax: z.number().optional().catch(undefined),
+    tokenUnit: z.enum(['M', 'K']).optional().catch(undefined),
+    view: z.enum(['list', 'card', 'table']).optional().catch(undefined),
+    rechargePrice: z.boolean().optional().catch(undefined),
+    model: z.string().optional().catch(undefined),
+  })
+)
 
 export const Route = createFileRoute('/pricing/$modelId/')({
   validateSearch: modelDetailsSearchSchema,

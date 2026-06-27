@@ -20,8 +20,6 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useStatus } from '@/hooks/use-status'
 import { getPricing } from '../api'
-import { buildModelStats, buildSupportedParameters } from '../lib/mock-stats'
-import { deriveModelMetadata } from '../lib/model-metadata'
 import {
   getInputPriceUsdPerM,
   getOutputPriceUsdPerM,
@@ -37,7 +35,6 @@ export function usePricingData() {
     staleTime: 5 * 60 * 1000,
   })
 
-  // Ensure rates never reach zero to prevent division errors
   const priceRate = useMemo(
     () => Math.max((status?.price as number) ?? 1, 0.001),
     [status?.price]
@@ -47,13 +44,6 @@ export function usePricingData() {
     [status?.usd_exchange_rate, priceRate]
   )
 
-  // Models are enriched with derived metadata (series/context/modalities/
-  // supported-params) and PLACEHOLDER usage stats (tokens/week, growth,
-  // latency) so the OpenRouter-style list can render without a metrics
-  // backend. Raw PricingModel fields are preserved verbatim, so existing
-  // consumers that read `model.model_name`, `model.model_ratio`, etc. keep
-  // working. New consumers read `model.stats` / `model.meta` / the flattened
-  // `promptPriceUsdPerM`. Stats are seeded by model name → stable on refresh.
   const models = useMemo<EnrichedPricingModel[]>(() => {
     if (!data?.data || !data?.vendors) return []
 
@@ -71,13 +61,8 @@ export function usePricingData() {
         vendor_description: vendor?.description,
         group_ratio: data.group_ratio,
       }
-      const supportedParameters = buildSupportedParameters(base).map(
-        (p) => p.name
-      )
       return {
         ...base,
-        stats: buildModelStats(base),
-        meta: deriveModelMetadata(base, supportedParameters),
         promptPriceUsdPerM: getInputPriceUsdPerM(base),
         completionPriceUsdPerM: getOutputPriceUsdPerM(base),
       }

@@ -34,40 +34,30 @@ import {
   MAX_FILTER_ITEMS,
   QUOTA_TYPES,
   getEndpointTypeLabels,
-  getModalityLabels,
+  getModelTypeLabels,
   getQuotaTypeLabels,
   type FilterSection,
-  type ModalityFilterOption,
 } from '../constants'
 import {
   extractEndpointTypes,
   extractGroups,
-  extractInputModalities,
-  extractOutputModalities,
+  extractModelTypeFacets,
   extractProviders,
-  extractSeries,
-  extractSupportedParameters,
   extractTagFacets,
   type FacetOption,
 } from '../lib/filters'
-import type { EnrichedPricingModel } from '../types'
-import {
-  ContextLengthSlider,
-  PromptPriceSlider,
-} from './pricing-range-filters'
+import type { EnrichedPricingModel, PricingVendor } from '../types'
+import { PromptPriceSlider } from './pricing-range-filters'
 
 export interface PricingSidebarProps {
   models: EnrichedPricingModel[]
-  /** Selected values per facet (from useFilters().facetState). */
+  vendors: PricingVendor[]
   facetState: Record<FilterSection, string[]>
   toggleFacetValue: (facet: FilterSection, value: string) => void
-  /** Vendor icon lookup is by vendor name → icon key. */
   vendorIcons: Record<string, string | undefined>
   groupRatios?: Record<string, number>
-  contextRange: [number, number]
   promptPriceRange: [number, number]
   priceCeiling: number
-  onContextRangeChange: (value: [number, number]) => void
   onPromptPriceRangeChange: (value: [number, number]) => void
   hasActiveFilters: boolean
   onClearFilters: () => void
@@ -76,11 +66,8 @@ export interface PricingSidebarProps {
 
 const SECTION_TITLES: Record<FilterSection, string> = {
   [FILTER_SECTIONS.PROVIDER]: 'Providers',
-  [FILTER_SECTIONS.INPUT_MODALITY]: 'Input Modality',
-  [FILTER_SECTIONS.OUTPUT_MODALITY]: 'Output Modality',
-  [FILTER_SECTIONS.SERIES]: 'Series',
+  [FILTER_SECTIONS.MODEL_TYPE]: 'Model type',
   [FILTER_SECTIONS.CATEGORY]: 'Categories',
-  [FILTER_SECTIONS.SUPPORTED_PARAMETER]: 'Supported Parameters',
   [FILTER_SECTIONS.PRICING_TYPE]: 'Pricing Type',
   [FILTER_SECTIONS.ENDPOINT_TYPE]: 'Endpoint Type',
   [FILTER_SECTIONS.GROUP]: 'Groups',
@@ -97,26 +84,22 @@ function formatGroupRatio(ratio: number | undefined): string | undefined {
 export function PricingSidebar(props: PricingSidebarProps) {
   const { t } = useTranslation()
   const [filterQuery, setFilterQuery] = useState('')
-  const modalityLabels = getModalityLabels(t)
+  const modelTypeLabels = getModelTypeLabels(t)
   const endpointLabels = getEndpointTypeLabels(t)
   const quotaLabels = getQuotaTypeLabels(t)
 
-  // Build each facet's option list (value/label/count) from the live catalog.
-  // Modality + endpoint + pricing options localize their labels here; the rest
-  // use the extractor's label (the raw value).
   const facetOptions = useMemo<
     Record<FilterSection, Array<FacetOption & { iconKey?: string; suffix?: string }>>
   >(() => {
     const models = props.models
-    const localizeModality = (opts: FacetOption[]) =>
-      opts.map((o) => ({
-        ...o,
-        label: modalityLabels[o.value as ModalityFilterOption] ?? o.value,
-      }))
 
-    const providers = extractProviders(models).map((o) => ({
+    const providers = extractProviders(models, props.vendors).map((o) => ({
       ...o,
       iconKey: props.vendorIcons[o.value],
+    }))
+    const modelTypes = extractModelTypeFacets(models).map((o) => ({
+      ...o,
+      label: modelTypeLabels[o.value] ?? o.value,
     }))
     const groups = extractGroups(models).map((o) => ({
       ...o,
@@ -142,24 +125,18 @@ export function PricingSidebar(props: PricingSidebarProps) {
 
     return {
       [FILTER_SECTIONS.PROVIDER]: providers,
-      [FILTER_SECTIONS.INPUT_MODALITY]: localizeModality(
-        extractInputModalities(models)
-      ),
-      [FILTER_SECTIONS.OUTPUT_MODALITY]: localizeModality(
-        extractOutputModalities(models)
-      ),
-      [FILTER_SECTIONS.SERIES]: extractSeries(models),
+      [FILTER_SECTIONS.MODEL_TYPE]: modelTypes,
       [FILTER_SECTIONS.CATEGORY]: extractTagFacets(models),
-      [FILTER_SECTIONS.SUPPORTED_PARAMETER]: extractSupportedParameters(models),
       [FILTER_SECTIONS.PRICING_TYPE]: pricing,
       [FILTER_SECTIONS.ENDPOINT_TYPE]: endpoints,
       [FILTER_SECTIONS.GROUP]: groups,
     }
   }, [
     props.models,
+    props.vendors,
     props.vendorIcons,
     props.groupRatios,
-    modalityLabels,
+    modelTypeLabels,
     endpointLabels,
     quotaLabels,
   ])
@@ -207,15 +184,6 @@ export function PricingSidebar(props: PricingSidebarProps) {
       </div>
 
       <div className='space-y-1'>
-        {/* Context-length range */}
-        <RangeSection title={t('Context length')}>
-          <ContextLengthSlider
-            value={props.contextRange}
-            onChange={props.onContextRangeChange}
-          />
-        </RangeSection>
-
-        {/* Prompt-pricing range */}
         <RangeSection title={t('Prompt pricing')}>
           <PromptPriceSlider
             value={props.promptPriceRange}

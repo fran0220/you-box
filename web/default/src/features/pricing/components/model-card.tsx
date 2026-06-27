@@ -186,7 +186,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
       to='/pricing/$modelId'
       params={{ modelId: props.model.model_name }}
       // Retain catalog filter/sort/view/unit URL state across navigation.
-      search={(prev) => prev}
+      search={(prev: Record<string, unknown>) => prev}
       className={cn(
         'group bg-card border-border duration-base focus-visible:ring-ring/40 relative flex flex-col rounded-lg border p-3 transition-all ease-out outline-none focus-visible:ring-2 sm:p-4',
         'hover:border-brand-border hover:shadow-[var(--glow-brand)] motion-safe:hover:-translate-y-0.5'

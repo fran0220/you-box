@@ -42,20 +42,15 @@ import { DEFAULT_TOKEN_UNIT, QUOTA_TYPE_VALUES } from '../constants'
 import { usePricingData } from '../hooks/use-pricing-data'
 import { getDynamicPricingTiers } from '../lib/dynamic-price'
 import { parseTags } from '../lib/filters'
-import { buildModelStats } from '../lib/mock-stats'
-import { deriveSeries, inferModelMetadata } from '../lib/model-metadata'
-import type { Modality, ModelCapability, PricingModel, TokenUnit } from '../types'
+import type { PricingModel, TokenUnit } from '../types'
 import { DynamicPricingBreakdown } from './dynamic-pricing-breakdown'
 import { ModelDetailsApi, ModelDetailsProviderInfo } from './model-details-api'
 import { ModelDetailsApps } from './model-details-apps'
 import { GroupPricingSection } from './model-details-group-pricing'
-import { ModalityIcons } from './model-details-modalities'
 import { ModelDetailsPerformance } from './model-details-performance'
 import { PriceSection } from './model-details-price'
 import { ModelDetailsProviders } from './model-details-providers'
-import { ModelDetailsQuickStats } from './model-details-quick-stats'
 import { ModelSpecCard } from './model-details-spec-card'
-import { ModelDetailsUsageStats } from './model-details-usage-stats'
 
 // ----------------------------------------------------------------------------
 // Local UI helpers
@@ -69,91 +64,6 @@ function SectionTitle(props: { children: React.ReactNode }) {
   )
 }
 
-const CAPABILITY_LABEL_KEYS: Record<ModelCapability, string> = {
-  function_calling: 'Function calling',
-  streaming: 'Streaming',
-  vision: 'Vision',
-  json_mode: 'JSON mode',
-  structured_output: 'Structured output',
-  reasoning: 'Reasoning',
-  tools: 'Tools',
-  system_prompt: 'System prompt',
-  web_search: 'Web search',
-  code_interpreter: 'Code interpreter',
-  caching: 'Prompt caching',
-  embeddings: 'Embeddings',
-}
-
-function CompactCapabilityList(props: { capabilities: ModelCapability[] }) {
-  const { t } = useTranslation()
-
-  if (props.capabilities.length === 0) {
-    return (
-      <span className='text-muted-foreground text-xs'>
-        {t('No capabilities reported for this model.')}
-      </span>
-    )
-  }
-
-  return (
-    <div className='flex flex-wrap gap-1.5'>
-      {props.capabilities.map((capability) => (
-        <span
-          key={capability}
-          className='bg-muted text-muted-foreground rounded-md px-2 py-1 text-xs font-medium'
-        >
-          {t(CAPABILITY_LABEL_KEYS[capability] ?? capability)}
-        </span>
-      ))}
-    </div>
-  )
-}
-
-function CompactModalities(props: { input: Modality[]; output: Modality[] }) {
-  const { t } = useTranslation()
-
-  return (
-    <div className='grid gap-2 sm:grid-cols-2'>
-      <div className='flex items-center justify-between gap-3 rounded-lg border px-3 py-2'>
-        <span className='text-muted-foreground text-xs font-medium'>
-          {t('Input')}
-        </span>
-        <ModalityIcons modalities={props.input} />
-      </div>
-      <div className='flex items-center justify-between gap-3 rounded-lg border px-3 py-2'>
-        <span className='text-muted-foreground text-xs font-medium'>
-          {t('Output')}
-        </span>
-        <ModalityIcons modalities={props.output} />
-      </div>
-    </div>
-  )
-}
-
-function ModelSignalsSection(props: {
-  capabilities: ModelCapability[]
-  input: Modality[]
-  output: Modality[]
-}) {
-  const { t } = useTranslation()
-
-  return (
-    <section>
-      <SectionTitle>
-        {t('Capabilities')} / {t('Supported modalities')}
-      </SectionTitle>
-      <div className='grid gap-3 rounded-xl border p-3 @2xl/details:grid-cols-[minmax(0,1.5fr)_minmax(260px,1fr)]'>
-        <CompactCapabilityList capabilities={props.capabilities} />
-        <CompactModalities input={props.input} output={props.output} />
-      </div>
-    </section>
-  )
-}
-
-// ----------------------------------------------------------------------------
-// Model header (always visible above the detail sections)
-// ----------------------------------------------------------------------------
-
 function ModelHeader(props: { model: PricingModel }) {
   const { t } = useTranslation()
   const model = props.model
@@ -161,7 +71,6 @@ function ModelHeader(props: { model: PricingModel }) {
   const modelIcon = modelIconKey ? getLobeIcon(modelIconKey, 20) : null
   const description = model.description || model.vendor_description || null
   const tags = parseTags(model.tags)
-  const series = deriveSeries(model.model_name || '')
   const isSpecialExpression =
     model.billing_mode === 'tiered_expr' &&
     Boolean(model.billing_expr) &&
@@ -186,12 +95,6 @@ function ModelHeader(props: { model: PricingModel }) {
       <div className='mt-1 flex flex-wrap items-center gap-1.5 text-xs'>
         {model.vendor_name && (
           <span className='text-muted-foreground'>{model.vendor_name}</span>
-        )}
-        {series && (
-          <>
-            <span className='text-muted-foreground/30'>·</span>
-            <span className='text-muted-foreground/70'>{series}</span>
-          </>
         )}
         <span className='text-muted-foreground/30'>·</span>
         <span className='text-muted-foreground/70'>
@@ -257,22 +160,9 @@ export interface ModelDetailsContentProps {
   showRechargePrice?: boolean
 }
 
-/**
- * The single shared host for the full model detail surface. Both the URL-driven
- * detail page ({@link ModelDetails}) and the optional quick-peek drawer
- * ({@link ModelDetailsDrawer}) render this — there is no longer any duplicated
- * spec/price/group markup between the two.
- *
- * Placeholder usage stats (tokens/week, weekly growth, latency) are derived
- * deterministically from the model name via {@link buildModelStats}, so the
- * detail page does not require the caller to thread `stats` through and the
- * numbers stay stable on refresh.
- */
 export function ModelDetailsContent(props: ModelDetailsContentProps) {
   const { t } = useTranslation()
   const showRechargePrice = props.showRechargePrice ?? false
-  const metadata = useMemo(() => inferModelMetadata(props.model), [props.model])
-  const stats = useMemo(() => buildModelStats(props.model), [props.model])
 
   const isDynamic =
     props.model.billing_mode === 'tiered_expr' &&
@@ -281,8 +171,6 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
   return (
     <div className='@container/details space-y-4'>
       <ModelHeader model={props.model} />
-
-      <ModelDetailsUsageStats stats={stats} />
 
       <Tabs defaultValue='overview' className='gap-4'>
         <TabsList className='bg-muted/60 grid w-full grid-cols-3 gap-1 rounded-lg p-1 group-data-horizontal/tabs:h-auto @md/details:grid-cols-5'>
@@ -333,14 +221,6 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
               showRechargePrice={showRechargePrice}
             />
           </section>
-
-          <ModelDetailsQuickStats metadata={metadata} />
-
-          <ModelSignalsSection
-            capabilities={metadata.capabilities}
-            input={metadata.input_modalities}
-            output={metadata.output_modalities}
-          />
 
           <ModelDetailsProviderInfo model={props.model} />
         </TabsContent>

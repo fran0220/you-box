@@ -23,40 +23,29 @@ import type { TokenUnit } from './types'
 // Pricing Constants
 // ----------------------------------------------------------------------------
 
-/** Sort options for pricing models */
+/** Sort options for pricing models (real fields only). */
 export const SORT_OPTIONS = {
-  TOP_WEEKLY: 'top-weekly',
   NAME: 'name',
   PRICE_LOW: 'price-low',
   PRICE_HIGH: 'price-high',
-  CONTEXT_HIGH: 'context-high',
-  NEWEST: 'newest',
 } as const
 
 export type SortOption = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS]
 
-/** Default sort: OpenRouter-style "Top Weekly" (by tokens/week). */
-export const DEFAULT_SORT: SortOption = SORT_OPTIONS.TOP_WEEKLY
+export const DEFAULT_SORT: SortOption = SORT_OPTIONS.NAME
 
 export function getSortLabels(t: TFunction): Record<SortOption, string> {
   return {
-    [SORT_OPTIONS.TOP_WEEKLY]: t('Top Weekly'),
     [SORT_OPTIONS.NAME]: t('Name'),
     [SORT_OPTIONS.PRICE_LOW]: t('Price: Low to High'),
     [SORT_OPTIONS.PRICE_HIGH]: t('Price: High to Low'),
-    [SORT_OPTIONS.CONTEXT_HIGH]: t('Context: High to Low'),
-    [SORT_OPTIONS.NEWEST]: t('Newest'),
   }
 }
 
-/** Ordered list of sort options for rendering the Sort dropdown. */
 export const SORT_OPTION_ORDER: SortOption[] = [
-  SORT_OPTIONS.TOP_WEEKLY,
-  SORT_OPTIONS.NEWEST,
+  SORT_OPTIONS.NAME,
   SORT_OPTIONS.PRICE_LOW,
   SORT_OPTIONS.PRICE_HIGH,
-  SORT_OPTIONS.CONTEXT_HIGH,
-  SORT_OPTIONS.NAME,
 ]
 
 /** Input-modality filter options (what a model can accept). */
@@ -148,14 +137,9 @@ export function getEndpointTypeLabels(
  * endpoint → groups.
  */
 export const FILTER_SECTIONS = {
-  /** Vendor / provider (model owner). URL param `providers`. */
   PROVIDER: 'providers',
-  INPUT_MODALITY: 'inputModalities',
-  OUTPUT_MODALITY: 'outputModalities',
-  SERIES: 'series',
-  /** Model tags. URL param `categories`. */
+  MODEL_TYPE: 'modelTypes',
   CATEGORY: 'categories',
-  SUPPORTED_PARAMETER: 'supportedParameters',
   PRICING_TYPE: 'quotaTypes',
   ENDPOINT_TYPE: 'endpointTypes',
   GROUP: 'groups',
@@ -164,18 +148,25 @@ export const FILTER_SECTIONS = {
 export type FilterSection =
   (typeof FILTER_SECTIONS)[keyof typeof FILTER_SECTIONS]
 
-/** Ordered facet rendering sequence for the sidebar (OpenRouter parity). */
 export const FILTER_SECTION_ORDER: FilterSection[] = [
   FILTER_SECTIONS.PROVIDER,
-  FILTER_SECTIONS.INPUT_MODALITY,
-  FILTER_SECTIONS.OUTPUT_MODALITY,
-  FILTER_SECTIONS.SERIES,
+  FILTER_SECTIONS.MODEL_TYPE,
   FILTER_SECTIONS.CATEGORY,
-  FILTER_SECTIONS.SUPPORTED_PARAMETER,
   FILTER_SECTIONS.PRICING_TYPE,
   FILTER_SECTIONS.ENDPOINT_TYPE,
   FILTER_SECTIONS.GROUP,
 ]
+
+export function getModelTypeLabels(t: TFunction): Record<string, string> {
+  return {
+    Chat: t('Chat'),
+    Embedding: t('Embedding'),
+    Image: t('Image'),
+    Rerank: t('Rerank'),
+    Video: t('Video'),
+    Audio: t('Audio'),
+  }
+}
 
 /** Maximum number of tags to display in model row */
 export const MAX_TAGS_DISPLAY = 5
@@ -233,18 +224,6 @@ export const MAX_COMPARE_MODELS = 5
 // ----------------------------------------------------------------------------
 // Range-slider bounds
 // ----------------------------------------------------------------------------
-
-/**
- * Context-length slider stops (tokens). The slider operates on these discrete
- * indices so the thumb snaps to human-friendly K/M ticks. Index 0 == "any".
- */
-export const CONTEXT_LENGTH_STOPS = [
-  0, 4_000, 8_000, 16_000, 32_000, 64_000, 128_000, 200_000, 400_000,
-  1_000_000,
-] as const
-
-/** Sentinel meaning "no lower bound on context length". */
-export const CONTEXT_LENGTH_MIN = 0
 
 /** Upper bound for the prompt-price slider, in USD per 1M input tokens. */
 export const PROMPT_PRICE_MAX_USD_PER_M = 100

@@ -36,20 +36,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { StatusBadge } from '@/components/status-badge'
 import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
-import { MAX_COMPARE_MODELS } from '../constants'
+import { MAX_COMPARE_MODELS, QUOTA_TYPE_VALUES } from '../constants'
 import { usePricingData } from '../hooks/use-pricing-data'
-import {
-  formatTokenCount,
-  formatYearMonth,
-  inferModelMetadata,
-} from '../lib/model-metadata'
+import { deriveModelTypes } from '../lib/model-type'
 import { formatPrice, formatRequestPrice } from '../lib/price'
 import type { PricingModel } from '../types'
 import { LoadingSkeleton } from './loading-skeleton'
-import { ModelDetailsCapabilities } from './model-details-capabilities'
-import { ModalityIcons } from './model-details-modalities'
 
 interface ComparePricingContext {
   priceRate: number
@@ -58,18 +53,18 @@ interface ComparePricingContext {
 
 interface CompareRow {
   label: string
-  render: (
-    model: PricingModel,
-    meta: ReturnType<typeof inferModelMetadata>,
-    ctx: ComparePricingContext
-  ) => React.ReactNode
+  render: (model: PricingModel, ctx: ComparePricingContext) => React.ReactNode
 }
 
 const COMPARE_ROWS: CompareRow[] = [
   {
+    label: 'Vendor',
+    render: (model) => model.vendor_name ?? '—',
+  },
+  {
     label: 'Input price (/1M)',
-    render: (model, _meta, ctx) =>
-      model.quota_type === 1
+    render: (model, ctx) =>
+      model.quota_type === QUOTA_TYPE_VALUES.REQUEST
         ? formatRequestPrice(model, false, ctx.priceRate, ctx.usdExchangeRate)
         : formatPrice(
             model,
@@ -82,8 +77,8 @@ const COMPARE_ROWS: CompareRow[] = [
   },
   {
     label: 'Output price (/1M)',
-    render: (model, _meta, ctx) =>
-      model.quota_type === 1
+    render: (model, ctx) =>
+      model.quota_type === QUOTA_TYPE_VALUES.REQUEST
         ? '—'
         : formatPrice(
             model,
@@ -95,46 +90,42 @@ const COMPARE_ROWS: CompareRow[] = [
           ),
   },
   {
-    label: 'Context length',
-    render: (_model, meta) => formatTokenCount(meta.context_length),
+    label: 'Pricing type',
+    render: (model) =>
+      model.quota_type === QUOTA_TYPE_VALUES.TOKEN ? 'Token' : 'Request',
   },
   {
-    label: 'Max output',
-    render: (_model, meta) => formatTokenCount(meta.max_output_tokens),
+    label: 'Model types',
+    render: (model) => {
+      const types = deriveModelTypes(model)
+      if (types.length === 0) return '—'
+      return (
+        <span className='flex flex-wrap gap-1'>
+          {types.map((t) => (
+            <StatusBadge key={t} label={t} size='sm' copyable={false} />
+          ))}
+        </span>
+      )
+    },
   },
   {
-    label: 'Input',
-    render: (_model, meta) => (
-      <ModalityIcons modalities={meta.input_modalities} />
-    ),
+    label: 'Endpoints',
+    render: (model) => {
+      const eps = model.supported_endpoint_types ?? []
+      if (eps.length === 0) return '—'
+      return eps.join(', ')
+    },
   },
   {
-    label: 'Output',
-    render: (_model, meta) => (
-      <ModalityIcons modalities={meta.output_modalities} />
-    ),
-  },
-  {
-    label: 'Knowledge cutoff',
-    render: (_model, meta) =>
-      meta.knowledge_cutoff ? formatYearMonth(meta.knowledge_cutoff) : '—',
-  },
-  {
-    label: 'Released',
-    render: (_model, meta) =>
-      meta.release_date ? formatYearMonth(meta.release_date) : '—',
-  },
-  {
-    label: 'Capabilities',
-    render: (_model, meta) => (
-      <div className='@container/details'>
-        <ModelDetailsCapabilities capabilities={meta.capabilities} />
-      </div>
-    ),
+    label: 'Groups',
+    render: (model) => {
+      const groups = (model.enable_groups ?? []).filter((g) => g && g !== 'auto')
+      if (groups.length === 0) return '—'
+      return groups.join(', ')
+    },
   },
 ]
 
-/** Popover that adds another model to the comparison. */
 function AddModelButton(props: {
   models: PricingModel[]
   selected: string[]
@@ -175,11 +166,11 @@ function AddModelButton(props: {
       >
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder={t('Search models...')}
+            placeholder={t('Search models…')}
             value={search}
             onValueChange={setSearch}
           />
-          <CommandList className='max-h-[320px]'>
+          <CommandList>
             <CommandEmpty>{t('No models found.')}</CommandEmpty>
             <CommandGroup>
               {options.map((model) => (
@@ -191,13 +182,7 @@ function AddModelButton(props: {
                     setOpen(false)
                     setSearch('')
                   }}
-                  className='gap-2 rounded-lg px-2.5 py-2'
                 >
-                  {model.vendor_icon ? (
-                    <span className='shrink-0'>
-                      {getLobeIcon(model.vendor_icon, 16)}
-                    </span>
-                  ) : null}
                   <span className='min-w-0 flex-1 truncate'>
                     {model.model_name}
                   </span>
@@ -248,14 +233,6 @@ export function ModelCompare() {
     usdExchangeRate: usdExchangeRate ?? 1,
   }
 
-  const metaByModel = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof inferModelMetadata>>()
-    for (const model of selectedModels) {
-      map.set(model.model_name, inferModelMetadata(model))
-    }
-    return map
-  }, [selectedModels])
-
   const canAddMore = selectedModels.length < MAX_COMPARE_MODELS
   const gridTemplateColumns = `minmax(120px,160px) repeat(${selectedModels.length}, minmax(190px, 1fr))`
 
@@ -282,7 +259,7 @@ export function ModelCompare() {
           </h1>
           <p className='text-muted-foreground/70 mt-2 max-w-2xl text-sm'>
             {t(
-              'Put models side by side and compare pricing, context, modalities, and capabilities.'
+              'Put models side by side and compare pricing and catalog fields from the live API.'
             )}
           </p>
         </div>
@@ -328,7 +305,6 @@ export function ModelCompare() {
                 className='min-w-fit'
                 style={{ display: 'grid', gridTemplateColumns }}
               >
-                {/* Header row */}
                 <div className='bg-surface/60 border-b p-3' />
                 {selectedModels.map((model) => (
                   <div
@@ -371,19 +347,16 @@ export function ModelCompare() {
                   </div>
                 ))}
 
-                {/* Attribute rows */}
                 {COMPARE_ROWS.map((row, rowIndex) => (
                   <CompareRowCells
                     key={row.label}
                     row={row}
                     models={selectedModels}
-                    metaByModel={metaByModel}
                     ctx={ctx}
                     striped={rowIndex % 2 === 1}
                   />
                 ))}
 
-                {/* Actions row */}
                 <div className='border-t p-3' />
                 {selectedModels.map((model) => (
                   <div
@@ -416,12 +389,11 @@ export function ModelCompare() {
 function CompareRowCells(props: {
   row: CompareRow
   models: PricingModel[]
-  metaByModel: Map<string, ReturnType<typeof inferModelMetadata>>
   ctx: ComparePricingContext
   striped: boolean
 }) {
   const { t } = useTranslation()
-  const { row, models, metaByModel, ctx, striped } = props
+  const { row, models, ctx, striped } = props
   return (
     <>
       <div
@@ -432,20 +404,17 @@ function CompareRowCells(props: {
       >
         {t(row.label)}
       </div>
-      {models.map((model) => {
-        const meta = metaByModel.get(model.model_name)
-        return (
-          <div
-            key={`${row.label}-${model.model_name}`}
-            className={cn(
-              'border-t border-l p-3 text-sm tabular-nums',
-              striped && 'bg-surface/30'
-            )}
-          >
-            {meta ? row.render(model, meta, ctx) : '—'}
-          </div>
-        )
-      })}
+      {models.map((model) => (
+        <div
+          key={`${row.label}-${model.model_name}`}
+          className={cn(
+            'border-t border-l p-3 text-sm tabular-nums',
+            striped && 'bg-surface/30'
+          )}
+        >
+          {row.render(model, ctx)}
+        </div>
+      ))}
     </>
   )
 }

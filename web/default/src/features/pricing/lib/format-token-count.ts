@@ -16,20 +16,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-export { PricingSidebar } from './pricing-sidebar'
-export { PricingToolbar } from './pricing-toolbar'
-export { PricingFilterPills } from './pricing-filter-pills'
-export { ModelRow } from './model-row'
-export { ModelList } from './model-list'
-export { ModelCard } from './model-card'
-export { ModelCardGrid } from './model-card-grid'
-export { PromptPriceSlider } from './pricing-range-filters'
-export { LoadingSkeleton } from './loading-skeleton'
-export { EmptyState } from './empty-state'
-export { SearchBar } from './search-bar'
-export {
-  ModelDetails,
-  ModelDetailsContent,
-  ModelDetailsDrawer,
-} from './model-details'
-export { PricingTable } from './pricing-table'
+
+/** Format a token count for display (e.g. 128000 → "128K"). */
+export function formatTokenCount(tokens: number | undefined | null): string {
+  if (tokens == null || !Number.isFinite(tokens) || tokens <= 0) return '—'
+  if (tokens >= 1_000_000) {
+    const m = tokens / 1_000_000
+    return Number.isInteger(m) ? `${m}M` : `${m.toFixed(1)}M`
+  }
+  if (tokens >= 1_000) {
+    const k = tokens / 1_000
+    return Number.isInteger(k) ? `${k}K` : `${k.toFixed(1)}K`
+  }
+  return String(tokens)
+}

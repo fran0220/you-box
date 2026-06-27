@@ -41,7 +41,7 @@ import {
 } from '../lib/dynamic-price'
 import { parseTags } from '../lib/filters'
 import { isTokenBasedModel } from '../lib/model-helpers'
-import { formatTokenCount } from '../lib/model-metadata'
+
 import {
   formatPrice,
   formatRequestPrice,
@@ -93,8 +93,7 @@ function SortableHeader(props: {
     >
       {props.title}
       {isActive &&
-        (props.sortBy === SORT_OPTIONS.PRICE_HIGH ||
-        props.sortBy === SORT_OPTIONS.CONTEXT_HIGH ? (
+        (props.sortBy === SORT_OPTIONS.PRICE_HIGH ? (
           <ArrowDown className='size-3.5' />
         ) : (
           <ArrowUp className='size-3.5' />
@@ -194,27 +193,6 @@ export function usePricingColumns(
         )
       },
       size: 80,
-      enableSorting: false,
-    },
-
-    // Context column (sortable: context-high)
-    {
-      id: 'context',
-      meta: { label: t('Context') },
-      header: () => (
-        <SortableHeader
-          title={t('Context')}
-          options={[SORT_OPTIONS.CONTEXT_HIGH]}
-          sortBy={sortBy}
-          onSortChange={onSortChange}
-        />
-      ),
-      cell: ({ row }) => (
-        <span className='font-mono text-sm tabular-nums'>
-          {formatTokenCount(row.original.meta.contextLength)}
-        </span>
-      ),
-      size: 100,
       enableSorting: false,
     },
 

@@ -92,7 +92,7 @@ export function PricingTable(props: PricingTableProps) {
         to: '/pricing/$modelId',
         params: { modelId: model.model_name },
         // Retain catalog filter/sort/view/unit URL state across navigation.
-        search: (prev) => prev,
+        search: (prev: Record<string, unknown>) => prev,
       })
     },
     [navigate]
