@@ -36,6 +36,11 @@ export const DESIGN_LAB_GROUPS: DesignLabGroup[] = [
     component: lazy(() => import('./demos/foundations')),
   },
   {
+    id: 'ui-primitives',
+    title: 'UI primitives',
+    component: lazy(() => import('./demos/ui-primitives')),
+  },
+  {
     id: 'data-display',
     title: 'Data display',
     component: lazy(() => import('./demos/data-display')),

@@ -68,9 +68,9 @@ function PaginationLink({
 }: PaginationLinkProps) {
   return (
     <Button
-      variant={isActive ? 'outline' : 'ghost'}
+      variant={isActive ? 'secondary' : 'ghost'}
       size={size}
-      className={cn(className)}
+      className={cn(isActive && 'bg-surface-3', className)}
       nativeButton={false}
       render={
         <a

@@ -28,15 +28,26 @@ function hashString(value: string): number {
   return hash
 }
 
+/** Monochrome initials palette (YouBox DS); no chromatic hues. */
+const MONO_AVATAR_PALETTE = [
+  '#9a9aa4',
+  '#74747f',
+  '#565663',
+  '#c2c2c9',
+  '#3b3b47',
+  '#8b9097',
+  '#807c75',
+  '#a7abb1',
+] as const
+
 export function getUserAvatarStyle(name: string): UserAvatarStyle {
   const hash = hashString(name)
-  const hue = hash % 360
-  const saturation = 54 + (hash % 8)
-  const lightness = 52 + ((hash >> 4) % 8)
+  const backgroundColor =
+    MONO_AVATAR_PALETTE[hash % MONO_AVATAR_PALETTE.length]
 
   return {
-    backgroundColor: `hsl(${hue} ${saturation}% ${lightness}% / 0.82)`,
-    color: 'white',
+    backgroundColor,
+    color: '#ffffff',
   }
 }
 
