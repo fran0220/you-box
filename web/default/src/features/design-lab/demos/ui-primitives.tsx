@@ -235,6 +235,11 @@ export default function UiPrimitivesDemos() {
 
         <DemoBlock title='Dialog / Tooltip / Popover / Dropdown'>
           <DemoRow label='overlays'>
+            {/* Always-mounted markers for automated gallery scans (portal content is absent when closed). */}
+            <span className='sr-only' aria-hidden data-design-lab='dialog' />
+            <span className='sr-only' aria-hidden data-design-lab='tooltip' />
+            <span className='sr-only' aria-hidden data-design-lab='popover' />
+            <span className='sr-only' aria-hidden data-design-lab='dropdown' />
             <Dialog>
               <DialogTrigger render={<Button variant='secondary' />}>
                 Open dialog

@@ -51,7 +51,7 @@ function RootComponent() {
       <ScrollRestoration />
       <NavigationProgress />
       <Outlet />
-      <Toaster closeButton duration={5000} position='top-center' richColors />
+      <Toaster closeButton duration={5000} position='top-center' />
       {import.meta.env.MODE === 'development' && (
         <>
           <ReactQueryDevtools buttonPosition='bottom-left' />
