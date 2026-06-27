@@ -29,13 +29,13 @@ import { resolveTopNavLinks } from '../lib/resolve-top-nav-links'
 import { useTopNavAuthPrompt } from '../hooks/use-top-nav-auth-prompt'
 import type { TopNavLink } from '../types'
 import { HeaderLogo } from './header-logo'
-import { MobileDrawer } from './mobile-drawer'
+import { TopNavMobileDrawer } from './top-nav-mobile-drawer'
 
 type TopNavProps = {
   className?: string
   /** When false, desktop links are hidden (e.g. app header keeps search-first layout). */
   showDesktopLinks?: boolean
-  /** When true, renders the mobile menu trigger + shared MobileDrawer. */
+  /** When true, renders the mobile menu trigger + mobile nav sheet. */
   showMobileMenu?: boolean
   /** Override resolved links (testing); default uses useTopNavLinks + defaultTopNavLinks. */
   links?: TopNavLink[]
@@ -191,7 +191,7 @@ export function TopNav(props: TopNavProps) {
             </Button>
           </div>
 
-          <MobileDrawer
+          <TopNavMobileDrawer
             isOpen={mobileOpen}
             onClose={closeMobile}
             homeUrl='/'

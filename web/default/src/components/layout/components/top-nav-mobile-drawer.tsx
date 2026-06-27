@@ -34,9 +34,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { SignOutDialog } from '@/components/sign-out-dialog'
 import type { TopNavLink } from '../types'
 
-/**
- * Brand logo component with skeleton loading
- */
 interface BrandLogoProps {
   homeUrl: string
   displayLogo: React.ReactNode
@@ -71,9 +68,6 @@ function BrandLogo({
   )
 }
 
-/**
- * Mobile user profile section with navigation links
- */
 interface MobileUserProfileProps {
   user: AuthUser | null
   onNavigate?: () => void
@@ -88,9 +82,7 @@ function MobileUserProfile({ user, onNavigate }: MobileUserProfileProps) {
 
   return (
     <>
-      {/* User info section - compact style matching navigation */}
       <div className='flex flex-col text-sm'>
-        {/* User header - simplified */}
         <div className='border-border flex items-center gap-2.5 border-b p-2.5'>
           <Avatar className='size-9'>
             <AvatarImage src='/avatars/01.png' alt={`@${displayName}`} />
@@ -114,7 +106,6 @@ function MobileUserProfile({ user, onNavigate }: MobileUserProfileProps) {
           </div>
         </div>
 
-        {/* Navigation links - same style as top nav */}
         <Link
           to='/profile'
           onClick={onNavigate}
@@ -133,7 +124,6 @@ function MobileUserProfile({ user, onNavigate }: MobileUserProfileProps) {
           {t('Wallet')}
         </Link>
 
-        {/* Sign out - consistent style */}
         <Button
           variant='ghost'
           onClick={() => setSignOutOpen(true)}
@@ -149,9 +139,6 @@ function MobileUserProfile({ user, onNavigate }: MobileUserProfileProps) {
   )
 }
 
-/**
- * Mobile sign in button for unauthenticated users
- */
 interface MobileSignInButtonProps {
   onNavigate?: () => void
 }
@@ -170,10 +157,7 @@ function MobileSignInButton({ onNavigate }: MobileSignInButtonProps) {
   )
 }
 
-/**
- * Mobile drawer component props
- */
-export interface MobileDrawerProps {
+export interface TopNavMobileDrawerProps {
   isOpen: boolean
   onClose: () => void
   homeUrl: string
@@ -191,88 +175,58 @@ export interface MobileDrawerProps {
   ) => void
 }
 
-/**
- * Mobile navigation drawer.
- *
- * Re-hosted on the shared Base UI `Sheet` primitive (side="left") instead of a
- * hand-rolled `motion` overlay. The Sheet supplies the full a11y contract that
- * the old implementation lacked (B2): focus trap, scroll-lock, ESC-to-close,
- * `role="dialog"`, and `aria-labelledby`/`aria-describedby` wiring (via the
- * sr-only `SheetTitle`/`SheetDescription`). Surface uses the canonical `bg-card`
- * token and the overlay uses `bg-[var(--overlay)]` + backdrop-blur (from the
- * Sheet primitive), replacing the divergent `bg-black/50 backdrop-blur-sm`.
- *
- * The external prop contract (`isOpen`/`onClose` + nav content) is preserved;
- * `onClose` fires whenever the Sheet requests dismissal (overlay click, ESC,
- * close button, or link navigation).
- */
-export function MobileDrawer({
-  isOpen,
-  onClose,
-  homeUrl,
-  displayLogo,
-  displaySiteName,
-  loading,
-  logoLoaded,
-  mobileLinksList,
-  showAuthButtons,
-  user,
-  onNavLinkClick,
-}: MobileDrawerProps) {
+/** Public-header mobile nav sheet; used only by `TopNav`. */
+export function TopNavMobileDrawer(props: TopNavMobileDrawerProps) {
   const { t } = useTranslation()
 
   return (
     <Sheet
-      open={isOpen}
+      open={props.isOpen}
       onOpenChange={(open) => {
-        if (!open) onClose()
+        if (!open) props.onClose()
       }}
     >
       <SheetContent
         side='left'
         className='w-[88%] max-w-sm gap-0 p-4 md:hidden'
       >
-        {/* Accessible name/description for the dialog. Kept visually hidden
-            because the in-flow brand logo serves as the visual heading. */}
         <SheetTitle className='sr-only'>{t('Navigation menu')}</SheetTitle>
         <SheetDescription className='sr-only'>
           {t('Site navigation and account options')}
         </SheetDescription>
 
         <div className='flex flex-col gap-4'>
-          {/* Header with logo (the Sheet renders its own close button) */}
           <div className='flex items-center justify-between'>
             <BrandLogo
-              homeUrl={homeUrl}
-              displayLogo={displayLogo}
-              displaySiteName={displaySiteName}
-              loading={loading}
-              logoLoaded={logoLoaded}
-              onClick={onClose}
+              homeUrl={props.homeUrl}
+              displayLogo={props.displayLogo}
+              displaySiteName={props.displaySiteName}
+              loading={props.loading}
+              logoLoaded={props.logoLoaded}
+              onClick={props.onClose}
             />
           </div>
 
-          {/* Navigation links */}
           <div className='border-border mb-4 flex flex-col rounded-md border text-sm'>
-            {loading ? (
+            {props.loading ? (
               <div className='flex flex-col gap-1 p-2'>
                 {Array.from({ length: 4 }, (_, i) => (
                   <Skeleton key={i} className='h-8 w-full' />
                 ))}
               </div>
             ) : (
-              mobileLinksList.map((link, index) => {
+              props.mobileLinksList.map((link, index) => {
                 const label = t(link.title)
-                const closeMobile = () => onClose()
+                const closeMobile = () => props.onClose()
                 const handleClick = (
                   event: React.MouseEvent<HTMLAnchorElement>
                 ) => {
-                  if (onNavLinkClick) {
-                    onNavLinkClick(event, link, { closeMobile })
-                    if (!event.defaultPrevented) onClose()
+                  if (props.onNavLinkClick) {
+                    props.onNavLinkClick(event, link, { closeMobile })
+                    if (!event.defaultPrevented) props.onClose()
                     return
                   }
-                  onClose()
+                  props.onClose()
                 }
                 return (
                   <div
@@ -305,12 +259,11 @@ export function MobileDrawer({
             )}
           </div>
 
-          {/* User profile section */}
-          {showAuthButtons &&
-            (user ? (
-              <MobileUserProfile user={user} onNavigate={onClose} />
+          {props.showAuthButtons &&
+            (props.user ? (
+              <MobileUserProfile user={props.user} onNavigate={props.onClose} />
             ) : (
-              <MobileSignInButton onNavigate={onClose} />
+              <MobileSignInButton onNavigate={props.onClose} />
             ))}
         </div>
       </SheetContent>
