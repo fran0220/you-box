@@ -92,7 +92,15 @@ export function filterByEndpointType(
 function getModelSortPrice(model: EnrichedPricingModel): number {
   const usd = model.promptPriceUsdPerM
   if (Number.isFinite(usd)) return usd
-  return model.quota_type === 0 ? model.model_ratio : model.model_price || 0
+  if (model.quota_type === QUOTA_TYPE_VALUES.REQUEST) {
+    return model.model_price || 0
+  }
+  return model.model_ratio || 0
+}
+
+/** Token-priced models sort before per-request models (VAL-PLAZA-034). */
+function priceSortTier(model: EnrichedPricingModel): number {
+  return model.quota_type === QUOTA_TYPE_VALUES.REQUEST ? 1 : 0
 }
 
 export function sortModels(
@@ -103,19 +111,27 @@ export function sortModels(
   const byName = (a: EnrichedPricingModel, b: EnrichedPricingModel) =>
     (a.model_name || '').localeCompare(b.model_name || '')
 
+  const byPriceLow = (a: EnrichedPricingModel, b: EnrichedPricingModel) => {
+    const tier = priceSortTier(a) - priceSortTier(b)
+    if (tier !== 0) return tier
+    return getModelSortPrice(a) - getModelSortPrice(b) || byName(a, b)
+  }
+
+  const byPriceHigh = (a: EnrichedPricingModel, b: EnrichedPricingModel) => {
+    const tier = priceSortTier(a) - priceSortTier(b)
+    if (tier !== 0) return tier
+    return getModelSortPrice(b) - getModelSortPrice(a) || byName(a, b)
+  }
+
   switch (sortBy) {
     case SORT_OPTIONS.NAME:
       sorted.sort(byName)
       break
     case SORT_OPTIONS.PRICE_LOW:
-      sorted.sort(
-        (a, b) => getModelSortPrice(a) - getModelSortPrice(b) || byName(a, b)
-      )
+      sorted.sort(byPriceLow)
       break
     case SORT_OPTIONS.PRICE_HIGH:
-      sorted.sort(
-        (a, b) => getModelSortPrice(b) - getModelSortPrice(a) || byName(a, b)
-      )
+      sorted.sort(byPriceHigh)
       break
     default:
       sorted.sort(byName)
