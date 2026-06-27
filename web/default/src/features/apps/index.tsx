@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { getApps } from './api'
 import { AppsLeaderboardTable } from './components/apps-leaderboard'
@@ -32,9 +32,9 @@ export function AppsRankings() {
   })
 
   return (
-    <PublicLayout showMainContainer={false}>
-      <PageTransition className='mx-auto w-full max-w-3xl px-3 pt-16 pb-12 sm:px-6 sm:pt-20'>
-        <header className='mb-6'>
+    <AppShell variant='public' contentMode='fluid'>
+      <PageTransition className='mx-auto w-full max-w-3xl px-3 pb-12 sm:px-6'>
+        <div className='mb-6'>
           <p className='yb-eyebrow mb-3'>
             {'// '}
             {t('App rankings')}
@@ -47,7 +47,7 @@ export function AppsRankings() {
               'Applications ranked by token usage, attributed via the HTTP-Referer and X-Title request headers.'
             )}
           </p>
-        </header>
+        </div>
 
         {isLoading ? (
           <div className='text-muted-foreground rounded-xl border p-6 text-center text-sm'>
@@ -63,6 +63,6 @@ export function AppsRankings() {
           <AppsLeaderboardTable apps={apps} rounded='xl' />
         )}
       </PageTransition>
-    </PublicLayout>
+    </AppShell>
   )
 }

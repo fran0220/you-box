@@ -29,7 +29,7 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { CodeBlock } from '@/components/ai-elements/code-block'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { getUserModels } from '@/features/playground/api'
 
@@ -171,9 +171,9 @@ export function ApiDocs() {
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
-      <PageTransition className='mx-auto w-full max-w-[1200px] px-3 pt-16 pb-12 sm:px-6 sm:pt-20'>
-        <header className='mb-6'>
+    <AppShell variant='public' contentMode='fluid'>
+      <PageTransition className='mx-auto w-full max-w-[1200px] px-3 pb-12 sm:px-6'>
+        <div className='mb-6'>
           <p className='yb-eyebrow mb-3'>{'// '}API</p>
           <h1 className='font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] font-bold tracking-[-0.03em]'>
             {t('API reference')}
@@ -183,7 +183,7 @@ export function ApiDocs() {
               'An OpenAI-compatible API. Point any OpenAI SDK at the base URL below and use one of your API keys.'
             )}
           </p>
-        </header>
+        </div>
 
         <div className='mb-6 rounded-xl border p-4'>
           <div className='text-muted-foreground mb-1 text-xs font-medium tracking-wider uppercase'>
@@ -326,6 +326,6 @@ export function ApiDocs() {
           </section>
         </div>
       </PageTransition>
-    </PublicLayout>
+    </AppShell>
   )
 }

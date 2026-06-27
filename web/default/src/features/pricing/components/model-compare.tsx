@@ -36,7 +36,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { MAX_COMPARE_MODELS } from '../constants'
 import { usePricingData } from '../hooks/use-pricing-data'
@@ -261,18 +261,18 @@ export function ModelCompare() {
 
   if (isLoading) {
     return (
-      <PublicLayout showMainContainer={false}>
-        <div className='mx-auto w-full max-w-[1400px] px-3 pt-16 pb-8 sm:px-6 sm:pt-20'>
+      <AppShell variant='public' contentMode='fluid'>
+        <div className='mx-auto w-full max-w-[1400px] px-3 pb-8 sm:px-6'>
           <LoadingSkeleton viewMode='table' />
         </div>
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
-      <PageTransition className='mx-auto w-full max-w-[1400px] px-3 pt-16 pb-10 sm:px-6 sm:pt-20'>
-        <header className='mb-6'>
+    <AppShell variant='public' contentMode='fluid'>
+      <PageTransition className='mx-auto w-full max-w-[1400px] px-3 pb-10 sm:px-6'>
+        <div className='mb-6'>
           <p className='yb-eyebrow mb-3'>
             {'// '}
             {t('Compare models')}
@@ -285,7 +285,7 @@ export function ModelCompare() {
               'Put models side by side and compare pricing, context, modalities, and capabilities.'
             )}
           </p>
-        </header>
+        </div>
 
         {selectedModels.length === 0 ? (
           <div className='flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed px-6 py-12 text-center'>
@@ -409,7 +409,7 @@ export function ModelCompare() {
           </div>
         )}
       </PageTransition>
-    </PublicLayout>
+    </AppShell>
   )
 }
 

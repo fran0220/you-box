@@ -161,7 +161,7 @@ export function ModelsSection(props: ModelsSectionProps) {
   return (
     <section className='bg-card overflow-hidden rounded-lg border'>
       {/* Chart block ----------------------------------------------------- */}
-      <header className='flex items-start justify-between gap-4 px-5 py-4'>
+      <div className='flex items-start justify-between gap-4 px-5 py-4'>
         <div className='min-w-0 flex-1'>
           <h2 className='text-foreground inline-flex items-center gap-2 text-base font-semibold'>
             <BarChart3 className='text-primary size-4' />
@@ -179,7 +179,7 @@ export function ModelsSection(props: ModelsSectionProps) {
             {t('tokens')}
           </div>
         </div>
-      </header>
+      </div>
 
       <div className='px-5 pb-5'>
         <div className='h-60 sm:h-72'>
@@ -203,7 +203,7 @@ export function ModelsSection(props: ModelsSectionProps) {
 
       {/* Leaderboard block ----------------------------------------------- */}
       <div className='border-t'>
-        <header className='px-5 pt-4 pb-2'>
+        <div className='px-5 pt-4 pb-2'>
           <h3 className='text-foreground inline-flex items-center gap-2 text-sm font-semibold'>
             <Trophy className='text-warning size-3.5' />
             {t('LLM Leaderboard')}
@@ -211,7 +211,7 @@ export function ModelsSection(props: ModelsSectionProps) {
           <p className='text-muted-foreground/80 mt-0.5 text-xs'>
             {t('Compare the most popular models on the platform')}
           </p>
-        </header>
+        </div>
         {props.rows.length === 0 ? (
           <div className='text-muted-foreground/80 px-5 py-8 text-center text-sm'>
             {t('No models match the selected filters')}

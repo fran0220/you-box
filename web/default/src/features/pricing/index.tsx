@@ -23,7 +23,7 @@ import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { MOTION_TRANSITION } from '@/lib/motion'
 import { Button } from '@/components/ui/button'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import {
   EmptyState,
@@ -200,19 +200,18 @@ export function Pricing() {
 
   if (isLoading) {
     return (
-      <PublicLayout showMainContainer={false}>
-        <div className='mx-auto w-full max-w-[1600px] px-3 pt-8 pb-8 sm:px-6 sm:pt-10 xl:px-8'>
+      <AppShell variant='public' contentMode='fluid'>
+        <div className='mx-auto w-full max-w-[1600px] px-3 pb-8 sm:px-6 xl:px-8'>
           <LoadingSkeleton viewMode={viewMode} />
         </div>
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
-      <PageTransition className='mx-auto w-full max-w-[1600px] px-3 pt-8 pb-10 sm:px-6 sm:pt-10 xl:px-8'>
-        {/* Slim, left-aligned header */}
-        <header className='mb-4 flex flex-wrap items-end justify-between gap-3'>
+    <AppShell variant='public' contentMode='fluid'>
+      <PageTransition className='mx-auto w-full max-w-[1600px] px-3 pb-10 sm:px-6 xl:px-8'>
+        <div className='mb-4 flex flex-wrap items-end justify-between gap-3'>
           <div>
             <h1 className='font-display text-2xl font-bold tracking-[-0.02em] sm:text-3xl'>
               {t('Models')}
@@ -235,7 +234,7 @@ export function Pricing() {
             <Scale className='size-4' />
             {t('Compare models')}
           </Button>
-        </header>
+        </div>
 
         {/* Sticky control strip: search + toolbar + pills */}
         <div className='bg-background/80 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-10 -mx-3 mb-4 space-y-2.5 px-3 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 xl:-mx-8 xl:px-8'>
@@ -273,7 +272,7 @@ export function Pricing() {
         <div className='grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]'>
           <PricingSidebar
             {...sidebarProps}
-            className='hover-scrollbar sticky top-20 hidden max-h-[calc(100dvh-6rem)] self-start overflow-y-auto pr-1 xl:flex'
+            className='hover-scrollbar sticky top-[var(--app-header-height,3rem)] hidden max-h-[calc(100dvh-var(--app-header-height,3rem)-1rem)] self-start overflow-y-auto pr-1 xl:flex'
           />
 
           <main className='min-w-0'>
@@ -303,6 +302,6 @@ export function Pricing() {
           </main>
         </div>
       </PageTransition>
-    </PublicLayout>
+    </AppShell>
   )
 }

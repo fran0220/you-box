@@ -84,7 +84,7 @@ function PulseCard(props: {
 }) {
   return (
     <div className='bg-card overflow-hidden rounded-lg border'>
-      <header className='border-b px-4 py-3'>
+      <div className='border-b px-4 py-3'>
         <h3 className='text-foreground inline-flex items-center gap-2 text-sm font-semibold'>
           {props.icon}
           {props.title}
@@ -92,7 +92,7 @@ function PulseCard(props: {
         <p className='text-muted-foreground/80 mt-0.5 text-xs'>
           {props.description}
         </p>
-      </header>
+      </div>
       <div className='py-1'>{props.children}</div>
     </div>
   )

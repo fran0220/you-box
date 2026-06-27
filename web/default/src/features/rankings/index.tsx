@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import {
   MarketShareSection,
@@ -55,7 +55,7 @@ export function Rankings() {
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
+    <AppShell variant='public' contentMode='fluid'>
       <div className='relative'>
         <div
           aria-hidden
@@ -65,7 +65,7 @@ export function Rankings() {
               'radial-gradient(circle, color-mix(in oklch, var(--brand) 14%, transparent), transparent 62%)',
           }}
         />
-        <PageTransition className='relative mx-auto w-full max-w-[1280px] space-y-8 px-3 pt-16 pb-10 sm:px-6 sm:pt-20 sm:pb-12 xl:px-8'>
+        <PageTransition className='relative mx-auto w-full max-w-[1280px] space-y-8 px-3 pb-10 sm:px-6 sm:pb-12 xl:px-8'>
           <RankingsHero period={period} onPeriodChange={handlePeriodChange} />
 
           {rankingsQuery.isLoading ? (
@@ -106,7 +106,7 @@ export function Rankings() {
           )}
         </PageTransition>
       </div>
-    </PublicLayout>
+    </AppShell>
   )
 }
 

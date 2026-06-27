@@ -26,7 +26,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Markdown } from '@/components/ui/markdown'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import type { LegalDocumentResponse } from './types'
 
 type LegalDocumentProps = {
@@ -111,20 +111,20 @@ export function LegalDocument({
 
   if (isLoading) {
     return (
-      <PublicLayout>
+      <AppShell variant='public'>
         <div className='mx-auto flex max-w-4xl flex-col gap-4 py-12'>
           <Skeleton className='h-8 w-[45%]' />
           <Skeleton className='h-4 w-full' />
           <Skeleton className='h-4 w-[90%]' />
           <Skeleton className='h-4 w-[80%]' />
         </div>
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   if (!success || !hasContent) {
     return (
-      <PublicLayout>
+      <AppShell variant='public'>
         <div className='mx-auto max-w-2xl py-12'>
           <Card className='border-dashed'>
             <CardHeader className='flex flex-row items-center gap-4'>
@@ -140,13 +140,13 @@ export function LegalDocument({
             </CardHeader>
           </Card>
         </div>
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   if (isUrl) {
     return (
-      <PublicLayout>
+      <AppShell variant='public'>
         <div className='mx-auto max-w-2xl py-12'>
           <Card>
             <CardHeader>
@@ -172,12 +172,12 @@ export function LegalDocument({
             </CardContent>
           </Card>
         </div>
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   return (
-    <PublicLayout>
+    <AppShell variant='public'>
       <div
         className={cn(
           'mx-auto space-y-6 py-12',
@@ -245,6 +245,6 @@ export function LegalDocument({
         {/* "Last updated" mono footer intentionally omitted (R2-B15
             adaptation): LegalDocumentResponse exposes no timestamp. */}
       </div>
-    </PublicLayout>
+    </AppShell>
   )
 }

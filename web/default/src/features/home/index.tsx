@@ -31,7 +31,7 @@ export function Home() {
 
   if (!isLoaded) {
     return (
-      <AppShell variant='public' contentMode='bare' showFooter={false}>
+      <AppShell variant='public' contentMode='bare'>
         <div className='flex flex-1 items-center justify-center'>
           <div className='text-muted-foreground'>{t('Loading...')}</div>
         </div>
@@ -41,7 +41,7 @@ export function Home() {
 
   if (content) {
     return (
-      <AppShell variant='public' contentMode='bare' showFooter={false}>
+      <AppShell variant='public' contentMode='bare'>
         <div className='overflow-x-hidden'>
           {isUrl ? (
             <iframe

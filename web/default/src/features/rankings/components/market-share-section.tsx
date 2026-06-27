@@ -209,7 +209,7 @@ export function MarketShareSection(props: MarketShareSectionProps) {
   return (
     <section className='bg-card overflow-hidden rounded-lg border'>
       {/* Chart block ----------------------------------------------------- */}
-      <header className='px-5 py-4'>
+      <div className='px-5 py-4'>
         <h2 className='text-foreground inline-flex items-center gap-2 text-base font-semibold'>
           <PieChart className='text-primary size-4' />
           {t('Market Share')}
@@ -217,7 +217,7 @@ export function MarketShareSection(props: MarketShareSectionProps) {
         <p className='text-muted-foreground mt-1 text-sm'>
           {t(PERIOD_DESCRIPTIONS[props.period])}
         </p>
-      </header>
+      </div>
 
       <div className='px-5 pb-5'>
         <div className='h-60 sm:h-72'>
@@ -241,14 +241,14 @@ export function MarketShareSection(props: MarketShareSectionProps) {
 
       {/* Vendor list block ----------------------------------------------- */}
       <div className='border-t'>
-        <header className='px-5 pt-4 pb-2'>
+        <div className='px-5 pt-4 pb-2'>
           <h3 className='text-foreground text-sm font-semibold'>
             {t('By model author')}
           </h3>
           <p className='text-muted-foreground/80 mt-0.5 text-xs'>
             {t('Vendors ranked by aggregated token volume')}
           </p>
-        </header>
+        </div>
         {visible.length === 0 ? (
           <div className='text-muted-foreground/80 px-5 py-8 text-center text-sm'>
             {t('No vendor data available')}

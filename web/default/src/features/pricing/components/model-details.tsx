@@ -37,7 +37,7 @@ import {
   DrawerHeader,
   DrawerShell,
 } from '@/components/drawer-layout'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { DEFAULT_TOKEN_UNIT, QUOTA_TYPE_VALUES } from '../constants'
 import { usePricingData } from '../hooks/use-pricing-data'
 import { getDynamicPricingTiers } from '../lib/dynamic-price'
@@ -168,7 +168,7 @@ function ModelHeader(props: { model: PricingModel }) {
     getDynamicPricingTiers(model).length === 0
 
   return (
-    <header className='pb-4'>
+    <div className='pb-4'>
       <div className='flex items-center gap-2.5'>
         {modelIcon}
         <h1 className='font-mono text-xl font-bold tracking-tight sm:text-2xl'>
@@ -227,7 +227,7 @@ function ModelHeader(props: { model: PricingModel }) {
           ))}
         </div>
       )}
-    </header>
+    </div>
   )
 }
 
@@ -448,7 +448,7 @@ export function ModelDetails() {
 
   if (isLoading) {
     return (
-      <PublicLayout>
+      <AppShell variant='public'>
         <div className='mx-auto max-w-5xl px-4 sm:px-6'>
           <Skeleton className='mb-4 h-5 w-16' />
           <div className='space-y-2'>
@@ -467,13 +467,13 @@ export function ModelDetails() {
             ))}
           </div>
         </div>
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   if (!model) {
     return (
-      <PublicLayout>
+      <AppShell variant='public'>
         <div className='mx-auto max-w-2xl px-4 text-center sm:px-6'>
           <h2 className='mb-1 text-base font-semibold'>
             {t('Model not found')}
@@ -485,12 +485,12 @@ export function ModelDetails() {
             {t('Back to Models')}
           </Button>
         </div>
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   return (
-    <PublicLayout>
+    <AppShell variant='public'>
       <div className='mx-auto max-w-5xl px-4 sm:px-6'>
         <Button
           variant='ghost'
@@ -519,6 +519,6 @@ export function ModelDetails() {
           }
         />
       </div>
-    </PublicLayout>
+    </AppShell>
   )
 }

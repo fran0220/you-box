@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { sanitizeHtml } from '@/lib/sanitize'
 import { Markdown } from '@/components/ui/markdown'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { getAboutContent } from './api'
 
 function isValidUrl(value: string) {
@@ -92,39 +92,39 @@ export function About() {
 
   if (isLoading) {
     return (
-      <PublicLayout>
+      <AppShell variant='public'>
         <div className='mx-auto flex max-w-4xl flex-col gap-4 py-12'>
           <Skeleton className='h-8 w-[45%]' />
           <Skeleton className='h-4 w-full' />
           <Skeleton className='h-4 w-[90%]' />
           <Skeleton className='h-4 w-[80%]' />
         </div>
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   if (!hasContent) {
     return (
-      <PublicLayout>
+      <AppShell variant='public'>
         <EmptyAboutState />
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   if (isUrl) {
     return (
-      <PublicLayout showMainContainer={false}>
+      <AppShell variant='public' contentMode='fluid'>
         <iframe
           src={rawContent}
-          className='h-[calc(100vh-3.5rem)] w-full border-0'
+          className='min-h-[calc(100svh-var(--app-header-height,3rem))] w-full border-0'
           title={t('About')}
         />
-      </PublicLayout>
+      </AppShell>
     )
   }
 
   return (
-    <PublicLayout>
+    <AppShell variant='public'>
       <div className='mx-auto max-w-6xl px-4 py-8'>
         <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
           {isHtml ? (
@@ -139,6 +139,6 @@ export function About() {
           )}
         </div>
       </div>
-    </PublicLayout>
+    </AppShell>
   )
 }
