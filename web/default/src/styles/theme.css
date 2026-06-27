@@ -102,6 +102,7 @@ For commercial licensing, please contact support@quantumnous.com
   --color-surface-3: var(--surface-3);
   --color-surface-hover: var(--surface-hover);
   --color-surface-inset: var(--surface-inset);
+  --color-text-strong: var(--text-strong);
   --color-field: var(--field-bg);
   --color-field-border: var(--field-border);
   --color-code: var(--code-bg);
@@ -184,8 +185,15 @@ For commercial licensing, please contact support@quantumnous.com
   --z-toast: 90;
 
   --radius: 14px;
-  --app-header-height: 3rem;
+  --app-header-height: 3.75rem;
   --nav-height: 64px;
+  --gutter: 24px;
+  --container-sm: 640px;
+  --container-md: 860px;
+  --container-lg: 1100px;
+  --container-xl: 1280px;
+  --blur-md: blur(18px);
+  --z-sticky: 200;
   --app-rev: '2k6e8r7p';
   --font-body: var(--font-sans);
 
@@ -272,13 +280,13 @@ For commercial licensing, please contact support@quantumnous.com
   --chart-4: var(--amber-600);
   --chart-5: var(--ink-300);
 
-  --sidebar: var(--ink-25);
-  --sidebar-foreground: var(--ink-900);
+  --sidebar: var(--surface-inset);
+  --sidebar-foreground: var(--text);
   --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: var(--brand-on);
-  --sidebar-accent: var(--ink-100);
-  --sidebar-accent-foreground: var(--ink-950);
-  --sidebar-border: rgba(15, 15, 20, 0.1);
+  --sidebar-accent: var(--surface-hover);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--border);
   --sidebar-ring: var(--brand-ring);
 
   --skeleton-base: var(--ink-100);
@@ -372,13 +380,13 @@ For commercial licensing, please contact support@quantumnous.com
   --chart-4: var(--amber-500);
   --chart-5: var(--ink-400);
 
-  --sidebar: var(--ink-900);
-  --sidebar-foreground: var(--ink-50);
+  --sidebar: var(--surface-inset);
+  --sidebar-foreground: var(--text);
   --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: var(--brand-on);
-  --sidebar-accent: var(--ink-800);
-  --sidebar-accent-foreground: var(--ink-100);
-  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-accent: var(--surface-hover);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--border);
   --sidebar-ring: var(--brand-ring);
 
   --skeleton-base: var(--ink-800);

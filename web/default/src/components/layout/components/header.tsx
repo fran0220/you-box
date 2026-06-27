@@ -54,7 +54,7 @@ export function Header(props: HeaderProps) {
   const showNotifications = props.showNotifications ?? true
   const showConfigDrawer = props.showConfigDrawer ?? variant === 'app'
   const showProfileDropdown = props.showProfileDropdown ?? variant === 'app'
-  const showThemeSwitch = props.showThemeSwitch ?? variant === 'public'
+  const showThemeSwitch = props.showThemeSwitch ?? true
   const showAuthButtons = props.showAuthButtons ?? variant === 'public'
   const showLanguageSwitcher = props.showLanguageSwitcher ?? true
 
@@ -143,6 +143,7 @@ export function Header(props: HeaderProps) {
           />
         ) : null}
         {showLanguageSwitcher ? <LanguageSwitcher /> : null}
+        {showThemeSwitch ? <ThemeSwitch /> : null}
         {showConfigDrawer ? <ConfigDrawer /> : null}
         {showProfileDropdown ? <ProfileDropdown /> : null}
       </div>
