@@ -184,6 +184,11 @@ export interface MobileDrawerProps {
   mobileLinksList: TopNavLink[]
   showAuthButtons: boolean
   user: AuthUser | null
+  onNavLinkClick?: (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    link: TopNavLink,
+    options?: { closeMobile?: () => void }
+  ) => void
 }
 
 /**
@@ -212,6 +217,7 @@ export function MobileDrawer({
   mobileLinksList,
   showAuthButtons,
   user,
+  onNavLinkClick,
 }: MobileDrawerProps) {
   const { t } = useTranslation()
 
@@ -255,20 +261,47 @@ export function MobileDrawer({
                 ))}
               </div>
             ) : (
-              mobileLinksList.map((link, index) => (
-                <div
-                  key={`${link.href}-${index}`}
-                  className='border-border border-b p-2.5 last:border-b-0'
-                >
-                  <Link
-                    to={link.href}
-                    className='text-primary/60 hover:text-primary/80 transition-colors'
-                    onClick={onClose}
+              mobileLinksList.map((link, index) => {
+                const label = t(link.title)
+                const closeMobile = () => onClose()
+                const handleClick = (
+                  event: React.MouseEvent<HTMLAnchorElement>
+                ) => {
+                  if (onNavLinkClick) {
+                    onNavLinkClick(event, link, { closeMobile })
+                    if (!event.defaultPrevented) onClose()
+                    return
+                  }
+                  onClose()
+                }
+                return (
+                  <div
+                    key={`${link.href}-${index}`}
+                    className='border-border border-b p-2.5 last:border-b-0'
                   >
-                    {link.title}
-                  </Link>
-                </div>
-              ))
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-primary/60 hover:text-primary/80 transition-colors'
+                        onClick={handleClick}
+                      >
+                        {label}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        disabled={link.disabled}
+                        className='text-primary/60 hover:text-primary/80 transition-colors'
+                        onClick={handleClick}
+                      >
+                        {label}
+                      </Link>
+                    )}
+                  </div>
+                )
+              })
             )}
           </div>
 

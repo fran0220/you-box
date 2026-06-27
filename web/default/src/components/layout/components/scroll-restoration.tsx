@@ -16,12 +16,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { AppShell } from './app-shell'
+import { useEffect } from 'react'
+import { useRouterState } from '@tanstack/react-router'
 
-type AuthenticatedLayoutProps = {
-  children?: React.ReactNode
-}
+/** Scroll window to top on pathname changes (cross-route navigation). */
+export function ScrollRestoration() {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
 
-export function AuthenticatedLayout(props: AuthenticatedLayoutProps) {
-  return <AppShell variant='app'>{props.children}</AppShell>
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [pathname])
+
+  return null
 }

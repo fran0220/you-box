@@ -19,8 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { Markdown } from '@/components/ui/markdown'
-import { PublicLayout } from '@/components/layout'
-import { Footer } from '@/components/layout/components/footer'
+import { AppShell } from '@/components/layout/components/app-shell'
 import { CTA, Features, Hero, HowItWorks, Stats } from './components'
 import { useHomePageContent } from './hooks'
 
@@ -32,44 +31,43 @@ export function Home() {
 
   if (!isLoaded) {
     return (
-      <PublicLayout showMainContainer={false}>
-        <main className='flex min-h-screen items-center justify-center'>
+      <AppShell variant='public' contentMode='bare' showFooter={false}>
+        <div className='flex flex-1 items-center justify-center'>
           <div className='text-muted-foreground'>{t('Loading...')}</div>
-        </main>
-      </PublicLayout>
+        </div>
+      </AppShell>
     )
   }
 
   if (content) {
     return (
-      <PublicLayout showMainContainer={false}>
-        <main className='overflow-x-hidden'>
+      <AppShell variant='public' contentMode='bare' showFooter={false}>
+        <div className='overflow-x-hidden'>
           {isUrl ? (
             <iframe
               src={content}
-              className='h-dvh w-full border-none'
+              className='min-h-[calc(100svh-var(--app-header-height,3rem))] w-full border-none'
               title={t('Custom Home Page')}
             />
           ) : (
-            <div className='container mx-auto py-8'>
+            <div className='mx-auto max-w-7xl px-4 py-8 md:px-6'>
               <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
                 <Markdown className='custom-home-content'>{content}</Markdown>
               </div>
             </div>
           )}
-        </main>
-      </PublicLayout>
+        </div>
+      </AppShell>
     )
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
+    <AppShell variant='public' contentMode='bare'>
       <Hero isAuthenticated={isAuthenticated} />
       <Stats />
       <Features />
       <HowItWorks />
       <CTA isAuthenticated={isAuthenticated} />
-      <Footer />
-    </PublicLayout>
+    </AppShell>
   )
 }

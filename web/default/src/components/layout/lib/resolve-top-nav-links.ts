@@ -16,12 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { AppShell } from './app-shell'
+import { defaultTopNavLinks } from '../config/top-nav.config'
+import type { TopNavLink } from '../types'
 
-type AuthenticatedLayoutProps = {
-  children?: React.ReactNode
-}
-
-export function AuthenticatedLayout(props: AuthenticatedLayoutProps) {
-  return <AppShell variant='app'>{props.children}</AppShell>
+/** Backend-driven links with static fallback — used only by TopNav. */
+export function resolveTopNavLinks(dynamicLinks: TopNavLink[]): TopNavLink[] {
+  return dynamicLinks.length > 0 ? dynamicLinks : defaultTopNavLinks
 }
