@@ -22,6 +22,7 @@ import { Loader2, Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
+import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -92,6 +93,7 @@ function ModelQuickPicks(props: {
 
 export function ApiDocs() {
   const { t } = useTranslation()
+  const user = useAuthStore((s) => s.auth.user)
   const base =
     typeof window !== 'undefined' ? window.location.origin : 'https://your-host'
   const [state, setState] = useState<ApiDocsBuilderState>(DEFAULT_BUILDER)
@@ -107,13 +109,8 @@ export function ApiDocs() {
   // Available models (only when authenticated); used as quick-picks.
   const { data: models = [] } = useQuery({
     queryKey: ['api-docs-models'],
-    queryFn: async () => {
-      try {
-        return await getUserModels()
-      } catch {
-        return []
-      }
-    },
+    queryFn: () => getUserModels(),
+    enabled: !!user,
     staleTime: 5 * 60 * 1000,
   })
 
