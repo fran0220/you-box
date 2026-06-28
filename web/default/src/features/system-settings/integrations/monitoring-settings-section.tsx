@@ -16,12 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import { parseHttpStatusCodeRules } from '@/lib/http-status-code-rules'
 import {
   Form,
@@ -40,9 +39,11 @@ import {
   SettingRowGroup,
   SettingsForm,
 } from '../components/settings-form-layout'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
-import { useResetForm } from '../hooks/use-reset-form'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import { safeNumberFieldProps } from '../utils/numeric-field'
 
@@ -208,12 +209,34 @@ export function MonitoringSettingsSection({
     [defaultValues]
   )
 
-  const form = useForm<MonitoringFormInput, unknown, MonitoringFormValues>({
-    resolver: zodResolver(monitoringSchema),
-    defaultValues: formDefaults,
-  })
+  useEffect(() => {
+    baselineRef.current = normalizeDefaults(defaultValues)
+  }, [defaultValues])
 
-  useResetForm(form, formDefaults)
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<MonitoringFormValues>({
+      resolver: zodResolver(monitoringSchema) as Resolver<
+        MonitoringFormValues,
+        unknown,
+        MonitoringFormValues
+      >,
+      defaultValues: formDefaults as MonitoringFormValues,
+      onSubmit: async (data) => {
+        const normalized = normalizeFormValues(data)
+        const updates = (
+          Object.keys(normalized) as Array<keyof NormalizedMonitoringValues>
+        ).filter((key) => normalized[key] !== baselineRef.current[key])
+
+        for (const key of updates) {
+          await updateOption.mutateAsync({
+            key,
+            value: normalized[key],
+          })
+        }
+
+        baselineRef.current = normalized
+      },
+    })
 
   const autoDisableStatusCodes = form.watch('AutomaticDisableStatusCodes')
   const autoRetryStatusCodes = form.watch('AutomaticRetryStatusCodes')
@@ -226,37 +249,21 @@ export function MonitoringSettingsSection({
     [autoRetryStatusCodes]
   )
 
-  const onSubmit = async (values: MonitoringFormValues) => {
-    const normalized = normalizeFormValues(values)
-    const updates = (
-      Object.keys(normalized) as Array<keyof NormalizedMonitoringValues>
-    ).filter((key) => normalized[key] !== baselineRef.current[key])
-
-    if (updates.length === 0) {
-      toast.info(t('No changes to save'))
-      return
-    }
-
-    for (const key of updates) {
-      const value = normalized[key]
-      await updateOption.mutateAsync({
-        key,
-        value,
-      })
-    }
-
-    baselineRef.current = normalized
-  }
-
   return (
-    <SettingsSection title={t('Monitoring & Alerts')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-            saveLabel='Save monitoring rules'
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Monitoring & Alerts')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+              saveLabel='Save monitoring rules'
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -489,8 +496,9 @@ export function MonitoringSettingsSection({
               )}
             />
           </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

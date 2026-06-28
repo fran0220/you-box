@@ -16,9 +16,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -44,8 +43,11 @@ import {
   SettingsControlGroup,
   SettingsForm,
 } from '../components/settings-form-layout'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 
 const logSettingsSchema = z.object({
@@ -88,22 +90,27 @@ export function LogSettingsSection({
 }: LogSettingsSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
-  const form = useForm<LogSettingsFormValues>({
-    resolver: zodResolver(logSettingsSchema),
-    defaultValues: {
-      LogConsumeEnabled: defaultEnabled,
-    },
-  })
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<LogSettingsFormValues>({
+      resolver: zodResolver(logSettingsSchema),
+      defaultValues: {
+        LogConsumeEnabled: defaultEnabled,
+      },
+      onSubmit: async (_data, changedFields) => {
+        if ('LogConsumeEnabled' in changedFields) {
+          await updateOption.mutateAsync({
+            key: 'LogConsumeEnabled',
+            value: changedFields.LogConsumeEnabled as boolean,
+          })
+        }
+      },
+    })
 
   const [purgeDate, setPurgeDate] = useState<Date | undefined>(() =>
     getDateDaysAgo(30)
   )
   const [isCleaning, setIsCleaning] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-
-  useEffect(() => {
-    form.reset({ LogConsumeEnabled: defaultEnabled })
-  }, [defaultEnabled, form])
 
   const purgeTimestamp = useMemo(() => {
     if (!purgeDate) return null
@@ -114,14 +121,6 @@ export function LogSettingsSection({
     if (!purgeDate) return ''
     return formatTimestampToDate(purgeDate.getTime(), 'milliseconds')
   }, [purgeDate])
-
-  const onSubmit = async (values: LogSettingsFormValues) => {
-    if (values.LogConsumeEnabled === defaultEnabled) return
-    await updateOption.mutateAsync({
-      key: 'LogConsumeEnabled',
-      value: values.LogConsumeEnabled,
-    })
-  }
 
   const handleRequestCleanLogs = () => {
     if (!purgeTimestamp) {
@@ -160,14 +159,20 @@ export function LogSettingsSection({
   }
 
   return (
-    <SettingsSection title={t('Log Maintenance')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-            saveLabel='Save log settings'
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Log Maintenance')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+              saveLabel='Save log settings'
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -250,6 +255,7 @@ export function LogSettingsSection({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </SettingsSection>
+      </SettingsSection>
+    </>
   )
 }

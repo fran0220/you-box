@@ -24,6 +24,7 @@ import { formatTimestamp, formatTimestampToDate } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { Markdown } from '@/components/ui/markdown'
 import { Dialog } from '@/components/dialog'
+import { StatCard } from '@/components/youbox'
 import { SettingsSection } from '../components/settings-section'
 
 type ReleaseInfo = {
@@ -106,18 +107,8 @@ export function UpdateCheckerSection({
       <SettingsSection title={t('System maintenance')}>
         <div className='space-y-6'>
           <div className='grid gap-4 md:grid-cols-2'>
-            <div className='rounded-lg border p-4'>
-              <div className='text-muted-foreground text-sm'>
-                {t('Current version')}
-              </div>
-              <div className='text-lg font-semibold'>{version}</div>
-            </div>
-            <div className='rounded-lg border p-4'>
-              <div className='text-muted-foreground text-sm'>
-                {t('Uptime since')}
-              </div>
-              <div className='text-lg font-semibold'>{uptime}</div>
-            </div>
+            <StatCard label={t('Current version')} value={version} />
+            <StatCard label={t('Uptime since')} value={uptime} />
           </div>
 
           <Button onClick={handleCheckUpdates} disabled={checking}>

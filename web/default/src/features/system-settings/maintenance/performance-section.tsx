@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -57,8 +57,11 @@ import {
   SettingRowGroup,
   SettingsForm,
 } from '../components/settings-form-layout'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import { safeNumberFieldProps } from '../utils/numeric-field'
 
@@ -227,23 +230,38 @@ export function PerformanceSection(props: Props) {
     [props.defaultValues]
   )
 
-  const form = useForm<PerfFormInput, unknown, PerfFormValues>({
-    resolver: zodResolver(perfSchema),
-    defaultValues: formDefaults,
-  })
-
   const baselineRef = useRef<FlatPerfDefaults>(props.defaultValues)
-  const baselineSerializedRef = useRef<string>(
-    JSON.stringify(props.defaultValues)
-  )
 
   useEffect(() => {
-    const serialized = JSON.stringify(props.defaultValues)
-    if (serialized === baselineSerializedRef.current) return
     baselineRef.current = props.defaultValues
-    baselineSerializedRef.current = serialized
-    form.reset(buildFormDefaults(props.defaultValues))
-  }, [props.defaultValues, form])
+  }, [props.defaultValues])
+
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<PerfFormValues>({
+      resolver: zodResolver(perfSchema) as Resolver<
+        PerfFormValues,
+        unknown,
+        PerfFormValues
+      >,
+      defaultValues: formDefaults as PerfFormValues,
+      onSubmit: async (values) => {
+        const normalized = normalizeFormValues(values)
+        const changedKeys = (
+          Object.keys(normalized) as Array<keyof FlatPerfDefaults>
+        ).filter((key) => normalized[key] !== baselineRef.current[key])
+
+        for (const key of changedKeys) {
+          await updateOption.mutateAsync({
+            key,
+            value: normalized[key],
+          })
+        }
+
+        baselineRef.current = normalized
+        form.reset(buildFormDefaults(normalized) as PerfFormValues)
+        fetchStats()
+      },
+    })
 
   const fetchStats = useCallback(async () => {
     try {
@@ -267,30 +285,6 @@ export function PerformanceSection(props: Props) {
     fetchStats()
     fetchLogInfo()
   }, [fetchStats, fetchLogInfo])
-
-  const onSubmit = async (values: PerfFormValues) => {
-    const normalized = normalizeFormValues(values)
-    const changedKeys = (
-      Object.keys(normalized) as Array<keyof FlatPerfDefaults>
-    ).filter((key) => normalized[key] !== baselineRef.current[key])
-
-    if (changedKeys.length === 0) {
-      toast.info(t('No changes to save'))
-      return
-    }
-
-    for (const key of changedKeys) {
-      await updateOption.mutateAsync({
-        key,
-        value: normalized[key],
-      })
-    }
-
-    baselineRef.current = normalized
-    baselineSerializedRef.current = JSON.stringify(normalized)
-    form.reset(buildFormDefaults(normalized))
-    fetchStats()
-  }
 
   const clearDiskCache = async () => {
     try {
@@ -386,13 +380,19 @@ export function PerformanceSection(props: Props) {
       : 0
 
   return (
-    <SettingsSection title={t('Performance Settings')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Performance Settings')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           {/* Disk Cache Settings */}
           <div>
             <h4 className='font-medium'>{t('Disk Cache Settings')}</h4>
@@ -1062,6 +1062,7 @@ export function PerformanceSection(props: Props) {
           </>
         )}
       </div>
-    </SettingsSection>
+      </SettingsSection>
+    </>
   )
 }

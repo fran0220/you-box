@@ -17,12 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -30,7 +31,7 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
-import { useResetForm } from '../hooks/use-reset-form'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import { removeTrailingSlash } from './utils'
 
@@ -58,53 +59,55 @@ export function WorkerSettingsSection({
   const updateOption = useUpdateOption()
   const workerSchema = createWorkerSchema(t)
 
-  const form = useForm<WorkerFormValues>({
-    resolver: zodResolver(workerSchema),
-    defaultValues,
-  })
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<WorkerFormValues>({
+      resolver: zodResolver(workerSchema),
+      defaultValues,
+      onSubmit: async (values, changedFields) => {
+        const sanitizedUrl = removeTrailingSlash(values.WorkerUrl)
+        const sanitizedKey = values.WorkerValidKey.trim()
 
-  useResetForm(form, defaultValues)
+        if ('WorkerUrl' in changedFields) {
+          await updateOption.mutateAsync({
+            key: 'WorkerUrl',
+            value: sanitizedUrl,
+          })
+        }
 
-  const onSubmit = async (values: WorkerFormValues) => {
-    const sanitizedUrl = removeTrailingSlash(values.WorkerUrl)
-    const sanitizedKey = values.WorkerValidKey.trim()
-    const initialUrl = removeTrailingSlash(defaultValues.WorkerUrl)
-    const initialKey = defaultValues.WorkerValidKey.trim()
+        if (
+          'WorkerValidKey' in changedFields ||
+          ('WorkerUrl' in changedFields && sanitizedUrl === '')
+        ) {
+          await updateOption.mutateAsync({
+            key: 'WorkerValidKey',
+            value: sanitizedKey,
+          })
+        }
 
-    const updates: Array<{ key: string; value: string | boolean }> = []
-
-    if (sanitizedUrl !== initialUrl) {
-      updates.push({ key: 'WorkerUrl', value: sanitizedUrl })
-    }
-
-    if (sanitizedKey !== initialKey || sanitizedUrl === '') {
-      updates.push({ key: 'WorkerValidKey', value: sanitizedKey })
-    }
-
-    if (
-      values.WorkerAllowHttpImageRequestEnabled !==
-      defaultValues.WorkerAllowHttpImageRequestEnabled
-    ) {
-      updates.push({
-        key: 'WorkerAllowHttpImageRequestEnabled',
-        value: values.WorkerAllowHttpImageRequestEnabled,
-      })
-    }
-
-    for (const update of updates) {
-      await updateOption.mutateAsync(update)
-    }
-  }
+        if ('WorkerAllowHttpImageRequestEnabled' in changedFields) {
+          await updateOption.mutateAsync({
+            key: 'WorkerAllowHttpImageRequestEnabled',
+            value: values.WorkerAllowHttpImageRequestEnabled,
+          })
+        }
+      },
+    })
 
   return (
-    <SettingsSection title={t('Worker Proxy')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-            saveLabel='Save Worker settings'
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Worker Proxy')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit} autoComplete='off'>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+              saveLabel='Save Worker settings'
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -178,8 +181,9 @@ export function WorkerSettingsSection({
               )}
             />
           </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

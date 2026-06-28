@@ -17,12 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -30,7 +31,7 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
-import { useResetForm } from '../hooks/use-reset-form'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 
 const createEmailSchema = (t: (key: string) => string) =>
@@ -65,84 +66,53 @@ export function EmailSettingsSection({
   const updateOption = useUpdateOption()
   const emailSchema = createEmailSchema(t)
 
-  const form = useForm<EmailFormValues>({
-    resolver: zodResolver(emailSchema),
-    defaultValues,
-  })
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<EmailFormValues>({
+      resolver: zodResolver(emailSchema),
+      defaultValues,
+      onSubmit: async (values, changedFields) => {
+        const sanitized = {
+          SMTPServer: values.SMTPServer.trim(),
+          SMTPPort: values.SMTPPort.trim(),
+          SMTPAccount: values.SMTPAccount.trim(),
+          SMTPFrom: values.SMTPFrom.trim(),
+          SMTPToken: values.SMTPToken.trim(),
+          SMTPSSLEnabled: values.SMTPSSLEnabled,
+          SMTPForceAuthLogin: values.SMTPForceAuthLogin,
+        }
 
-  useResetForm(form, defaultValues)
-
-  const onSubmit = async (values: EmailFormValues) => {
-    const sanitized = {
-      SMTPServer: values.SMTPServer.trim(),
-      SMTPPort: values.SMTPPort.trim(),
-      SMTPAccount: values.SMTPAccount.trim(),
-      SMTPFrom: values.SMTPFrom.trim(),
-      SMTPToken: values.SMTPToken.trim(),
-      SMTPSSLEnabled: values.SMTPSSLEnabled,
-      SMTPForceAuthLogin: values.SMTPForceAuthLogin,
-    }
-
-    const initial = {
-      SMTPServer: defaultValues.SMTPServer.trim(),
-      SMTPPort: defaultValues.SMTPPort.trim(),
-      SMTPAccount: defaultValues.SMTPAccount.trim(),
-      SMTPFrom: defaultValues.SMTPFrom.trim(),
-      SMTPToken: defaultValues.SMTPToken.trim(),
-      SMTPSSLEnabled: defaultValues.SMTPSSLEnabled,
-      SMTPForceAuthLogin: defaultValues.SMTPForceAuthLogin,
-    }
-
-    const updates: Array<{ key: string; value: string | boolean }> = []
-
-    if (sanitized.SMTPServer !== initial.SMTPServer) {
-      updates.push({ key: 'SMTPServer', value: sanitized.SMTPServer })
-    }
-
-    if (sanitized.SMTPPort !== initial.SMTPPort) {
-      updates.push({ key: 'SMTPPort', value: sanitized.SMTPPort })
-    }
-
-    if (sanitized.SMTPAccount !== initial.SMTPAccount) {
-      updates.push({ key: 'SMTPAccount', value: sanitized.SMTPAccount })
-    }
-
-    if (sanitized.SMTPFrom !== initial.SMTPFrom) {
-      updates.push({ key: 'SMTPFrom', value: sanitized.SMTPFrom })
-    }
-
-    if (sanitized.SMTPToken && sanitized.SMTPToken !== initial.SMTPToken) {
-      updates.push({ key: 'SMTPToken', value: sanitized.SMTPToken })
-    }
-
-    if (sanitized.SMTPSSLEnabled !== initial.SMTPSSLEnabled) {
-      updates.push({
-        key: 'SMTPSSLEnabled',
-        value: sanitized.SMTPSSLEnabled,
-      })
-    }
-
-    if (sanitized.SMTPForceAuthLogin !== initial.SMTPForceAuthLogin) {
-      updates.push({
-        key: 'SMTPForceAuthLogin',
-        value: sanitized.SMTPForceAuthLogin,
-      })
-    }
-
-    for (const update of updates) {
-      await updateOption.mutateAsync(update)
-    }
-  }
+        for (const key of Object.keys(changedFields) as Array<
+          keyof EmailFormValues
+        >) {
+          if (key === 'SMTPToken') {
+            const token = sanitized.SMTPToken
+            if (!token) continue
+            await updateOption.mutateAsync({ key: 'SMTPToken', value: token })
+            continue
+          }
+          await updateOption.mutateAsync({
+            key,
+            value: sanitized[key] as string | boolean,
+          })
+        }
+      },
+    })
 
   return (
-    <SettingsSection title={t('SMTP Email')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-            saveLabel='Save SMTP settings'
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('SMTP Email')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit} autoComplete='off'>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+              saveLabel='Save SMTP settings'
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -300,8 +270,9 @@ export function EmailSettingsSection({
               )}
             />
           </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }
