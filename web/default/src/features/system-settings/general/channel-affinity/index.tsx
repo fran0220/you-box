@@ -281,17 +281,28 @@ export function ChannelAffinitySection(props: Props) {
 
   const handleSave = async () => {
     setSaving(true)
+    let flat: Record<string, string | number | boolean>
     try {
-      const flat = flattenChannelAffinityForSave(currentFormSlice)
-      const changed = compareChannelAffinityBaselines(
-        flat,
-        props.defaultValues
-      )
-      const entries = Object.entries(changed)
-      if (entries.length === 0) {
-        toast.info(t('No changes to save'))
-        return
+      flat = flattenChannelAffinityForSave(currentFormSlice)
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('array')) {
+        toast.error(t('Rules JSON must be an array'))
+      } else {
+        toast.error(t('Invalid rules JSON format'))
       }
+      setSaving(false)
+      return
+    }
+
+    const changed = compareChannelAffinityBaselines(flat, props.defaultValues)
+    const entries = Object.entries(changed)
+    if (entries.length === 0) {
+      toast.info(t('No changes to save'))
+      setSaving(false)
+      return
+    }
+
+    try {
       for (const [key, value] of entries) {
         await updateOption.mutateAsync({
           key,
@@ -302,11 +313,11 @@ export function ChannelAffinitySection(props: Props) {
         })
       }
     } catch (err) {
-      if (err instanceof Error && err.message.includes('array')) {
-        toast.error(t('Rules JSON must be an array'))
-      } else {
-        toast.error(t('Invalid rules JSON format'))
-      }
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : t('Failed to update setting')
+      )
     } finally {
       setSaving(false)
     }

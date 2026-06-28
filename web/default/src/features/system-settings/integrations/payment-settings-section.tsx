@@ -158,6 +158,7 @@ const paymentSchema = z.object({
   WaffoMinTopUp: z.coerce.number().min(1),
   WaffoNotifyUrl: z.string(),
   WaffoReturnUrl: z.string(),
+  WaffoPayMethods: z.string(),
   WaffoPancakeMerchantID: z.string(),
   WaffoPancakePrivateKey: z.string(),
   WaffoPancakeReturnURL: z.string(),
@@ -167,7 +168,9 @@ type PaymentFormValues = z.infer<typeof paymentSchema>
 type WaffoFormFieldValues = Omit<WaffoSettingsValues, 'WaffoPayMethods'>
 type PaymentBaseFormValues = Omit<
   PaymentFormValues,
-  keyof WaffoFormFieldValues | keyof WaffoPancakeSettingsValues
+  | keyof WaffoFormFieldValues
+  | keyof WaffoPancakeSettingsValues
+  | 'WaffoPayMethods'
 >
 
 const CURRENT_COMPLIANCE_TERMS_VERSION = 'v1'
@@ -340,10 +343,80 @@ export function PaymentSettingsSection({
       AmountOptions: formatJsonForEditor(initialFormValues.AmountOptions),
       AmountDiscount: formatJsonForEditor(initialFormValues.AmountDiscount),
       CreemProducts: formatJsonForEditor(initialFormValues.CreemProducts),
+      WaffoPayMethods: formatJsonForEditor(
+        initialFormValues.WaffoPayMethods ?? waffoDefaultValues.WaffoPayMethods
+      ),
     },
   })
 
   const { isDirty, isSubmitting } = form.formState
+
+  const syncWaffoPayMethodsToForm = React.useCallback(
+    (methods: PayMethod[]) => {
+      const json = JSON.stringify(methods)
+      form.setValue('WaffoPayMethods', json, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+    },
+    [form]
+  )
+
+  const handleWaffoPayMethodsChange = React.useCallback(
+    (value: React.SetStateAction<PayMethod[]>) => {
+      setWaffoPayMethods((previous) => {
+        const next =
+          typeof value === 'function' ? value(previous) : value
+        syncWaffoPayMethodsToForm(next)
+        return next
+      })
+    },
+    [syncWaffoPayMethodsToForm]
+  )
+
+  const waffoPayMethodsBaselineJson = React.useMemo(
+    () => JSON.stringify(parseWaffoPayMethods(waffoDefaultValues.WaffoPayMethods)),
+    [waffoDefaultValues.WaffoPayMethods]
+  )
+
+  const waffoPancakeBindingDirty =
+    waffoPancakeSelection.storeID !== waffoPancakeSavedBinding.storeID ||
+    waffoPancakeSelection.productID !== waffoPancakeSavedBinding.productID
+
+  const isPaymentDirty =
+    isDirty ||
+    JSON.stringify(waffoPayMethods) !== waffoPayMethodsBaselineJson ||
+    waffoPancakeBindingDirty
+
+  const resetToSavedBaseline = React.useCallback(() => {
+    const parsedDefaults = JSON.parse(defaultsSignature) as PaymentFormValues
+    initialRef.current = parsedDefaults
+    form.reset({
+      ...parsedDefaults,
+      PayMethods: formatJsonForEditor(parsedDefaults.PayMethods),
+      AmountOptions: formatJsonForEditor(parsedDefaults.AmountOptions),
+      AmountDiscount: formatJsonForEditor(parsedDefaults.AmountDiscount),
+      CreemProducts: formatJsonForEditor(parsedDefaults.CreemProducts),
+      WaffoPayMethods: formatJsonForEditor(
+        parsedDefaults.WaffoPayMethods ?? waffoDefaultValues.WaffoPayMethods
+      ),
+    })
+    setWaffoPayMethods(
+      parseWaffoPayMethods(waffoDefaultValues.WaffoPayMethods)
+    )
+    const savedBinding = {
+      storeID: waffoPancakeProvisionedStoreID ?? '',
+      productID: waffoPancakeProvisionedProductID ?? '',
+    }
+    setWaffoPancakeSelection(savedBinding)
+    setWaffoPancakeSavedBinding(savedBinding)
+  }, [
+    defaultsSignature,
+    form,
+    waffoDefaultValues.WaffoPayMethods,
+    waffoPancakeProvisionedProductID,
+    waffoPancakeProvisionedStoreID,
+  ])
 
   const setPaymentValue = React.useCallback(
     (
@@ -397,8 +470,14 @@ export function PaymentSettingsSection({
       AmountOptions: formatJsonForEditor(parsedDefaults.AmountOptions),
       AmountDiscount: formatJsonForEditor(parsedDefaults.AmountDiscount),
       CreemProducts: formatJsonForEditor(parsedDefaults.CreemProducts),
+      WaffoPayMethods: formatJsonForEditor(
+        parsedDefaults.WaffoPayMethods ?? waffoDefaultValues.WaffoPayMethods
+      ),
     })
-  }, [defaultsSignature, form])
+    setWaffoPayMethods(
+      parseWaffoPayMethods(waffoDefaultValues.WaffoPayMethods)
+    )
+  }, [defaultsSignature, form, waffoDefaultValues.WaffoPayMethods])
 
   const onSubmit = async (values: PaymentFormValues) => {
     const sanitized = {
@@ -701,6 +780,17 @@ export function PaymentSettingsSection({
       await updateOption.mutateAsync(update)
     }
 
+    const postSaveWaffoPayMethodsJson = JSON.stringify(waffoPayMethods)
+    const currentValues = form.getValues()
+    initialRef.current = {
+      ...currentValues,
+      WaffoPayMethods: postSaveWaffoPayMethodsJson,
+    }
+    form.reset({
+      ...currentValues,
+      WaffoPayMethods: formatJsonForEditor(postSaveWaffoPayMethodsJson),
+    })
+
     if (!hasWaffoPancakeChanges) {
       return
     }
@@ -782,7 +872,7 @@ export function PaymentSettingsSection({
 
   return (
     <>
-      <FormNavigationGuard when={isDirty} />
+      <FormNavigationGuard when={isPaymentDirty} />
 
       <SettingsSection title={t('Payment Gateway')}>
       {!complianceConfirmed ? (
@@ -859,11 +949,12 @@ export function PaymentSettingsSection({
         >
           <SettingsPageFormActions
             onSave={form.handleSubmit(onSubmit)}
-            onReset={() => form.reset()}
+            onReset={resetToSavedBaseline}
             isSaving={updateOption.isPending || isSubmitting}
-            isResetDisabled={!isDirty}
+            isResetDisabled={!isPaymentDirty}
+            isDirty={isPaymentDirty}
           />
-          <FormDirtyIndicator isDirty={isDirty} />
+          <FormDirtyIndicator isDirty={isPaymentDirty} />
           <div className='space-y-4'>
             <div>
               <h3 className='text-lg font-medium'>{t('General Settings')}</h3>
@@ -1545,7 +1636,9 @@ export function PaymentSettingsSection({
             onValueChange={setWaffoPancakeValue}
             selectedBinding={waffoPancakeSelection}
             savedBinding={waffoPancakeSavedBinding}
-            onSelectedBindingChange={setWaffoPancakeSelection}
+            onSelectedBindingChange={(value) => {
+              setWaffoPancakeSelection(value)
+            }}
           />
 
           <Separator />
@@ -1554,7 +1647,7 @@ export function PaymentSettingsSection({
             values={waffoValues}
             onValueChange={setWaffoValue}
             payMethods={waffoPayMethods}
-            onPayMethodsChange={setWaffoPayMethods}
+            onPayMethodsChange={handleWaffoPayMethodsChange}
           />
         </SettingsForm>
       </Form>

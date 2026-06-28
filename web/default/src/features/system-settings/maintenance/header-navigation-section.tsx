@@ -145,8 +145,8 @@ export function HeaderNavigationSection({
     })
   }
 
-  const resetToDefault = () => {
-    form.reset(toFormValues(HEADER_NAV_DEFAULT))
+  const resetToSavedBaseline = () => {
+    form.reset(formDefaults)
   }
 
   const simpleModules: Array<{
@@ -218,7 +218,7 @@ export function HeaderNavigationSection({
         <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
           <SettingsPageFormActions
             onSave={form.handleSubmit(onSubmit)}
-            onReset={resetToDefault}
+            onReset={resetToSavedBaseline}
             isSaving={updateOption.isPending}
             isResetDisabled={!isDirty}
           />

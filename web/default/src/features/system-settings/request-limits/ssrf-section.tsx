@@ -199,13 +199,14 @@ export function SSRFSection({ defaultValues }: SSRFSectionProps) {
     }
 
     baselineRef.current = normalized
+    form.reset(buildFormDefaults(normalized))
   }
 
   const domainFilterMode = form.watch('fetch_setting.domain_filter_mode')
   const ipFilterMode = form.watch('fetch_setting.ip_filter_mode')
 
   const handleReset = () => {
-    form.reset(buildFormDefaults(defaultValues))
+    form.reset(buildFormDefaults(baselineRef.current))
     toast.success(t('Form reset to saved values'))
   }
 

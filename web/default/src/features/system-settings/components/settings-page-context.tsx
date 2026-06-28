@@ -109,6 +109,8 @@ type SettingsPageFormActionsProps = {
   isSaving?: boolean
   isSaveDisabled?: boolean
   isResetDisabled?: boolean
+  /** When set, overrides react-hook-form isDirty (e.g. external payment-method state). */
+  isDirty?: boolean
   /** @deprecated Labels are fixed by the sticky save bar. */
   saveLabel?: string
   /** @deprecated Labels are fixed by the sticky save bar. */
@@ -135,11 +137,13 @@ export function SettingsPageFormActions(props: SettingsPageFormActionsProps) {
 
 function FormBoundFormActions(props: SettingsPageFormActionsProps) {
   const { control, reset } = useFormContext()
-  const { isDirty, isSubmitting } = useFormState({ control })
+  const { isDirty: formDirty, isSubmitting } = useFormState({ control })
+  const dirty =
+    props.isDirty !== undefined ? props.isDirty || formDirty : formDirty
 
   return (
     <FormActionsRegistrar
-      dirty={isDirty}
+      dirty={dirty}
       saving={Boolean(props.isSaving) || isSubmitting}
       save={props.onSave}
       discard={props.onReset ?? (() => reset())}

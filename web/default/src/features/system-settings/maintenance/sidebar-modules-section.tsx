@@ -40,7 +40,6 @@ import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
 import {
-  SIDEBAR_MODULES_DEFAULT,
   type SidebarModulesAdminConfig,
   serializeSidebarModulesAdmin,
 } from './config'
@@ -176,8 +175,8 @@ export function SidebarModulesSection({
     })
   }
 
-  const resetToDefault = () => {
-    form.reset(SIDEBAR_MODULES_DEFAULT)
+  const resetToSavedBaseline = () => {
+    form.reset(formDefaults)
   }
 
   const sections = Object.entries(config)
@@ -190,7 +189,7 @@ export function SidebarModulesSection({
         <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
           <SettingsPageFormActions
             onSave={form.handleSubmit(onSubmit)}
-            onReset={resetToDefault}
+            onReset={resetToSavedBaseline}
             isSaving={updateOption.isPending}
             isResetDisabled={!isDirty}
           />
