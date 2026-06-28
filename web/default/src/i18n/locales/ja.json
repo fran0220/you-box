@@ -4100,6 +4100,7 @@
     "Subscription Billing": "サブスクリプション課金",
     "Subscription First": "サブスクリプション優先",
     "Subscription Management": "サブスクリプション管理",
+    "Create and manage subscription plans, pricing, quotas, and user-side visibility.": "サブスクリプションプラン、価格、クォータ、ユーザー向け表示を作成・管理します。",
     "Subscription Only": "サブスクリプションのみ",
     "Subscription plan creation and changes are locked until the administrator confirms compliance terms in Payment Gateway settings.": "管理者が支払いゲートウェイ設定でコンプライアンス条件を確認するまで、サブスクリプションプランの作成と変更はロックされます。",
     "Subscription Plans": "サブスクリプションプラン",

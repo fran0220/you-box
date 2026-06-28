@@ -4100,6 +4100,7 @@
     "Subscription Billing": "Facturation d'abonnement",
     "Subscription First": "Abonnement en priorité",
     "Subscription Management": "Gestion des abonnements",
+    "Create and manage subscription plans, pricing, quotas, and user-side visibility.": "Créez et gérez les offres d'abonnement, les tarifs, les quotas et la visibilité côté utilisateur.",
     "Subscription Only": "Abonnement uniquement",
     "Subscription plan creation and changes are locked until the administrator confirms compliance terms in Payment Gateway settings.": "La création et la modification des forfaits d’abonnement sont verrouillées jusqu’à ce que l’administrateur confirme les conditions de conformité dans les paramètres de la passerelle de paiement.",
     "Subscription Plans": "Plans d'abonnement",

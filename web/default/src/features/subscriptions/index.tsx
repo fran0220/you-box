@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useTranslation } from 'react-i18next'
 import { SectionPageLayout } from '@/components/layout'
 import { InlineAlert } from '@/components/patterns'
+import { PageHeader } from '@/components/youbox'
 import { PlanPreviewPanel } from './components/plan-preview-panel'
 import { SubscriptionsDialogs } from './components/subscriptions-dialogs'
 import { SubscriptionsPrimaryButtons } from './components/subscriptions-primary-buttons'
@@ -35,33 +36,31 @@ function SubscriptionsContent() {
   return (
     <>
       <SectionPageLayout>
-        <SectionPageLayout.Title>
-          {t('Subscription Management')}
-        </SectionPageLayout.Title>
-        <SectionPageLayout.Actions>
-          <SubscriptionsPrimaryButtons />
-        </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          {/* Stripe/Creem product hint — InlineAlert form (r2-B10 §4),
-              copy unchanged. Moved from the header actions slot into the
-              content column so it no longer competes with the Create
-              button for space. */}
-          <InlineAlert tone='info' className='mb-4 px-3 py-2.5'>
-            {t(
-              'Stripe/Creem requires creating products on the third-party platform and entering the ID'
-            )}
-          </InlineAlert>
-          {/* Compliance gate — copy unchanged; warning tone per r2-B10 §4. */}
-          {!complianceConfirmed ? (
-            <InlineAlert tone='warning' className='mb-4'>
+          <div className='mx-auto w-full max-w-[1080px] space-y-5'>
+            <PageHeader
+              eyebrow={t('Admin')}
+              title={t('Subscription Management')}
+              subtitle={t(
+                'Create and manage subscription plans, pricing, quotas, and user-side visibility.'
+              )}
+              actions={<SubscriptionsPrimaryButtons />}
+            />
+            <InlineAlert tone='info' className='px-3 py-2.5'>
               {t(
-                'Subscription plan creation and changes are locked until the administrator confirms compliance terms in Payment Gateway settings.'
+                'Stripe/Creem requires creating products on the third-party platform and entering the ID'
               )}
             </InlineAlert>
-          ) : null}
-          {/* Collapsed-by-default preview of the user-side plan list. */}
-          <PlanPreviewPanel className='mb-4' />
-          <SubscriptionsTable />
+            {!complianceConfirmed ? (
+              <InlineAlert tone='warning'>
+                {t(
+                  'Subscription plan creation and changes are locked until the administrator confirms compliance terms in Payment Gateway settings.'
+                )}
+              </InlineAlert>
+            ) : null}
+            <PlanPreviewPanel />
+            <SubscriptionsTable />
+          </div>
         </SectionPageLayout.Content>
       </SectionPageLayout>
 
