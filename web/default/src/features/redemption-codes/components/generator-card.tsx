@@ -292,7 +292,7 @@ export function GeneratorCard() {
           </InlineAlert>
         )}
 
-        <p className='text-muted-foreground text-xs'>
+        <p className='text-muted text-xs'>
           {t('Codes are shown once after generation. Copy them now.')}
         </p>
       </PanelBody>

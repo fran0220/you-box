@@ -225,7 +225,7 @@ export function useRedemptionsColumns(): ColumnDef<Redemption>[] {
         const redemption = row.original
 
         if (userId === 0) {
-          return <span className='text-muted-foreground text-sm'>-</span>
+          return <span className='text-muted text-sm'>-</span>
         }
 
         return (
