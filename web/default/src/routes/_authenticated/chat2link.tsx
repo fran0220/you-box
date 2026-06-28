@@ -17,15 +17,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { isSidebarModuleEnabled } from '@/lib/nav-modules'
 import { useActiveChatKey } from '@/features/chat/hooks/use-active-chat-key'
 import { useChatPresets } from '@/features/chat/hooks/use-chat-presets'
 import { resolveChatUrl } from '@/features/chat/lib/chat-links'
 
 export const Route = createFileRoute('/_authenticated/chat2link')({
+  beforeLoad: () => {
+    if (!isSidebarModuleEnabled('chat', 'chat')) {
+      throw redirect({ to: '/dashboard' })
+    }
+  },
   component: Chat2LinkPage,
 })
 
@@ -83,9 +89,12 @@ function Chat2LinkPage() {
   ])
 
   return (
-    <div className='flex h-full flex-col items-center justify-center gap-3'>
-      <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
-      <p className='text-muted-foreground text-sm'>
+    <div className='bg-background flex h-full min-h-[50vh] flex-col items-center justify-center gap-3'>
+      <Loader2
+        aria-hidden='true'
+        className='text-muted-foreground size-8 animate-spin'
+      />
+      <p className='text-muted-foreground font-mono text-sm'>
         {t('Redirecting to chat page...')}
       </p>
     </div>

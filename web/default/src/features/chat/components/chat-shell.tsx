@@ -28,7 +28,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ConversationRailItem } from '@/components/ai-elements/conversation-rail-item'
 import { FilterBarSearch } from '@/components/data-table'
-import { Eyebrow } from '@/components/patterns'
+import { Eyebrow } from '@/components/youbox'
 import { fetchActiveChatKey } from '../hooks/use-active-chat-key'
 import { useChatPresets } from '../hooks/use-chat-presets'
 import {
@@ -169,9 +169,9 @@ export function ChatShell({
   const openLoading = preset != null && loadingPresetId === preset.id
 
   return (
-    <div className='flex h-full min-h-0'>
-      <aside className='bg-surface hidden w-[260px] shrink-0 flex-col border-r lg:flex'>
-        <div className='space-y-3 px-4 pt-4 pb-3'>
+    <div className='bg-background flex h-full min-h-0'>
+      <aside className='bg-surface-inset border-border hidden w-[268px] shrink-0 flex-col border-r lg:flex'>
+        <div className='border-border space-y-3 border-b px-4 py-4'>
           <Eyebrow>{t('Presets')}</Eyebrow>
           <FilterBarSearch
             value={search}
@@ -186,7 +186,7 @@ export function ChatShell({
           className='min-h-0 flex-1 space-y-0.5 overflow-y-auto px-2 pb-2'
         >
           {filteredPresets.length === 0 ? (
-            <p className='text-muted-foreground px-3 py-2 text-xs'>
+            <p className='text-muted-foreground px-3 py-2 font-mono text-xs'>
               {t('No matching presets')}
             </p>
           ) : (
@@ -217,25 +217,27 @@ export function ChatShell({
             ))
           )}
         </nav>
-        <div className='flex items-center gap-3 border-t px-4 py-3'>
+        <div className='border-border flex items-center gap-3 border-t px-4 py-3'>
           <Avatar size='sm'>
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
-          <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>
-            {displayName}
-          </span>
-          <span className='text-muted-foreground shrink-0 font-mono text-xs'>
+          <div className='min-w-0 flex-1'>
+            <div className='truncate text-[13px] font-semibold text-foreground'>
+              {displayName}
+            </div>
+          </div>
+          <span className='text-muted-foreground shrink-0 font-mono text-[11px]'>
             {formatQuota(user?.quota ?? 0)}
           </span>
         </div>
       </aside>
-      <div className='flex min-w-0 flex-1 flex-col'>
-        <div className='flex items-center gap-3 border-b px-4 py-3'>
-          <h1 className='min-w-0 truncate text-[15px] font-semibold'>
+      <div className='bg-background flex min-w-0 flex-1 flex-col'>
+        <div className='border-border flex h-[60px] shrink-0 items-center gap-3 border-b px-6'>
+          <h1 className='text-foreground min-w-0 flex-1 truncate text-[15px] font-semibold'>
             {preset?.name ?? t('Chat')}
           </h1>
           {preset != null && (
-            <Badge variant='outline'>
+            <Badge variant='secondary'>
               {preset.type === 'web' ? t('Embedded') : t('External')}
             </Badge>
           )}
