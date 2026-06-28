@@ -65,8 +65,10 @@ type ModelsContextType = {
   >
   tabCategory: ModelTabCategory
   setTabCategory: (category: ModelTabCategory) => void
-  metadataTotal: number | null
-  setMetadataTotal: React.Dispatch<React.SetStateAction<number | null>>
+  metadataConfiguredTotal: number | null
+  setMetadataConfiguredTotal: React.Dispatch<
+    React.SetStateAction<number | null>
+  >
 }
 
 // ============================================================================
@@ -99,7 +101,9 @@ export function ModelsProvider({ children }: { children: React.ReactNode }) {
     source: 'official',
   })
   const [tabCategory, setTabCategory] = useState<ModelTabCategory>('metadata')
-  const [metadataTotal, setMetadataTotal] = useState<number | null>(null)
+  const [metadataConfiguredTotal, setMetadataConfiguredTotal] = useState<
+    number | null
+  >(null)
 
   return (
     <ModelsContext.Provider
@@ -120,8 +124,8 @@ export function ModelsProvider({ children }: { children: React.ReactNode }) {
         setSyncWizardOptions,
         tabCategory,
         setTabCategory,
-        metadataTotal,
-        setMetadataTotal,
+        metadataConfiguredTotal,
+        setMetadataConfiguredTotal,
       }}
     >
       {children}

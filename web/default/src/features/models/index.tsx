@@ -62,7 +62,7 @@ function ModelsContent() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { tabCategory, setTabCategory, metadataTotal } = useModels()
+  const { tabCategory, setTabCategory, metadataConfiguredTotal } = useModels()
   const params = route.useParams()
   const activeSection = (params.section ??
     MODELS_DEFAULT_SECTION) as ModelsSectionId
@@ -121,8 +121,8 @@ function ModelsContent() {
 
   const pageTitle = t('Models')
   const subtitle =
-    activeSection === 'metadata' && metadataTotal != null
-      ? t('{{count}} configured models', { count: metadataTotal })
+    activeSection === 'metadata' && metadataConfiguredTotal != null
+      ? t('{{count}} configured models', { count: metadataConfiguredTotal })
       : t(sectionMeta.subtitleKey)
 
   const headerActions =
