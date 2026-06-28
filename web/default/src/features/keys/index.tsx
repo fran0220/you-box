@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { SectionPageLayout } from '@/components/layout'
+import { PageHeader } from '@/components/youbox'
 import { ApiKeysDialogs } from './components/api-keys-dialogs'
 import { ApiKeysPrimaryButtons } from './components/api-keys-primary-buttons'
 import { ApiKeysProvider } from './components/api-keys-provider'
@@ -28,17 +29,16 @@ export function ApiKeys() {
   return (
     <ApiKeysProvider>
       <SectionPageLayout>
-        <SectionPageLayout.Title>{t('API Keys')}</SectionPageLayout.Title>
-        <SectionPageLayout.Actions>
-          <ApiKeysPrimaryButtons />
-        </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <div className='space-y-3'>
-            <p className='text-muted-foreground text-sm'>
-              {t(
+          <div className='mx-auto w-full max-w-[1200px] space-y-5'>
+            <PageHeader
+              eyebrow={`// ${t('API Keys')}`}
+              title={t('API Keys')}
+              subtitle={t(
                 'Issue scoped keys with per-key budgets, rate limits and model allowlists.'
               )}
-            </p>
+              actions={<ApiKeysPrimaryButtons />}
+            />
             <ApiKeysTable />
           </div>
         </SectionPageLayout.Content>
