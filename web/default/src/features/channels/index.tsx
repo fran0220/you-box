@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { SectionPageLayout } from '@/components/layout'
+import { PageHeader } from '@/components/youbox'
 import { ChannelsDialogs } from './components/channels-dialogs'
 import { ChannelsPrimaryButtons } from './components/channels-primary-buttons'
 import { ChannelsProvider } from './components/channels-provider'
@@ -28,17 +29,16 @@ export function Channels() {
   return (
     <ChannelsProvider>
       <SectionPageLayout>
-        <SectionPageLayout.Title>{t('Channels')}</SectionPageLayout.Title>
-        <SectionPageLayout.Actions>
-          <ChannelsPrimaryButtons />
-        </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <div className='space-y-3'>
-            <p className='text-muted-foreground text-sm'>
-              {t(
+          <div className='mx-auto w-full max-w-[1200px] space-y-5'>
+            <PageHeader
+              eyebrow={t('Channels')}
+              title={t('Channels')}
+              subtitle={t(
                 'Upstream providers this gateway routes to, with health, priority and balance.'
               )}
-            </p>
+              actions={<ChannelsPrimaryButtons />}
+            />
             <ChannelsTable />
           </div>
         </SectionPageLayout.Content>
