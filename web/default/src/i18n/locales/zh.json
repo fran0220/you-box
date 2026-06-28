@@ -4893,6 +4893,13 @@
     "Zero retention": "零数据保留",
     "Zhipu": "智谱",
     "Zhipu V4": "智谱 V4",
-    "Zoom": "缩放"
+    "Zoom": "缩放",
+    "Good morning": "早上好",
+    "Good afternoon": "下午好",
+    "Good evening": "晚上好",
+    "Command Palette": "命令面板",
+    "Search for a command to run...": "搜索要运行的命令…",
+    "Go to page {{page}}": "前往第 {{page}} 页",
+    "Toggle Sidebar": "切换侧边栏"
   }
 }

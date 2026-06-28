@@ -30,5 +30,7 @@
   "Tap the star on a model to pin it here.": "Tap the star on a model to pin it here.",
   "The price the customer pays, in USD.": "The price the customer pays, in USD.",
   "Time unit for the subscription length. Choose Custom to set an exact number of seconds.": "Time unit for the subscription length. Choose Custom to set an exact number of seconds.",
-  "Up to ${{price}}/1M": "Up to ${{price}}/1M"
+  "Up to ${{price}}/1M": "Up to ${{price}}/1M",
+  "Search for a command to run...": "Search for a command to run...",
+  "Go to page {{page}}": "Go to page {{page}}"
 }

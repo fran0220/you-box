@@ -78,5 +78,12 @@
   "Usage stats are placeholder estimates.": "Usage stats are placeholder estimates.",
   "WeChat ID": "WeChat ID",
   "Week-over-week change (placeholder data)": "Week-over-week change (placeholder data)",
-  "Weekly growth": "Weekly growth"
+  "Weekly growth": "Weekly growth",
+  "Good morning": "Good morning",
+  "Good afternoon": "Good afternoon",
+  "Good evening": "Good evening",
+  "Command Palette": "Command Palette",
+  "Search for a command to run...": "Search for a command to run...",
+  "Go to page {{page}}": "Go to page {{page}}",
+  "Toggle Sidebar": "Toggle Sidebar"
 }

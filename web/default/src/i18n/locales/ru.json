@@ -4893,6 +4893,13 @@
     "Zero retention": "Без хранения данных",
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
+    "Zoom": "Zoom",
+    "Good morning": "Good morning",
+    "Good afternoon": "Good afternoon",
+    "Good evening": "Good evening",
+    "Command Palette": "Command Palette",
+    "Search for a command to run...": "Search for a command to run...",
+    "Go to page {{page}}": "Go to page {{page}}",
+    "Toggle Sidebar": "Toggle Sidebar"
   }
 }
