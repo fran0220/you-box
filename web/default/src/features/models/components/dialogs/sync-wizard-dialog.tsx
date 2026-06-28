@@ -103,7 +103,10 @@ export function SyncWizardDialog({
 
       if (conflicts.length > 0) {
         toast.warning(
-          `Found ${conflicts.length} conflict${conflicts.length > 1 ? 's' : ''}. Please resolve them first.`
+          t(
+            'Found {{count}} conflict(s). Please resolve them in the conflict dialog first.',
+            { count: conflicts.length }
+          )
         )
         setUpstreamConflicts(conflicts)
         setOpen('upstream-conflict')
@@ -117,7 +120,14 @@ export function SyncWizardDialog({
         const { created_models, created_vendors, updated_models } =
           response.data || {}
         toast.success(
-          `Sync completed! Created ${created_models || 0} models, updated ${updated_models || 0}, and added ${created_vendors || 0} vendors.`
+          t(
+            'Sync completed. Created {{created}} models, updated {{updated}}, added {{vendors}} vendors.',
+            {
+              created: created_models || 0,
+              updated: updated_models || 0,
+              vendors: created_vendors || 0,
+            }
+          )
         )
         queryClient.invalidateQueries({ queryKey: modelsQueryKeys.lists() })
         queryClient.invalidateQueries({ queryKey: vendorsQueryKeys.lists() })
@@ -185,10 +195,10 @@ export function SyncWizardDialog({
                 htmlFor={`sync-source-${option.value}`}
                 className={cn(
                   'flex-col items-start gap-0 rounded-lg border p-4 font-normal transition-all',
-                  isActive && 'border-primary ring-primary ring-1',
+                  isActive && 'border-brand ring-1 ring-brand/30',
                   isDisabled
                     ? 'cursor-not-allowed opacity-60'
-                    : 'hover:border-primary/60 cursor-pointer'
+                    : 'hover:border-border-strong cursor-pointer'
                 )}
               >
                 <div className='flex items-start gap-3'>
@@ -202,7 +212,7 @@ export function SyncWizardDialog({
                       <span className='font-medium'>{option.label}</span>
                       {option.value === 'official' && (
                         <StatusBadge
-                          label='Default'
+                          label={t('Default')}
                           variant='neutral'
                           copyable={false}
                         />

@@ -616,7 +616,7 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
         return (
           <StatusBadge
             label={syncOfficial === 1 ? t('Official Sync') : t('No Sync')}
-            variant={syncOfficial === 1 ? 'success' : 'warning'}
+            variant={syncOfficial === 1 ? 'success' : 'neutral'}
             size='sm'
             copyable={false}
           />

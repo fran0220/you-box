@@ -44,22 +44,22 @@ export function getNameRuleConfig(
   return {
     0: {
       label: t('Exact'),
-      color: 'green',
+      color: 'neutral',
       description: t('Match model name exactly'),
     },
     1: {
       label: t('Prefix'),
-      color: 'blue',
+      color: 'neutral',
       description: t('Match models starting with this name'),
     },
     2: {
       label: t('Contains'),
-      color: 'orange',
+      color: 'neutral',
       description: t('Match models containing this name'),
     },
     3: {
       label: t('Suffix'),
-      color: 'purple',
+      color: 'neutral',
       description: t('Match models ending with this name'),
     },
   }
@@ -146,8 +146,8 @@ export function getQuotaTypeConfig(
   t: TFunction
 ): Record<number, { label: string; color: string }> {
   return {
-    0: { label: t('Usage-based'), color: 'violet' },
-    1: { label: t('Per-call'), color: 'teal' },
+    0: { label: t('Usage-based'), color: 'neutral' },
+    1: { label: t('Per-call'), color: 'neutral' },
   }
 }
 
