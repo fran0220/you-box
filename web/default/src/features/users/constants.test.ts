@@ -16,27 +16,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { UserPlus } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
-import { useUsers } from './users-provider'
+import { describe, expect, it } from 'vitest'
+import { USER_ROLE, USER_ROLES, USER_STATUS, USER_STATUSES } from './constants'
 
-export function UsersPrimaryButtons() {
-  const { t } = useTranslation()
-  const { setOpen, setCurrentRow } = useUsers()
+describe('USER_ROLES badge variants', () => {
+  it('maps Root to info, Admin to brand, User to neutral (monochrome tones)', () => {
+    expect(USER_ROLES[USER_ROLE.ROOT].variant).toBe('info')
+    expect(USER_ROLES[USER_ROLE.ADMIN].variant).toBe('brand')
+    expect(USER_ROLES[USER_ROLE.USER].variant).toBe('neutral')
+  })
+})
 
-  const handleCreate = () => {
-    setCurrentRow(null)
-    setOpen('create')
-  }
-
-  return (
-    <div className='flex gap-2'>
-      <Button size='sm' onClick={handleCreate}>
-        <UserPlus className='h-4 w-4' />
-        <span className='max-sm:hidden'>{t('Add User')}</span>
-        <span className='sm:hidden'>{t('Add')}</span>
-      </Button>
-    </div>
-  )
-}
+describe('USER_STATUSES', () => {
+  it('maps enabled to success and disabled to danger', () => {
+    expect(USER_STATUSES[USER_STATUS.ENABLED].variant).toBe('success')
+    expect(USER_STATUSES[USER_STATUS.DISABLED].variant).toBe('danger')
+  })
+})

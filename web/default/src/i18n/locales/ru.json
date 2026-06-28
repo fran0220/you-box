@@ -4906,6 +4906,9 @@
     "© 2025 Your Company. All rights reserved.": "© 2025 Ваша Компания. Все права защищены.",
     "、": ", ",
     "，": ", ",
-    "，and ": ", and "
+    "，and ": ", and ",
+    "Manage accounts, roles, groups, and quotas across your organization.": "Управляйте учётными записями, ролями, группами и квотами в организации.",
+    "Reset Passkey for {{username}}? The user will need to register a new Passkey before using passwordless login.": "Сбросить Passkey для {{username}}? Пользователю нужно зарегистрировать новый Passkey для входа без пароля.",
+    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "Сбросить 2FA для {{username}}? Пользователю нужно снова настроить 2FA."
   }
 }

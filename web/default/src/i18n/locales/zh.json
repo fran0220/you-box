@@ -4906,6 +4906,9 @@
     "© 2025 Your Company. All rights reserved.": "© 2025 您的公司。保留所有权利。",
     "、": "、",
     "，": "，",
-    "，and ": "，"
+    "，and ": "，",
+    "Manage accounts, roles, groups, and quotas across your organization.": "管理组织内的账户、角色、分组与额度。",
+    "Reset Passkey for {{username}}? The user will need to register a new Passkey before using passwordless login.": "为 {{username}} 重置 Passkey？用户需重新注册 Passkey 后才能使用无密码登录。",
+    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "为 {{username}} 重置双因素认证？用户需重新设置 2FA 后才能继续使用。"
   }
 }
