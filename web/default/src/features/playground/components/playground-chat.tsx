@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo, useState } from 'react'
 import { MessagesSquare } from 'lucide-react'
+import { EmptyState } from '@/components/youbox'
 import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
@@ -174,19 +175,14 @@ export function PlaygroundChat({
       <ConversationContent className='p-0'>
         <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-4'>
           {messages.length === 0 && !isGenerating && (
-            <div className='flex min-h-[50vh] flex-col items-center justify-center gap-4 p-6 text-center'>
-              <MessagesSquare className='text-muted-foreground h-12 w-12' />
-              <div className='space-y-1'>
-                <h2 className='text-lg font-semibold'>
-                  {t('Start a conversation')}
-                </h2>
-                <p className='text-muted-foreground'>
-                  {t(
-                    'Pick a model, tune the parameters, and send a message below — responses stream here.'
-                  )}
-                </p>
-              </div>
-            </div>
+            <EmptyState
+              className='min-h-[50vh]'
+              icon={MessagesSquare}
+              title={t('Start a conversation')}
+              description={t(
+                'Pick a model, tune the parameters, and send a message below — responses stream here.'
+              )}
+            />
           )}
 
           {rows.map((row, rowIndex) => {
@@ -234,7 +230,7 @@ export function PlaygroundChat({
                 {row.messages.map((message, colIndex) => (
                   <m.div
                     key={message.key}
-                    className='bg-surface/40 min-w-0 rounded-lg border p-3'
+                    className='bg-surface-2/60 border-border min-w-0 rounded-lg border p-3'
                     initial={reveal?.initial}
                     animate={reveal?.animate}
                     transition={
