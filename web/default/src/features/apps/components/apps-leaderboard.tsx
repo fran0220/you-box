@@ -40,47 +40,54 @@ export { RankBadge }
  */
 export function AppsLeaderboardTable(props: {
   apps: AppRankingRow[]
+  /** When true, omit outer border/radius (parent Card provides the shell). */
+  embedded?: boolean
   rounded?: 'lg' | 'xl'
 }) {
   const { t } = useTranslation()
-  const radius = props.rounded === 'xl' ? 'rounded-xl' : 'rounded-lg'
-  const headerCellClass =
-    'text-muted-foreground py-2 text-[10px] font-medium tracking-wider uppercase'
+  let radius: string | undefined
+  if (props.embedded !== true) {
+    radius = props.rounded === 'xl' ? 'rounded-xl' : 'rounded-lg'
+  }
+
+  const table = (
+    <Table className='text-sm'>
+      <TableHeader>
+        <TableRow className='hover:bg-transparent'>
+          <TableHead className='w-12'>#</TableHead>
+          <TableHead>{t('App')}</TableHead>
+          <TableHead className='text-right'>{t('Requests')}</TableHead>
+          <TableHead className='text-right'>{t('Tokens')}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {props.apps.map((app, index) => (
+          <TableRow key={`${app.app}-${index}`}>
+            <TableCell className='py-3'>
+              <RankBadge rank={index + 1} />
+            </TableCell>
+            <TableCell className='text-foreground py-3 font-medium break-all'>
+              {app.app}
+            </TableCell>
+            <TableCell className='py-3 text-right font-mono tabular-nums'>
+              {app.request_count.toLocaleString()}
+            </TableCell>
+            <TableCell className='py-3 text-right font-mono tabular-nums'>
+              {formatCompactNumber(app.total_tokens)}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+
+  if (props.embedded === true) {
+    return table
+  }
 
   return (
-    <div className={cn('overflow-x-auto border', radius)}>
-      <Table className='text-sm'>
-        <TableHeader>
-          <TableRow className='hover:bg-transparent'>
-            <TableHead className={cn(headerCellClass, 'w-12')}>#</TableHead>
-            <TableHead className={headerCellClass}>{t('App')}</TableHead>
-            <TableHead className={`${headerCellClass} text-right`}>
-              {t('Requests')}
-            </TableHead>
-            <TableHead className={`${headerCellClass} text-right`}>
-              {t('Tokens')}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {props.apps.map((app, index) => (
-            <TableRow key={`${app.app}-${index}`}>
-              <TableCell className='py-2.5'>
-                <RankBadge rank={index + 1} />
-              </TableCell>
-              <TableCell className='py-2.5 font-medium break-all'>
-                {app.app}
-              </TableCell>
-              <TableCell className='py-2.5 text-right font-mono tabular-nums'>
-                {app.request_count.toLocaleString()}
-              </TableCell>
-              <TableCell className='py-2.5 text-right font-mono tabular-nums'>
-                {formatCompactNumber(app.total_tokens)}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className={cn('border-border overflow-x-auto border', radius)}>
+      {table}
     </div>
   )
 }
