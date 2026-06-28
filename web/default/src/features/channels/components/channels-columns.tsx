@@ -345,35 +345,50 @@ function StatusCell({ channel }: { channel: Channel }) {
     }
   }
 
+  const showProblemBadge =
+    status === CHANNEL_STATUS.MANUAL_DISABLED ||
+    status === CHANNEL_STATUS.AUTO_DISABLED
+
   return (
-    <TooltipProvider delay={100}>
-      <Tooltip>
-        <TooltipTrigger render={<span className='inline-flex' />}>
-          <Switch
-            size='sm'
-            checked={isEnabled}
-            onCheckedChange={handleToggle}
-            disabled={isToggling}
-            aria-label={isEnabled ? t('Disable') : t('Enable')}
-          />
-        </TooltipTrigger>
-        <TooltipContent side='top' className='max-w-xs'>
-          <div className='space-y-1 text-xs'>
-            <div>{label}</div>
-            {statusReason && (
-              <div>
-                {t('Reason:')} {statusReason}
-              </div>
-            )}
-            {statusTime && (
-              <div>
-                {t('Time:')} {statusTime}
-              </div>
-            )}
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div className='inline-flex items-center gap-2'>
+      {showProblemBadge && (
+        <StatusBadge
+          label={label}
+          variant={config.variant}
+          appearance='soft'
+          size='sm'
+          copyable={false}
+        />
+      )}
+      <TooltipProvider delay={100}>
+        <Tooltip>
+          <TooltipTrigger render={<span className='inline-flex' />}>
+            <Switch
+              size='sm'
+              checked={isEnabled}
+              onCheckedChange={handleToggle}
+              disabled={isToggling}
+              aria-label={isEnabled ? t('Disable') : t('Enable')}
+            />
+          </TooltipTrigger>
+          <TooltipContent side='top' className='max-w-xs'>
+            <div className='space-y-1 text-xs'>
+              <div>{label}</div>
+              {statusReason && (
+                <div>
+                  {t('Reason:')} {statusReason}
+                </div>
+              )}
+              {statusTime && (
+                <div>
+                  {t('Time:')} {statusTime}
+                </div>
+              )}
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
   )
 }
 
