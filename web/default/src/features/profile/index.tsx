@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { useStatus } from '@/hooks/use-status'
 import { SectionPageLayout } from '@/components/layout'
+import { PageHeader } from '@/components/youbox'
 import {
   CardStaggerContainer,
   CardStaggerItem,
@@ -49,9 +50,16 @@ export function Profile() {
 
   return (
     <SectionPageLayout>
-      <SectionPageLayout.Title>{t('Profile')}</SectionPageLayout.Title>
       <SectionPageLayout.Content>
-        <CardStaggerContainer className='grid w-full gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start'>
+        <div className='mx-auto w-full max-w-[980px] space-y-5'>
+          <PageHeader
+            eyebrow={t('Account')}
+            title={t('Profile')}
+            subtitle={t(
+              'Manage your account, security, bindings, and preferences.'
+            )}
+          />
+          <CardStaggerContainer className='grid w-full gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start'>
           <CardStaggerItem className='lg:self-start'>
             <div className='lg:sticky lg:top-6'>
               <AccountCard profile={profile} loading={loading} />
@@ -82,7 +90,8 @@ export function Profile() {
               )}
             </div>
           </CardStaggerItem>
-        </CardStaggerContainer>
+          </CardStaggerContainer>
+        </div>
       </SectionPageLayout.Content>
     </SectionPageLayout>
   )

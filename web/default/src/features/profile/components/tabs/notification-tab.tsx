@@ -159,7 +159,7 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
                 htmlFor={method.value}
                 className={`flex min-h-16 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border p-2 text-center transition-colors sm:min-h-20 sm:gap-2 sm:border-2 sm:p-3 ${
                   isSelected
-                    ? 'border-primary bg-primary/5 text-primary'
+                    ? 'border-brand bg-brand-subtle text-brand'
                     : 'border-muted hover:border-muted-foreground/25 hover:bg-muted/50'
                 }`}
               >
@@ -375,7 +375,7 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
                 href='https://gotify.net/'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-primary hover:underline'
+                className='text-brand hover:underline'
               >
                 {t('Gotify Documentation')}
               </a>

@@ -178,7 +178,7 @@ export function TwoFASetupDialog({
       <div className='space-y-4 py-4'>
         {initializing ? (
           <div className='flex flex-col items-center justify-center gap-3 py-8'>
-            <div className='border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent' />
+            <div className='border-brand h-8 w-8 animate-spin rounded-full border-4 border-t-transparent' />
             <div className='text-muted-foreground text-sm'>
               {t('Setting up 2FA...')}
             </div>

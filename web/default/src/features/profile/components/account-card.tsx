@@ -101,7 +101,7 @@ export function AccountCard({ profile, loading }: AccountCardProps) {
       <PanelBody>
         <div className='flex flex-col items-center gap-2 text-center'>
           <Avatar className='size-20'>
-            <AvatarFallback className='bg-primary/10 text-primary text-xl font-medium'>
+            <AvatarFallback className='bg-brand-subtle text-brand text-xl font-medium'>
               {initials}
             </AvatarFallback>
           </Avatar>
