@@ -52,12 +52,21 @@ const SECTION_META: Record<UsageLogsSectionId, { titleKey: string }> = {
   },
 }
 
-const SECTION_SUBTITLE_KEYS: Record<UsageLogsSectionId, string> = {
-  common:
-    'Every request routed through your keys, with token counts, cost and latency.',
-  drawing:
-    'Image generation and drawing task history with filters and export.',
-  task: 'Async task logs with status, timing, and request metadata.',
+function usageLogsSubtitle(
+  t: (key: string) => string,
+  section: UsageLogsSectionId
+): string {
+  if (section === 'common') {
+    return t(
+      'Every request routed through your keys, with token counts, cost and latency.'
+    )
+  }
+  if (section === 'drawing') {
+    return t(
+      'Image generation and drawing task history with filters and export.'
+    )
+  }
+  return t('Async task logs with status, timing, and request metadata.')
 }
 
 function UsageLogsContent() {
@@ -134,9 +143,9 @@ function UsageLogsContent() {
         <SectionPageLayout.Content>
           <div className='space-y-4'>
             <PageHeader
-              eyebrow={`// ${t('Usage Logs')}`}
+              eyebrow={t('Usage Logs')}
               title={t(pageMeta.titleKey)}
-              subtitle={t(SECTION_SUBTITLE_KEYS[activeCategory])}
+              subtitle={usageLogsSubtitle(t, activeCategory)}
               actions={headerActions}
             />
             <UsageLogsTable logCategory={activeCategory} />

@@ -32,7 +32,7 @@ export function ApiKeys() {
         <SectionPageLayout.Content>
           <div className='mx-auto w-full max-w-[1200px] space-y-5'>
             <PageHeader
-              eyebrow={`// ${t('API Keys')}`}
+              eyebrow={t('API Keys')}
               title={t('API Keys')}
               subtitle={t(
                 'Issue scoped keys with per-key budgets, rate limits and model allowlists.'

@@ -77,25 +77,33 @@ export function SectionPageLayout(props: SectionPageLayoutProps) {
   return (
     <PageFooterProvider container={footerContainer}>
       <Main>
-        <div className='mx-auto w-full max-w-[var(--container-lg,1100px)] shrink-0 px-[var(--gutter,24px)] pt-7 pb-4'>
-          {breadcrumb != null && (
-            <div className='mb-2 sm:mb-3'>{breadcrumb}</div>
-          )}
-          <div className='flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:gap-x-4'>
-            {/* min-w keeps the title readable; crowded actions wrap below
+        {(breadcrumb != null || title != null || actions != null) && (
+          <div className='mx-auto w-full max-w-[var(--container-lg,1100px)] shrink-0 px-[var(--gutter,24px)] pt-7 pb-4'>
+            {breadcrumb != null && (
+              <div className='mb-2 sm:mb-3'>{breadcrumb}</div>
+            )}
+            {(title != null || actions != null) && (
+              <div className='flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:gap-x-4'>
+                {/* min-w keeps the title readable; crowded actions wrap below
                 instead of squeezing the heading to a sliver */}
-            <div className='min-w-[min(100%,12rem)] flex-1'>
-              <h2 className='font-display truncate text-lg font-bold tracking-[-0.025em] sm:text-xl'>
-                {title}
-              </h2>
-            </div>
-            {actions != null && (
-              <div className='flex max-w-full min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-x-4'>
-                {actions}
+                {title != null ? (
+                  <div className='min-w-[min(100%,12rem)] flex-1'>
+                    <h2 className='font-display truncate text-lg font-bold tracking-[-0.025em] sm:text-xl'>
+                      {title}
+                    </h2>
+                  </div>
+                ) : (
+                  <div className='flex-1' />
+                )}
+                {actions != null && (
+                  <div className='flex max-w-full min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-x-4'>
+                    {actions}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        </div>
+        )}
 
         <div
           data-app-content-scroll

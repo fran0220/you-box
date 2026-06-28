@@ -320,7 +320,7 @@ export function Wallet(props: WalletProps) {
         <SectionPageLayout.Content>
           <div className='mx-auto w-full max-w-[1120px] space-y-5'>
             <PageHeader
-              eyebrow={`// ${t('Wallet')}`}
+              eyebrow={t('Wallet')}
               title={t('Wallet')}
               subtitle={t(
                 'Top up your balance, redeem codes, and review billing history.'

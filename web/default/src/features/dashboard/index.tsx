@@ -302,7 +302,7 @@ export function Dashboard() {
               </FadeIn>
             </>
           )}
-          {activeSection === 'users' && (
+          {activeSection === 'users' && isAdmin && (
             <FadeIn>
               <Suspense fallback={<ModelChartsFallback />}>
                 <LazyUserCharts />
