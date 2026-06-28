@@ -27,6 +27,8 @@ import {
   FormLabel,
 } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingsControlChildren,
   SettingsForm,
@@ -179,18 +181,20 @@ export function SidebarModulesSection({
   }
 
   const sections = Object.entries(config)
+  const isDirty = form.formState.isDirty
 
   return (
     <SettingsSection title={t('Sidebar modules')}>
+      <FormNavigationGuard when={isDirty} />
       <Form {...form}>
         <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
           <SettingsPageFormActions
             onSave={form.handleSubmit(onSubmit)}
             onReset={resetToDefault}
             isSaving={updateOption.isPending}
-            resetLabel='Reset to default'
-            saveLabel='Save sidebar modules'
+            isResetDisabled={!isDirty}
           />
+          <FormDirtyIndicator isDirty={isDirty} />
           {sections.map(([sectionKey, sectionConfig]) => {
             const sectionInfo = sectionMeta[sectionKey] ?? {
               title: toTitleCase(sectionKey),

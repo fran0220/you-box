@@ -20,7 +20,7 @@ import { useMemo, useState } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Edit, Trash2, Save } from 'lucide-react'
+import { Plus, Edit, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import dayjs from '@/lib/dayjs'
@@ -66,9 +66,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { DateTimePicker } from '@/components/datetime-picker'
 import { Dialog } from '@/components/dialog'
 import { StatusBadge } from '@/components/status-badge'
-import { SettingsSwitchField } from '../components/settings-form-layout'
+import { EmptyState } from '@/components/youbox'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
+import { ContentListEditorShell } from './content-list-editor-shell'
+import { useContentListSettingsForm } from './use-content-list-settings-form'
 
 type Announcement = {
   id: number
@@ -115,35 +117,41 @@ function parseAnnouncements(data: string): Announcement[] | null {
   }
 }
 
+const typeSwatchClass: Record<
+  Announcement['type'],
+  string
+> = {
+  default: 'bg-muted',
+  ongoing: 'bg-info',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  error: 'bg-destructive',
+}
+
 const typeOptions = [
   {
     value: 'default',
     label: 'Default',
-    color: 'bg-gray-500',
     badgeVariant: 'neutral' as const,
   },
   {
     value: 'ongoing',
     label: 'Ongoing',
-    color: 'bg-info',
     badgeVariant: 'info' as const,
   },
   {
     value: 'success',
     label: 'Success',
-    color: 'bg-success',
     badgeVariant: 'success' as const,
   },
   {
     value: 'warning',
     label: 'Warning',
-    color: 'bg-warning',
     badgeVariant: 'warning' as const,
   },
   {
     value: 'error',
     label: 'Error',
-    color: 'bg-destructive',
     badgeVariant: 'danger' as const,
   },
 ]
@@ -158,7 +166,6 @@ export function AnnouncementsSection({
     () => parseAnnouncements(data) ?? []
   )
   const [isEnabled, setIsEnabled] = useState(enabled)
-  const [hasChanges, setHasChanges] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [showDialog, setShowDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -166,13 +173,29 @@ export function AnnouncementsSection({
     useState<Announcement | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<'single' | 'batch'>('single')
 
-  const form = useForm<AnnouncementFormValues>({
+  const dialogForm = useForm<AnnouncementFormValues>({
     resolver: zodResolver(announcementSchema),
     defaultValues: {
       content: '',
       publishDate: new Date().toISOString(),
       type: 'default',
       extra: '',
+    },
+  })
+
+  const listFormBridge = useContentListSettingsForm({
+    serialized: JSON.stringify(announcements),
+    baselineSerialized: data || '[]',
+    save: async (value) => {
+      await updateOption.mutateAsync({
+        key: 'console_setting.announcements',
+        value,
+      })
+    },
+    onDiscard: (baselinePayload) => {
+      const parsed = parseAnnouncements(baselinePayload)
+      if (parsed) setAnnouncements(parsed)
+      setSelectedIds([])
     },
   })
 
@@ -205,7 +228,7 @@ export function AnnouncementsSection({
 
   const handleAdd = () => {
     setEditingAnnouncement(null)
-    form.reset({
+    dialogForm.reset({
       content: '',
       publishDate: new Date().toISOString(),
       type: 'default',
@@ -216,7 +239,7 @@ export function AnnouncementsSection({
 
   const handleEdit = (announcement: Announcement) => {
     setEditingAnnouncement(announcement)
-    form.reset({
+    dialogForm.reset({
       content: announcement.content,
       publishDate: announcement.publishDate,
       type: announcement.type,
@@ -245,14 +268,14 @@ export function AnnouncementsSection({
       setAnnouncements((prev) =>
         prev.filter((item) => item.id !== editingAnnouncement.id)
       )
-      setHasChanges(true)
-      toast.success(t('Announcement deleted. Click "Save Settings" to apply.'))
+      toast.success(
+        t('Announcement deleted. Click "Save Settings" to apply.')
+      )
     } else if (deleteTarget === 'batch') {
       setAnnouncements((prev) =>
         prev.filter((item) => !selectedIds.includes(item.id))
       )
       setSelectedIds([])
-      setHasChanges(true)
       toast.success(
         t('{{count}} announcements deleted. Click "Save Settings" to apply.', {
           count: selectedIds.length,
@@ -276,21 +299,7 @@ export function AnnouncementsSection({
       setAnnouncements((prev) => [...prev, { id: newId, ...values }])
       toast.success(t('Announcement added. Click "Save Settings" to apply.'))
     }
-    setHasChanges(true)
     setShowDialog(false)
-  }
-
-  const handleSaveAll = async () => {
-    try {
-      await updateOption.mutateAsync({
-        key: 'console_setting.announcements',
-        value: JSON.stringify(announcements),
-      })
-      setHasChanges(false)
-      toast.success(t('Announcements saved successfully'))
-    } catch {
-      toast.error(t('Failed to save announcements'))
-    }
   }
 
   const toggleSelectAll = (checked: boolean) => {
@@ -326,9 +335,15 @@ export function AnnouncementsSection({
 
   return (
     <SettingsSection title={t('Announcements')}>
-      <div className='space-y-4'>
-        <div className='flex flex-wrap items-center justify-between gap-2'>
-          <div className='flex flex-wrap items-center gap-2'>
+      <ContentListEditorShell
+        form={listFormBridge.form}
+        registration={listFormBridge.registration}
+        isDirty={listFormBridge.isDirty}
+        enabled={isEnabled}
+        onEnabledChange={handleToggleEnabled}
+        enabledLabel={t('Enabled')}
+        toolbar={
+          <>
             <Button onClick={handleAdd} size='sm'>
               <Plus className='mr-2 h-4 w-4' />
               {t('Add Announcement')}
@@ -343,25 +358,10 @@ export function AnnouncementsSection({
               {t('Delete (')}
               {selectedIds.length})
             </Button>
-            <Button
-              onClick={handleSaveAll}
-              size='sm'
-              variant='secondary'
-              disabled={!hasChanges || updateOption.isPending}
-            >
-              <Save className='mr-2 h-4 w-4' />
-              {updateOption.isPending ? t('Saving...') : t('Save Settings')}
-            </Button>
-          </div>
-          <SettingsSwitchField
-            checked={isEnabled}
-            onCheckedChange={handleToggleEnabled}
-            label={t('Enabled')}
-            className='border-b-0 py-0'
-          />
-        </div>
-
-        <div className='rounded-md border'>
+          </>
+        }
+      >
+        <div className='overflow-hidden rounded-lg border'>
           <Table>
             <TableHeader>
               <TableRow>
@@ -384,10 +384,15 @@ export function AnnouncementsSection({
             <TableBody>
               {sortedAnnouncements.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className='h-24 text-center'>
-                    {t(
-                      'No announcements yet. Click "Add Announcement" to create one.'
-                    )}
+                  <TableCell colSpan={6} className='p-0'>
+                    <EmptyState
+                      className='border-0 py-10'
+                      title={t(
+                        'No announcements yet. Click "Add Announcement" to create one.'
+                      )}
+                      actionLabel={t('Add Announcement')}
+                      onAction={handleAdd}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -464,7 +469,7 @@ export function AnnouncementsSection({
             </TableBody>
           </Table>
         </div>
-      </div>
+      </ContentListEditorShell>
 
       <Dialog
         open={showDialog}
@@ -493,14 +498,14 @@ export function AnnouncementsSection({
           </>
         }
       >
-        <Form {...form}>
+        <Form {...dialogForm}>
           <form
             id={ANNOUNCEMENT_FORM_ID}
-            onSubmit={form.handleSubmit(handleSubmitForm)}
+            onSubmit={dialogForm.handleSubmit(handleSubmitForm)}
             className='space-y-4'
           >
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='content'
               render={({ field }) => (
                 <FormItem>
@@ -522,7 +527,7 @@ export function AnnouncementsSection({
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='publishDate'
               render={({ field }) => (
                 <FormItem>
@@ -546,7 +551,7 @@ export function AnnouncementsSection({
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='type'
               render={({ field }) => (
                 <FormItem>
@@ -558,7 +563,7 @@ export function AnnouncementsSection({
                         label: (
                           <div className='flex items-center gap-2'>
                             <div
-                              className={`h-3 w-3 rounded-full ${option.color}`}
+                              className={`h-3 w-3 rounded-full ${typeSwatchClass[option.value as Announcement['type']]}`}
                             />
                             {option.label}
                           </div>
@@ -581,7 +586,7 @@ export function AnnouncementsSection({
                           <SelectItem key={option.value} value={option.value}>
                             <div className='flex items-center gap-2'>
                               <div
-                                className={`h-3 w-3 rounded-full ${option.color}`}
+                                className={`h-3 w-3 rounded-full ${typeSwatchClass[option.value as Announcement['type']]}`}
                               />
                               {option.label}
                             </div>
@@ -595,7 +600,7 @@ export function AnnouncementsSection({
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='extra'
               render={({ field }) => (
                 <FormItem>

@@ -16,9 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import {
@@ -30,9 +28,12 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsForm } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 
 const noticeSchema = z.object({
@@ -48,37 +49,37 @@ type NoticeSectionProps = {
 export function NoticeSection({ defaultValue }: NoticeSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
-  const form = useForm<NoticeFormValues>({
-    resolver: zodResolver(noticeSchema),
-    defaultValues: {
-      Notice: defaultValue ?? '',
-    },
-  })
 
-  useEffect(() => {
-    form.reset({ Notice: defaultValue ?? '' })
-  }, [defaultValue, form])
+  const normalizedDefault = defaultValue ?? ''
 
-  const onSubmit = async (values: NoticeFormValues) => {
-    const normalized = values.Notice ?? ''
-    if (normalized === (defaultValue ?? '')) {
-      return
-    }
-    await updateOption.mutateAsync({
-      key: 'Notice',
-      value: normalized,
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<NoticeFormValues>({
+      resolver: zodResolver(noticeSchema),
+      defaultValues: {
+        Notice: normalizedDefault,
+      },
+      onSubmit: async (_data, changedFields) => {
+        for (const [key, value] of Object.entries(changedFields)) {
+          await updateOption.mutateAsync({
+            key,
+            value: typeof value === 'string' ? value : String(value ?? ''),
+          })
+        }
+      },
     })
-  }
 
   return (
     <SettingsSection title={t('System Notice')}>
+      <FormNavigationGuard when={isDirty} />
       <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
+        <SettingsForm onSubmit={handleSubmit}>
           <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-            saveLabel='Save notice'
+            onSave={handleSubmit}
+            onReset={handleReset}
+            isSaving={isSubmitting || updateOption.isPending}
+            isResetDisabled={!isDirty}
           />
+          <FormDirtyIndicator isDirty={isDirty} />
           <FormField
             control={form.control}
             name='Notice'

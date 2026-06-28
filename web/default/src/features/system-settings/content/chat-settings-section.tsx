@@ -33,6 +33,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { SettingsForm } from '../components/settings-form-layout'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
@@ -125,15 +127,20 @@ export function ChatSettingsSection({
     })
   }
 
+  const isDirty = form.formState.isDirty
+
   return (
     <SettingsSection title={t('Chat Presets')}>
+      <FormNavigationGuard when={isDirty} />
       <Form {...form}>
         <SettingsForm onSubmit={(event) => form.handleSubmit(onSubmit)(event)}>
           <SettingsPageFormActions
             onSave={() => form.handleSubmit(onSubmit)()}
+            onReset={() => form.reset({ Chats: formatted })}
             isSaving={updateOption.isPending}
-            saveLabel='Save chat settings'
+            isResetDisabled={!isDirty}
           />
+          <FormDirtyIndicator isDirty={isDirty} />
           <Tabs
             value={editMode}
             onValueChange={(value) => setEditMode(value as 'visual' | 'json')}

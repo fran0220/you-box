@@ -30,7 +30,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
+  SettingRowGroup,
   SettingsControlChildren,
   SettingsForm,
   SettingsSwitchContent,
@@ -206,18 +209,22 @@ export function HeaderNavigationSection({
     },
   ]
 
+  const isDirty = form.formState.isDirty
+
   return (
     <SettingsSection title={t('Header navigation')}>
+      <FormNavigationGuard when={isDirty} />
       <Form {...form}>
         <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
           <SettingsPageFormActions
             onSave={form.handleSubmit(onSubmit)}
             onReset={resetToDefault}
             isSaving={updateOption.isPending}
-            resetLabel='Reset to default'
-            saveLabel='Save navigation'
+            isResetDisabled={!isDirty}
           />
-          <div className='grid gap-4 md:grid-cols-2'>
+          <FormDirtyIndicator isDirty={isDirty} />
+          <SettingRowGroup>
+            <div className='grid gap-0 md:grid-cols-2 md:divide-x md:divide-[var(--divider)]'>
             {simpleModules.map((module) => (
               <FormField
                 key={module.key}
@@ -240,7 +247,8 @@ export function HeaderNavigationSection({
                 )}
               />
             ))}
-          </div>
+            </div>
+          </SettingRowGroup>
 
           <div className='grid gap-4 lg:grid-cols-2'>
             {accessModules.map((module) => (

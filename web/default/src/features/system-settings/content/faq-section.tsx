@@ -20,7 +20,7 @@ import { useState } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Edit, Trash2, Save } from 'lucide-react'
+import { Plus, Edit, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
@@ -55,9 +55,11 @@ import {
 } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog } from '@/components/dialog'
-import { SettingsSwitchField } from '../components/settings-form-layout'
+import { EmptyState } from '@/components/youbox'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
+import { ContentListEditorShell } from './content-list-editor-shell'
+import { useContentListSettingsForm } from './use-content-list-settings-form'
 
 type FAQ = {
   id: number
@@ -105,18 +107,33 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
   const updateOption = useUpdateOption()
   const [faqList, setFaqList] = useState<FAQ[]>(() => parseFaqList(data) ?? [])
   const [isEnabled, setIsEnabled] = useState(enabled)
-  const [hasChanges, setHasChanges] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [showDialog, setShowDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [editingFaq, setEditingFaq] = useState<FAQ | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<'single' | 'batch'>('single')
 
-  const form = useForm<FAQFormValues>({
+  const dialogForm = useForm<FAQFormValues>({
     resolver: zodResolver(faqSchema),
     defaultValues: {
       question: '',
       answer: '',
+    },
+  })
+
+  const listFormBridge = useContentListSettingsForm({
+    serialized: JSON.stringify(faqList),
+    baselineSerialized: data || '[]',
+    save: async (value) => {
+      await updateOption.mutateAsync({
+        key: 'console_setting.faq',
+        value,
+      })
+    },
+    onDiscard: (baselinePayload) => {
+      const parsed = parseFaqList(baselinePayload)
+      if (parsed) setFaqList(parsed)
+      setSelectedIds([])
     },
   })
 
@@ -149,7 +166,7 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
 
   const handleAdd = () => {
     setEditingFaq(null)
-    form.reset({
+    dialogForm.reset({
       question: '',
       answer: '',
     })
@@ -158,7 +175,7 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
 
   const handleEdit = (faq: FAQ) => {
     setEditingFaq(faq)
-    form.reset({
+    dialogForm.reset({
       question: faq.question,
       answer: faq.answer,
     })
@@ -183,14 +200,12 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
   const confirmDelete = () => {
     if (deleteTarget === 'single' && editingFaq) {
       setFaqList((prev) => prev.filter((item) => item.id !== editingFaq.id))
-      setHasChanges(true)
       toast.success(t('FAQ deleted. Click "Save Settings" to apply.'))
     } else if (deleteTarget === 'batch') {
       setFaqList((prev) =>
         prev.filter((item) => !selectedIds.includes(item.id))
       )
       setSelectedIds([])
-      setHasChanges(true)
       toast.success(
         t('{{count}} FAQs deleted. Click "Save Settings" to apply.', {
           count: selectedIds.length,
@@ -214,21 +229,7 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
       setFaqList((prev) => [...prev, { id: newId, ...values }])
       toast.success(t('FAQ added. Click "Save Settings" to apply.'))
     }
-    setHasChanges(true)
     setShowDialog(false)
-  }
-
-  const handleSaveAll = async () => {
-    try {
-      await updateOption.mutateAsync({
-        key: 'console_setting.faq',
-        value: JSON.stringify(faqList),
-      })
-      setHasChanges(false)
-      toast.success(t('FAQ saved successfully'))
-    } catch {
-      toast.error(t('Failed to save FAQ'))
-    }
   }
 
   const toggleSelectAll = (checked: boolean) => {
@@ -243,9 +244,15 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
 
   return (
     <SettingsSection title={t('FAQ')}>
-      <div className='space-y-4'>
-        <div className='flex flex-wrap items-center justify-between gap-2'>
-          <div className='flex flex-wrap items-center gap-2'>
+      <ContentListEditorShell
+        form={listFormBridge.form}
+        registration={listFormBridge.registration}
+        isDirty={listFormBridge.isDirty}
+        enabled={isEnabled}
+        onEnabledChange={handleToggleEnabled}
+        enabledLabel={t('Enabled')}
+        toolbar={
+          <>
             <Button onClick={handleAdd} size='sm'>
               <Plus className='mr-2 h-4 w-4' />
               {t('Add FAQ')}
@@ -260,25 +267,10 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
               {t('Delete (')}
               {selectedIds.length})
             </Button>
-            <Button
-              onClick={handleSaveAll}
-              size='sm'
-              variant='secondary'
-              disabled={!hasChanges || updateOption.isPending}
-            >
-              <Save className='mr-2 h-4 w-4' />
-              {updateOption.isPending ? t('Saving...') : t('Save Settings')}
-            </Button>
-          </div>
-          <SettingsSwitchField
-            checked={isEnabled}
-            onCheckedChange={handleToggleEnabled}
-            label={t('Enabled')}
-            className='border-b-0 py-0'
-          />
-        </div>
-
-        <div className='rounded-md border'>
+          </>
+        }
+      >
+        <div className='overflow-hidden rounded-lg border'>
           <Table>
             <TableHeader>
               <TableRow>
@@ -299,8 +291,15 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
             <TableBody>
               {faqList.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className='h-24 text-center'>
-                    {t('No FAQ entries yet. Click "Add FAQ" to create one.')}
+                  <TableCell colSpan={4} className='p-0'>
+                    <EmptyState
+                      className='border-0 py-10'
+                      title={t(
+                        'No FAQ entries yet. Click "Add FAQ" to create one.'
+                      )}
+                      actionLabel={t('Add FAQ')}
+                      onAction={handleAdd}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -350,7 +349,7 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
             </TableBody>
           </Table>
         </div>
-      </div>
+      </ContentListEditorShell>
 
       <Dialog
         open={showDialog}
@@ -375,14 +374,14 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
           </>
         }
       >
-        <Form {...form}>
+        <Form {...dialogForm}>
           <form
             id={FAQ_FORM_ID}
-            onSubmit={form.handleSubmit(handleSubmitForm)}
+            onSubmit={dialogForm.handleSubmit(handleSubmitForm)}
             className='space-y-4'
           >
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='question'
               render={({ field }) => (
                 <FormItem>
@@ -401,7 +400,7 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='answer'
               render={({ field }) => (
                 <FormItem>

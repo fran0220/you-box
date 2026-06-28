@@ -20,7 +20,7 @@ import { useState } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Edit, Trash2, Save } from 'lucide-react'
+import { Plus, Edit, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
@@ -54,9 +54,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Dialog } from '@/components/dialog'
-import { SettingsSwitchField } from '../components/settings-form-layout'
+import { EmptyState } from '@/components/youbox'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
+import { ContentListEditorShell } from './content-list-editor-shell'
+import { useContentListSettingsForm } from './use-content-list-settings-form'
 
 type UptimeKumaGroup = {
   id: number
@@ -115,19 +117,34 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
     () => parseUptimeKumaGroups(data) ?? []
   )
   const [isEnabled, setIsEnabled] = useState(enabled)
-  const [hasChanges, setHasChanges] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [showDialog, setShowDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [editingGroup, setEditingGroup] = useState<UptimeKumaGroup | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<'single' | 'batch'>('single')
 
-  const form = useForm<UptimeKumaFormValues>({
+  const dialogForm = useForm<UptimeKumaFormValues>({
     resolver: zodResolver(uptimeKumaSchema),
     defaultValues: {
       categoryName: '',
       url: '',
       slug: '',
+    },
+  })
+
+  const listFormBridge = useContentListSettingsForm({
+    serialized: JSON.stringify(groups),
+    baselineSerialized: data || '[]',
+    save: async (value) => {
+      await updateOption.mutateAsync({
+        key: 'console_setting.uptime_kuma_groups',
+        value,
+      })
+    },
+    onDiscard: (baselinePayload) => {
+      const parsed = parseUptimeKumaGroups(baselinePayload)
+      if (parsed) setGroups(parsed)
+      setSelectedIds([])
     },
   })
 
@@ -160,7 +177,7 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
 
   const handleAdd = () => {
     setEditingGroup(null)
-    form.reset({
+    dialogForm.reset({
       categoryName: '',
       url: '',
       slug: '',
@@ -170,7 +187,7 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
 
   const handleEdit = (group: UptimeKumaGroup) => {
     setEditingGroup(group)
-    form.reset({
+    dialogForm.reset({
       categoryName: group.categoryName,
       url: group.url,
       slug: group.slug,
@@ -196,12 +213,10 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
   const confirmDelete = () => {
     if (deleteTarget === 'single' && editingGroup) {
       setGroups((prev) => prev.filter((item) => item.id !== editingGroup.id))
-      setHasChanges(true)
       toast.success(t('Group deleted. Click "Save Settings" to apply.'))
     } else if (deleteTarget === 'batch') {
       setGroups((prev) => prev.filter((item) => !selectedIds.includes(item.id)))
       setSelectedIds([])
-      setHasChanges(true)
       toast.success(
         t('{{count}} groups deleted. Click "Save Settings" to apply.', {
           count: selectedIds.length,
@@ -225,21 +240,7 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
       setGroups((prev) => [...prev, { id: newId, ...values }])
       toast.success(t('Group added. Click "Save Settings" to apply.'))
     }
-    setHasChanges(true)
     setShowDialog(false)
-  }
-
-  const handleSaveAll = async () => {
-    try {
-      await updateOption.mutateAsync({
-        key: 'console_setting.uptime_kuma_groups',
-        value: JSON.stringify(groups),
-      })
-      setHasChanges(false)
-      toast.success(t('Uptime Kuma groups saved successfully'))
-    } catch {
-      toast.error(t('Failed to save Uptime Kuma groups'))
-    }
   }
 
   const toggleSelectAll = (checked: boolean) => {
@@ -254,9 +255,15 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
 
   return (
     <SettingsSection title={t('Uptime Kuma')}>
-      <div className='space-y-4'>
-        <div className='flex flex-wrap items-center justify-between gap-2'>
-          <div className='flex flex-wrap items-center gap-2'>
+      <ContentListEditorShell
+        form={listFormBridge.form}
+        registration={listFormBridge.registration}
+        isDirty={listFormBridge.isDirty}
+        enabled={isEnabled}
+        onEnabledChange={handleToggleEnabled}
+        enabledLabel={t('Enabled')}
+        toolbar={
+          <>
             <Button onClick={handleAdd} size='sm'>
               <Plus className='mr-2 h-4 w-4' />
               {t('Add Group')}
@@ -271,25 +278,10 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
               {t('Delete (')}
               {selectedIds.length})
             </Button>
-            <Button
-              onClick={handleSaveAll}
-              size='sm'
-              variant='secondary'
-              disabled={!hasChanges || updateOption.isPending}
-            >
-              <Save className='mr-2 h-4 w-4' />
-              {updateOption.isPending ? t('Saving...') : t('Save Settings')}
-            </Button>
-          </div>
-          <SettingsSwitchField
-            checked={isEnabled}
-            onCheckedChange={handleToggleEnabled}
-            label={t('Enabled')}
-            className='border-b-0 py-0'
-          />
-        </div>
-
-        <div className='rounded-md border'>
+          </>
+        }
+      >
+        <div className='overflow-hidden rounded-lg border'>
           <Table>
             <TableHeader>
               <TableRow>
@@ -310,10 +302,15 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
             <TableBody>
               {groups.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className='h-24 text-center'>
-                    {t(
-                      'No Uptime Kuma groups yet. Click "Add Group" to create one.'
-                    )}
+                  <TableCell colSpan={5} className='p-0'>
+                    <EmptyState
+                      className='border-0 py-10'
+                      title={t(
+                        'No Uptime Kuma groups yet. Click "Add Group" to create one.'
+                      )}
+                      actionLabel={t('Add Group')}
+                      onAction={handleAdd}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -363,7 +360,7 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
             </TableBody>
           </Table>
         </div>
-      </div>
+      </ContentListEditorShell>
 
       <Dialog
         open={showDialog}
@@ -393,14 +390,14 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
           </>
         }
       >
-        <Form {...form}>
+        <Form {...dialogForm}>
           <form
             id={UPTIME_KUMA_FORM_ID}
-            onSubmit={form.handleSubmit(handleSubmitForm)}
+            onSubmit={dialogForm.handleSubmit(handleSubmitForm)}
             className='space-y-4'
           >
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='categoryName'
               render={({ field }) => (
                 <FormItem>
@@ -421,7 +418,7 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='url'
               render={({ field }) => (
                 <FormItem>
@@ -440,7 +437,7 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='slug'
               render={({ field }) => (
                 <FormItem>
