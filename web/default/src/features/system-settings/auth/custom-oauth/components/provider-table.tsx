@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/table'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { StatusBadge } from '@/components/status-badge'
+import { EmptyState } from '@/components/youbox'
 import { useDeleteProvider } from '../hooks/use-custom-oauth-mutations'
 import type { CustomOAuthProvider } from '../types'
 
@@ -65,9 +66,14 @@ export function ProviderTable(props: ProviderTableProps) {
       </div>
 
       {props.providers.length === 0 ? (
-        <div className='text-muted-foreground rounded-lg border border-dashed p-8 text-center text-sm'>
-          {t('No custom OAuth providers configured yet.')}
-        </div>
+        <EmptyState
+          title={t('No custom OAuth providers configured yet.')}
+          description={t(
+            'Manage custom OAuth providers for user authentication'
+          )}
+          actionLabel={t('Add Provider')}
+          onAction={props.onCreate}
+        />
       ) : (
         <Table>
           <TableHeader>

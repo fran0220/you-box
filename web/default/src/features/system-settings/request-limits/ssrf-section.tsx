@@ -42,6 +42,8 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -202,15 +204,26 @@ export function SSRFSection({ defaultValues }: SSRFSectionProps) {
   const domainFilterMode = form.watch('fetch_setting.domain_filter_mode')
   const ipFilterMode = form.watch('fetch_setting.ip_filter_mode')
 
+  const handleReset = () => {
+    form.reset(buildFormDefaults(defaultValues))
+    toast.success(t('Form reset to saved values'))
+  }
+
   return (
-    <SettingsSection title={t('SSRF Protection')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-            saveLabel='Save SSRF settings'
-          />
+    <>
+      <FormNavigationGuard when={form.formState.isDirty} />
+
+      <SettingsSection title={t('SSRF Protection')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
+            <SettingsPageFormActions
+              onSave={form.handleSubmit(onSubmit)}
+              onReset={handleReset}
+              isSaving={updateOption.isPending}
+              isResetDisabled={!form.formState.isDirty}
+              saveLabel='Save SSRF settings'
+            />
+            <FormDirtyIndicator isDirty={form.formState.isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -434,8 +447,9 @@ export function SSRFSection({ defaultValues }: SSRFSectionProps) {
               )}
             />
           </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

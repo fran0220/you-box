@@ -18,7 +18,6 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import {
@@ -32,6 +31,8 @@ import {
 } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -39,7 +40,7 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
-import { useResetForm } from '../hooks/use-reset-form'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 
 const basicAuthSchema = z.object({
@@ -58,6 +59,22 @@ type BasicAuthSectionProps = {
   defaultValues: BasicAuthFormValues
 }
 
+function domainsFromApi(csv: string): string {
+  return csv
+    .split(',')
+    .map((domain) => domain.trim())
+    .filter(Boolean)
+    .join('\n')
+}
+
+function domainsToApi(text: string): string {
+  return text
+    .split('\n')
+    .map((domain) => domain.trim())
+    .filter(Boolean)
+    .join(',')
+}
+
 export function BasicAuthSection({ defaultValues }: BasicAuthSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
@@ -65,53 +82,46 @@ export function BasicAuthSection({ defaultValues }: BasicAuthSectionProps) {
   const formDefaults = useMemo<BasicAuthFormValues>(
     () => ({
       ...defaultValues,
-      EmailDomainWhitelist: defaultValues.EmailDomainWhitelist.split(',')
-        .map((domain) => domain.trim())
-        .filter(Boolean)
-        .join('\n'),
+      EmailDomainWhitelist: domainsFromApi(defaultValues.EmailDomainWhitelist),
     }),
     [defaultValues]
   )
 
-  const form = useForm<BasicAuthFormValues>({
-    resolver: zodResolver(basicAuthSchema),
-    defaultValues: formDefaults,
-  })
-
-  useResetForm(form, formDefaults)
-
-  const onSubmit = async (data: BasicAuthFormValues) => {
-    const updates: Array<{ key: string; value: string | boolean }> = []
-
-    Object.entries(data).forEach(([key, value]) => {
-      if (key === 'EmailDomainWhitelist') {
-        if (typeof value !== 'string') return
-        const domains = value
-          .split('\n')
-          .map((domain) => domain.trim())
-          .filter(Boolean)
-          .join(',')
-        if (domains !== defaultValues.EmailDomainWhitelist) {
-          updates.push({ key, value: domains })
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<BasicAuthFormValues>({
+      resolver: zodResolver(basicAuthSchema),
+      defaultValues: formDefaults,
+      onSubmit: async (_data, changedFields) => {
+        for (const [key, value] of Object.entries(changedFields)) {
+          if (key === 'EmailDomainWhitelist') {
+            await updateOption.mutateAsync({
+              key,
+              value: domainsToApi(String(value ?? '')),
+            })
+            continue
+          }
+          await updateOption.mutateAsync({
+            key,
+            value: value as string | boolean | number,
+          })
         }
-      } else if (value !== defaultValues[key as keyof typeof defaultValues]) {
-        updates.push({ key, value })
-      }
+      },
     })
 
-    for (const update of updates) {
-      await updateOption.mutateAsync(update)
-    }
-  }
-
   return (
-    <SettingsSection title={t('Basic Authentication')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Basic Authentication')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={isSubmitting || updateOption.isPending}
+              isResetDisabled={!isDirty}
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -252,8 +262,9 @@ export function BasicAuthSection({ defaultValues }: BasicAuthSectionProps) {
               </FormItem>
             )}
           />
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }
