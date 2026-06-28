@@ -2487,6 +2487,7 @@
     "Maximum 200 characters": "最大200文字",
     "Maximum 500 characters. Supports Markdown and HTML.": "最大500文字。MarkdownとHTMLをサポートしています。",
     "Maximum check-in quota": "最大チェックインクォータ",
+    "Maximum quota must be greater than or equal to minimum": "Maximum quota must be greater than or equal to minimum",
     "Maximum input window": "最大入力ウィンドウ",
     "Maximum number of tokens in the response": "レスポンスの最大トークン数",
     "Maximum prompt price": "Maximum prompt price",

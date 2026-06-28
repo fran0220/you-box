@@ -108,14 +108,14 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
       onSubmit: async (_data, changedFields) => {
         for (const [key, value] of Object.entries(changedFields)) {
           if (value === undefined || value === null) continue
-          if (typeof value === 'object') continue
 
-          let serialized: string | boolean = value as string | boolean
-
+          let serialized: string
           if (typeof value === 'boolean') {
             serialized = String(value)
           } else if (typeof value === 'number') {
             serialized = Number.isFinite(value) ? String(value) : '0'
+          } else {
+            serialized = String(value)
           }
 
           await updateOption.mutateAsync({

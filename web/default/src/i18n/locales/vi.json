@@ -2487,6 +2487,7 @@
     "Maximum 200 characters": "Tối đa 200 ký tự",
     "Maximum 500 characters. Supports Markdown and HTML.": "Tối đa 500 ký tự. Hỗ trợ Markdown và HTML.",
     "Maximum check-in quota": "Hạn ngạch điểm danh tối đa",
+    "Maximum quota must be greater than or equal to minimum": "Maximum quota must be greater than or equal to minimum",
     "Maximum input window": "Cửa sổ nhập tối đa",
     "Maximum number of tokens in the response": "Số token tối đa trong phản hồi",
     "Maximum prompt price": "Maximum prompt price",

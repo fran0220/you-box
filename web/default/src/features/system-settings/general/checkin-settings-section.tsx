@@ -16,14 +16,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { z } from 'zod'
-import { useForm, type Resolver } from 'react-hook-form'
+import * as z from 'zod'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -31,15 +32,33 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 
-const schema = z.object({
-  enabled: z.boolean(),
-  minQuota: z.coerce.number().int().min(0),
-  maxQuota: z.coerce.number().int().min(0),
-})
+const CHECKIN_FIELD_TO_OPTION_KEY: Record<string, string> = {
+  enabled: 'checkin_setting.enabled',
+  minQuota: 'checkin_setting.min_quota',
+  maxQuota: 'checkin_setting.max_quota',
+}
 
-type Values = z.infer<typeof schema>
+const createCheckinSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      enabled: z.boolean(),
+      minQuota: z.coerce.number().int().min(0),
+      maxQuota: z.coerce.number().int().min(0),
+    })
+    .superRefine((data, ctx) => {
+      if (data.enabled && data.minQuota > data.maxQuota) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['maxQuota'],
+          message: t('Maximum quota must be greater than or equal to minimum'),
+        })
+      }
+    })
+
+type CheckinFormValues = z.infer<ReturnType<typeof createCheckinSchema>>
 
 export function CheckinSettingsSection({
   defaultValues,
@@ -52,65 +71,48 @@ export function CheckinSettingsSection({
 }) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
+  const checkinSchema = createCheckinSchema(t)
 
-  const form = useForm<Values>({
-    resolver: zodResolver(schema) as unknown as Resolver<Values>,
-    defaultValues: {
-      enabled: defaultValues.enabled,
-      minQuota: defaultValues.minQuota,
-      maxQuota: defaultValues.maxQuota,
-    },
-  })
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<CheckinFormValues>({
+      resolver: zodResolver(checkinSchema) as Resolver<
+        CheckinFormValues,
+        unknown,
+        CheckinFormValues
+      >,
+      defaultValues: {
+        enabled: defaultValues.enabled,
+        minQuota: defaultValues.minQuota,
+        maxQuota: defaultValues.maxQuota,
+      },
+      onSubmit: async (_data, changedFields) => {
+        for (const [field, value] of Object.entries(changedFields)) {
+          const key = CHECKIN_FIELD_TO_OPTION_KEY[field]
+          if (!key) continue
+          await updateOption.mutateAsync({
+            key,
+            value: String(value),
+          })
+        }
+      },
+    })
 
-  const { isDirty, isSubmitting } = form.formState
   const enabled = form.watch('enabled')
 
-  async function onSubmit(values: Values) {
-    const updates: Array<{ key: string; value: string }> = []
-
-    if (values.enabled !== defaultValues.enabled) {
-      updates.push({
-        key: 'checkin_setting.enabled',
-        value: String(values.enabled),
-      })
-    }
-
-    if (values.minQuota !== defaultValues.minQuota) {
-      updates.push({
-        key: 'checkin_setting.min_quota',
-        value: String(values.minQuota),
-      })
-    }
-
-    if (values.maxQuota !== defaultValues.maxQuota) {
-      updates.push({
-        key: 'checkin_setting.max_quota',
-        value: String(values.maxQuota),
-      })
-    }
-
-    if (updates.length === 0) {
-      toast.info(t('No changes to save'))
-      return
-    }
-
-    for (const update of updates) {
-      await updateOption.mutateAsync(update)
-    }
-
-    form.reset(values)
-  }
-
   return (
-    <SettingsSection title={t('Check-in Settings')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)} autoComplete='off'>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending || isSubmitting}
-            isSaveDisabled={!isDirty}
-            saveLabel='Save check-in settings'
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Check-in Settings')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit} autoComplete='off'>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -182,8 +184,9 @@ export function CheckinSettingsSection({
               )}
             />
           </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

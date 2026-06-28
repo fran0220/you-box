@@ -2487,6 +2487,7 @@
     "Maximum 200 characters": "最多 200 个字符",
     "Maximum 500 characters. Supports Markdown and HTML.": "最多 500 个字符。支持 Markdown 和 HTML。",
     "Maximum check-in quota": "签到最大额度",
+    "Maximum quota must be greater than or equal to minimum": "Maximum quota must be greater than or equal to minimum",
     "Maximum input window": "最大输入窗口",
     "Maximum number of tokens in the response": "响应中最大 token 数",
     "Maximum prompt price": "Maximum prompt price",

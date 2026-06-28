@@ -16,6 +16,7 @@
   "Lower values are listed first on the pricing page.": "Lower values are listed first on the pricing page.",
   "Maps this plan to a Creem product for checkout. Leave blank if Creem is not used.": "Maps this plan to a Creem product for checkout. Leave blank if Creem is not used.",
   "Maps this plan to a Stripe price for checkout. Leave blank if Stripe is not used.": "Maps this plan to a Stripe price for checkout. Leave blank if Stripe is not used.",
+  "Maximum quota must be greater than or equal to minimum": "Maximum quota must be greater than or equal to minimum",
   "Network connection failed or server not responding": "Network connection failed or server not responding",
   "No content to copy": "No content to copy",
   "Optional one-line tagline displayed under the title.": "Optional one-line tagline displayed under the title.",

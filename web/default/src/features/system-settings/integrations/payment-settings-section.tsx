@@ -52,6 +52,8 @@ import {
   SettingRowGroup,
   SettingsForm,
 } from '../components/settings-form-layout'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
@@ -341,7 +343,7 @@ export function PaymentSettingsSection({
     },
   })
 
-  const { isSubmitting } = form.formState
+  const { isDirty, isSubmitting } = form.formState
 
   const setPaymentValue = React.useCallback(
     (
@@ -779,7 +781,10 @@ export function PaymentSettingsSection({
   }
 
   return (
-    <SettingsSection title={t('Payment Gateway')}>
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Payment Gateway')}>
       {!complianceConfirmed ? (
         <Alert variant='destructive' className='mb-6'>
           <ShieldAlert className='h-4 w-4' />
@@ -854,9 +859,11 @@ export function PaymentSettingsSection({
         >
           <SettingsPageFormActions
             onSave={form.handleSubmit(onSubmit)}
+            onReset={() => form.reset()}
             isSaving={updateOption.isPending || isSubmitting}
-            saveLabel='Save all settings'
+            isResetDisabled={!isDirty}
           />
+          <FormDirtyIndicator isDirty={isDirty} />
           <div className='space-y-4'>
             <div>
               <h3 className='text-lg font-medium'>{t('General Settings')}</h3>
@@ -1552,5 +1559,6 @@ export function PaymentSettingsSection({
         </SettingsForm>
       </Form>
     </SettingsSection>
+    </>
   )
 }

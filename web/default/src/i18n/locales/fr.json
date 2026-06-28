@@ -2487,6 +2487,7 @@
     "Maximum 200 characters": "Maximum 200 caractères",
     "Maximum 500 characters. Supports Markdown and HTML.": "Maximum 500 caractères. Prend en charge Markdown et HTML.",
     "Maximum check-in quota": "Quota maximum de connexion",
+    "Maximum quota must be greater than or equal to minimum": "Maximum quota must be greater than or equal to minimum",
     "Maximum input window": "Fenêtre d'entrée maximale",
     "Maximum number of tokens in the response": "Nombre maximum de jetons dans la réponse",
     "Maximum prompt price": "Maximum prompt price",

@@ -41,6 +41,7 @@
   "Lower values are listed first on the pricing page.": "Lower values are listed first on the pricing page.",
   "Maps this plan to a Creem product for checkout. Leave blank if Creem is not used.": "Maps this plan to a Creem product for checkout. Leave blank if Creem is not used.",
   "Maps this plan to a Stripe price for checkout. Leave blank if Stripe is not used.": "Maps this plan to a Stripe price for checkout. Leave blank if Stripe is not used.",
+  "Maximum quota must be greater than or equal to minimum": "Maximum quota must be greater than or equal to minimum",
   "Maximum prompt price": "Maximum prompt price",
   "Median latency (placeholder data)": "Median latency (placeholder data)",
   "Minimum context length": "Minimum context length",
