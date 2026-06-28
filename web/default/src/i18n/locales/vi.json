@@ -3186,6 +3186,8 @@
     "Randomly select a key from the pool for each request": "Chọn ngẫu nhiên một khóa từ kho cho mỗi yêu cầu",
     "Ranking data is currently simulated for preview purposes and will be replaced with live analytics once the backend integration ships.": "Dữ liệu xếp hạng hiện đang được mô phỏng để xem trước và sẽ được thay bằng dữ liệu thực sau khi tích hợp backend.",
     "Rankings": "Bảng xếp hạng",
+    "Most used models on YouBox": "Các mô hình được dùng nhiều nhất trên YouBox",
+    "Ranked by tokens routed across all customers. Updated from live usage data.": "Xếp hạng theo token được định tuyến cho mọi khách hàng. Cập nhật từ dữ liệu sử dụng thời gian thực.",
     "Rate Limit Windows": "Cửa sổ giới hạn tốc độ",
     "Rate Limited": "Giới hạn tốc độ",
     "Rate Limiting": "Rate limit",

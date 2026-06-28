@@ -3186,6 +3186,8 @@
     "Randomly select a key from the pool for each request": "每次请求从池中随机选择一个密钥",
     "Ranking data is currently simulated for preview purposes and will be replaced with live analytics once the backend integration ships.": "当前排行榜数据为预览用模拟数据，后端集成完成后将替换为真实分析数据。",
     "Rankings": "排行榜",
+    "Most used models on YouBox": "YouBox 最常用模型",
+    "Ranked by tokens routed across all customers. Updated from live usage data.": "按全平台路由的 Token 用量排名，数据来自实时用量并持续更新。",
     "Rate Limit Windows": "速率限制窗口",
     "Rate Limited": "限流",
     "Rate Limiting": "速率限制",

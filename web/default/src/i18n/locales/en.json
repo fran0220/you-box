@@ -3186,6 +3186,8 @@
     "Randomly select a key from the pool for each request": "Randomly select a key from the pool for each request",
     "Ranking data is currently simulated for preview purposes and will be replaced with live analytics once the backend integration ships.": "Ranking data is currently simulated for preview purposes and will be replaced with live analytics once the backend integration ships.",
     "Rankings": "Rankings",
+    "Most used models on YouBox": "Most used models on YouBox",
+    "Ranked by tokens routed across all customers. Updated from live usage data.": "Ranked by tokens routed across all customers. Updated from live usage data.",
     "Rate Limit Windows": "Rate Limit Windows",
     "Rate Limited": "Rate Limited",
     "Rate Limiting": "Rate Limiting",

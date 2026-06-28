@@ -159,12 +159,12 @@ export function ModelsSection(props: ModelsSectionProps) {
   }, [chartGridColor, chartTextColor, orderedPoints, t])
 
   return (
-    <section className='bg-card overflow-hidden rounded-lg border'>
+    <section className='bg-surface-card overflow-hidden rounded-lg border border-border'>
       {/* Chart block ----------------------------------------------------- */}
       <div className='flex items-start justify-between gap-4 px-5 py-4'>
         <div className='min-w-0 flex-1'>
           <h2 className='text-foreground inline-flex items-center gap-2 text-base font-semibold'>
-            <BarChart3 className='text-primary size-4' />
+            <BarChart3 className='text-muted-foreground size-4' aria-hidden />
             {t('Top Models')}
           </h2>
           <p className='text-muted-foreground mt-1 text-sm'>
@@ -205,7 +205,7 @@ export function ModelsSection(props: ModelsSectionProps) {
       <div className='border-t'>
         <div className='px-5 pt-4 pb-2'>
           <h3 className='text-foreground inline-flex items-center gap-2 text-sm font-semibold'>
-            <Trophy className='text-warning size-3.5' />
+            <Trophy className='text-muted-foreground size-3.5' aria-hidden />
             {t('LLM Leaderboard')}
           </h3>
           <p className='text-muted-foreground/80 mt-0.5 text-xs'>

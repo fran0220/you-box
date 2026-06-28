@@ -3186,6 +3186,8 @@
     "Randomly select a key from the pool for each request": "各リクエストごとにプールからランダムにキーを選択",
     "Ranking data is currently simulated for preview purposes and will be replaced with live analytics once the backend integration ships.": "現在のランキングデータはプレビュー用のシミュレーションです。バックエンド連携が完了次第、リアルタイム分析データに置き換わります。",
     "Rankings": "ランキング",
+    "Most used models on YouBox": "YouBox で最も使われているモデル",
+    "Ranked by tokens routed across all customers. Updated from live usage data.": "全顧客のルーティング Token 数でランキング。ライブ利用データに基づき更新されます。",
     "Rate Limit Windows": "レート制限ウィンドウ",
     "Rate Limited": "レート制限",
     "Rate Limiting": "レート制限",
