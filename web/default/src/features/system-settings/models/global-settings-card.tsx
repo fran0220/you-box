@@ -16,9 +16,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -38,6 +37,8 @@ import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { StatusBadge } from '@/components/status-badge'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -45,6 +46,7 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 
 const thinkingBlacklistExample = JSON.stringify(
@@ -98,19 +100,13 @@ const schema = z.object({
 })
 
 type GlobalModelSettingsFormValues = z.output<typeof schema>
-type GlobalModelSettingsFormInput = z.input<typeof schema>
 
-type FlatGlobalModelSettings = {
-  'global.pass_through_request_enabled': boolean
-  'global.thinking_model_blacklist': string
-  'global.chat_completions_to_responses_policy': string
-  'general_setting.ping_interval_enabled': boolean
-  'general_setting.ping_interval_seconds': number
+function normalizeJsonText(value: string, fallback: string) {
+  const trimmed = (value ?? '').toString().trim()
+  return trimmed ? trimmed : fallback
 }
 
-const flattenGlobalValues = (
-  values: GlobalModelSettingsFormValues
-): FlatGlobalModelSettings => ({
+const flattenGlobalValues = (values: GlobalModelSettingsFormValues) => ({
   'global.pass_through_request_enabled':
     values.global.pass_through_request_enabled,
   'global.thinking_model_blacklist': normalizeJsonText(
@@ -127,11 +123,6 @@ const flattenGlobalValues = (
     values.general_setting.ping_interval_seconds,
 })
 
-function normalizeJsonText(value: string, fallback: string) {
-  const trimmed = (value ?? '').toString().trim()
-  return trimmed ? trimmed : fallback
-}
-
 type GlobalSettingsCardProps = {
   defaultValues: GlobalModelSettingsFormValues
 }
@@ -140,18 +131,25 @@ export function GlobalSettingsCard({ defaultValues }: GlobalSettingsCardProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
 
-  const form = useForm<
-    GlobalModelSettingsFormInput,
-    unknown,
-    GlobalModelSettingsFormValues
-  >({
-    resolver: zodResolver(schema),
-    defaultValues: defaultValues as GlobalModelSettingsFormInput,
-  })
-
-  useEffect(() => {
-    form.reset(defaultValues as GlobalModelSettingsFormInput)
-  }, [defaultValues, form])
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<GlobalModelSettingsFormValues>({
+      resolver: zodResolver(schema) as Resolver<
+        GlobalModelSettingsFormValues,
+        unknown,
+        GlobalModelSettingsFormValues
+      >,
+      defaultValues,
+      onSubmit: async (values, changedFields) => {
+        const flattened = flattenGlobalValues(values)
+        for (const key of Object.keys(changedFields)) {
+          if (!(key in flattened)) continue
+          await updateOption.mutateAsync({
+            key,
+            value: flattened[key as keyof typeof flattened],
+          })
+        }
+      },
+    })
 
   const pingEnabled = form.watch('general_setting.ping_interval_enabled')
 
@@ -170,135 +168,63 @@ export function GlobalSettingsCard({ defaultValues }: GlobalSettingsCardProps) {
     }
   }
 
-  const onSubmit = async (values: GlobalModelSettingsFormValues) => {
-    const flattenedDefaults = flattenGlobalValues(defaultValues)
-    const flattenedValues = flattenGlobalValues(values)
-    const updates = Object.entries(flattenedValues).filter(
-      ([key, value]) =>
-        value !== flattenedDefaults[key as keyof FlatGlobalModelSettings]
-    )
-
-    if (updates.length === 0) {
-      toast.info(t('No changes to save'))
-      return
-    }
-
-    for (const [key, value] of updates) {
-      await updateOption.mutateAsync({
-        key,
-        value,
-      })
-    }
-  }
-
   return (
-    <SettingsSection title={t('Global Model Configuration')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-          />
-          <SettingRowGroup>
-            <FormField
-              control={form.control}
-              name='global.pass_through_request_enabled'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Enable Request Passthrough')}
-                  description={t(
-                    'Forward requests directly to upstream providers without any post-processing.'
-                  )}
-                  control={
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Global Model Configuration')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
             />
-          </SettingRowGroup>
-
-          <FormField
-            control={form.control}
-            name='global.thinking_model_blacklist'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {t('Models that skip thinking suffix processing')}
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    rows={4}
-                    placeholder={`${t('Example:')}\n${thinkingBlacklistExample}`}
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t(
-                    'Models listed here will not automatically append or remove -thinking / -nothinking suffixes.'
-                  )}
-                </FormDescription>
-                <div className='flex flex-wrap gap-2'>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    onClick={() =>
-                      formatJsonField('global.thinking_model_blacklist')
+            <FormDirtyIndicator isDirty={isDirty} />
+            <SettingRowGroup>
+              <FormField
+                control={form.control}
+                name='global.pass_through_request_enabled'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Enable Request Passthrough')}
+                    description={t(
+                      'Forward requests directly to upstream providers without any post-processing.'
+                    )}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
                     }
-                  >
-                    {t('Format JSON')}
-                  </Button>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Separator />
-
-          <div className='space-y-4'>
-            <div className='flex items-center gap-2'>
-              <h3 className='text-base font-semibold'>
-                {t('ChatCompletions -> Responses Compatibility')}
-              </h3>
-              <StatusBadge
-                label={t('Preview')}
-                variant='neutral'
-                copyable={false}
-              />
-            </div>
-
-            <Alert>
-              <AlertTitle>{t('Warning')}</AlertTitle>
-              <AlertDescription>
-                {t(
-                  'This feature is experimental. Configuration format and behavior may change.'
+                  />
                 )}
-              </AlertDescription>
-            </Alert>
+              />
+            </SettingRowGroup>
 
             <FormField
               control={form.control}
-              name='global.chat_completions_to_responses_policy'
+              name='global.thinking_model_blacklist'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('Policy JSON')}</FormLabel>
+                  <FormLabel>
+                    {t('Models that skip thinking suffix processing')}
+                  </FormLabel>
                   <FormControl>
                     <Textarea
-                      rows={8}
-                      placeholder={`${t('Example (specific channels):')}\n${chatToResponsesPolicyExample}\n\n${t('Example (all channels):')}\n${chatToResponsesPolicyAllChannelsExample}`}
+                      rows={4}
+                      placeholder={`${t('Example:')}\n${thinkingBlacklistExample}`}
                       {...field}
                       onChange={(event) => field.onChange(event.target.value)}
                     />
                   </FormControl>
                   <FormDescription>
-                    {t('Empty value will be saved as {}.')}
+                    {t(
+                      'Models listed here will not automatically append or remove -thinking / -nothinking suffixes.'
+                    )}
                   </FormDescription>
                   <div className='flex flex-wrap gap-2'>
                     <Button
@@ -306,37 +232,7 @@ export function GlobalSettingsCard({ defaultValues }: GlobalSettingsCardProps) {
                       variant='outline'
                       size='sm'
                       onClick={() =>
-                        form.setValue(
-                          'global.chat_completions_to_responses_policy',
-                          chatToResponsesPolicyExample,
-                          { shouldDirty: true }
-                        )
-                      }
-                    >
-                      {t('Fill example (specific channels)')}
-                    </Button>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      onClick={() =>
-                        form.setValue(
-                          'global.chat_completions_to_responses_policy',
-                          chatToResponsesPolicyAllChannelsExample,
-                          { shouldDirty: true }
-                        )
-                      }
-                    >
-                      {t('Fill example (all channels)')}
-                    </Button>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      onClick={() =>
-                        formatJsonField(
-                          'global.chat_completions_to_responses_policy'
-                        )
+                        formatJsonField('global.thinking_model_blacklist')
                       }
                     >
                       {t('Format JSON')}
@@ -346,67 +242,157 @@ export function GlobalSettingsCard({ defaultValues }: GlobalSettingsCardProps) {
                 </FormItem>
               )}
             />
-          </div>
 
-          <Separator />
+            <Separator />
 
-          <SettingRowGroup>
-            <FormField
-              control={form.control}
-              name='general_setting.ping_interval_enabled'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Keep-alive Ping')}
-                  description={t(
-                    'Periodically send ping frames to keep streaming connections active.'
-                  )}
-                  control={
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  }
+            <div className='space-y-4'>
+              <div className='flex items-center gap-2'>
+                <h3 className='text-base font-semibold'>
+                  {t('ChatCompletions -> Responses Compatibility')}
+                </h3>
+                <StatusBadge
+                  label={t('Preview')}
+                  variant='neutral'
+                  copyable={false}
                 />
-              )}
-            />
+              </div>
 
-            <FormField
-              control={form.control}
-              name='general_setting.ping_interval_seconds'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Ping Interval (seconds)')}
-                  description={t(
-                    'Recommended to keep this high to avoid upstream throttling.'
+              <Alert>
+                <AlertTitle>{t('Warning')}</AlertTitle>
+                <AlertDescription>
+                  {t(
+                    'This feature is experimental. Configuration format and behavior may change.'
                   )}
-                  disabled={!pingEnabled}
-                  control={
+                </AlertDescription>
+              </Alert>
+
+              <FormField
+                control={form.control}
+                name='global.chat_completions_to_responses_policy'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('Policy JSON')}</FormLabel>
                     <FormControl>
-                      <Input
-                        type='number'
-                        min={1}
-                        disabled={!pingEnabled}
-                        className='w-24'
-                        value={
-                          field.value === undefined || field.value === null
-                            ? ''
-                            : String(field.value)
-                        }
+                      <Textarea
+                        rows={8}
+                        placeholder={`${t('Example (specific channels):')}\n${chatToResponsesPolicyExample}\n\n${t('Example (all channels):')}\n${chatToResponsesPolicyAllChannelsExample}`}
+                        {...field}
                         onChange={(event) => field.onChange(event.target.value)}
-                        onBlur={field.onBlur}
-                        name={field.name}
-                        ref={field.ref}
                       />
                     </FormControl>
-                  }
-                />
-              )}
-            />
-          </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+                    <FormDescription>
+                      {t('Empty value will be saved as {}.')}
+                    </FormDescription>
+                    <div className='flex flex-wrap gap-2'>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() =>
+                          form.setValue(
+                            'global.chat_completions_to_responses_policy',
+                            chatToResponsesPolicyExample,
+                            { shouldDirty: true }
+                          )
+                        }
+                      >
+                        {t('Fill example (specific channels)')}
+                      </Button>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() =>
+                          form.setValue(
+                            'global.chat_completions_to_responses_policy',
+                            chatToResponsesPolicyAllChannelsExample,
+                            { shouldDirty: true }
+                          )
+                        }
+                      >
+                        {t('Fill example (all channels)')}
+                      </Button>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() =>
+                          formatJsonField(
+                            'global.chat_completions_to_responses_policy'
+                          )
+                        }
+                      >
+                        {t('Format JSON')}
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Separator />
+
+            <SettingRowGroup>
+              <FormField
+                control={form.control}
+                name='general_setting.ping_interval_enabled'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Keep-alive Ping')}
+                    description={t(
+                      'Periodically send ping frames to keep streaming connections active.'
+                    )}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='general_setting.ping_interval_seconds'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Ping Interval (seconds)')}
+                    description={t(
+                      'Recommended to keep this high to avoid upstream throttling.'
+                    )}
+                    disabled={!pingEnabled}
+                    control={
+                      <FormControl>
+                        <Input
+                          type='number'
+                          min={1}
+                          disabled={!pingEnabled}
+                          className='w-24'
+                          value={
+                            field.value === undefined || field.value === null
+                              ? ''
+                              : String(field.value)
+                          }
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+            </SettingRowGroup>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }
