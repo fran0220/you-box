@@ -607,10 +607,12 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
                 )}
               </Button>
               <div className='flex items-center gap-1.5'>
-                <span className='font-semibold'>Tag：{tag}</span>
+                <span className='font-semibold'>
+                  {t('Tag: {{tag}}', { tag })}
+                </span>
                 <StatusBadge
-                  label={`${childrenCount} channels`}
-                  variant='blue'
+                  label={t('{{count}} channels', { count: childrenCount })}
+                  variant='neutral'
                   size='sm'
                   copyable={false}
                 />
@@ -839,7 +841,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           if (hasEnabled) {
             return (
               <StatusBadge
-                label={`Active (${childrenCount})`}
+                label={t('Active ({{count}})', { count: childrenCount })}
                 variant='success'
                 size='sm'
                 copyable={false}
@@ -848,7 +850,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           } else {
             return (
               <StatusBadge
-                label={`Inactive (${childrenCount})`}
+                label={t('Inactive ({{count}})', { count: childrenCount })}
                 variant='neutral'
                 size='sm'
                 copyable={false}
