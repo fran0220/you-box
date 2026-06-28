@@ -23,6 +23,7 @@ import { useSidebarConfig } from '@/hooks/use-sidebar-config'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SectionPageLayout } from '@/components/layout'
 import type { NavGroup } from '@/components/layout/types'
+import { PageHeader } from '@/components/youbox'
 import { CacheStatsDialog } from '@/features/system-settings/general/channel-affinity/cache-stats-dialog'
 import { UserInfoDialog } from './components/dialogs/user-info-dialog'
 import {
@@ -49,6 +50,14 @@ const SECTION_META: Record<UsageLogsSectionId, { titleKey: string }> = {
   task: {
     titleKey: 'Task Logs',
   },
+}
+
+const SECTION_SUBTITLE_KEYS: Record<UsageLogsSectionId, string> = {
+  common:
+    'Every request routed through your keys, with token counts, cost and latency.',
+  drawing:
+    'Image generation and drawing task history with filters and export.',
+  task: 'Async task logs with status, timing, and request metadata.',
 }
 
 function UsageLogsContent() {
@@ -103,35 +112,33 @@ function UsageLogsContent() {
     [navigate]
   )
 
-  const pageMeta =
-    activeCategory === 'common' ? SECTION_META.common : SECTION_META.task
+  const pageMeta = SECTION_META[activeCategory]
   const showTaskSwitcher =
     activeCategory !== 'common' && visibleSections.length > 1
+
+  const headerActions = showTaskSwitcher ? (
+    <Tabs value={activeCategory} onValueChange={handleSectionChange}>
+      <TabsList className='max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto'>
+        {visibleSections.map((section) => (
+          <TabsTrigger key={section} value={section}>
+            {t(SECTION_META[section].titleKey)}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
+  ) : undefined
 
   return (
     <>
       <SectionPageLayout>
-        <SectionPageLayout.Title>
-          {t(pageMeta.titleKey)}
-        </SectionPageLayout.Title>
         <SectionPageLayout.Content>
           <div className='space-y-4'>
-            <p className='text-muted-foreground text-sm'>
-              {t(
-                'Every request routed through your keys, with token counts, cost and latency.'
-              )}
-            </p>
-            {showTaskSwitcher && (
-              <Tabs value={activeCategory} onValueChange={handleSectionChange}>
-                <TabsList className='max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto'>
-                  {visibleSections.map((section) => (
-                    <TabsTrigger key={section} value={section}>
-                      {t(SECTION_META[section].titleKey)}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            )}
+            <PageHeader
+              eyebrow={`// ${t('Usage Logs')}`}
+              title={t(pageMeta.titleKey)}
+              subtitle={t(SECTION_SUBTITLE_KEYS[activeCategory])}
+              actions={headerActions}
+            />
             <UsageLogsTable logCategory={activeCategory} />
           </div>
         </SectionPageLayout.Content>

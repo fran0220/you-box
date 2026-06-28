@@ -33,13 +33,20 @@ const route = getRouteApi('/_authenticated/usage-logs/$section')
 function StatBadge(props: {
   label: string
   value: string | number
-  accent: string
+  accentOpacity: string
 }) {
   return (
-    <span className='border-border/60 bg-muted/25 inline-flex h-7 items-center gap-2 rounded-md border px-2.5 text-xs shadow-xs'>
-      <span className={cn('h-3.5 w-0.5 rounded-full', props.accent)} />
-      <span className='text-muted-foreground'>{props.label}</span>
-      <span className='text-foreground/85 font-mono font-semibold tabular-nums'>
+    <span className='border-border bg-surface-2/80 inline-flex h-7 items-center gap-2 rounded-md border px-2.5 text-xs shadow-xs'>
+      <span
+        className={cn(
+          'bg-brand h-3.5 w-0.5 shrink-0 rounded-full',
+          props.accentOpacity
+        )}
+      />
+      <span className='text-muted-foreground font-mono text-[11px] uppercase tracking-[0.06em]'>
+        {props.label}
+      </span>
+      <span className='text-foreground font-mono text-xs font-semibold tabular-nums'>
         {props.value}
       </span>
     </span>
@@ -89,10 +96,18 @@ export function CommonLogsStats() {
       <StatBadge
         label={t('Usage')}
         value={sensitiveVisible ? formatLogQuota(stats?.quota || 0) : '••••'}
-        accent='bg-brand/80'
+        accentOpacity='opacity-100'
       />
-      <StatBadge label={t('RPM')} value={stats?.rpm || 0} accent='bg-success/80' />
-      <StatBadge label={t('TPM')} value={stats?.tpm || 0} accent='bg-info/70' />
+      <StatBadge
+        label={t('RPM')}
+        value={stats?.rpm || 0}
+        accentOpacity='opacity-70'
+      />
+      <StatBadge
+        label={t('TPM')}
+        value={stats?.tpm || 0}
+        accentOpacity='opacity-45'
+      />
     </div>
   )
 }
