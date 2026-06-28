@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useCallback, useMemo, lazy, Suspense } from 'react'
+import { useState, useCallback, useMemo, lazy, Suspense, useEffect } from 'react'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
@@ -187,10 +187,10 @@ export function Dashboard() {
 
   const meta = SECTION_META[activeSection] ?? SECTION_META.overview
   const isAdmin = Boolean(userRole && userRole >= ROLE.ADMIN)
-  const visibleSections = useMemo(
+  const sectionTabIds = useMemo(
     () =>
       DASHBOARD_SECTION_IDS.filter(
-        (section) => section !== 'overview' && (section !== 'users' || isAdmin)
+        (section) => section !== 'users' || isAdmin
       ),
     [isAdmin]
   )
@@ -203,8 +203,17 @@ export function Dashboard() {
     },
     [navigate]
   )
-  const showSectionTabs =
-    activeSection !== 'overview' && visibleSections.length > 1
+  const showSectionTabs = sectionTabIds.length > 1
+
+  useEffect(() => {
+    if (activeSection === 'users' && !isAdmin) {
+      void navigate({
+        to: '/dashboard/$section',
+        params: { section: DASHBOARD_DEFAULT_SECTION },
+        replace: true,
+      })
+    }
+  }, [activeSection, isAdmin, navigate])
   const modelActions =
     activeSection === 'models' ? (
       <>
@@ -224,13 +233,13 @@ export function Dashboard() {
     <SectionPageLayout>
       <SectionPageLayout.Title>{t(meta.titleKey)}</SectionPageLayout.Title>
       <SectionPageLayout.Content>
-        <div className='space-y-3 sm:space-y-4'>
-          {activeSection !== 'overview' && (
+        <div className='mx-auto w-full max-w-[1180px] space-y-3 sm:space-y-4'>
+          {(showSectionTabs || modelActions != null) && (
             <div className='flex flex-wrap items-center justify-between gap-1.5 sm:gap-2'>
               {showSectionTabs ? (
                 <Tabs value={activeSection} onValueChange={handleSectionChange}>
                   <TabsList className='max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto'>
-                    {visibleSections.map((section) => (
+                    {sectionTabIds.map((section) => (
                       <TabsTrigger key={section} value={section}>
                         {t(SECTION_META[section].titleKey)}
                       </TabsTrigger>
