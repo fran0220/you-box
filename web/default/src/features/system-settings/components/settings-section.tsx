@@ -17,7 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
-import { SettingsPanel } from '@/components/settings'
+import { Panel } from '@/components/patterns/panel'
+import { SettingsSection as YouboxSettingsSection } from '@/components/youbox'
+import { cn } from '@/lib/utils'
 import { useSettingsSectionChrome } from './use-settings-section-chrome'
 
 type SettingsSectionProps = {
@@ -26,11 +28,13 @@ type SettingsSectionProps = {
   className?: string
 }
 
+const panelBodyClassName = 'flex flex-col gap-4 py-3 sm:py-4'
+
 /**
- * Shared container for every system-settings section, rendered as an
- * A3 SettingsPanel (eyebrow = owning group, title = section name). The
- * suppress-header context still hides the panel header where the page
- * chrome already names the section.
+ * Shared container for every system-settings section, using the canonical
+ * youbox SettingsSection (Panel + mono group title). When the page chrome
+ * already names the section, suppress-header renders a headless panel body
+ * only so VAL-SET-010 still finds `[data-slot=settings-panel-body]`.
  */
 export function SettingsSection({
   title,
@@ -41,15 +45,25 @@ export function SettingsSection({
   const { suppressSectionHeader: suppressHeader, sectionEyebrow: eyebrowKey } =
     useSettingsSectionChrome()
 
+  if (suppressHeader) {
+    return (
+      <Panel className={cn(className)}>
+        <div data-slot='settings-panel-body' className='px-4 py-1 sm:px-5'>
+          <div className={panelBodyClassName}>{children}</div>
+        </div>
+      </Panel>
+    )
+  }
+
   return (
-    <SettingsPanel
+    <YouboxSettingsSection
       className={className}
-      eyebrow={
-        !suppressHeader && eyebrowKey ? t(eyebrowKey).toLowerCase() : undefined
-      }
-      title={!suppressHeader ? title : undefined}
+      title={title}
+      description={eyebrowKey ? t(eyebrowKey) : undefined}
     >
-      <div className='flex flex-col gap-4 py-3 sm:py-4'>{children}</div>
-    </SettingsPanel>
+      <div data-slot='settings-panel-body' className={panelBodyClassName}>
+        {children}
+      </div>
+    </YouboxSettingsSection>
   )
 }
