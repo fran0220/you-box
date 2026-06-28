@@ -4909,6 +4909,9 @@
     "，and ": ", and ",
     "Manage accounts, roles, groups, and quotas across your organization.": "組織のアカウント、ロール、グループ、クォータを管理します。",
     "Reset Passkey for {{username}}? The user will need to register a new Passkey before using passwordless login.": "{{username}} の Passkey をリセットしますか？パスワードレスログインの前に新しい Passkey の登録が必要です。",
-    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "{{username}} の 2FA をリセットしますか？引き続き利用するには再設定が必要です。"
+    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "{{username}} の 2FA をリセットしますか？引き続き利用するには再設定が必要です。",
+    "{{count}} configured models": "設定済みモデル {{count}} 件",
+    "Catalog metadata for models exposed to users — vendors, ratios, and sync.": "ユーザー向けモデルのカタログメタデータ（ベンダー、倍率、同期）。",
+    "GPU deployments managed through io.net when enabled.": "有効時は io.net 経由で管理される GPU デプロイ。"
   }
 }

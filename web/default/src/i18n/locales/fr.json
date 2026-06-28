@@ -4909,6 +4909,9 @@
     "，and ": ", and ",
     "Manage accounts, roles, groups, and quotas across your organization.": "Gérez les comptes, rôles, groupes et quotas de votre organisation.",
     "Reset Passkey for {{username}}? The user will need to register a new Passkey before using passwordless login.": "Réinitialiser la Passkey pour {{username}} ? L'utilisateur devra enregistrer une nouvelle Passkey avant la connexion sans mot de passe.",
-    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "Réinitialiser la 2FA pour {{username}} ? L'utilisateur devra la reconfigurer pour continuer à l'utiliser."
+    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "Réinitialiser la 2FA pour {{username}} ? L'utilisateur devra la reconfigurer pour continuer à l'utiliser.",
+    "{{count}} configured models": "{{count}} modèles configurés",
+    "Catalog metadata for models exposed to users — vendors, ratios, and sync.": "Métadonnées du catalogue des modèles exposés aux utilisateurs — fournisseurs, ratios et synchronisation.",
+    "GPU deployments managed through io.net when enabled.": "Déploiements GPU gérés via io.net lorsque activé."
   }
 }

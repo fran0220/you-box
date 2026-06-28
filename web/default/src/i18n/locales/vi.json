@@ -4909,6 +4909,9 @@
     "，and ": ", and ",
     "Manage accounts, roles, groups, and quotas across your organization.": "Quản lý tài khoản, vai trò, nhóm và hạn mức trong tổ chức của bạn.",
     "Reset Passkey for {{username}}? The user will need to register a new Passkey before using passwordless login.": "Đặt lại Passkey cho {{username}}? Người dùng cần đăng ký Passkey mới trước khi đăng nhập không mật khẩu.",
-    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "Đặt lại 2FA cho {{username}}? Người dùng phải thiết lập lại 2FA để tiếp tục sử dụng."
+    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "Đặt lại 2FA cho {{username}}? Người dùng phải thiết lập lại 2FA để tiếp tục sử dụng.",
+    "{{count}} configured models": "{{count}} mô hình đã cấu hình",
+    "Catalog metadata for models exposed to users — vendors, ratios, and sync.": "Siêu dữ liệu danh mục mô hình cho người dùng — nhà cung cấp, tỷ lệ và đồng bộ.",
+    "GPU deployments managed through io.net when enabled.": "Triển khai GPU qua io.net khi được bật."
   }
 }

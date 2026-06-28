@@ -4909,6 +4909,9 @@
     "，and ": ", and ",
     "Manage accounts, roles, groups, and quotas across your organization.": "Manage accounts, roles, groups, and quotas across your organization.",
     "Reset Passkey for {{username}}? The user will need to register a new Passkey before using passwordless login.": "Reset Passkey for {{username}}? The user will need to register a new Passkey before using passwordless login.",
-    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it."
+    "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.": "Reset 2FA for {{username}}? The user must set up 2FA again to continue using it.",
+    "{{count}} configured models": "{{count}} configured models",
+    "Catalog metadata for models exposed to users — vendors, ratios, and sync.": "Catalog metadata for models exposed to users — vendors, ratios, and sync.",
+    "GPU deployments managed through io.net when enabled.": "GPU deployments managed through io.net when enabled."
   }
 }
