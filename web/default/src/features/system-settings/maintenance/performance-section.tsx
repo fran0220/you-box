@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as z from 'zod'
 import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -61,6 +62,7 @@ import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { getPerformanceLogs, getPerformanceStats } from '../api'
 import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import { safeNumberFieldProps } from '../utils/numeric-field'
@@ -219,8 +221,21 @@ type PerformanceStats = {
 export function PerformanceSection(props: Props) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
-  const [stats, setStats] = useState<PerformanceStats | null>(null)
-  const [logInfo, setLogInfo] = useState<LogInfo | null>(null)
+  const queryClient = useQueryClient()
+  const { data: stats = null } = useQuery({
+    queryKey: ['performance', 'stats'],
+    queryFn: getPerformanceStats,
+    staleTime: 30_000,
+    retry: false,
+    select: (data) => data as PerformanceStats,
+  })
+  const { data: logInfo = null } = useQuery({
+    queryKey: ['performance', 'logs'],
+    queryFn: getPerformanceLogs,
+    staleTime: 30_000,
+    retry: false,
+    select: (data) => data as LogInfo,
+  })
   const [logCleanupMode, setLogCleanupMode] = useState('by_count')
   const [logCleanupValue, setLogCleanupValue] = useState(10)
   const [logCleanupLoading, setLogCleanupLoading] = useState(false)
@@ -259,39 +274,24 @@ export function PerformanceSection(props: Props) {
 
         baselineRef.current = normalized
         form.reset(buildFormDefaults(normalized) as PerfFormValues)
-        fetchStats()
+        void queryClient.invalidateQueries({ queryKey: ['performance', 'stats'] })
       },
     })
 
-  const fetchStats = useCallback(async () => {
-    try {
-      const res = await api.get('/api/performance/stats')
-      if (res.data.success) setStats(res.data.data)
-    } catch {
-      /* ignore */
-    }
-  }, [])
+  const refreshStats = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: ['performance', 'stats'] })
+  }, [queryClient])
 
-  const fetchLogInfo = useCallback(async () => {
-    try {
-      const res = await api.get('/api/performance/logs')
-      if (res.data.success) setLogInfo(res.data.data)
-    } catch {
-      /* ignore */
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchStats()
-    fetchLogInfo()
-  }, [fetchStats, fetchLogInfo])
+  const refreshLogInfo = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: ['performance', 'logs'] })
+  }, [queryClient])
 
   const clearDiskCache = async () => {
     try {
       const res = await api.delete('/api/performance/disk_cache')
       if (res.data.success) {
         toast.success(t('Disk cache cleared'))
-        fetchStats()
+        refreshStats()
       }
     } catch {
       toast.error(t('Cleanup failed'))
@@ -303,7 +303,7 @@ export function PerformanceSection(props: Props) {
       const res = await api.post('/api/performance/reset_stats')
       if (res.data.success) {
         toast.success(t('Statistics reset'))
-        fetchStats()
+        refreshStats()
       }
     } catch {
       toast.error(t('Reset failed'))
@@ -315,7 +315,7 @@ export function PerformanceSection(props: Props) {
       const res = await api.post('/api/performance/gc')
       if (res.data.success) {
         toast.success(t('GC executed'))
-        fetchStats()
+        refreshStats()
       }
     } catch {
       toast.error(t('GC execution failed'))
@@ -343,7 +343,7 @@ export function PerformanceSection(props: Props) {
       } else {
         toast.error(res.data.message || t('Cleanup failed'))
       }
-      fetchLogInfo()
+      refreshLogInfo()
     } catch {
       toast.error(t('Cleanup failed'))
     } finally {
@@ -886,7 +886,7 @@ export function PerformanceSection(props: Props) {
       <div className='space-y-4'>
         <div className='flex items-center gap-2'>
           <h4 className='font-medium'>{t('Performance Monitor')}</h4>
-          <Button variant='outline' size='sm' onClick={fetchStats}>
+          <Button variant='outline' size='sm' onClick={refreshStats}>
             {t('Refresh Stats')}
           </Button>
           <AlertDialog>

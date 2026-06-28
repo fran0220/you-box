@@ -200,14 +200,14 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
   const confirmDelete = () => {
     if (deleteTarget === 'single' && editingFaq) {
       setFaqList((prev) => prev.filter((item) => item.id !== editingFaq.id))
-      toast.success(t('FAQ deleted. Click "Save Settings" to apply.'))
+      toast.success(t('FAQ deleted. Use Save Changes in the bar below to apply.'))
     } else if (deleteTarget === 'batch') {
       setFaqList((prev) =>
         prev.filter((item) => !selectedIds.includes(item.id))
       )
       setSelectedIds([])
       toast.success(
-        t('{{count}} FAQs deleted. Click "Save Settings" to apply.', {
+        t('{{count}} FAQs deleted. Use Save Changes in the bar below to apply.', {
           count: selectedIds.length,
         })
       )
@@ -223,11 +223,11 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
           item.id === editingFaq.id ? { ...item, ...values } : item
         )
       )
-      toast.success(t('FAQ updated. Click "Save Settings" to apply.'))
+      toast.success(t('FAQ updated. Use Save Changes in the bar below to apply.'))
     } else {
       const newId = Math.max(...faqList.map((item) => item.id), 0) + 1
       setFaqList((prev) => [...prev, { id: newId, ...values }])
-      toast.success(t('FAQ added. Click "Save Settings" to apply.'))
+      toast.success(t('FAQ added. Use Save Changes in the bar below to apply.'))
     }
     setShowDialog(false)
   }

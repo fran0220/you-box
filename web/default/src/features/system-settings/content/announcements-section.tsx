@@ -269,7 +269,7 @@ export function AnnouncementsSection({
         prev.filter((item) => item.id !== editingAnnouncement.id)
       )
       toast.success(
-        t('Announcement deleted. Click "Save Settings" to apply.')
+        t('Announcement deleted. Use Save Changes in the bar below to apply.')
       )
     } else if (deleteTarget === 'batch') {
       setAnnouncements((prev) =>
@@ -277,7 +277,7 @@ export function AnnouncementsSection({
       )
       setSelectedIds([])
       toast.success(
-        t('{{count}} announcements deleted. Click "Save Settings" to apply.', {
+        t('{{count}} announcements deleted. Use Save Changes in the bar below to apply.', {
           count: selectedIds.length,
         })
       )
@@ -293,11 +293,11 @@ export function AnnouncementsSection({
           item.id === editingAnnouncement.id ? { ...item, ...values } : item
         )
       )
-      toast.success(t('Announcement updated. Click "Save Settings" to apply.'))
+      toast.success(t('Announcement updated. Use Save Changes in the bar below to apply.'))
     } else {
       const newId = Math.max(...announcements.map((item) => item.id), 0) + 1
       setAnnouncements((prev) => [...prev, { id: newId, ...values }])
-      toast.success(t('Announcement added. Click "Save Settings" to apply.'))
+      toast.success(t('Announcement added. Use Save Changes in the bar below to apply.'))
     }
     setShowDialog(false)
   }

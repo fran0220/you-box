@@ -236,14 +236,14 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
       setApiInfoList((prev) =>
         prev.filter((item) => item.id !== editingApiInfo.id)
       )
-      toast.success(t('API info deleted. Click "Save Settings" to apply.'))
+      toast.success(t('API info deleted. Use Save Changes in the bar below to apply.'))
     } else if (deleteTarget === 'batch') {
       setApiInfoList((prev) =>
         prev.filter((item) => !selectedIds.includes(item.id))
       )
       setSelectedIds([])
       toast.success(
-        t('{{count}} API entries deleted. Click "Save Settings" to apply.', {
+        t('{{count}} API entries deleted. Use Save Changes in the bar below to apply.', {
           count: selectedIds.length,
         })
       )
@@ -259,11 +259,11 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
           item.id === editingApiInfo.id ? { ...item, ...values } : item
         )
       )
-      toast.success(t('API info updated. Click "Save Settings" to apply.'))
+      toast.success(t('API info updated. Use Save Changes in the bar below to apply.'))
     } else {
       const newId = Math.max(...apiInfoList.map((item) => item.id), 0) + 1
       setApiInfoList((prev) => [...prev, { id: newId, ...values }])
-      toast.success(t('API info added. Click "Save Settings" to apply.'))
+      toast.success(t('API info added. Use Save Changes in the bar below to apply.'))
     }
     setShowDialog(false)
   }

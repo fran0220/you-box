@@ -213,12 +213,12 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
   const confirmDelete = () => {
     if (deleteTarget === 'single' && editingGroup) {
       setGroups((prev) => prev.filter((item) => item.id !== editingGroup.id))
-      toast.success(t('Group deleted. Click "Save Settings" to apply.'))
+      toast.success(t('Group deleted. Use Save Changes in the bar below to apply.'))
     } else if (deleteTarget === 'batch') {
       setGroups((prev) => prev.filter((item) => !selectedIds.includes(item.id)))
       setSelectedIds([])
       toast.success(
-        t('{{count}} groups deleted. Click "Save Settings" to apply.', {
+        t('{{count}} groups deleted. Use Save Changes in the bar below to apply.', {
           count: selectedIds.length,
         })
       )
@@ -234,11 +234,11 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
           item.id === editingGroup.id ? { ...item, ...values } : item
         )
       )
-      toast.success(t('Group updated. Click "Save Settings" to apply.'))
+      toast.success(t('Group updated. Use Save Changes in the bar below to apply.'))
     } else {
       const newId = Math.max(...groups.map((item) => item.id), 0) + 1
       setGroups((prev) => [...prev, { id: newId, ...values }])
-      toast.success(t('Group added. Click "Save Settings" to apply.'))
+      toast.success(t('Group added. Use Save Changes in the bar below to apply.'))
     }
     setShowDialog(false)
   }
