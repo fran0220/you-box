@@ -146,7 +146,9 @@ export function PricingSidebar(props: PricingSidebarProps) {
   return (
     <aside className={cn('flex flex-col', props.className)}>
       <div className='mb-3 flex items-center justify-between gap-2'>
-        <h2 className='text-foreground text-sm font-bold'>{t('Filters')}</h2>
+        <h2 className='text-foreground font-mono text-xs font-semibold tracking-[0.06em] uppercase'>
+          {t('Filters')}
+        </h2>
         <Button
           type='button'
           variant='ghost'
@@ -219,7 +221,7 @@ function RangeSection(props: { title: string; children: React.ReactNode }) {
       className='border-border/60 border-b pb-3 last:border-b-0'
     >
       <CollapsibleTrigger className='group flex w-full items-center justify-between py-2.5 text-left'>
-        <span className='text-foreground text-sm font-semibold'>
+        <span className='text-foreground font-mono text-xs font-semibold tracking-[0.06em] uppercase'>
           {props.title}
         </span>
         <ChevronDown className='text-muted-foreground size-4 transition-transform group-data-[panel-open]:rotate-180' />
@@ -271,7 +273,7 @@ function CheckboxFacetSection(props: {
       className='border-border/60 border-b pb-3 last:border-b-0'
     >
       <CollapsibleTrigger className='group flex w-full items-center justify-between py-2.5 text-left'>
-        <span className='text-foreground flex items-center gap-1.5 text-sm font-semibold'>
+        <span className='text-foreground flex items-center gap-1.5 font-mono text-xs font-semibold tracking-[0.06em] uppercase'>
           {props.title}
           {props.selected.length > 0 && (
             <span className='bg-brand text-brand-foreground rounded-full px-1.5 text-[10px] font-medium tabular-nums'>
