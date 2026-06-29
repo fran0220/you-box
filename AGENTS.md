@@ -41,12 +41,12 @@ web/             — Frontend themes container
 ## Production Deployment
 
 - Production host: `jpdata`
-- Production domain: `amp.you-box.com`
+- Production domain: `https://api.you-box.com/`
 - App directory on host: `/opt/you-box`
 - Runtime: Docker Compose, service/container `new-api`
-- Production image tag used by compose: `you-box-new-api:jpdata`
+- Production image tag used by compose: `boxai:jpdata`
 - Public app port on host: `3000` behind the host reverse proxy
-- Deploy flow: push the release commit/tag, then on `jpdata` update `/opt/you-box`, rebuild `you-box-new-api:jpdata`, and restart the compose service without touching persistent volumes.
+- Deploy flow: push the release commit/tag, then on `jpdata` update `/opt/you-box`, rebuild `boxai:jpdata`, and restart the compose service without touching persistent volumes.
 
 ## Internationalization (i18n)
 
