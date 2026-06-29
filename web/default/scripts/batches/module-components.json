@@ -1,0 +1,41 @@
+{
+  "zh": {
+    "Playground": "试用区"
+  },
+  "fr": {
+    "Asc": "Croissant",
+    "Auto": "Automatique",
+    "Command Palette": "Palette de commandes",
+    "Compact": "Compacte",
+    "Direction": "Direction",
+    "Discard": "Abandonner",
+    "Filter by status": "Filtrer par statut",
+    "Filter notifications": "Filtrer les notifications",
+    "Mark all read": "Tout marquer comme lu",
+    "Navigation menu": "Menu de navigation",
+    "Toggle Sidebar": "Afficher/masquer la barre latérale",
+    "earlier": "plus tôt",
+    "sources": "sources",
+    "today": "aujourd'hui"
+  },
+  "ja": {
+    "today": "今日"
+  },
+  "ru": {
+    "today": "сегодня"
+  },
+  "vi": {
+    "All": "Tất cả",
+    "Asc": "Tăng dần",
+    "Command Palette": "Bảng lệnh",
+    "Discard": "Hủy thay đổi",
+    "Filter by status": "Lọc theo trạng thái",
+    "Filter notifications": "Lọc thông báo",
+    "Mark all read": "Đánh dấu tất cả đã đọc",
+    "Navigation menu": "Menu điều hướng",
+    "Toggle Sidebar": "Bật/tắt thanh bên",
+    "earlier": "trước đó",
+    "of": "trên",
+    "today": "hôm nay"
+  }
+}

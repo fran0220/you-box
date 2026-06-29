@@ -1,0 +1,27 @@
+{
+  "zh": {
+    "Audio Tokens": "音频令牌",
+    "Every request routed through your keys, with token counts, cost and latency.": "经由您的 API 密钥转发的每一次请求，包含令牌数、费用与延迟。",
+    "Image Tokens": "图像令牌",
+    "Input Tokens": "输入令牌",
+    "Output Tokens": "输出令牌",
+    "Per-token": "按令牌",
+    "Token Breakdown": "令牌明细"
+  },
+  "fr": {
+    "Image": "Image",
+    "Instance": "Instance",
+    "Raw Data": "Données brutes"
+  },
+  "vi": {
+    "Audio Tokens": "token âm thanh",
+    "Balance": "Số dư",
+    "Image Tokens": "token hình ảnh",
+    "Input Tokens": "token đầu vào",
+    "Output Tokens": "token đầu ra",
+    "Raw Data": "Dữ liệu thô",
+    "Token": "token",
+    "Token Name": "Tên token",
+    "Tokens": "token"
+  }
+}

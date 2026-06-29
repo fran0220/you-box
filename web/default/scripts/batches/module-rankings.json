@@ -1,0 +1,14 @@
+{
+  "zh": {
+    "Ranked by tokens routed across all customers. Updated from live usage data.": "按全平台路由的令牌用量排名，数据来自实时用量并持续更新。",
+    "Token share relative to the top model": "相对榜首模型的令牌份额",
+    "Tokens": "令牌",
+    "Vendors ranked by aggregated token volume": "供应商按聚合令牌用量排序",
+    "tokens": "令牌"
+  },
+  "vi": {
+    "Tokens": "Token",
+    "Top Models": "Mô hình hàng đầu",
+    "tokens": "token"
+  }
+}

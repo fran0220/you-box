@@ -1,0 +1,10 @@
+{
+  "zh": {
+    "Default Max Tokens": "默认最大令牌数",
+    "Enter API Key": "请输入 API 密钥",
+    "Hit criteria: If cached tokens exist in usage, it counts as a hit.": "命中判定：usage 中存在缓存令牌即视为命中。"
+  },
+  "vi": {
+    "Add": "Thêm"
+  }
+}

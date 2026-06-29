@@ -1,0 +1,32 @@
+[
+  {
+    "file": "components/ui/checkbox.test.tsx",
+    "line": 10,
+    "type": "aria-label",
+    "value": "Lab checkbox"
+  },
+  {
+    "file": "components/ui/switch.test.tsx",
+    "line": 12,
+    "type": "aria-label",
+    "value": "Lab switch"
+  },
+  {
+    "file": "features/home/components/sections/hero-code-block.tsx",
+    "line": 49,
+    "type": "title-prop",
+    "value": "route.ts"
+  },
+  {
+    "file": "features/home/components/sections/how-it-works.tsx",
+    "line": 115,
+    "type": "title-prop",
+    "value": "quickstart.sh"
+  },
+  {
+    "file": "features/usage-logs/components/dialogs/details-dialog.tsx",
+    "line": 883,
+    "type": "title-prop",
+    "value": "detail.json"
+  }
+]

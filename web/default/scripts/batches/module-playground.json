@@ -1,0 +1,47 @@
+{
+  "zh": {
+    "Failed to load playground groups": "加载试用区分组失败",
+    "Failed to load playground models": "加载试用区模型失败",
+    "Max reasoning tokens (optional)": "最大推理令牌数（可选）",
+    "Max tokens": "最大令牌数",
+    "Render tokens as they are generated": "生成时实时渲染令牌",
+    "Tokens": "令牌",
+    "Unable to load playground": "无法加载试用区",
+    "tokens": "令牌"
+  },
+  "fr": {
+    "Effort": "Intensité",
+    "High": "Élevé",
+    "Low": "Faible",
+    "Off": "Désactivé",
+    "Failed to load playground groups": "Échec du chargement des groupes du bac à sable",
+    "Failed to load playground models": "Échec du chargement des modèles du bac à sable",
+    "Unable to load playground": "Impossible de charger le bac à sable"
+  },
+  "ja": {
+    "Reasoning": "推論",
+    "High": "高",
+    "Low": "低",
+    "Off": "オフ"
+  },
+  "ru": {
+    "High": "Высокий",
+    "Low": "Низкий",
+    "Off": "Выкл.",
+    "No models found.": "Модели не найдены.",
+    "Failed to load playground groups": "Не удалось загрузить группы песочницы",
+    "Failed to load playground models": "Не удалось загрузить модели песочницы",
+    "Unable to load playground": "Не удалось загрузить песочницу"
+  },
+  "vi": {
+    "High": "Cao",
+    "Low": "Thấp",
+    "Off": "Tắt",
+    "Search models...": "Tìm kiếm mô hình…",
+    "Tokens": "token",
+    "tokens": "token",
+    "Failed to load playground groups": "Tải nhóm khu thử nghiệm thất bại",
+    "Failed to load playground models": "Tải mô hình khu thử nghiệm thất bại",
+    "Unable to load playground": "Không thể tải khu thử nghiệm"
+  }
+}

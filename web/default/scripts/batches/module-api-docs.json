@@ -1,0 +1,19 @@
+{
+  "zh": {
+    "Max tokens": "最大令牌数",
+    "Run": "运行"
+  },
+  "fr": {
+    "Authenticate with a bearer token. Create a key in API keys and pass it in the Authorization header. Keep it server-side — never ship it to a browser.": "Authentifiez-vous avec un jeton bearer. Créez une clé API et transmettez-la dans l'en-tête Authorization. Conservez-la côté serveur — ne l'exposez jamais au navigateur.",
+    "Run": "Exécuter"
+  },
+  "ja": {
+    "Run": "実行"
+  },
+  "ru": {
+    "Run": "Запустить"
+  },
+  "vi": {
+    "Run": "Chạy"
+  }
+}

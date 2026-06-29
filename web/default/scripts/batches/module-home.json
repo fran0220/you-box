@@ -1,0 +1,28 @@
+{
+  "zh": {
+    "/ mo": "/月",
+    "Go to Dashboard": "前往仪表盘",
+    "No markup on tokens. Drop-in OpenAI-compatible SDK.": "令牌零加价。即插即用的 OpenAI 兼容 SDK。",
+    "Pay for tokens, not the gateway.": "为令牌付费，而非网关。",
+    "Volume token discounts": "大批量令牌折扣",
+    "your AI integration?": "你的 AI 集成？"
+  },
+  "fr": {
+    "/ mo": "/ mois",
+    "Marketplace": "Place de marché"
+  },
+  "ja": {
+    "/ mo": "/月"
+  },
+  "ru": {
+    "/ mo": "/мес."
+  },
+  "vi": {
+    "/ mo": "/tháng",
+    "Go to Dashboard": "Truy cập bảng điều khiển",
+    "Marketplace": "Sàn giao dịch",
+    "Rate Limiting": "Giới hạn tốc độ",
+    "Team Collaboration": "Hợp tác nhóm",
+    "View Pricing": "Xem giá"
+  }
+}

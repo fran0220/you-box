@@ -1,0 +1,18 @@
+{
+  "zh": {
+    "Client ID": "客户端 ID",
+    "Client Secret": "客户端密钥",
+    "Server Token": "服务器令牌",
+    "Token Endpoint (Optional)": "令牌端点（可选）"
+  },
+  "fr": {
+    "Well-Known URL": "URL Well-Known"
+  },
+  "ru": {
+    "OAuth Client Secret": "Секрет клиента OAuth"
+  },
+  "vi": {
+    "Slug": "Slug",
+    "Well-Known URL": "URL Well-Known"
+  }
+}

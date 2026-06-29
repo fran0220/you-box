@@ -294,7 +294,7 @@ export function PrefillGroupManagementDialog({
                         onClick={() => onEditGroup(group)}
                       >
                         <Pencil className='h-4 w-4' />
-                        <span className='sr-only'>Edit group</span>
+                        <span className='sr-only'>{t('Edit group')}</span>
                       </Button>
                       <Button
                         size='icon'
@@ -303,7 +303,7 @@ export function PrefillGroupManagementDialog({
                         onClick={() => handleDeleteClick(group)}
                       >
                         <Trash2 className='h-4 w-4' />
-                        <span className='sr-only'>Delete group</span>
+                        <span className='sr-only'>{t('Delete group')}</span>
                       </Button>
                     </div>
                   </CardHeader>
@@ -433,7 +433,7 @@ export function PrefillGroupManagementDialog({
                               onClick={() => onEditGroup(group)}
                             >
                               <Pencil className='h-4 w-4' />
-                              <span className='sr-only'>Edit group</span>
+                              <span className='sr-only'>{t('Edit group')}</span>
                             </Button>
                             <Button
                               size='icon'
@@ -442,7 +442,7 @@ export function PrefillGroupManagementDialog({
                               onClick={() => handleDeleteClick(group)}
                             >
                               <Trash2 className='h-4 w-4' />
-                              <span className='sr-only'>Delete group</span>
+                              <span className='sr-only'>{t('Delete group')}</span>
                             </Button>
                           </div>
                         </TableCell>

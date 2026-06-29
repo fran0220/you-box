@@ -1,0 +1,29 @@
+{
+  "zh": {
+    "Enable unlimited quota for this API key": "为此 API 密钥启用无限额度",
+    "Enter quota in tokens": "输入令牌额度",
+    "Enter the quota amount in tokens": "输入令牌额度数量",
+    "Enter the quota amount in {{currency}}": "输入 {{currency}} 额度数量",
+    "Set API key access restrictions": "设置 API 密钥的访问限制",
+    "Set API key basic information": "设置 API 密钥的基本信息",
+    "Unlimited Quota": "无限额度",
+    "Update the API key by providing necessary info.": "通过提供必要信息更新 API 密钥。"
+  },
+  "fr": {
+    "1 Hour": "1 h",
+    "1 Month": "1 mois",
+    "Active keys": "Clés actives",
+    "Dismiss": "Fermer",
+    "New key created — copy it now": "Nouvelle clé créée — copiez-la maintenant",
+    "Quota": "Quota",
+    "Requests today": "Requêtes aujourd'hui",
+    "Spend (7d)": "Dépenses (7 j)"
+  },
+  "vi": {
+    "Active keys": "Khóa đang hoạt động",
+    "Dismiss": "Đóng",
+    "New key created — copy it now": "Đã tạo khóa mới — hãy sao chép ngay",
+    "Requests today": "Yêu cầu hôm nay",
+    "Spend (7d)": "Chi tiêu (7 ngày)"
+  }
+}

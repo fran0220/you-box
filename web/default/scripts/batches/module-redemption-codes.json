@@ -1,0 +1,43 @@
+{
+  "zh": {
+    "Code": "兑换码",
+    "Copy code": "复制兑换码",
+    "Copy selected codes": "复制选中的兑换码",
+    "Enter quota in tokens": "输入令牌额度",
+    "Enter the quota amount in tokens": "输入令牌额度数量",
+    "Enter the quota amount in {{currency}}": "输入 {{currency}} 额度数量",
+    "Number of codes to create": "要创建的兑换码数量",
+    "Quota must be a positive number": "额度必须为正数"
+  },
+  "fr": {
+    "Codes are shown once after generation. Copy them now.": "Les codes ne sont affichés qu'une fois après la génération. Copiez-les maintenant.",
+    "Codes generated": "Codes générés",
+    "Codes issued": "Codes émis",
+    "Copy redemption code": "Copier le code de réduction",
+    "Create multiple redemption codes at once (1-100)": "Créer plusieurs codes de réduction à la fois (1-100)",
+    "Delete Invalid Redemption Codes?": "Supprimer les codes de réduction invalides ?",
+    "Delete invalid redemption codes": "Supprimer les codes de réduction invalides",
+    "Dismiss": "Fermer",
+    "Generate codes": "Générer des codes",
+    "Generate {{count}} codes": "Générer {{count}} codes",
+    "Redeemed value": "Valeur utilisée",
+    "Redemption Details": "Détails de l'échange",
+    "Update the redemption code by providing necessary info.": "Mettez à jour le code de réduction en fournissant les informations nécessaires.",
+    "Value ({{currency}})": "Valeur ({{currency}})",
+    "redemption codes.": "codes de réduction."
+  },
+  "vi": {
+    "Codes are shown once after generation. Copy them now.": "Mã chỉ hiển thị một lần sau khi tạo. Hãy sao chép ngay.",
+    "Codes generated": "Đã tạo mã",
+    "Codes issued": "Mã đã phát hành",
+    "Delete invalid codes (used/disabled/expired)": "Xóa mã không hợp lệ (đã sử dụng/đã vô hiệu hóa/đã hết hạn)",
+    "Dismiss": "Đóng",
+    "Generate codes": "Tạo mã",
+    "Generate {{count}} codes": "Tạo {{count}} mã",
+    "Redeemed value": "Giá trị đã đổi",
+    "Redemption Details": "Chi tiết đổi thưởng",
+    "Value ({{currency}})": "Giá trị ({{currency}})",
+    "redemption codes.": "mã đổi thưởng.",
+    "used": "đã sử dụng"
+  }
+}

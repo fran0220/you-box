@@ -1,0 +1,60 @@
+{
+  "zh": {
+    "Amount of quota to credit to user account.": "记入用户账户的额度数量。",
+    "Choose how quota values are shown to users": "选择向用户展示额度的方式",
+    "Configure in your Creem dashboard": "在 Creem 控制台中配置",
+    "Creem product ID from your Creem dashboard.": "从 Creem 控制台获取 Creem 产品 ID。",
+    "Disabled lanes are omitted on save.": "保存时将省略已禁用的价格档位。",
+    "Display Token Statistics": "显示令牌统计",
+    "Enter token counts to preview the estimated cost (excluding group multipliers).": "输入令牌数量以预览预估费用（不含用户组倍率）。",
+    "Estimated quota cost": "估算额度费用",
+    "External link for users to purchase quota": "供用户购买额度的外部链接",
+    "Initial quota given to new users": "授予新用户的初始额度",
+    "Input tokens": "输入令牌",
+    "New User Quota": "新用户额度",
+    "Number of tokens per unit quota": "每单位额度的令牌数",
+    "Output tokens": "输出令牌",
+    "Per-token": "按令牌",
+    "Pre-Consumed Quota": "预消耗额度",
+    "Priority order for automatic group assignment. New tokens rotate through this list.": "自动分组分配的优先级顺序。新令牌将按此列表轮换。",
+    "Quota Per Unit": "每单位额度",
+    "Quota consumed before charging users": "向用户收费前消耗的额度",
+    "Quota given to invited users": "授予被邀请用户的额度",
+    "Quota given to users who invite others": "授予邀请他人的额度",
+    "Show prices in currency instead of quota.": "以货币而非额度显示价格。",
+    "This model has both fixed-price and token-price settings. Saving the current mode will rewrite the conflicting fields.": "该模型同时存在固定价格和按令牌计价设置。保存当前模式将覆盖冲突字段。",
+    "Token estimator": "令牌估算器",
+    "Token prices": "令牌价格",
+    "Tokens Only": "仅令牌",
+    "Tokens-only mode will show raw quota values regardless of this toggle.": "仅令牌模式将忽略此开关，显示原始额度值。",
+    "USD price per 1M input tokens.": "每 100 万输入令牌的美元价格。",
+    "USD price per 1M tokens.": "每 100 万令牌的美元价格。",
+    "When enabled, zero-cost models also pre-consume quota before final settlement.": "启用后，零成本模型也会在最终结算前预扣额度。"
+  },
+  "fr": {
+    "End": "Fin",
+    "Store": "Boutique",
+    "Waffo Pancake Dashboard": "Tableau de bord Waffo Pancake"
+  },
+  "ja": {
+    "Store": "ストア",
+    "Waffo Pancake Dashboard": "Waffo Pancake ダッシュボード"
+  },
+  "ru": {
+    "End": "Конец",
+    "Store": "Магазин",
+    "Waffo Pancake Dashboard": "Панель Waffo Pancake"
+  },
+  "vi": {
+    "Add": "Thêm",
+    "Amount of quota to credit to user account.": "Số hạn mức ghi có vào tài khoản người dùng.",
+    "End": "Kết thúc",
+    "Header": "Tiêu đề",
+    "Store": "Cửa hàng",
+    "Tokens-only mode will show raw quota values regardless of this toggle.": "Chế độ chỉ token sẽ hiển thị giá trị hạn mức thô bất kể công tắc này.",
+    "Waffo Pancake Dashboard": "Bảng điều khiển Waffo Pancake",
+    "Webhook URL (Production):": "URL Webhook (Production) :",
+    "Webhook URL (Test):": "URL Webhook (Test) :",
+    "off": "tắt"
+  }
+}

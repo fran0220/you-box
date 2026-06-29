@@ -1,0 +1,19 @@
+{
+  "zh": {
+    "Only the last {{value}} log files will be retained; the rest will be deleted.": "仅保留最近 {{value}} 个日志文件，其余将删除。",
+    "Quota reminder (tokens)": "额度提醒（令牌）",
+    "Record quota usage": "记录额度使用量",
+    "Requests will be forwarded to this worker. Trailing slashes are removed automatically.": "请求将转发至此 Worker，末尾斜杠会自动移除。",
+    "Send email alerts when a user falls below this quota": "当用户额度低于此阈值时发送邮件提醒",
+    "Worker Access Key": "Worker 访问密钥"
+  },
+  "fr": {
+    "Worker URL": "URL du worker"
+  },
+  "ru": {
+    "Worker URL": "URL Worker"
+  },
+  "vi": {
+    "Worker URL": "URL Worker"
+  }
+}

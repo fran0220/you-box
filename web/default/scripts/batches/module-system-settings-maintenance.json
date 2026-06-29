@@ -1,0 +1,8 @@
+{
+  "zh": {
+    "Dashboards, tokens, and usage analytics.": "仪表盘、令牌和使用分析。",
+    "Only the last {{value}} log files will be retained; the rest will be deleted.": "仅保留最近 {{value}} 个日志文件，其余将删除。",
+    "Record quota usage": "记录额度使用量",
+    "User dashboard and quota controls.": "用户仪表盘和额度控制。"
+  }
+}
