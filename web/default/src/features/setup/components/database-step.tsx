@@ -80,15 +80,15 @@ export function DatabaseStep({ status }: DatabaseStepProps) {
 
   return (
     <div className='space-y-4'>
-      <div className='bg-card flex items-center justify-between rounded-lg border p-4'>
+      <div className='bg-surface-card border-border flex items-center justify-between rounded-lg border p-4'>
         <div className='space-y-1'>
-          <p className='text-muted-foreground text-sm font-medium'>
+          <p className='text-text-muted text-sm font-medium'>
             {t('Detected database')}
           </p>
-          <p className='text-foreground text-base font-semibold'>
+          <p className='text-text-strong text-base font-semibold'>
             {meta?.label ?? t('Unknown')}
           </p>
-          <p className='text-muted-foreground text-sm'>
+          <p className='text-text-secondary text-sm'>
             {t(
               meta?.descriptionKey ??
                 'The setup wizard will use this database during initialization.'
@@ -122,7 +122,7 @@ export function DatabaseStep({ status }: DatabaseStepProps) {
               </p>
             )}
             {isElectron && !electronDataDir && (
-              <p className='text-muted-foreground mt-3 text-xs'>
+              <p className='text-text-muted mt-3 text-xs'>
                 {t(
                   'Data is stored locally on this device. Use system backups to keep a safe copy.'
                 )}

@@ -54,20 +54,20 @@ export function CompleteStep({ status, values }: CompleteStepProps) {
         <CheckCircle2 className='size-8' />
       </div>
       <div className='space-y-2'>
-        <h2 className='text-2xl font-semibold tracking-tight'>
+        <h2 className='font-display text-text-strong text-2xl font-semibold tracking-[-0.02em]'>
           {t('Ready to initialize')}
         </h2>
-        <p className='text-muted-foreground max-w-lg text-sm sm:text-base'>
+        <p className='text-text-secondary max-w-lg text-sm sm:text-base'>
           {t(
             'Double check the configuration below. Your system will be locked until initialization is complete.'
           )}
         </p>
       </div>
 
-      <div className='bg-card w-full rounded-xl border p-6 text-left shadow-sm sm:p-8'>
+      <div className='bg-surface-card border-border w-full rounded-xl border p-6 text-left shadow-sm sm:p-8'>
         <dl className='grid gap-6'>
           <div className='space-y-1.5'>
-            <dt className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <dt className='text-text-muted font-mono text-xs font-medium tracking-wide uppercase'>
               {t('Database')}
             </dt>
             <dd className='flex flex-wrap items-center gap-2'>
@@ -83,7 +83,7 @@ export function CompleteStep({ status, values }: CompleteStepProps) {
           <Separator />
 
           <div className='space-y-1.5'>
-            <dt className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <dt className='text-text-muted font-mono text-xs font-medium tracking-wide uppercase'>
               {t('Administrator account')}
             </dt>
             <dd className='text-sm font-semibold'>
@@ -96,7 +96,7 @@ export function CompleteStep({ status, values }: CompleteStepProps) {
           <Separator />
 
           <div className='space-y-1.5'>
-            <dt className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <dt className='text-text-muted font-mono text-xs font-medium tracking-wide uppercase'>
               {t('Usage mode')}
             </dt>
             <dd className='text-sm font-semibold'>{t(usageLabelKey)}</dd>

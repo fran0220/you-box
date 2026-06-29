@@ -311,14 +311,14 @@ export function SetupWizard() {
               {t('Initialize')} {systemName}
             </h1>
           )}
-          <p className='text-muted-foreground text-center text-sm sm:text-base'>
+          <p className='text-text-secondary text-center text-sm sm:text-base'>
             {t(
               'Follow the guided steps to prepare your workspace before the first login.'
             )}
           </p>
         </div>
 
-        <Card className='shadow-lg'>
+        <Card className='border-border-strong shadow-lg'>
           <CardHeader className='space-y-2'>
             <CardTitle className='font-display text-xl font-semibold tracking-[-0.01em]'>
               {t('System setup wizard')}
@@ -349,7 +349,7 @@ export function SetupWizard() {
                 >
                   {/* Step description moved here from the old step-card
                       grid so no information is lost (R2-B15). */}
-                  <p className='text-muted-foreground text-sm'>
+                  <p className='text-text-secondary text-sm'>
                     {t(STEPS[currentStep].descriptionKey)}
                   </p>
                   {currentStepComponent}
@@ -359,7 +359,7 @@ export function SetupWizard() {
           </CardContent>
 
           {!isLoading && !isError && (
-            <CardFooter className='w-full justify-end border-t'>
+            <CardFooter className='border-divider w-full justify-end border-t'>
               <StepNavigation
                 currentStep={currentStep}
                 totalSteps={STEPS.length}
@@ -375,7 +375,7 @@ export function SetupWizard() {
         {/* Bottom mono status line (R2-B15): system name + version (from
             /api/status) + database type (from setup status). */}
         {!systemConfigLoading && (
-          <p className='text-muted-foreground/70 text-center font-mono text-xs'>
+          <p className='text-text-muted text-center font-mono text-xs'>
             {[
               [systemName, systemStatus?.version].filter(Boolean).join(' '),
               setupStatus?.database_type

@@ -91,7 +91,7 @@ export function UsageModeStep({ form }: UsageModeStepProps) {
                       key={value}
                       htmlFor={`usage-mode-${value}`}
                       className={cn(
-                        'hover:border-primary/40 focus-within:border-primary/50 has-data-[checked]:border-primary has-data-[checked]:ring-primary/20 group bg-card border-muted flex cursor-pointer flex-col gap-3 rounded-xl border p-4 font-normal transition-all has-data-[checked]:ring-2'
+                        'group bg-card border-border hover:border-brand-border focus-within:border-brand-border has-data-[checked]:border-brand has-data-[checked]:ring-brand-ring/30 flex cursor-pointer flex-col gap-3 rounded-xl border p-4 font-normal transition-all has-data-[checked]:ring-2'
                       )}
                     >
                       <div className='flex items-center gap-3'>
@@ -107,11 +107,11 @@ export function UsageModeStep({ form }: UsageModeStepProps) {
                           >
                             {t(titleKey)}
                           </Label>
-                          <p className='text-muted-foreground mt-2 text-sm'>
+                          <p className='text-text-secondary mt-2 text-sm'>
                             {t(descriptionKey)}
                           </p>
                         </div>
-                        <Icon className='text-muted-foreground/70 group-hover:text-primary group-focus-within:text-primary group-has-data-[checked]:text-primary ml-auto size-5 shrink-0 transition' />
+                        <Icon className='text-text-muted group-hover:text-brand group-focus-within:text-brand group-has-data-[checked]:text-brand ml-auto size-5 shrink-0 transition' />
                       </div>
                     </Label>
                   )
