@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { Markdown } from '@/components/ui/markdown'
+import { Skeleton } from '@/components/ui/skeleton'
 import { AppShell } from '@/components/layout/components/app-shell'
 import { CTA, Features, Hero, HowItWorks, Stats } from './components'
 import { useHomePageContent } from './hooks'
@@ -32,8 +33,13 @@ export function Home() {
   if (!isLoaded) {
     return (
       <AppShell variant='public'>
-        <div className='flex min-h-[50vh] flex-1 items-center justify-center'>
-          <div className='text-muted-foreground'>{t('Loading...')}</div>
+        <div
+          className='flex min-h-[50vh] flex-1 flex-col items-center justify-center gap-3 px-4'
+          aria-busy
+          aria-live='polite'
+        >
+          <Skeleton className='h-4 w-32' />
+          <p className='text-muted-foreground font-mono text-sm'>{t('Loading...')}</p>
         </div>
       </AppShell>
     )
@@ -51,7 +57,7 @@ export function Home() {
             />
           ) : (
             <div className='py-2'>
-              <div className='bg-card border-border rounded-lg border p-6 md:p-10'>
+              <div className='bg-card border-border rounded-[var(--radius-lg)] border p-6 md:p-10'>
                 <Markdown className='custom-home-content'>{content}</Markdown>
               </div>
             </div>
