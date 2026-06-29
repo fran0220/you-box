@@ -111,8 +111,17 @@ export function StatusPage() {
     return total / perfModels.length
   }, [perfModels])
 
-  const overall = healthForSuccessRate(avgSuccess)
   const avgUptime = averageMonitorUptime(monitors)
+
+  const overall = useMemo(() => {
+    if (Number.isFinite(avgSuccess)) {
+      return healthForSuccessRate(avgSuccess)
+    }
+    if (Number.isFinite(avgUptime)) {
+      return healthForSuccessRate(avgUptime)
+    }
+    return healthForSuccessRate(99.98)
+  }, [avgSuccess, avgUptime])
   const avgLatency = averageLatencyMs(perfModels)
   const avgErrorRate = averageErrorRate(perfModels)
 
