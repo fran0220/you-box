@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .otp{width:52px;height:62px;text-align:center;font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--text-strong);background:var(--field-bg);border:1px solid var(--field-border);border-radius:12px;outline:none}
+  .otp.on{border-color:var(--brand);box-shadow:var(--ring)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text);font-family:var(--font-sans);padding:32px;position:relative;overflow:hidden">
+  <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:600px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.045),transparent 65%);pointer-events:none"></div>
+  <div style="width:100%;max-width:430px;position:relative">
+    <a href="Index.dc.html" style="display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em;margin-bottom:28px"><span style="display:inline-flex;width:28px;height:28px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:17px;height:17px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></a>
+    <div class="yb-card yb-card--pad-lg" style="text-align:center">
+      <span style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--brand-subtle);color:var(--brand);margin:0 auto 18px"><i data-lucide="shield-check" style="width:22px;height:22px"></i></span>
+      <h1 style="font-family:var(--font-display);font-size:24px;letter-spacing:-.02em;font-weight:700;margin:0 0 8px;color:var(--text-strong)">Two-factor authentication</h1>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin:0 0 26px">Enter the 6-digit code from your authenticator app to finish signing in.</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-bottom:24px"><input class="otp" value="4"><input class="otp" value="7"><input class="otp on" value="2"><input class="otp" value=""><input class="otp" value=""><input class="otp" value=""></div>
+      <button class="yb-btn yb-btn--primary yb-btn--lg yb-btn--block" style="margin-bottom:16px"><span>Verify &amp; continue</span><i data-lucide="arrow-right"></i></button>
+      <div style="font-size:13px;color:var(--text-muted)">Didn't get a code? <a href="#" style="color:var(--text);font-weight:500">Resend in 0:24</a></div>
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--divider)"><a href="#" style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--text-secondary)"><i data-lucide="key-round" style="width:15px;height:15px"></i>Use a passkey instead</a></div>
+    </div>
+    <a href="SignIn.dc.html" style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:22px;font-size:13px;color:var(--text-secondary)"><i data-lucide="arrow-left" style="width:15px;height:15px"></i>Back to sign in</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:720},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

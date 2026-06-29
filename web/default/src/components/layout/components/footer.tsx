@@ -81,14 +81,14 @@ function LegalLinks(props: { leadingSeparator?: boolean }) {
     items.push({
       key: 'user-agreement',
       label: t('User Agreement'),
-      href: '/user-agreement',
+      href: '/legal/terms',
     })
   }
   if (status?.privacy_policy_enabled) {
     items.push({
       key: 'privacy-policy',
       label: t('Privacy Policy'),
-      href: '/privacy-policy',
+      href: '/legal/privacy',
     })
   }
   if (items.length === 0) {
@@ -137,52 +137,36 @@ function ProjectAttribution(props: { currentYear: number; inline?: boolean }) {
 
 export function Footer(props: FooterProps) {
   const { t } = useTranslation()
-  const {
-    systemName,
-    logo: systemLogo,
-    footerHtml,
-    demoSiteEnabled,
-  } = useSystemConfig()
+  const { systemName, logo: systemLogo, footerHtml } = useSystemConfig()
 
   const displayLogo = systemLogo || props.logo || '/logo.png'
   const displayName = systemName || props.name || 'BoxAI'
-  const isDemoSiteMode = Boolean(demoSiteEnabled)
   const currentYear = new Date().getFullYear()
 
   const fallbackColumns = useMemo<FooterColumnProps[]>(
     () => [
       {
-        title: t('footer.columns.about.title'),
+        title: t('Product'),
         links: [
-          {
-            text: t('footer.columns.about.links.aboutProject'),
-            href: '/about',
-          },
-          {
-            text: t('footer.columns.about.links.contact'),
-            href: '/about',
-          },
-          {
-            text: t('footer.columns.about.links.features'),
-            href: '/pricing',
-          },
+          { text: t('Model Square'), href: '/pricing' },
+          { text: t('Rankings'), href: '/rankings' },
+          { text: t('Playground'), href: '/playground' },
         ],
       },
       {
-        title: t('footer.columns.docs.title'),
+        title: t('Developers'),
         links: [
-          {
-            text: t('footer.columns.docs.links.quickStart'),
-            href: '/docs',
-          },
-          {
-            text: t('footer.columns.docs.links.installation'),
-            href: '/docs',
-          },
-          {
-            text: t('footer.columns.docs.links.apiDocs'),
-            href: '/docs',
-          },
+          { text: t('Documentation'), href: '/docs' },
+          { text: t('API reference'), href: '/docs' },
+          { text: t('Status'), href: '/status' },
+        ],
+      },
+      {
+        title: t('Company'),
+        links: [
+          { text: t('About'), href: '/about' },
+          { text: t('Privacy Policy'), href: '/legal/privacy' },
+          { text: t('User Agreement'), href: '/legal/terms' },
         ],
       },
     ],
@@ -233,14 +217,13 @@ export function Footer(props: FooterProps) {
                 {displayName}
               </span>
             </Link>
-            <p className='text-muted-foreground/60 mt-3 max-w-[200px] text-xs leading-relaxed'>
-              {t('Powerful API Management Platform')}
+            <p className='text-muted-foreground/60 mt-3 max-w-[240px] text-xs leading-relaxed'>
+              {t('Every model, one box. The unified gateway and marketplace for large language models.')}
             </p>
           </div>
 
           {/* Links columns */}
-          {isDemoSiteMode && (
-            <div className='grid grid-cols-3 gap-8 md:gap-16'>
+          <div className='grid grid-cols-2 gap-8 sm:grid-cols-3 md:gap-16'>
               {displayColumns.map((column, index) => (
                 <div key={index}>
                   <p className='text-muted-foreground/60 mb-3 font-mono text-[11px] font-medium tracking-[0.08em] uppercase'>
@@ -256,7 +239,6 @@ export function Footer(props: FooterProps) {
                 </div>
               ))}
             </div>
-          )}
         </div>
 
         {/* Copyright + optional legal links inline on the left, project

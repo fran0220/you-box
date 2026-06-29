@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .rrow{display:grid;grid-template-columns:1.4fr .7fr .9fr 1fr .8fr auto;gap:14px;align-items:center;padding:13px 18px;border-top:1px solid var(--divider);font-size:13px}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="ModelsAdmin.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="Subscriptions.dc.html"><i data-lucide="badge-dollar-sign"></i>Subscriptions</a>
+      <a class="snav on" href="RedemptionCodes.dc.html"><i data-lucide="ticket"></i>Redemption</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <a class="snav" href="Profile.dc.html" style="margin:0;border-top:1px solid var(--border);border-radius:0;padding:12px 18px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></a>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Redemption codes</div>
+      <div style="flex:1"></div>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <div style="padding:28px 28px 64px;max-width:1120px">
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:22px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <div class="yb-card"><span class="yb-stat__label">Codes issued</span><div class="yb-stat__value" style="margin-top:8px">480</div></div>
+          <div class="yb-card"><span class="yb-stat__label">Redeemed</span><div class="yb-stat__value" style="margin-top:8px">312</div></div>
+          <div class="yb-card"><span class="yb-stat__label">Value out</span><div class="yb-stat__value" style="margin-top:8px">$6.2<span class="yb-stat__unit">K</span></div></div>
+        </div>
+        <!-- generate -->
+        <div class="yb-card">
+          <div style="font-size:13px;font-weight:600;color:var(--text-strong);margin-bottom:12px">Generate codes</div>
+          <div style="display:flex;gap:10px"><div class="yb-field" style="flex:1"><label class="yb-field__label">Value ($)</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="dollar-sign"></i></span><input class="yb-input yb-input--with-icon yb-input--sm mono" value="25"></div></div><div class="yb-field" style="flex:1"><label class="yb-field__label">Quantity</label><input class="yb-input yb-input--sm mono" value="50"></div></div>
+          <button class="yb-btn yb-btn--primary yb-btn--block yb-btn--sm" style="margin-top:12px"><i data-lucide="sparkles"></i><span>Generate batch</span></button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div class="yb-input-wrap" style="flex:1;max-width:320px"><span class="yb-ic-l"><i data-lucide="search"></i></span><input class="yb-input yb-input--with-icon yb-input--sm" placeholder="Search codes…"></div>
+        <div class="yb-tabs yb-tabs--pill"><button class="yb-tab yb-tab--active">All</button><button class="yb-tab">Unused</button><button class="yb-tab">Redeemed</button></div>
+        <div style="flex:1"></div>
+        <button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="download"></i><span>Export</span></button>
+      </div>
+
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="rrow" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>Code</span><span>Value</span><span>Batch</span><span>Redeemed by</span><span>Status</span><span></span></div>
+        <div class="rrow"><span class="mono" style="color:var(--text)">YB-25-A7F3-9K2D</span><span class="mono" style="color:var(--text)">$25</span><span class="mono" style="color:var(--text-muted)">jun-promo</span><span class="mono" style="color:var(--text-secondary)">ada@northwind.io</span><span><span class="yb-badge yb-badge--neutral">Redeemed</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="rrow"><span class="mono" style="color:var(--text)">YB-25-B2C8-4M1X</span><span class="mono" style="color:var(--text)">$25</span><span class="mono" style="color:var(--text-muted)">jun-promo</span><span class="mono" style="color:var(--text-faint)">—</span><span><span class="yb-badge yb-badge--success" >Unused</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="copy"></i></button></div>
+        <div class="rrow"><span class="mono" style="color:var(--text)">YB-50-D9E1-7P3Q</span><span class="mono" style="color:var(--text)">$50</span><span class="mono" style="color:var(--text-muted)">launch</span><span class="mono" style="color:var(--text-secondary)">rafa@vela.app</span><span><span class="yb-badge yb-badge--neutral">Redeemed</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="rrow"><span class="mono" style="color:var(--text)">YB-50-F4A6-2R8T</span><span class="mono" style="color:var(--text)">$50</span><span class="mono" style="color:var(--text-muted)">launch</span><span class="mono" style="color:var(--text-faint)">—</span><span><span class="yb-badge yb-badge--success">Unused</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="copy"></i></button></div>
+        <div class="rrow"><span class="mono" style="color:var(--text)">YB-10-G1B5-5W9Z</span><span class="mono" style="color:var(--text)">$10</span><span class="mono" style="color:var(--text-muted)">support</span><span class="mono" style="color:var(--text-faint)">—</span><span><span class="yb-badge yb-badge--warning" >Expired</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="rrow"><span class="mono" style="color:var(--text)">YB-25-H8C2-1Y4V</span><span class="mono" style="color:var(--text)">$25</span><span class="mono" style="color:var(--text-muted)">jun-promo</span><span class="mono" style="color:var(--text-secondary)">devi@stacks.sh</span><span><span class="yb-badge yb-badge--neutral">Redeemed</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

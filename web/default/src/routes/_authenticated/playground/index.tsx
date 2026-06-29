@@ -21,7 +21,17 @@ import { isSidebarModuleEnabled } from '@/lib/nav-modules'
 import { Main } from '@/components/layout'
 import { Playground } from '@/features/playground'
 
+type PlaygroundSearch = {
+  model?: string
+}
+
 export const Route = createFileRoute('/_authenticated/playground/')({
+  validateSearch: (search: Record<string, unknown>): PlaygroundSearch => ({
+    model:
+      typeof search.model === 'string' && search.model.trim()
+        ? search.model.trim()
+        : undefined,
+  }),
   beforeLoad: () => {
     if (!isSidebarModuleEnabled('chat', 'playground')) {
       throw redirect({ to: '/dashboard' })
@@ -31,9 +41,10 @@ export const Route = createFileRoute('/_authenticated/playground/')({
 })
 
 function PlaygroundPage() {
+  const { model } = Route.useSearch()
   return (
     <Main className='h-full min-h-0 p-0'>
-      <Playground />
+      <Playground initialModel={model} />
     </Main>
   )
 }

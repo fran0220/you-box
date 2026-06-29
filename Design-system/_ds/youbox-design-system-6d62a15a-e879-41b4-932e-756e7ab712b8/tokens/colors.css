@@ -1,0 +1,175 @@
+/* ============================================================
+   YouBox — Color tokens
+   Dark-mode-first. :root is the dark theme (the brand's primary
+   surface). [data-theme="light"] re-maps the semantic aliases.
+   Base ramps stay constant across themes; only the semantic
+   layer flips.
+   ============================================================ */
+
+:root {
+  /* -------- Brand: neutral (monochrome — primary = inverse of canvas) -------- */
+  /* Warm-gray ramp; brand alias maps to ink, not to a hue. Used for code keywords. */
+  --orange-50:  #F4F3F1;
+  --orange-100: #E6E4E1;
+  --orange-200: #CFCCC7;
+  --orange-300: #B4B0AA;
+  --orange-400: #97938C;
+  --orange-500: #807C75;
+  --orange-600: #6B6760;
+  --orange-700: #56524C;
+  --orange-800: #43403B;
+  --orange-900: #34312D;
+
+  /* -------- Support: cool-gray ramp (data dots, code strings) -------- */
+  --teal-50:  #F1F2F3;
+  --teal-100: #E2E4E6;
+  --teal-200: #C7CACE;
+  --teal-300: #A7ABB1;
+  --teal-400: #8B9097;
+  --teal-500: #71767D;
+  --teal-600: #595E64;
+  --teal-700: #474B50;
+
+  /* -------- Neutrals: slightly warm slate ramp -------- */
+  --ink-950: #0B0B0F; /* darkest canvas */
+  --ink-900: #101015;
+  --ink-850: #16161D;
+  --ink-800: #1C1C24;
+  --ink-750: #23232C;
+  --ink-700: #2C2C36;
+  --ink-600: #3B3B47;
+  --ink-500: #565663;
+  --ink-400: #74747F;
+  --ink-300: #9A9AA4;
+  --ink-200: #C2C2C9;
+  --ink-150: #D9D9DE;
+  --ink-100: #E8E8EB;
+  --ink-50:  #F4F4F3;
+  --ink-25:  #FAFAF8; /* warm off-white canvas */
+  --white:   #FFFFFF;
+  --black:   #000000;
+
+  /* -------- Semantic palette -------- */
+  /* -------- Semantic palette — neutralized to grayscale; only danger keeps a muted red -------- */
+  --green-500:  #8A938C;
+  --green-600:  #767E78;
+  --amber-500:  #9A958B;
+  --amber-600:  #847F75;
+  --red-500:    #B5746E;
+  --red-600:    #9E5F59;
+  --blue-500:   #87909C;
+  --blue-600:   #6F7884;
+
+  /* ============================================================
+     SEMANTIC ALIASES — dark theme (default)
+     ============================================================ */
+
+  --brand:            var(--orange-500);
+  --brand-hover:      var(--orange-400);
+  --brand-active:     var(--orange-600);
+  /* Brand — monochrome: light on dark */
+  --brand:            var(--ink-50);
+  --brand-hover:      var(--white);
+  --brand-active:     var(--ink-200);
+  --brand-subtle:     rgba(255, 255, 255, 0.08);
+  --brand-border:     rgba(255, 255, 255, 0.16);
+  --brand-on:         var(--ink-950); /* dark text/icon on a light brand surface */
+  --brand-ring:       rgba(255, 255, 255, 0.22);
+
+  --accent:           var(--ink-300);
+  --accent-subtle:    rgba(255, 255, 255, 0.06);
+
+  /* Surfaces */
+  --bg:               var(--ink-950);
+  --surface:          var(--ink-850);
+  --surface-2:        var(--ink-800);
+  --surface-3:        var(--ink-750);
+  --surface-hover:    var(--ink-800);
+  --surface-card:     var(--ink-850);
+  --surface-inset:    var(--ink-900);
+  --overlay:          rgba(7, 7, 10, 0.72);
+
+  /* Text */
+  --text:             var(--ink-50);
+  --text-strong:      var(--white);
+  --text-secondary:   var(--ink-300);
+  --text-muted:       var(--ink-400);
+  --text-faint:       var(--ink-500);
+  --text-on-brand:    var(--brand-on);
+  --text-link:        var(--ink-100);
+
+  /* Borders & lines */
+  --border:           rgba(255, 255, 255, 0.09);
+  --border-strong:    rgba(255, 255, 255, 0.16);
+  --border-faint:     rgba(255, 255, 255, 0.05);
+  --divider:          rgba(255, 255, 255, 0.07);
+
+  /* Form controls */
+  --field-bg:         var(--ink-900);
+  --field-border:     rgba(255, 255, 255, 0.12);
+  --field-placeholder:var(--ink-500);
+
+  /* Semantic foregrounds (dark) */
+  --success:          var(--green-500);
+  --success-subtle:   rgba(255, 255, 255, 0.06);
+  --warning:          var(--amber-500);
+  --warning-subtle:   rgba(255, 255, 255, 0.06);
+  --danger:           var(--red-500);
+  --danger-subtle:    rgba(181, 116, 110, 0.15);
+  --info:             var(--blue-500);
+  --info-subtle:      rgba(255, 255, 255, 0.06);
+
+  /* Code surface */
+  --code-bg:          #0C0C11;
+  --code-border:      rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   SEMANTIC ALIASES — light theme
+   ============================================================ */
+[data-theme="light"] {
+  --brand:            var(--ink-950);
+  --brand-hover:      var(--ink-800);
+  --brand-active:     var(--black);
+  --brand-subtle:     rgba(15, 15, 20, 0.06);
+  --brand-border:     rgba(15, 15, 20, 0.16);
+  --brand-on:         #FFFFFF;
+  --brand-ring:       rgba(15, 15, 20, 0.22);
+
+  --accent:           var(--ink-500);
+  --accent-subtle:    rgba(15, 15, 20, 0.06);
+
+  --bg:               var(--ink-25);
+  --surface:          var(--white);
+  --surface-2:        var(--ink-50);
+  --surface-3:        var(--ink-100);
+  --surface-hover:    var(--ink-50);
+  --surface-card:     var(--white);
+  --surface-inset:    var(--ink-50);
+  --overlay:          rgba(20, 20, 25, 0.45);
+
+  --text:             var(--ink-900);
+  --text-strong:      var(--ink-950);
+  --text-secondary:   var(--ink-500);
+  --text-muted:       var(--ink-400);
+  --text-faint:       var(--ink-300);
+  --text-on-brand:    #FFFFFF;
+  --text-link:        var(--ink-900);
+
+  --border:           rgba(15, 15, 20, 0.10);
+  --border-strong:    rgba(15, 15, 20, 0.18);
+  --border-faint:     rgba(15, 15, 20, 0.05);
+  --divider:          rgba(15, 15, 20, 0.08);
+
+  --field-bg:         var(--white);
+  --field-border:     rgba(15, 15, 20, 0.16);
+  --field-placeholder:var(--ink-300);
+
+  --success-subtle:   rgba(15, 15, 20, 0.05);
+  --warning-subtle:   rgba(15, 15, 20, 0.05);
+  --danger-subtle:    rgba(158, 95, 89, 0.10);
+  --info-subtle:      rgba(15, 15, 20, 0.05);
+
+  --code-bg:          #F7F7F4;
+  --code-border:      rgba(15, 15, 20, 0.10);
+}

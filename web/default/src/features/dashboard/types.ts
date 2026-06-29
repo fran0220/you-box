@@ -40,8 +40,10 @@ export interface QuotaDataItem {
 export interface UptimeMonitor {
   name: string
   uptime: number
+  uptime_24h?: number
   status: number
   group?: string
+  history?: number[]
 }
 
 export interface UptimeGroupResult {

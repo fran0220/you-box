@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .navlink{font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-secondary);padding:8px 12px;border-radius:6px}
+  .navlink:hover{color:var(--text);background:var(--surface-hover)}
+  .navlink.on{color:var(--text-strong)}
+  .mono{font-family:var(--font-mono)}
+  .dnav a{display:block;font-size:13.5px;color:var(--text-secondary);padding:6px 10px;border-radius:7px;margin-bottom:1px}
+  .dnav a:hover{color:var(--text);background:var(--surface-hover)}
+  .dnav a.on{color:var(--text-strong);background:var(--surface-2);font-weight:500}
+  .dgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 10px;margin:18px 0 6px}
+  .toc a{display:block;font-size:12.5px;color:var(--text-muted);padding:5px 0;border-left:1.5px solid var(--border);padding-left:12px;margin-left:-1.5px}
+  .toc a.on{color:var(--text-strong);border-left-color:var(--brand)}
+  .doc h1{font-family:var(--font-display);font-size:34px;letter-spacing:-.025em;font-weight:700;color:var(--text-strong);margin:0 0 10px}
+  .doc h2{font-family:var(--font-display);font-size:22px;letter-spacing:-.01em;font-weight:600;color:var(--text-strong);margin:38px 0 14px;scroll-margin-top:80px}
+  .doc p{font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0 0 14px}
+  .doc code.ic{font-family:var(--font-mono);font-size:13px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--text)}
+  .prow{display:grid;grid-template-columns:170px 90px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--divider);font-size:13.5px;align-items:baseline}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <header style="position:sticky;top:0;z-index:200;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--border)">
+    <div style="max-width:1320px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;gap:28px">
+      <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong);font-weight:700">Box</b></span></a>
+      <nav style="display:flex;align-items:center;gap:2px;margin-left:6px"><a class="navlink" href="Marketplace.dc.html">Models</a><a class="navlink" href="Rankings.dc.html">Rankings</a><a class="navlink on" href="Docs.dc.html">Docs</a><a class="navlink" href="Status.dc.html">Status</a></nav>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px"><button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button><a class="yb-btn yb-btn--ghost yb-btn--sm" href="SignIn.dc.html"><span>Sign in</span></a><a class="yb-btn yb-btn--primary yb-btn--sm" href="SignUp.dc.html"><span>Get API key</span></a></div>
+    </div>
+  </header>
+
+  <div style="max-width:1320px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:228px 1fr 200px;gap:40px">
+    <!-- doc nav -->
+    <aside class="dnav" style="position:sticky;top:64px;align-self:start;height:calc(100dvh - 64px);overflow:auto;padding:26px 0 40px">
+      <div class="dgrp" style="margin-top:0">Get started</div>
+      <a href="#">Introduction</a>
+      <a class="on" href="#">Quickstart</a>
+      <a href="#">Authentication</a>
+      <a href="#">Models &amp; slugs</a>
+      <div class="dgrp">API reference</div>
+      <a href="#">Chat completions</a>
+      <a href="#">Streaming</a>
+      <a href="#">Embeddings</a>
+      <a href="#">Images</a>
+      <a href="#">Audio</a>
+      <div class="dgrp">Guides</div>
+      <a href="#">Failover &amp; routing</a>
+      <a href="#">Cost controls</a>
+      <a href="#">Rate limits</a>
+      <a href="#">Errors</a>
+      <a href="#">Webhooks</a>
+    </aside>
+
+    <!-- content -->
+    <main class="doc" style="padding:36px 0 80px;min-width:0">
+      <div class="mono" style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:12px">// Get started</div>
+      <h1>Quickstart</h1>
+      <p>YouBox exposes a single OpenAI-compatible endpoint that routes to 300+ models. If you already use the OpenAI SDK, you're three lines away — change the base URL, drop in your key, and pass a provider-prefixed model slug.</p>
+
+      <h2 id="base">Base URL</h2>
+      <p>All requests go to one host. Point any OpenAI-compatible client at it:</p>
+      <div class="yb-code" style="margin-bottom:8px"><div class="yb-code__bar"><span class="yb-code__dots"><i></i><i></i><i></i></span><span class="yb-code__lang">http</span><span class="yb-code__spacer"></span><button class="yb-code__copy"><i data-lucide="copy"></i>Copy</button></div><pre class="yb-code__pre"><code>https://api.youbox.dev/v1</code></pre></div>
+
+      <h2 id="auth">Authentication</h2>
+      <p>Authenticate with a bearer token. Create a key in <a href="ApiKeys.dc.html" style="color:var(--text);border-bottom:1px solid var(--border-strong)">API keys</a> and pass it in the <code class="ic">Authorization</code> header. Keep it server-side — never ship it to a browser.</p>
+
+      <h2 id="call">Your first call</h2>
+      <p>Send a chat completion. Switch providers by changing only the <code class="ic">model</code> string:</p>
+      <div class="yb-code"><div class="yb-code__bar"><span class="yb-code__dots"><i></i><i></i><i></i></span><div style="display:flex;gap:2px"><button class="yb-tab yb-tab--active" style="height:24px;padding:0 10px;font-size:12px">cURL</button><button class="yb-tab" style="height:24px;padding:0 10px;font-size:12px">Python</button><button class="yb-tab" style="height:24px;padding:0 10px;font-size:12px">Node</button></div><span class="yb-code__spacer"></span><button class="yb-code__copy"><i data-lucide="copy"></i>Copy</button></div><pre class="yb-code__pre"><code>curl https://api.youbox.dev/v1/chat/completions \
+  -H <span style="color:var(--teal-300)">"Authorization: Bearer $YOUBOX_KEY"</span> \
+  -H <span style="color:var(--teal-300)">"Content-Type: application/json"</span> \
+  -d <span style="color:var(--teal-300)">'{
+    "model": "anthropic/claude-opus-4.6",
+    "messages": [{"role": "user", "content": "Hello!"}],
+    "stream": false
+  }'</span></code></pre></div>
+
+      <h2 id="params">Request parameters</h2>
+      <p>The body follows the OpenAI Chat Completions schema, with a few YouBox extensions for routing.</p>
+      <div style="border-top:none">
+        <div class="prow" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>Field</span><span>Type</span><span>Description</span></div>
+        <div class="prow"><span class="mono" style="color:var(--text)">model<span style="color:var(--danger)"> *</span></span><span class="mono" style="color:var(--text-muted)">string</span><span style="color:var(--text-secondary)">Provider-prefixed slug, e.g. <code class="ic">openai/gpt-5.2</code>.</span></div>
+        <div class="prow"><span class="mono" style="color:var(--text)">messages<span style="color:var(--danger)"> *</span></span><span class="mono" style="color:var(--text-muted)">array</span><span style="color:var(--text-secondary)">Conversation history as role/content objects.</span></div>
+        <div class="prow"><span class="mono" style="color:var(--text)">stream</span><span class="mono" style="color:var(--text-muted)">boolean</span><span style="color:var(--text-secondary)">Stream tokens as server-sent events. Default <code class="ic">false</code>.</span></div>
+        <div class="prow"><span class="mono" style="color:var(--text)">temperature</span><span class="mono" style="color:var(--text-muted)">number</span><span style="color:var(--text-secondary)">Sampling temperature, 0–2. Default <code class="ic">1</code>.</span></div>
+        <div class="prow"><span class="mono" style="color:var(--text)">route</span><span class="mono" style="color:var(--text-muted)">string</span><span style="color:var(--text-secondary)">YouBox routing strategy: <code class="ic">cost</code>, <code class="ic">latency</code>, or <code class="ic">quality</code>.</span></div>
+        <div class="prow"><span class="mono" style="color:var(--text)">fallbacks</span><span class="mono" style="color:var(--text-muted)">array</span><span style="color:var(--text-secondary)">Ordered model slugs to try if the primary fails.</span></div>
+      </div>
+
+      <h2 id="resp">Response</h2>
+      <div class="yb-code"><div class="yb-code__bar"><span class="yb-code__dots"><i></i><i></i><i></i></span><span class="yb-code__lang">json</span><span class="yb-code__spacer"></span><button class="yb-code__copy"><i data-lucide="copy"></i>Copy</button></div><pre class="yb-code__pre"><code>{
+  <span style="color:var(--blue-500)">"id"</span>: <span style="color:var(--teal-300)">"chatcmpl-7f3a9c"</span>,
+  <span style="color:var(--blue-500)">"model"</span>: <span style="color:var(--teal-300)">"anthropic/claude-opus-4.6"</span>,
+  <span style="color:var(--blue-500)">"choices"</span>: [{ <span style="color:var(--blue-500)">"message"</span>: { <span style="color:var(--blue-500)">"role"</span>: <span style="color:var(--teal-300)">"assistant"</span>, <span style="color:var(--blue-500)">"content"</span>: <span style="color:var(--teal-300)">"Hi!"</span> } }],
+  <span style="color:var(--blue-500)">"usage"</span>: { <span style="color:var(--blue-500)">"prompt_tokens"</span>: <span style="color:var(--text)">9</span>, <span style="color:var(--blue-500)">"completion_tokens"</span>: <span style="color:var(--text)">2</span> },
+  <span style="color:var(--blue-500)">"yb_provider"</span>: <span style="color:var(--teal-300)">"anthropic-direct"</span>
+}</code></pre></div>
+
+      <h2 id="errors">Error codes</h2>
+      <div>
+        <div class="prow" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);grid-template-columns:90px 1fr"><span>Code</span><span>Meaning</span></div>
+        <div class="prow" style="grid-template-columns:90px 1fr"><span><span class="yb-badge yb-badge--neutral">401</span></span><span style="color:var(--text-secondary)">Missing or invalid API key.</span></div>
+        <div class="prow" style="grid-template-columns:90px 1fr"><span><span class="yb-badge yb-badge--warning" >429</span></span><span style="color:var(--text-secondary)">Rate limit or budget exceeded — back off and retry.</span></div>
+        <div class="prow" style="grid-template-columns:90px 1fr"><span><span class="yb-badge yb-badge--danger" >502</span></span><span style="color:var(--text-secondary)">All upstream providers failed after failover.</span></div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:40px;padding-top:20px;border-top:1px solid var(--divider)">
+        <a class="yb-btn yb-btn--ghost" href="#"><i data-lucide="arrow-left"></i><span>Introduction</span></a>
+        <a class="yb-btn yb-btn--secondary" href="#"><span>Authentication</span><i data-lucide="arrow-right"></i></a>
+      </div>
+    </main>
+
+    <!-- toc -->
+    <aside class="toc" style="position:sticky;top:64px;align-self:start;padding:38px 0;display:flex;flex-direction:column;gap:0">
+      <div class="mono" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:10px;padding-left:12px">On this page</div>
+      <a href="#base">Base URL</a>
+      <a href="#auth">Authentication</a>
+      <a class="on" href="#call">Your first call</a>
+      <a href="#params">Request parameters</a>
+      <a href="#resp">Response</a>
+      <a href="#errors">Error codes</a>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

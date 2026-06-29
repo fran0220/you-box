@@ -99,6 +99,7 @@ func GetStatus(c *gin.Context) {
 		// 面板启用开关
 		"api_info_enabled":      cs.ApiInfoEnabled,
 		"uptime_kuma_enabled":   cs.UptimeKumaEnabled,
+		"status_page_url":       "",
 		"announcements_enabled": cs.AnnouncementsEnabled,
 		"faq_enabled":           cs.FAQEnabled,
 
@@ -131,6 +132,9 @@ func GetStatus(c *gin.Context) {
 	}
 	if cs.FAQEnabled {
 		data["faq"] = console_setting.GetFAQ()
+	}
+	if cs.UptimeKumaEnabled {
+		data["status_page_url"] = GetPublicStatusPageURL()
 	}
 
 	// Add enabled custom OAuth providers

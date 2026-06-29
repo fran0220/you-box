@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .mrow{display:grid;grid-template-columns:1.6fr .9fr .8fr .9fr .7fr 90px auto;gap:14px;align-items:center;padding:13px 18px;border-top:1px solid var(--divider);font-size:13px}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav on" href="ModelsAdmin.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="Subscriptions.dc.html"><i data-lucide="badge-dollar-sign"></i>Subscriptions</a>
+      <a class="snav" href="RedemptionCodes.dc.html"><i data-lucide="ticket"></i>Redemption</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <a class="snav" href="Profile.dc.html" style="margin:0;border-top:1px solid var(--border);border-radius:0;padding:12px 18px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></a>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Models</div>
+      <div style="flex:1"></div>
+      <button class="yb-btn yb-btn--secondary yb-btn--sm"><i data-lucide="refresh-cw"></i><span>Sync catalog</span></button>
+      <button class="yb-btn yb-btn--primary yb-btn--sm"><i data-lucide="plus"></i><span>Add model</span></button>
+    </header>
+
+    <div style="padding:24px 28px 64px;max-width:1180px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px">
+        <div class="yb-tabs yb-tabs--line"><button class="yb-tab yb-tab--active">Metadata <span class="yb-tab__count">312</span></button><button class="yb-tab">Deployments <span class="yb-tab__count">28</span></button><button class="yb-tab">Pricing</button></div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div class="yb-input-wrap" style="flex:1;max-width:340px"><span class="yb-ic-l"><i data-lucide="search"></i></span><input class="yb-input yb-input--with-icon yb-input--sm" placeholder="Search models or slugs…"></div>
+        <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid var(--field-border);border-radius:8px;background:var(--field-bg);font-size:13px;color:var(--text)"><i data-lucide="filter" style="width:15px;height:15px;color:var(--text-muted)"></i>All providers<i data-lucide="chevron-down" style="width:15px;height:15px;color:var(--text-muted)"></i></div>
+        <div style="flex:1"></div>
+        <button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="upload"></i><span>Import JSON</span></button>
+      </div>
+
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="mrow" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>Model</span><span>Provider</span><span>In ratio</span><span>Channels</span><span>Type</span><span>Status</span><span></span></div>
+        <div class="mrow"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#565663">An</span><span><div style="color:var(--text);font-weight:500">Claude Opus 4.6</div><div class="mono" style="font-size:11px;color:var(--text-muted)">anthropic/claude-opus-4.6</div></span></span><span class="mono" style="color:var(--text-secondary)">Anthropic</span><span class="mono" style="color:var(--text)">3.00×</span><span class="mono" style="color:var(--text)">3 active</span><span><span class="yb-badge yb-badge--neutral">chat</span></span><span><span class="yb-badge yb-badge--success" >Enabled</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="mrow"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#3B3B47">Op</span><span><div style="color:var(--text);font-weight:500">GPT-5.2</div><div class="mono" style="font-size:11px;color:var(--text-muted)">openai/gpt-5.2</div></span></span><span class="mono" style="color:var(--text-secondary)">OpenAI</span><span class="mono" style="color:var(--text)">2.50×</span><span class="mono" style="color:var(--text)">2 active</span><span><span class="yb-badge yb-badge--neutral">chat</span></span><span><span class="yb-badge yb-badge--success">Enabled</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="mrow"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#8B9097">Go</span><span><div style="color:var(--text);font-weight:500">Gemini 3 Pro</div><div class="mono" style="font-size:11px;color:var(--text-muted)">google/gemini-3-pro</div></span></span><span class="mono" style="color:var(--text-secondary)">Google</span><span class="mono" style="color:var(--text)">1.25×</span><span class="mono" style="color:var(--text)">2 active</span><span><span class="yb-badge yb-badge--neutral">chat</span></span><span><span class="yb-badge yb-badge--success">Enabled</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="mrow"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#9A9AA4">Bl</span><span><div style="color:var(--text);font-weight:500">FLUX 1.2 Pro</div><div class="mono" style="font-size:11px;color:var(--text-muted)">black-forest/flux-1.2-pro</div></span></span><span class="mono" style="color:var(--text-secondary)">Black Forest</span><span class="mono" style="color:var(--text)">—</span><span class="mono" style="color:var(--text)">1 active</span><span><span class="yb-badge yb-badge--neutral">image</span></span><span><span class="yb-badge yb-badge--success">Enabled</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="mrow"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#807C75">De</span><span><div style="color:var(--text);font-weight:500">DeepSeek V4</div><div class="mono" style="font-size:11px;color:var(--text-muted)">deepseek/deepseek-v4</div></span></span><span class="mono" style="color:var(--text-secondary)">DeepSeek</span><span class="mono" style="color:var(--text)">0.27×</span><span class="mono" style="color:var(--text)">1 active</span><span><span class="yb-badge yb-badge--neutral">chat</span></span><span><span class="yb-badge yb-badge--success">Enabled</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="mrow"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#A7ABB1">Mi</span><span><div style="color:var(--text);font-weight:500">Mistral Large 2</div><div class="mono" style="font-size:11px;color:var(--text-muted)">mistral/mistral-large-2</div></span></span><span class="mono" style="color:var(--text-secondary)">Mistral</span><span class="mono" style="color:var(--text)">2.00×</span><span class="mono" style="color:var(--text-muted)">0 active</span><span><span class="yb-badge yb-badge--neutral">chat</span></span><span><span class="yb-badge yb-badge--warning" >Disabled</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

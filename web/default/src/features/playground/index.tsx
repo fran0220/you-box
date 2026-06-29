@@ -52,7 +52,11 @@ import {
 } from './lib'
 import type { Message as MessageType } from './types'
 
-export function Playground() {
+type PlaygroundProps = {
+  initialModel?: string
+}
+
+export function Playground(props: PlaygroundProps) {
   const { t } = useTranslation()
   const {
     config,
@@ -68,6 +72,12 @@ export function Playground() {
     clearMessages,
     applyPreset,
   } = usePlaygroundState()
+
+  useEffect(() => {
+    const model = props.initialModel?.trim()
+    if (!model) return
+    updateConfig('model', model)
+  }, [props.initialModel, updateConfig])
 
   // Pricing map (model → ratios) used to derive real per-response cost.
   const { data: pricingMap } = useQuery({

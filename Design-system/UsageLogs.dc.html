@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .lrow{display:grid;grid-template-columns:120px 1.3fr 1fr 110px 90px 80px 70px;gap:14px;align-items:center;padding:12px 18px;border-top:1px solid var(--divider);font-size:13px}
+  .sel{display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid var(--field-border);border-radius:8px;background:var(--field-bg);font-size:13px;color:var(--text);cursor:pointer}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav on" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="Marketplace.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <div style="border-top:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:10px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div><button class="yb-iconbtn yb-iconbtn--sm" aria-label="Account"><i data-lucide="chevron-down"></i></button></div>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Usage logs</div>
+      <div style="flex:1"></div>
+      <button class="yb-iconbtn" aria-label="Notifications"><i data-lucide="bell"></i></button>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <div style="padding:24px 28px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px">
+        <div><h1 style="font-family:var(--font-display);font-size:24px;letter-spacing:-.02em;font-weight:700;margin:0 0 4px;color:var(--text-strong)">Request logs</h1><p style="font-size:14px;color:var(--text-secondary);margin:0">Every request routed through your keys. Click a row for the full trace.</p></div>
+        <div class="yb-tabs yb-tabs--pill"><button class="yb-tab yb-tab--active">Completions</button><button class="yb-tab">Images</button><button class="yb-tab">Tasks</button></div>
+      </div>
+
+      <!-- filter bar -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+        <div class="yb-input-wrap" style="flex:1;min-width:220px;max-width:320px"><span class="yb-ic-l"><i data-lucide="search"></i></span><input class="yb-input yb-input--with-icon yb-input--sm" placeholder="Search by request ID or model…"></div>
+        <div class="sel"><i data-lucide="boxes" style="width:15px;height:15px;color:var(--text-muted)"></i>All models<i data-lucide="chevron-down" style="width:15px;height:15px;color:var(--text-muted)"></i></div>
+        <div class="sel"><i data-lucide="key-round" style="width:15px;height:15px;color:var(--text-muted)"></i>All keys<i data-lucide="chevron-down" style="width:15px;height:15px;color:var(--text-muted)"></i></div>
+        <div class="sel"><span style="width:7px;height:7px;border-radius:50%;background:var(--success)"></span>Status<i data-lucide="chevron-down" style="width:15px;height:15px;color:var(--text-muted)"></i></div>
+        <div class="sel"><i data-lucide="calendar" style="width:15px;height:15px;color:var(--text-muted)"></i>Last 24h<i data-lucide="chevron-down" style="width:15px;height:15px;color:var(--text-muted)"></i></div>
+        <div style="flex:1"></div>
+        <button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="download"></i><span>Export</span></button>
+      </div>
+
+      <!-- table -->
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="lrow" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>Time</span><span>Model</span><span>Key</span><span>Tokens (in/out)</span><span>Cost</span><span>Latency</span><span>Status</span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:22:07</span><span class="mono" style="color:var(--text)">anthropic/claude-opus-4.6</span><span class="mono" style="color:var(--text-muted)">prod · web</span><span class="mono" style="color:var(--text)">6,120 / 842</span><span class="mono" style="color:var(--text)">$0.031</span><span class="mono" style="color:var(--text-muted)">0.38s</span><span><span class="yb-badge yb-badge--success" >200</span></span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:21:55</span><span class="mono" style="color:var(--text)">openai/gpt-5.2</span><span class="mono" style="color:var(--text-muted)">prod · mobile</span><span class="mono" style="color:var(--text)">2,310 / 410</span><span class="mono" style="color:var(--text)">$0.010</span><span class="mono" style="color:var(--text-muted)">0.51s</span><span><span class="yb-badge yb-badge--success">200</span></span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:21:48</span><span class="mono" style="color:var(--text)">google/gemini-3-pro</span><span class="mono" style="color:var(--text-muted)">prod · web</span><span class="mono" style="color:var(--text)">18,402 / 1,204</span><span class="mono" style="color:var(--text)">$0.029</span><span class="mono" style="color:var(--text-muted)">0.62s</span><span><span class="yb-badge yb-badge--success">200</span></span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:21:30</span><span class="mono" style="color:var(--text)">deepseek/deepseek-v4</span><span class="mono" style="color:var(--text-muted)">staging</span><span class="mono" style="color:var(--text-muted)">— / —</span><span class="mono" style="color:var(--text-muted)">$0.000</span><span class="mono" style="color:var(--text-muted)">0.02s</span><span><span class="yb-badge yb-badge--danger" >429</span></span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:21:12</span><span class="mono" style="color:var(--text)">anthropic/claude-opus-4.6</span><span class="mono" style="color:var(--text-muted)">prod · web</span><span class="mono" style="color:var(--text)">9,840 / 2,108</span><span class="mono" style="color:var(--text)">$0.061</span><span class="mono" style="color:var(--text-muted)">0.41s</span><span><span class="yb-badge yb-badge--success">200</span></span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:20:58</span><span class="mono" style="color:var(--text)">meta/llama-4-405b</span><span class="mono" style="color:var(--text-muted)">ci · e2e</span><span class="mono" style="color:var(--text)">1,200 / 96</span><span class="mono" style="color:var(--text)">$0.001</span><span class="mono" style="color:var(--text-muted)">0.55s</span><span><span class="yb-badge yb-badge--success">200</span></span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:20:41</span><span class="mono" style="color:var(--text)">openai/gpt-5.2</span><span class="mono" style="color:var(--text-muted)">prod · mobile</span><span class="mono" style="color:var(--text-muted)">512 / —</span><span class="mono" style="color:var(--text-muted)">$0.001</span><span class="mono" style="color:var(--text-muted)">2.04s</span><span><span class="yb-badge yb-badge--warning" >504</span></span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:20:09</span><span class="mono" style="color:var(--text)">mistral/mistral-large-3</span><span class="mono" style="color:var(--text-muted)">prod · web</span><span class="mono" style="color:var(--text)">4,021 / 688</span><span class="mono" style="color:var(--text)">$0.012</span><span class="mono" style="color:var(--text-muted)">0.47s</span><span><span class="yb-badge yb-badge--success">200</span></span></div>
+        <div class="lrow"><span class="mono" style="color:var(--text-muted)">14:19:52</span><span class="mono" style="color:var(--text)">cohere/embed-4</span><span class="mono" style="color:var(--text-muted)">prod · web</span><span class="mono" style="color:var(--text)">2,400 / —</span><span class="mono" style="color:var(--text)">$0.000</span><span class="mono" style="color:var(--text-muted)">0.09s</span><span><span class="yb-badge yb-badge--success">200</span></span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;font-size:13px;color:var(--text-muted)"><span class="mono">1–9 of 412,889</span><div style="display:flex;gap:6px"><button class="yb-iconbtn yb-iconbtn--solid"><i data-lucide="chevron-left"></i></button><button class="yb-iconbtn yb-iconbtn--solid"><i data-lucide="chevron-right"></i></button></div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:880},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

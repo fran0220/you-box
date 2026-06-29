@@ -480,11 +480,6 @@ export const STATIC_I18N_KEYS = [
   'Violation deduction amount',
   'Base amount. Actual deduction = base amount × system group rate.',
 
-  // Chat2Link
-  'No available Web chat links',
-  'No enabled tokens available',
-  'Redirecting to chat page...',
-
   // Channel upstream updates
   'No processable upstream model updates for this channel',
   'Upstream model updates applied: {{added}} added, {{removed}} removed, {{ignored}} ignored this time, {{totalIgnored}} total ignored models',
@@ -507,9 +502,45 @@ export const STATIC_I18N_KEYS = [
   'Every week',
   'Every month',
 
+  // Home hero (design-system gap closure)
+  'Every model,',
+  'one box.',
+  'One API · 300+ models',
+  'YouBox is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.',
+  'Get your API key',
+  'Read the docs',
+  'No markup on tokens. Drop-in OpenAI-compatible SDK.',
+  'Models',
+  'Providers',
+
+  // Status page
+  'Uptime (90d)',
+  '90-day history',
+  'Routed capacity',
+  'Outage',
+  'Open in Playground',
+
+  // Docs reference
+  'Introduction',
+  'Your first call',
+  'Request parameters',
+  'Error codes',
+  'Field',
+  'Type',
+  'Meaning',
+  'Code',
+
+  // About fallback
+  'About YouBox',
+  "We're building the routing layer for every model.",
+  'Principles',
+  'What we optimize for',
+
   // Misc
   'Cancel',
   'Status',
+  'Apps',
+  'DPA',
   'Upgrade Group',
   'Regenerate',
   'Untitled',

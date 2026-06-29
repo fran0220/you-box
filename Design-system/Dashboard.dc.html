@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .bar2{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}
+  .bar2 span{width:60%;border-radius:4px 4px 0 0;background:var(--ink-300)}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <!-- SIDEBAR -->
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav on" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="Marketplace.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <div style="border-top:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:10px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div><button class="yb-iconbtn yb-iconbtn--sm" aria-label="Account"><i data-lucide="chevron-down"></i></button></div>
+  </aside>
+
+  <!-- MAIN -->
+  <div style="min-width:0">
+    <!-- topbar -->
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Overview</div>
+      <div style="flex:1"></div>
+      <div class="yb-input-wrap" style="width:240px"><span class="yb-ic-l"><i data-lucide="search"></i></span><input class="yb-input yb-input--with-icon yb-input--sm" placeholder="Search…  ⌘K"></div>
+      <a href="Wallet.dc.html" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);font-family:var(--font-mono);font-size:13px;color:var(--text)"><i data-lucide="wallet" style="width:14px;height:14px;color:var(--text-muted)"></i>$842.10</a>
+      <button class="yb-iconbtn" aria-label="Notifications"><i data-lucide="bell"></i></button>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <!-- content -->
+    <div style="padding:28px 28px 64px;max-width:1180px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap">
+        <div><h1 style="font-family:var(--font-display);font-size:26px;letter-spacing:-.02em;font-weight:700;margin:0 0 4px;color:var(--text-strong)">Welcome back, Jordan</h1><p style="font-size:14px;color:var(--text-secondary);margin:0">Here's how your traffic is doing this month.</p></div>
+        <div style="display:flex;gap:10px"><div class="yb-tabs yb-tabs--pill"><button class="yb-tab">24h</button><button class="yb-tab">7d</button><button class="yb-tab yb-tab--active">30d</button><button class="yb-tab">90d</button></div><button class="yb-btn yb-btn--secondary"><i data-lucide="download"></i><span>Export</span></button></div>
+      </div>
+
+      <!-- stat cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+        <div class="yb-card"><div style="display:flex;align-items:center;justify-content:space-between"><span class="yb-stat__label">Spend</span><span class="yb-badge yb-badge--neutral">+8%</span></div><div class="yb-stat__value" style="margin-top:10px">$1,284<span class="yb-stat__unit">.40</span></div><div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:6px">of $2,000 budget</div></div>
+        <div class="yb-card"><div style="display:flex;align-items:center;justify-content:space-between"><span class="yb-stat__label">Requests</span><span class="yb-badge yb-badge--success">+12%</span></div><div class="yb-stat__value" style="margin-top:10px">2.41<span class="yb-stat__unit">M</span></div><div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:6px">94.2K / day avg</div></div>
+        <div class="yb-card"><div style="display:flex;align-items:center;justify-content:space-between"><span class="yb-stat__label">Tokens</span><span class="yb-badge yb-badge--success">+19%</span></div><div class="yb-stat__value" style="margin-top:10px">684<span class="yb-stat__unit">M</span></div><div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:6px">in 512M · out 172M</div></div>
+        <div class="yb-card"><div style="display:flex;align-items:center;justify-content:space-between"><span class="yb-stat__label">Avg latency</span><span class="yb-badge yb-badge--success">−40ms</span></div><div class="yb-stat__value" style="margin-top:10px">0.46<span class="yb-stat__unit">s</span></div><div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:6px">p95 1.21s</div></div>
+      </div>
+
+      <!-- chart + balance -->
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="yb-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px"><div><div style="font-size:14px;font-weight:600;color:var(--text-strong)">Requests over time</div><div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:2px">Last 30 days</div></div><div style="display:flex;gap:14px;align-items:center;font-size:12px;color:var(--text-muted)"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:var(--ink-100)"></span>Success</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:var(--ink-600)"></span>Error</span></div></div>
+          <div style="height:160px;display:flex;align-items:flex-end;gap:5px">
+            <div class="bar2"><span style="height:54%"></span></div><div class="bar2"><span style="height:62%"></span></div><div class="bar2"><span style="height:48%"></span></div><div class="bar2"><span style="height:70%"></span></div><div class="bar2"><span style="height:65%"></span></div><div class="bar2"><span style="height:80%"></span></div><div class="bar2"><span style="height:72%"></span></div><div class="bar2"><span style="height:58%"></span></div><div class="bar2"><span style="height:84%"></span></div><div class="bar2"><span style="height:90%"></span></div><div class="bar2"><span style="height:76%"></span></div><div class="bar2"><span style="height:68%"></span></div><div class="bar2"><span style="height:88%"></span></div><div class="bar2"><span style="height:95%"></span></div><div class="bar2"><span style="height:100%;background:var(--ink-100)"></span></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;font-family:var(--font-mono);font-size:10px;color:var(--text-faint)"><span>Jun 1</span><span>Jun 15</span><span>Jun 30</span></div>
+        </div>
+        <div class="yb-card" style="display:flex;flex-direction:column">
+          <div style="font-size:14px;font-weight:600;color:var(--text-strong);margin-bottom:4px">Credit balance</div>
+          <div style="font-family:var(--font-display);font-size:38px;font-weight:700;letter-spacing:-.03em;color:var(--text-strong);margin:8px 0 2px">$842.10</div>
+          <div class="mono" style="font-size:12px;color:var(--text-muted)">≈ 18 days at current rate</div>
+          <div style="height:8px;border-radius:999px;background:var(--surface-3);margin:18px 0 8px;overflow:hidden"><div style="width:42%;height:100%;background:var(--ink-100)"></div></div>
+          <div class="mono" style="font-size:11px;color:var(--text-muted)">$842 of $2,000 monthly budget</div>
+          <div style="flex:1"></div>
+          <a class="yb-btn yb-btn--primary yb-btn--block" href="Wallet.dc.html" style="margin-top:18px"><i data-lucide="plus"></i><span>Add credits</span></a>
+        </div>
+      </div>
+
+      <!-- spend by model + recent -->
+      <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:16px">
+        <div class="yb-card">
+          <div style="font-size:14px;font-weight:600;color:var(--text-strong);margin-bottom:16px">Spend by model</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--text)">claude-opus-4.6</span><span class="mono" style="color:var(--text-muted)">$612</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:100%;height:100%;border-radius:999px;background:var(--ink-100)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--text)">gpt-5.2</span><span class="mono" style="color:var(--text-muted)">$398</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:65%;height:100%;border-radius:999px;background:var(--ink-300)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--text)">gemini-3-pro</span><span class="mono" style="color:var(--text-muted)">$176</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:29%;height:100%;border-radius:999px;background:var(--ink-400)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--text)">deepseek-v4</span><span class="mono" style="color:var(--text-muted)">$98</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:16%;height:100%;border-radius:999px;background:var(--ink-500)"></div></div></div>
+          </div>
+        </div>
+        <div class="yb-card" style="padding:0;overflow:hidden">
+          <div style="padding:16px 18px;font-size:14px;font-weight:600;color:var(--text-strong);border-bottom:1px solid var(--divider)">Recent requests</div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;padding:11px 18px;font-size:13px"><span class="mono" style="color:var(--text)">claude-opus-4.6</span><span class="mono" style="color:var(--text-muted)">8,241 tok</span><span class="mono" style="color:var(--text-muted)">0.38s</span><span class="yb-badge yb-badge--success" >200</span></div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;padding:11px 18px;border-top:1px solid var(--divider);font-size:13px"><span class="mono" style="color:var(--text)">gpt-5.2</span><span class="mono" style="color:var(--text-muted)">3,902 tok</span><span class="mono" style="color:var(--text-muted)">0.51s</span><span class="yb-badge yb-badge--success">200</span></div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;padding:11px 18px;border-top:1px solid var(--divider);font-size:13px"><span class="mono" style="color:var(--text)">gemini-3-pro</span><span class="mono" style="color:var(--text-muted)">12,004 tok</span><span class="mono" style="color:var(--text-muted)">0.62s</span><span class="yb-badge yb-badge--success">200</span></div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;padding:11px 18px;border-top:1px solid var(--divider);font-size:13px"><span class="mono" style="color:var(--text)">deepseek-v4</span><span class="mono" style="color:var(--text-muted)">920 tok</span><span class="mono" style="color:var(--text-muted)">0.44s</span><span class="yb-badge yb-badge--danger">429</span></div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;padding:11px 18px;border-top:1px solid var(--divider);font-size:13px"><span class="mono" style="color:var(--text)">claude-opus-4.6</span><span class="mono" style="color:var(--text-muted)">5,610 tok</span><span class="mono" style="color:var(--text-muted)">0.40s</span><span class="yb-badge yb-badge--success">200</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:880},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

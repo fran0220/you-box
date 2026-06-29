@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .trow{display:grid;grid-template-columns:54px 1.6fr 1fr 130px 110px 110px auto;gap:14px;align-items:center;padding:11px 16px;border-top:1px solid var(--divider);font-size:13px}
+  .thumb{width:38px;height:38px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted)}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="ApiTools.dc.html"><i data-lucide="wand-sparkles"></i>API tools</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav on" href="TaskLogs.dc.html"><i data-lucide="image"></i>Tasks &amp; drawing</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="ModelsAdmin.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <a class="snav" href="Profile.dc.html" style="margin:0;border-top:1px solid var(--border);border-radius:0;padding:12px 18px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></a>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Tasks &amp; drawing</div>
+      <div style="flex:1"></div>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <div style="padding:24px 28px 64px;max-width:1180px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px">
+        <div><h1 style="font-family:var(--font-display);font-size:24px;letter-spacing:-.02em;font-weight:700;margin:0 0 4px;color:var(--text-strong)">Async tasks</h1><p style="font-size:14px;color:var(--text-secondary);margin:0">Long-running image, video, and audio jobs. Each delivers a webhook callback on completion.</p></div>
+        <div class="yb-tabs yb-tabs--pill"><button class="yb-tab yb-tab--active">All</button><button class="yb-tab">Image</button><button class="yb-tab">Video</button><button class="yb-tab">Audio</button></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px">
+        <div class="yb-card"><span class="yb-stat__label">Queued</span><div class="yb-stat__value" style="margin-top:8px">3</div></div>
+        <div class="yb-card"><div style="display:flex;justify-content:space-between"><span class="yb-stat__label">Processing</span><span class="yb-badge yb-badge--neutral">2</span></div><div class="yb-stat__value" style="margin-top:8px">2</div></div>
+        <div class="yb-card"><span class="yb-stat__label">Succeeded (24h)</span><div class="yb-stat__value" style="margin-top:8px">418</div></div>
+        <div class="yb-card"><div style="display:flex;justify-content:space-between"><span class="yb-stat__label">Callbacks failed</span><span class="yb-badge yb-badge--danger" >1</span></div><div class="yb-stat__value" style="margin-top:8px">1</div></div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
+        <div class="yb-input-wrap" style="flex:1;max-width:320px"><span class="yb-ic-l"><i data-lucide="search"></i></span><input class="yb-input yb-input--with-icon yb-input--sm" placeholder="Search by task ID or prompt…"></div>
+        <div style="flex:1"></div>
+        <button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="refresh-cw"></i><span>Refresh</span></button>
+      </div>
+
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="trow" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span></span><span>Task</span><span>Model</span><span>Status</span><span>Submitted</span><span>Callback</span><span></span></div>
+
+        <div class="trow"><span class="thumb" style="background:linear-gradient(135deg,var(--ink-700),var(--ink-600))"></span><span style="min-width:0"><div class="mono" style="color:var(--text);font-size:12px">task_img_9f3a7c</div><div style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Lighthouse at dawn, watercolor…</div></span><span class="mono" style="color:var(--text-secondary)">flux-1.2-pro</span><span><span class="yb-badge yb-badge--success" ><span class="yb-badge__dot"></span>Succeeded</span></span><span class="mono" style="color:var(--text-muted)">2m ago</span><span><span class="yb-badge yb-badge--success">Delivered</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+
+        <div class="trow"><span class="thumb"><i data-lucide="clapperboard" style="width:17px;height:17px"></i></span><span style="min-width:0"><div class="mono" style="color:var(--text);font-size:12px">task_vid_2b8c41</div><div style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">5s clip · drone over coastline</div></span><span class="mono" style="color:var(--text-secondary)">veo-3</span><span><span style="display:flex;align-items:center;gap:8px"><span class="yb-badge yb-badge--neutral"><span class="yb-badge__dot"></span>Processing</span></span><div style="height:4px;border-radius:999px;background:var(--surface-3);margin-top:6px"><div style="width:62%;height:100%;border-radius:999px;background:var(--ink-200)"></div></div></span><span class="mono" style="color:var(--text-muted)">40s ago</span><span><span class="yb-badge yb-badge--neutral">Pending</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+
+        <div class="trow"><span class="thumb"><i data-lucide="music" style="width:17px;height:17px"></i></span><span style="min-width:0"><div class="mono" style="color:var(--text);font-size:12px">task_aud_7d1e9a</div><div style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Lo-fi beat, 90 bpm, rainy mood</div></span><span class="mono" style="color:var(--text-secondary)">suno-v4</span><span><span class="yb-badge yb-badge--neutral"><span class="yb-badge__dot"></span>Queued</span></span><span class="mono" style="color:var(--text-muted)">1m ago</span><span><span class="yb-badge yb-badge--neutral">Pending</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+
+        <div class="trow"><span class="thumb" style="background:linear-gradient(135deg,var(--ink-800),var(--ink-700))"></span><span style="min-width:0"><div class="mono" style="color:var(--text);font-size:12px">task_img_5a2f08</div><div style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Isometric office, flat shading</div></span><span class="mono" style="color:var(--text-secondary)">dall-e-3</span><span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Succeeded</span></span><span class="mono" style="color:var(--text-muted)">14m ago</span><span><span class="yb-badge yb-badge--danger" >Failed · retrying</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+
+        <div class="trow"><span class="thumb"><i data-lucide="clapperboard" style="width:17px;height:17px"></i></span><span style="min-width:0"><div class="mono" style="color:var(--text);font-size:12px">task_vid_3c9b22</div><div style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Product spin, white cyclorama</div></span><span class="mono" style="color:var(--text-secondary)">kling-2</span><span><span class="yb-badge yb-badge--danger" ><span class="yb-badge__dot"></span>Failed</span></span><span class="mono" style="color:var(--text-muted)">22m ago</span><span><span class="yb-badge yb-badge--success">Delivered</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+
+        <div class="trow"><span class="thumb" style="background:linear-gradient(135deg,var(--ink-700),var(--ink-600))"></span><span style="min-width:0"><div class="mono" style="color:var(--text);font-size:12px">task_img_1e7d44</div><div style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Mountain range, golden hour</div></span><span class="mono" style="color:var(--text-secondary)">sdxl</span><span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Succeeded</span></span><span class="mono" style="color:var(--text-muted)">31m ago</span><span><span class="yb-badge yb-badge--success">Delivered</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+      </div>
+
+      <!-- callback config -->
+      <div class="yb-card" style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+        <div style="display:flex;align-items:center;gap:13px"><span style="width:38px;height:38px;border-radius:10px;background:var(--brand-subtle);color:var(--brand);display:flex;align-items:center;justify-content:center"><i data-lucide="webhook" style="width:19px;height:19px"></i></span><div><div style="font-size:14px;font-weight:600;color:var(--text-strong)">Callback endpoint</div><div class="mono" style="font-size:12px;color:var(--text-muted);margin-top:2px">POST https://app.cortex.dev/hooks/youbox · signed with HMAC</div></div></div>
+        <button class="yb-btn yb-btn--secondary yb-btn--sm"><span>Edit webhook</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

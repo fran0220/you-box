@@ -89,6 +89,10 @@ export function useTopNavLinks(): TopNavLink[] {
     links.push({ title: t('Rankings'), href: '/rankings', requiresAuth })
   }
 
+  if (modules?.apps !== false) {
+    links.push({ title: t('Apps'), href: '/apps' })
+  }
+
   // Docs (supports external links)
   if (modules?.docs !== false) {
     if (docsLink) {
@@ -101,6 +105,11 @@ export function useTopNavLinks(): TopNavLink[] {
   // About
   if (modules?.about !== false) {
     links.push({ title: t('About'), href: '/about' })
+  }
+
+  // Status (public health board)
+  if (modules?.status !== false) {
+    links.push({ title: t('Status'), href: '/status' })
   }
 
   return links

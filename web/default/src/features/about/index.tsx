@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useQuery } from '@tanstack/react-query'
-import { AlertCircle, Construction } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { sanitizeHtml } from '@/lib/sanitize'
 import { cn } from '@/lib/utils'
@@ -26,6 +26,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { AppShell } from '@/components/layout'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/youbox/empty-state'
+import { AboutMarketingFallback } from './components/about-marketing-fallback'
 import { getAboutContent } from './api'
 import { resolveAboutContentMode } from './lib/about-content'
 
@@ -58,41 +59,6 @@ function AboutErrorState(props: { onRetry: () => void }) {
           </Button>
         }
       />
-    </div>
-  )
-}
-
-function EmptyAboutState() {
-  const { t } = useTranslation()
-  const currentYear = new Date().getFullYear()
-
-  return (
-    <div className='mx-auto flex w-full max-w-2xl flex-col items-center justify-center px-7 py-16'>
-      <EmptyState
-        icon={Construction}
-        title={t('No About Content Set')}
-        description={t(
-          'The administrator has not configured any about content yet. You can set it in the settings page, supporting HTML or URL.'
-        )}
-        className='min-h-0 py-8'
-      />
-      <div className='border-border bg-card mt-2 w-full max-w-lg space-y-4 rounded-lg border border-dashed px-6 py-8 text-center text-sm'>
-        <p className='text-muted-foreground'>
-          {t('BoxAI')} © {currentYear}
-        </p>
-        <p className='text-muted-foreground'>
-          {t('This project must be used in compliance with the')}{' '}
-          <a
-            href='/about'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='text-brand font-medium hover:underline'
-          >
-            {t('AGPL v3.0 License')}
-          </a>
-          .
-        </p>
-      </div>
     </div>
   )
 }
@@ -151,7 +117,7 @@ export function About() {
   if (mode === 'empty') {
     return (
       <AppShell variant='public'>
-        <EmptyAboutState />
+        <AboutMarketingFallback />
       </AppShell>
     )
   }

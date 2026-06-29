@@ -17,217 +17,172 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
-import { CherryStudio } from '@lobehub/icons'
-import { ArrowRight, BookOpen } from 'lucide-react'
+import { ArrowRight, BookOpen, CircleCheckBig } from 'lucide-react'
 import { m, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { useStatus } from '@/hooks/use-status'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { HeroTerminalDemo } from '../hero-terminal-demo'
+import { useHeroStatusPill } from '../../hooks/use-hero-status-pill'
+import { HeroCodeBlock } from './hero-code-block'
+import { HeroStatsStrip } from './hero-stats-strip'
 
 interface HeroProps {
   className?: string
   isAuthenticated?: boolean
 }
 
-// Stylized three-dots indicator representing "More"
-const MoreIcon = () => (
-  <svg
-    className='text-muted-foreground/60 group-hover:text-foreground size-6 shrink-0 transition-colors'
-    viewBox='0 0 24 24'
-    fill='none'
-    xmlns='http://www.w3.org/2000/svg'
-  >
-    <circle cx='6' cy='12' r='2' fill='currentColor' />
-    <circle cx='12' cy='12' r='2' fill='currentColor' />
-    <circle cx='18' cy='12' r='2' fill='currentColor' />
-  </svg>
-)
-
 export function Hero(props: HeroProps) {
   const { t } = useTranslation()
   const { status } = useStatus()
   const shouldReduce = useReducedMotion()
   const { scrollY } = useScroll()
-  // Subtle parallax: the brand glow drifts down as the page scrolls (depth cue).
   const glowY = useTransform(scrollY, [0, 600], [0, 120])
   const docsUrl = (status?.docs_link as string | undefined) || '/docs'
+  const statusPill = useHeroStatusPill()
 
   const renderDocsButton = () => {
     const isExternal = docsUrl.startsWith('http')
     if (isExternal) {
       return (
         <Button
-          variant='outline'
-          className='group border-border/50 hover:border-border hover:bg-muted/50 inline-flex h-11 items-center gap-1.5 rounded-lg px-5 text-sm font-medium'
+          variant='secondary'
+          className='group inline-flex h-11 items-center gap-1.5 rounded-lg px-5 text-sm font-medium'
           render={
             <a href={docsUrl} target='_blank' rel='noopener noreferrer' />
           }
         >
-          <BookOpen className='text-muted-foreground/80 group-hover:text-foreground duration-fast size-4 transition-colors' />
-          <span>{t('Docs')}</span>
+          <BookOpen className='text-muted-foreground/80 group-hover:text-foreground size-4' />
+          <span>{t('Read the docs')}</span>
         </Button>
       )
     }
     return (
       <Button
-        variant='outline'
-        className='group border-border/50 hover:border-border hover:bg-muted/50 inline-flex h-11 items-center gap-1.5 rounded-lg px-5 text-sm font-medium'
+        variant='secondary'
+        className='group inline-flex h-11 items-center gap-1.5 rounded-lg px-5 text-sm font-medium'
         render={<Link to={docsUrl} />}
       >
-        <BookOpen className='text-muted-foreground/80 group-hover:text-foreground duration-fast size-4 transition-colors' />
-        <span>{t('Docs')}</span>
+        <BookOpen className='text-muted-foreground/80 group-hover:text-foreground size-4' />
+        <span>{t('Read the docs')}</span>
       </Button>
     )
   }
 
   return (
-    <section className='relative z-10 overflow-hidden pt-16 pb-12 md:pt-24 md:pb-20 lg:pt-28 lg:pb-24'>
-      {/* YouBox hero brand glow — the single decorative move on the flat ink canvas */}
+    <section className='relative z-10 overflow-hidden pt-16 pb-14 md:pt-20 md:pb-16 lg:pt-24'>
       <m.div
         aria-hidden
-        className='pointer-events-none absolute -top-40 -right-32 -z-10 size-[520px] rounded-full blur-[10px]'
+        className='pointer-events-none absolute top-[-220px] left-1/2 -z-10 size-[620px] -translate-x-1/2 rounded-full blur-[10px]'
         style={{
           background:
-            'radial-gradient(circle, color-mix(in oklch, var(--brand) 16%, transparent), transparent 62%)',
+            'radial-gradient(circle, color-mix(in oklch, var(--foreground) 7%, transparent), transparent 64%)',
           y: shouldReduce ? 0 : glowY,
         }}
       />
 
-      <div className='mx-auto grid max-w-6xl grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8'>
-        {/* Left Column: Title, description, action buttons and application support */}
-        <div className='flex flex-col items-start text-left lg:col-span-6'>
-          {/* Top Pill Badge */}
-          <p
-            className='yb-eyebrow landing-animate-fade-up mb-5 opacity-0'
-            style={{ animationDelay: '0ms' }}
-          >
-            {'// '}
-            {t('AI Application Infrastructure Foundation')}
-          </p>
-
-          <h1
-            className='font-display landing-animate-fade-up text-[clamp(2.5rem,5vw,3.875rem)] leading-[1.04] font-bold tracking-[-0.035em]'
-            style={{ animationDelay: '60ms' }}
-          >
-            {t('Unified API Gateway for')}
-            <br />
-            <span className='text-brand'>{t('Vast Range of AI Models')}</span>
-          </h1>
-          <p
-            className='landing-animate-fade-up text-muted-foreground/80 mt-5 max-w-xl text-base leading-relaxed opacity-0 md:text-[15px]'
-            style={{ animationDelay: '120ms' }}
-          >
-            {t(
-              'Access a vast selection of models via a standard, unified API protocol. Power AI applications, manage digital assets, and connect the Future.'
+      <div className='mx-auto flex max-w-6xl flex-col items-center px-4 text-center md:px-6'>
+        <Link
+          to='/status'
+          className='landing-animate-fade-up border-border bg-surface-2 text-muted-foreground hover:border-brand-border mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs opacity-0 transition-colors'
+          style={{ animationDelay: '0ms' }}
+        >
+          <span
+            className={cn(
+              'size-[7px] rounded-full',
+              statusPill.variant === 'danger'
+                ? 'bg-destructive'
+                : statusPill.variant === 'warning'
+                  ? 'bg-warning'
+                  : 'bg-success'
             )}
-          </p>
+            aria-hidden='true'
+          />
+          <span>{t(statusPill.label)}</span>
+          <span className='bg-divider mx-0.5 h-3 w-px' aria-hidden='true' />
+          <span className='font-mono text-[11px]'>
+            {statusPill.loading
+              ? t('Checking status…')
+              : t('{{value}} uptime', { value: statusPill.uptimeDisplay })}
+          </span>
+          <ArrowRight className='size-3.5 opacity-60' aria-hidden='true' />
+        </Link>
 
-          <div
-            className='landing-animate-fade-up mt-8 flex flex-wrap items-center gap-3 opacity-0'
-            style={{ animationDelay: '180ms' }}
-          >
-            {props.isAuthenticated ? (
-              <>
-                <Button
-                  className='group h-11 rounded-lg px-5 text-sm font-medium'
-                  render={<Link to='/dashboard' />}
-                >
-                  {t('Go to Dashboard')}
-                  <ArrowRight className='duration-fast ml-1.5 size-4 transition-transform group-hover:translate-x-0.5' />
-                </Button>
-                {renderDocsButton()}
-              </>
-            ) : (
-              <>
-                <Button
-                  className='group h-11 rounded-lg px-5 text-sm font-medium'
-                  render={<Link to='/sign-up' />}
-                >
-                  {t('Get Started')}
-                  <ArrowRight className='duration-fast ml-1.5 size-4 transition-transform group-hover:translate-x-0.5' />
-                </Button>
-                <Button
-                  variant='outline'
-                  className='border-border/50 hover:border-border hover:bg-muted/50 h-11 rounded-lg px-5 text-sm font-medium'
-                  render={<Link to='/pricing' />}
-                >
-                  {t('View Pricing')}
-                </Button>
-                {renderDocsButton()}
-              </>
-            )}
-          </div>
+        <p
+          className='yb-eyebrow landing-animate-fade-up mb-4 opacity-0'
+          style={{ animationDelay: '40ms' }}
+        >
+          {'// '}
+          {t('One API · 300+ models')}
+        </p>
 
-          {/* Supported Apps (参考图二样式，进行卡片化和信息扩充设计，增加视觉高度) */}
-          <div
-            className='landing-animate-fade-up mt-10 w-full max-w-xl opacity-0'
-            style={{ animationDelay: '240ms' }}
-          >
-            <div className='mb-4 flex flex-col gap-1'>
-              <span className='text-muted-foreground/50 text-[10px] font-bold tracking-[0.15em] uppercase'>
-                {t('Supported Applications')}
-              </span>
-              <p className='text-muted-foreground/60 text-xs leading-relaxed'>
-                {t(
-                  'Supports one-click configuration and perfectly adapts to BoxAI multi-protocol configuration.'
-                )}
-              </p>
-            </div>
-            <div className='flex flex-wrap items-center gap-3'>
-              {/* Cherry Studio */}
-              <a
-                href='https://cherry-ai.com'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='group border-border/40 bg-muted/15 text-foreground/80 hover:border-border hover:bg-muted/30 hover:text-foreground duration-base flex items-center gap-3 rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_1px_2.5px_rgba(0,0,0,0.01)] backdrop-blur-xs transition-all hover:scale-[1.02]'
+        <h1
+          className='font-display landing-animate-fade-up text-[clamp(2.75rem,7vw,4.875rem)] leading-[1.02] font-bold tracking-[-0.04em] opacity-0'
+          style={{ animationDelay: '60ms' }}
+        >
+          {t('Every model,')}
+          <br />
+          {t('one box.')}
+        </h1>
+
+        <p
+          className='landing-animate-fade-up text-muted-foreground mt-5 max-w-[32em] text-base leading-relaxed opacity-0 md:text-xl md:leading-[1.55]'
+          style={{ animationDelay: '120ms' }}
+        >
+          {t(
+            'YouBox is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.'
+          )}
+        </p>
+
+        <div
+          className='landing-animate-fade-up mt-8 flex flex-wrap items-center justify-center gap-3 opacity-0'
+          style={{ animationDelay: '180ms' }}
+        >
+          {props.isAuthenticated ? (
+            <>
+              <Button
+                className='group h-11 rounded-lg px-5 text-sm font-medium'
+                render={<Link to='/dashboard' />}
               >
-                <CherryStudio.Color size={24} className='shrink-0' />
-                <span>Cherry Studio</span>
-              </a>
-
-              {/* CC Switch */}
-              <a
-                href='https://ccswitch.io'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='group border-border/40 bg-muted/15 text-foreground/80 hover:border-border hover:bg-muted/30 hover:text-foreground duration-base flex items-center gap-3 rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_1px_2.5px_rgba(0,0,0,0.01)] backdrop-blur-xs transition-all hover:scale-[1.02]'
+                {t('Go to Dashboard')}
+                <ArrowRight className='ml-1.5 size-4 transition-transform group-hover:translate-x-0.5' />
+              </Button>
+              {renderDocsButton()}
+            </>
+          ) : (
+            <>
+              <Button
+                className='group h-11 rounded-lg px-5 text-sm font-medium'
+                render={<Link to='/sign-up' />}
               >
-                <img
-                  src='https://ccswitch.io/favicon.png'
-                  alt='CC Switch'
-                  className='size-6 shrink-0 rounded-md object-contain'
-                  onError={(e) => {
-                    // Fallback to a styled text avatar if the remote favicon fails to load in sandbox or local environments
-                    e.currentTarget.style.display = 'none'
-                    const fallback = e.currentTarget.nextSibling as HTMLElement
-                    if (fallback) fallback.style.display = 'flex'
-                  }}
-                />
-                <span
-                  style={{ display: 'none' }}
-                  className='text-info bg-info-subtle size-6 shrink-0 items-center justify-center rounded-md text-[10px] font-bold'
-                >
-                  CC
-                </span>
-                <span>CC Switch</span>
-              </a>
-
-              {/* "更多" */}
-              <div className='group border-border/40 bg-muted/15 text-foreground/55 hover:border-border hover:bg-muted/30 hover:text-foreground duration-base flex cursor-default items-center gap-2.5 rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_1px_2.5px_rgba(0,0,0,0.01)] backdrop-blur-xs transition-all hover:scale-[1.02]'>
-                <MoreIcon />
-                <span>{t('More Apps')}</span>
-              </div>
-            </div>
-          </div>
+                {t('Get your API key')}
+                <ArrowRight className='ml-1.5 size-4 transition-transform group-hover:translate-x-0.5' />
+              </Button>
+              {renderDocsButton()}
+            </>
+          )}
         </div>
 
-        {/* Right Column: Hero Terminal API Demo */}
-        <div
-          className='landing-animate-fade-up flex w-full justify-center opacity-0 lg:col-span-6'
-          style={{ animationDelay: '320ms' }}
+        <p
+          className='landing-animate-fade-up text-muted-foreground mt-5 flex items-center justify-center gap-2 text-[13px] opacity-0'
+          style={{ animationDelay: '220ms' }}
         >
-          <HeroTerminalDemo className='mt-8 lg:mt-0' />
+          <CircleCheckBig className='text-success size-[15px]' aria-hidden='true' />
+          {t('No markup on tokens. Drop-in OpenAI-compatible SDK.')}
+        </p>
+
+        <div
+          className='landing-animate-fade-up mt-12 w-full opacity-0'
+          style={{ animationDelay: '280ms' }}
+        >
+          <HeroCodeBlock />
+        </div>
+
+        <div
+          className='landing-animate-fade-up w-full opacity-0'
+          style={{ animationDelay: '340ms' }}
+        >
+          <HeroStatsStrip />
         </div>
       </div>
     </section>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .tnav{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:8px;font-size:13.5px;color:var(--text-secondary);cursor:pointer}
+  .tnav:hover{background:var(--surface-hover);color:var(--text)}
+  .tnav.on{background:var(--surface-2);color:var(--text-strong);font-weight:500}
+  .tnav i{width:16px;height:16px}
+  .setrow{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:18px 0;border-top:1px solid var(--divider)}
+  .setrow .ttl{font-size:14px;font-weight:500;color:var(--text)}
+  .setrow .sub{font-size:13px;color:var(--text-muted);margin-top:3px;line-height:1.5}
+  .grpttl{font-size:13px;font-weight:600;color:var(--text-strong);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="ModelsAdmin.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav on" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <a class="snav" href="Profile.dc.html" style="margin:0;border-top:1px solid var(--border);border-radius:0;padding:12px 18px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></a>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">System settings</div>
+      <div style="flex:1"></div>
+      <button class="yb-btn yb-btn--ghost yb-btn--sm"><span>Discard</span></button>
+      <button class="yb-btn yb-btn--primary yb-btn--sm"><i data-lucide="check"></i><span>Save changes</span></button>
+    </header>
+
+    <div style="display:grid;grid-template-columns:212px 1fr;gap:32px;padding:28px 28px 64px;max-width:1100px">
+      <nav style="position:sticky;top:88px;align-self:start">
+        <div class="sgrp" style="margin-top:0">Settings</div>
+        <a class="tnav" href="SettingsSite.dc.html"><i data-lucide="globe"></i>Site identity</a>
+        <a class="tnav" href="SystemSettings.dc.html"><i data-lucide="shield"></i>Authentication</a>
+        <a class="tnav" href="SettingsBilling.dc.html"><i data-lucide="credit-card"></i>Billing</a>
+        <a class="tnav on" href="SettingsContent.dc.html"><i data-lucide="file-text"></i>Content</a>
+        <a class="tnav" href="SettingsModels.dc.html"><i data-lucide="boxes"></i>Models &amp; routing</a>
+        <a class="tnav" href="SettingsOperations.dc.html"><i data-lucide="server"></i>Operations</a>
+        <a class="tnav" href="SettingsSecurity.dc.html"><i data-lucide="lock"></i>Security</a>
+      </nav>
+
+      <div>
+        <div style="margin-bottom:8px"><h1 style="font-family:var(--font-display);font-size:24px;letter-spacing:-.02em;font-weight:700;margin:0 0 4px;color:var(--text-strong)">Content</h1><p style="font-size:14px;color:var(--text-secondary);margin:0">Announcements, homepage, FAQ, API info, and status integration.</p></div>
+
+        <div class="yb-card" style="margin-top:22px">
+          <div class="grpttl">Announcement banner</div>
+          <div class="setrow"><div><div class="ttl">Show banner</div><div class="sub">Displayed at the top of every page.</div></div><label class="yb-switch"><span class="yb-switch__track" style="background:var(--brand);border-color:transparent"><span class="yb-switch__thumb" style="transform:translateX(17px);background:var(--brand-on)"></span></span></label></div>
+          <div style="padding:16px 0 4px"><textarea class="mono" rows="2" style="width:100%;box-sizing:border-box;background:var(--field-bg);border:1px solid var(--field-border);border-radius:10px;color:var(--text);padding:10px 12px;font-size:13px;outline:none;resize:vertical">🎉 Gemini 3 Pro is now live — route with `google/gemini-3-pro`.</textarea></div>
+        </div>
+
+        <div class="yb-card" style="margin-top:18px">
+          <div class="grpttl">Pages</div>
+          <div class="setrow"><div><div class="ttl">Custom homepage</div><div class="sub">Replace the default landing with Markdown.</div></div><button class="yb-btn yb-btn--secondary yb-btn--sm"><i data-lucide="pencil"></i><span>Edit</span></button></div>
+          <div class="setrow"><div><div class="ttl">FAQ</div><div class="sub">12 entries · shown on the help page.</div></div><button class="yb-btn yb-btn--ghost yb-btn--sm"><span>Manage</span></button></div>
+          <div class="setrow"><div><div class="ttl">API info / About</div><div class="sub">Endpoint docs shown in the console.</div></div><button class="yb-btn yb-btn--ghost yb-btn--sm"><span>Edit</span></button></div>
+          <div class="setrow"><div><div class="ttl">Legal documents</div><div class="sub">Privacy policy &amp; terms of service.</div></div><button class="yb-btn yb-btn--ghost yb-btn--sm"><span>Edit</span></button></div>
+        </div>
+
+        <div class="yb-card" style="margin-top:18px">
+          <div class="grpttl">Integrations</div>
+          <div class="setrow"><div style="display:flex;align-items:center;gap:11px"><span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text);display:flex;align-items:center;justify-content:center"><i data-lucide="activity" style="width:18px;height:18px"></i></span><div><div class="ttl">Uptime Kuma</div><div class="sub mono">status.youbox.dev · connected</div></div></div><label class="yb-switch"><span class="yb-switch__track" style="background:var(--brand);border-color:transparent"><span class="yb-switch__thumb" style="transform:translateX(17px);background:var(--brand-on)"></span></span></label></div>
+          <div class="setrow"><div><div class="ttl">Chat &amp; drawing preset</div><div class="sub">Default model shown in the public playground.</div></div><span class="yb-badge yb-badge--neutral mono">claude-opus-4.6</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

@@ -17,8 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo } from 'react'
-import { useNavigate, useParams, useSearch } from '@tanstack/react-router'
-import { ArrowLeft, Boxes, Code2, Info, LayoutGrid } from 'lucide-react'
+import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router'
+import { ArrowLeft, Boxes, Code2, Info, LayoutGrid, Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { Button } from '@/components/ui/button'
@@ -59,7 +59,10 @@ function SectionTitle(props: { children: React.ReactNode }) {
   )
 }
 
-function ModelHeader(props: { model: PricingModel }) {
+function ModelHeader(props: {
+  model: PricingModel
+  showPlaygroundLink?: boolean
+}) {
   const { t } = useTranslation()
   const model = props.model
   const modelIconKey = model.icon || model.vendor_icon
@@ -92,6 +95,22 @@ function ModelHeader(props: { model: PricingModel }) {
               successTooltip={t('Copied!')}
               aria-label={t('Copy model name')}
             />
+            {props.showPlaygroundLink && model.model_name ? (
+              <Button
+                variant='secondary'
+                size='sm'
+                className='ml-auto gap-1.5'
+                render={
+                  <Link
+                    to='/playground'
+                    search={{ model: model.model_name }}
+                  />
+                }
+              >
+                <Play className='size-3.5' aria-hidden='true' />
+                {t('Open in Playground')}
+              </Button>
+            ) : null}
           </div>
       <div className='mt-1 flex flex-wrap items-center gap-1.5 text-xs'>
         {model.vendor_name && (
@@ -172,7 +191,7 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
 
   return (
     <div className='@container/details space-y-4'>
-      <ModelHeader model={props.model} />
+      <ModelHeader model={props.model} showPlaygroundLink />
 
       <Tabs defaultValue='overview' className='gap-5'>
         <TabsList className='grid h-auto w-full grid-cols-2 gap-1 p-1 @md/details:grid-cols-4'>

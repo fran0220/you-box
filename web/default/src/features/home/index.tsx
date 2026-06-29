@@ -21,7 +21,15 @@ import { useAuthStore } from '@/stores/auth-store'
 import { Markdown } from '@/components/ui/markdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AppShell } from '@/components/layout/components/app-shell'
-import { CTA, Features, Hero, HowItWorks, Stats } from './components'
+import {
+  CTA,
+  Features,
+  Hero,
+  HowItWorks,
+  MarketplacePreview,
+  PricingTiers,
+  Providers,
+} from './components'
 import { useHomePageContent } from './hooks'
 
 export function Home() {
@@ -70,9 +78,11 @@ export function Home() {
   return (
     <AppShell variant='public'>
       <Hero isAuthenticated={isAuthenticated} />
-      <Stats />
+      <Providers />
+      <MarketplacePreview />
       <Features />
       <HowItWorks />
+      <PricingTiers />
       <CTA isAuthenticated={isAuthenticated} />
     </AppShell>
   )

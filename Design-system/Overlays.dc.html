@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .mono{font-family:var(--font-mono)}
+  .lbl{font:500 11px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px}
+  .stage{background:var(--surface-inset);border:1px solid var(--border);border-radius:16px;padding:28px;display:flex;align-items:flex-start;justify-content:center}
+  .ov{background:var(--surface-card);border:1px solid var(--border-strong);border-radius:14px;box-shadow:var(--shadow-lg)}
+  .field input{width:100%;height:40px;box-sizing:border-box;background:var(--field-bg);color:var(--text);border:1px solid var(--field-border);border-radius:10px;font-family:var(--font-sans);font-size:14px;padding:0 12px;outline:none}
+  .field label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
+  .cmdrow{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;font-size:14px;color:var(--text-secondary)}
+  .cmdrow.on{background:var(--surface-2);color:var(--text-strong)}
+  .cmdrow i{width:16px;height:16px;color:var(--text-muted)}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+  .sect{font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:-.02em;color:var(--text-strong);margin:8px 0 18px}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+  <header style="border-bottom:1px solid var(--border)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;gap:12px">
+      <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></a>
+      <span class="mono" style="margin-left:6px;font-size:11px;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);padding:3px 8px;border-radius:999px">overlays &amp; components</span>
+    </div>
+  </header>
+
+  <div style="max-width:1180px;margin:0 auto;padding:36px 28px 72px">
+    <p class="mono" style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 12px">// Component library</p>
+    <h1 style="font-family:var(--font-display);font-size:34px;letter-spacing:-.025em;font-weight:700;margin:0 0 8px;color:var(--text-strong)">Dialogs, drawers &amp; menus</h1>
+    <p style="font-size:16px;color:var(--text-secondary);margin:0 0 32px;max-width:46em">The overlay vocabulary every screen reuses — modals, destructive confirms, side drawers, popovers, the command palette, and toasts.</p>
+
+    <div class="sect">Dialogs &amp; confirms</div>
+    <div class="grid" style="margin-bottom:40px">
+      <div><div class="lbl">Create API key — modal</div><div class="stage">
+        <div class="ov" style="width:100%;max-width:420px;padding:24px">
+          <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:18px"><span style="width:38px;height:38px;border-radius:10px;background:var(--brand-subtle);color:var(--brand);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="key-round" style="width:19px;height:19px"></i></span><div style="flex:1"><div style="font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--text-strong)">Create API key</div><div style="font-size:13px;color:var(--text-muted);margin-top:2px">Generate a new key for the gateway.</div></div><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="x"></i></button></div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="field"><label>Name</label><input value="Production · web"></div>
+            <div><label style="display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px">Monthly limit</label><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="yb-tag yb-tag--active">$2,000</span><span class="yb-tag">$1,000</span><span class="yb-tag">$200</span><span class="yb-tag">Unlimited</span></div></div>
+            <div><label style="display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px">Scopes</label><div style="display:flex;flex-direction:column;gap:9px"><label style="display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text-secondary)"><span style="width:16px;height:16px;border-radius:4px;background:var(--brand);color:var(--brand-on);display:inline-flex;align-items:center;justify-content:center"><i data-lucide="check" style="width:12px;height:12px"></i></span>Chat completions</label><label style="display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text-secondary)"><span style="width:16px;height:16px;border-radius:4px;border:1px solid var(--field-border)"></span>Image generation</label></div></div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:18px;border-top:1px solid var(--divider)"><button class="yb-btn yb-btn--ghost"><span>Cancel</span></button><button class="yb-btn yb-btn--primary"><i data-lucide="plus"></i><span>Create key</span></button></div>
+        </div>
+      </div></div>
+
+      <div><div class="lbl">Destructive confirm — alert</div><div class="stage">
+        <div class="ov" style="width:100%;max-width:380px;padding:24px">
+          <span style="width:40px;height:40px;border-radius:10px;background:var(--danger-subtle);color:var(--danger);display:flex;align-items:center;justify-content:center;margin-bottom:16px"><i data-lucide="triangle-alert" style="width:20px;height:20px"></i></span>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--text-strong);margin-bottom:8px">Revoke this key?</div>
+          <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin:0 0 18px">Any service using <span class="mono" style="color:var(--text)">yb-prod-7f3a••••4e2c</span> will immediately stop working. This can't be undone.</p>
+          <div style="background:var(--surface-inset);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:18px"><div class="mono" style="font-size:12px;color:var(--text-muted)">Type <b style="color:var(--text)">revoke</b> to confirm</div><input class="mono" value="revoke" style="width:100%;box-sizing:border-box;margin-top:8px;height:34px;background:var(--field-bg);border:1px solid var(--field-border);border-radius:8px;color:var(--text);padding:0 10px;font-size:13px;outline:none"></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end"><button class="yb-btn yb-btn--ghost"><span>Cancel</span></button><button class="yb-btn yb-btn--danger"><i data-lucide="trash-2"></i><span>Revoke key</span></button></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="sect">Drawers, popovers &amp; menus</div>
+    <div class="grid">
+      <div style="grid-row:span 2"><div class="lbl">Add channel — side drawer</div><div class="stage" style="justify-content:flex-end;padding:0;background:transparent;border:none">
+        <div class="ov" style="width:100%;max-width:400px;padding:0;overflow:hidden;border-radius:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--divider)"><div><div style="font-family:var(--font-display);font-size:17px;font-weight:600;color:var(--text-strong)">Add channel</div><div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">Connect a new upstream provider.</div></div><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="x"></i></button></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
+            <div class="field"><label>Provider type</label><div style="display:flex;align-items:center;justify-content:space-between;height:40px;padding:0 12px;border:1px solid var(--field-border);border-radius:10px;background:var(--field-bg);font-size:14px;color:var(--text)">Anthropic (native)<i data-lucide="chevron-down" style="width:16px;height:16px;color:var(--text-muted)"></i></div></div>
+            <div class="field"><label>Display name</label><input value="Anthropic Direct"></div>
+            <div class="field"><label>Base URL</label><input class="mono" value="https://api.anthropic.com" style="font-family:var(--font-mono);font-size:13px"></div>
+            <div class="field"><label>API key</label><input class="mono" type="password" value="sk-ant-xxxxxxxx" style="font-family:var(--font-mono);font-size:13px"></div>
+            <div style="display:flex;gap:12px"><div class="field" style="flex:1"><label>Priority</label><input value="8"></div><div class="field" style="flex:1"><label>Weight</label><input value="100"></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13.5px;color:var(--text)">Test connection on save</span><label class="yb-switch"><span class="yb-switch__track" style="background:var(--brand);border-color:transparent"><span class="yb-switch__thumb" style="transform:translateX(17px);background:var(--brand-on)"></span></span></label></div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;padding:16px 20px;border-top:1px solid var(--divider)"><button class="yb-btn yb-btn--ghost"><span>Cancel</span></button><button class="yb-btn yb-btn--primary"><i data-lucide="check"></i><span>Add channel</span></button></div>
+        </div>
+      </div></div>
+
+      <div><div class="lbl">Notifications — popover</div><div class="stage" style="padding:0;background:transparent;border:none">
+        <div class="ov" style="width:100%;max-width:380px;padding:0;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--divider)"><div style="font-size:14px;font-weight:600;color:var(--text-strong)">Notifications</div><a style="font-size:12px;color:var(--text-secondary)">Mark all read</a></div>
+          <div style="display:flex;gap:6px;padding:8px 12px"><span class="yb-tag yb-tag--active">All</span><span class="yb-tag">Unread</span><span class="yb-tag">Billing</span></div>
+          <div style="display:flex;gap:11px;padding:13px 16px;border-top:1px solid var(--divider)"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand);margin-top:5px;flex:none"></span><div><div style="font-size:13px;color:var(--text);line-height:1.4">Balance dropped below <b>$100</b> — auto top-up triggered.</div><div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:3px">12m ago</div></div></div>
+          <div style="display:flex;gap:11px;padding:13px 16px;border-top:1px solid var(--divider)"><span style="width:8px;height:8px;border-radius:50%;background:var(--brand);margin-top:5px;flex:none"></span><div><div style="font-size:13px;color:var(--text);line-height:1.4">Google Vertex degraded — failover engaged.</div><div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:3px">1h ago</div></div></div>
+        </div>
+      </div></div>
+
+      <div><div class="lbl">Command menu — ⌘K</div><div class="stage" style="padding:0;background:transparent;border:none">
+        <div class="ov" style="width:100%;max-width:420px;padding:0;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:11px;padding:15px 18px;border-bottom:1px solid var(--divider)"><i data-lucide="search" style="width:18px;height:18px;color:var(--text-muted)"></i><span style="flex:1;font-size:15px;color:var(--text)">claude</span><span class="mono" style="font-size:11px;color:var(--text-muted);border:1px solid var(--border);border-radius:5px;padding:2px 6px">ESC</span></div>
+          <div style="padding:8px">
+            <div class="mono" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:6px 12px">Models</div>
+            <div class="cmdrow on"><i data-lucide="box"></i><span style="flex:1">Open claude-opus-4.6 in Playground</span><i data-lucide="corner-down-left" style="width:14px;height:14px"></i></div>
+            <div class="cmdrow"><i data-lucide="box"></i><span style="flex:1">View claude-opus-4.6 details</span></div>
+            <div class="mono" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:6px 12px;margin-top:4px">Actions</div>
+            <div class="cmdrow"><i data-lucide="key-round"></i><span style="flex:1">Create API key</span></div>
+            <div class="cmdrow"><i data-lucide="wallet"></i><span style="flex:1">Add credits</span></div>
+          </div>
+        </div>
+      </div></div>
+
+      <div><div class="lbl">Toasts — notifications</div><div class="stage" style="background:transparent;border:none;padding:0;flex-direction:column;gap:12px">
+        <div class="ov" style="width:100%;display:flex;align-items:flex-start;gap:11px;padding:14px 16px"><span style="width:30px;height:30px;border-radius:8px;background:var(--success-subtle);color:var(--success);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="check" style="width:16px;height:16px"></i></span><div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:var(--text-strong)">Key created</div><div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">Production · web is now active.</div></div><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="x"></i></button></div>
+        <div class="ov" style="width:100%;display:flex;align-items:flex-start;gap:11px;padding:14px 16px"><span style="width:30px;height:30px;border-radius:8px;background:var(--danger-subtle);color:var(--danger);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="circle-x" style="width:16px;height:16px"></i></span><div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:var(--text-strong)">Payment failed</div><div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">Card declined — try another method.</div></div><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="x"></i></button></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

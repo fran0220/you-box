@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .preset{flex:1;text-align:center;padding:14px 0;border:1px solid var(--field-border);border-radius:12px;background:var(--surface-2);cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text)}
+  .preset.on{border-color:var(--brand);background:var(--brand-subtle);color:var(--brand)}
+  .trow{display:grid;grid-template-columns:auto 1fr auto auto;gap:16px;align-items:center;padding:14px 18px;border-top:1px solid var(--divider)}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav on" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="Marketplace.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <div style="border-top:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:10px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div><button class="yb-iconbtn yb-iconbtn--sm" aria-label="Account"><i data-lucide="chevron-down"></i></button></div>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Wallet</div>
+      <div style="flex:1"></div>
+      <button class="yb-iconbtn" aria-label="Notifications"><i data-lucide="bell"></i></button>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <div style="padding:28px 28px 64px;max-width:1120px">
+      <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:16px;margin-bottom:16px">
+        <!-- balance -->
+        <div class="yb-card yb-card--pad-lg" style="display:flex;flex-direction:column">
+          <span class="yb-stat__label">Current balance</span>
+          <div style="font-family:var(--font-display);font-size:52px;font-weight:700;letter-spacing:-.035em;color:var(--text-strong);margin:10px 0 4px">$842.10</div>
+          <div class="mono" style="font-size:12px;color:var(--text-muted)">≈ 18 days at your current burn rate</div>
+          <div style="display:flex;gap:24px;margin-top:24px;padding-top:18px;border-top:1px solid var(--divider)">
+            <div class="yb-stat" ><span class="yb-stat__label">Spent (mo)</span><span class="yb-stat__value" style="font-size:20px">$1,158</span></div>
+            <div class="yb-stat"><span class="yb-stat__label">Auto top-up</span><span class="yb-stat__value" style="font-size:20px">On</span></div>
+          </div>
+        </div>
+        <!-- add credits -->
+        <div class="yb-card yb-card--pad-lg">
+          <div style="font-size:14px;font-weight:600;color:var(--text-strong);margin-bottom:14px">Add credits</div>
+          <div style="display:flex;gap:10px;margin-bottom:14px"><div class="preset">$10</div><div class="preset on">$25</div><div class="preset">$50</div><div class="preset">$100</div></div>
+          <div class="yb-field" style="margin-bottom:16px"><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="dollar-sign"></i></span><input class="yb-input yb-input--with-icon mono" value="25.00"></div></div>
+          <div style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px">Payment method</div>
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--brand-border);background:var(--brand-subtle);border-radius:10px;font-size:13px;color:var(--text)"><i data-lucide="credit-card" style="width:15px;height:15px"></i>•••• 4242</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--field-border);border-radius:10px;font-size:13px;color:var(--text-secondary)"><i data-lucide="plus" style="width:15px;height:15px"></i>New card</div>
+          </div>
+          <button class="yb-btn yb-btn--primary yb-btn--block yb-btn--lg"><i data-lucide="lock"></i><span>Pay $25.00 securely</span></button>
+        </div>
+      </div>
+
+      <!-- auto topup -->
+      <div class="yb-card" style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:14px"><span style="width:40px;height:40px;border-radius:10px;background:var(--brand-subtle);color:var(--brand);display:flex;align-items:center;justify-content:center"><i data-lucide="repeat" style="width:19px;height:19px"></i></span><div><div style="font-size:14px;font-weight:600;color:var(--text-strong)">Auto top-up</div><div style="font-size:13px;color:var(--text-secondary)">When balance drops below <b style="color:var(--text)">$100</b>, automatically add <b style="color:var(--text)">$50</b>.</div></div></div>
+        <label class="yb-switch"><span class="yb-switch__track" style="background:var(--brand);border-color:transparent"><span class="yb-switch__thumb" style="transform:translateX(17px);background:var(--brand-on)"></span></span></label>
+      </div>
+
+      <!-- transactions -->
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--divider)"><div style="font-size:14px;font-weight:600;color:var(--text-strong)">Transactions</div><button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="download"></i><span>Export CSV</span></button></div>
+        <div class="trow"><span style="width:34px;height:34px;border-radius:9px;background:var(--success-subtle);color:var(--success);display:flex;align-items:center;justify-content:center"><i data-lucide="arrow-down-left" style="width:16px;height:16px"></i></span><div><div style="font-size:14px;color:var(--text);font-weight:500">Credit top-up</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Visa •••• 4242 · Jun 26, 14:20</div></div><span class="yb-badge yb-badge--success" >Paid</span><span class="mono" style="color:var(--text);font-weight:600">+$25.00</span></div>
+        <div class="trow"><span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;justify-content:center"><i data-lucide="zap" style="width:16px;height:16px"></i></span><div><div style="font-size:14px;color:var(--text);font-weight:500">Usage · claude-opus-4.6</div><div class="mono" style="font-size:11px;color:var(--text-muted)">8.2M tokens · Jun 26</div></div><span></span><span class="mono" style="color:var(--text-secondary)">−$18.42</span></div>
+        <div class="trow"><span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;justify-content:center"><i data-lucide="zap" style="width:16px;height:16px"></i></span><div><div style="font-size:14px;color:var(--text);font-weight:500">Usage · gpt-5.2</div><div class="mono" style="font-size:11px;color:var(--text-muted)">3.9M tokens · Jun 25</div></div><span></span><span class="mono" style="color:var(--text-secondary)">−$9.76</span></div>
+        <div class="trow"><span style="width:34px;height:34px;border-radius:9px;background:var(--success-subtle);color:var(--success);display:flex;align-items:center;justify-content:center"><i data-lucide="repeat" style="width:16px;height:16px"></i></span><div><div style="font-size:14px;color:var(--text);font-weight:500">Auto top-up</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Visa •••• 4242 · Jun 22</div></div><span class="yb-badge yb-badge--success">Paid</span><span class="mono" style="color:var(--text);font-weight:600">+$50.00</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:880},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

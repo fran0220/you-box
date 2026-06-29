@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .eyb{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 14px}
+  .grp{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:0 0 14px;display:flex;align-items:center;gap:10px}
+  .grp::after{content:"";flex:1;height:1px;background:var(--divider)}
+  .pc{display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface-card);border:1px solid var(--border);border-radius:14px}
+  .pc:hover{border-color:var(--brand-border);box-shadow:var(--glow-brand)}
+  .pc .ic{width:40px;height:40px;border-radius:10px;background:var(--brand-subtle);color:var(--brand);display:flex;align-items:center;justify-content:center;flex:none}
+  .pc .ic i{width:19px;height:19px}
+  .pc .nm{font-size:14px;font-weight:600;color:var(--text-strong)}
+  .pc .ds{font-size:12.5px;color:var(--text-muted);margin-top:2px}
+  .pc .ar{color:var(--text-faint)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:40px}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <header style="border-bottom:1px solid var(--border)">
+    <div class="wrap" style="height:64px;display:flex;align-items:center;gap:12px">
+      <span style="display:inline-flex;width:28px;height:28px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:17px;height:17px"></i></span>
+      <span style="font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em;color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span>
+      <span style="margin-left:8px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);padding:3px 8px;border-radius:999px">redesign prototypes</span>
+    </div>
+  </header>
+
+  <section style="padding:56px 0 36px">
+    <div class="wrap">
+      <p class="eyb">// Design system · YouBox</p>
+      <h1 style="font-family:var(--font-display);font-size:42px;letter-spacing:-.03em;font-weight:700;margin:0 0 12px;color:var(--text-strong);max-width:18em">Every page, rebuilt on the YouBox system.</h1>
+      <p style="font-size:17px;color:var(--text-secondary);line-height:1.6;margin:0;max-width:42em">A complete static redesign of the gateway — marketing, auth, console, and admin — in the dark-first monochrome design system. Each screen is its own prototype; flip the <b style="color:var(--text)">theme</b> tweak to preview light mode.</p>
+    </div>
+  </section>
+
+  <section style="padding:8px 0 64px">
+    <div class="wrap">
+
+      <div class="grp">Marketing</div>
+      <div class="grid">
+        <a class="pc" href="Home.dc.html"><span class="ic"><i data-lucide="house"></i></span><div style="flex:1"><div class="nm">Home</div><div class="ds">Landing · hero, marketplace, pricing</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Marketplace.dc.html"><span class="ic"><i data-lucide="boxes"></i></span><div style="flex:1"><div class="nm">Marketplace</div><div class="ds">Browse 312 models · filters</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="ModelDetail.dc.html"><span class="ic"><i data-lucide="box"></i></span><div style="flex:1"><div class="nm">Model detail</div><div class="ds">Providers, pricing, quick call</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Rankings.dc.html"><span class="ic"><i data-lucide="trophy"></i></span><div style="flex:1"><div class="nm">Rankings</div><div class="ds">Most-used models leaderboard</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Apps.dc.html"><span class="ic"><i data-lucide="layout-grid"></i></span><div style="flex:1"><div class="nm">App rankings</div><div class="ds">Top apps by token usage</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="About.dc.html"><span class="ic"><i data-lucide="info"></i></span><div style="flex:1"><div class="nm">About</div><div class="ds">Mission, principles, stats</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Status.dc.html"><span class="ic"><i data-lucide="activity"></i></span><div style="flex:1"><div class="nm">Status</div><div class="ds">API &amp; provider health board</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Legal.dc.html"><span class="ic"><i data-lucide="scale"></i></span><div style="flex:1"><div class="nm">Legal</div><div class="ds">Privacy, terms · sticky TOC</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Docs.dc.html"><span class="ic"><i data-lucide="book-open"></i></span><div style="flex:1"><div class="nm">Docs</div><div class="ds">API reference · quickstart</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+      </div>
+
+      <div class="grp">Authentication</div>
+      <div class="grid">
+        <a class="pc" href="SignIn.dc.html"><span class="ic"><i data-lucide="log-in"></i></span><div style="flex:1"><div class="nm">Sign in</div><div class="ds">Split layout · OAuth grid</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="SignUp.dc.html"><span class="ic"><i data-lucide="user-plus"></i></span><div style="flex:1"><div class="nm">Sign up</div><div class="ds">Create account · testimonial</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="ForgotPassword.dc.html"><span class="ic"><i data-lucide="key-round"></i></span><div style="flex:1"><div class="nm">Forgot password</div><div class="ds">Single-card reset flow</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Otp.dc.html"><span class="ic"><i data-lucide="shield-check"></i></span><div style="flex:1"><div class="nm">2FA / OTP</div><div class="ds">Code entry · passkey option</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="ResetPassword.dc.html"><span class="ic"><i data-lucide="lock-keyhole"></i></span><div style="flex:1"><div class="nm">Reset password</div><div class="ds">Set a new password</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="OAuthCallback.dc.html"><span class="ic"><i data-lucide="git-pull-request-arrow"></i></span><div style="flex:1"><div class="nm">OAuth callback</div><div class="ds">Connecting · success · denied</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+      </div>
+
+      <div class="grp">Console</div>
+      <div class="grid">
+        <a class="pc" href="Dashboard.dc.html"><span class="ic"><i data-lucide="layout-dashboard"></i></span><div style="flex:1"><div class="nm">Dashboard</div><div class="ds">Spend, requests, charts</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Analytics.dc.html"><span class="ic"><i data-lucide="chart-column"></i></span><div style="flex:1"><div class="nm">Analytics</div><div class="ds">Per-model &amp; per-user breakdown</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="ApiKeys.dc.html"><span class="ic"><i data-lucide="key-round"></i></span><div style="flex:1"><div class="nm">API keys</div><div class="ds">Create, manage, revoke</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Wallet.dc.html"><span class="ic"><i data-lucide="wallet"></i></span><div style="flex:1"><div class="nm">Wallet</div><div class="ds">Balance, top-up, transactions</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="UsageLogs.dc.html"><span class="ic"><i data-lucide="scroll-text"></i></span><div style="flex:1"><div class="nm">Usage logs</div><div class="ds">Request-level trace table</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Playground.dc.html"><span class="ic"><i data-lucide="flask-conical"></i></span><div style="flex:1"><div class="nm">Playground</div><div class="ds">Prompt + params rail</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Chat.dc.html"><span class="ic"><i data-lucide="messages-square"></i></span><div style="flex:1"><div class="nm">Chat</div><div class="ds">Conversations · threads</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Profile.dc.html"><span class="ic"><i data-lucide="user-round"></i></span><div style="flex:1"><div class="nm">Profile</div><div class="ds">Account, security, sessions</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="ApiTools.dc.html"><span class="ic"><i data-lucide="wand-sparkles"></i></span><div style="flex:1"><div class="nm">API tools</div><div class="ds">Embeddings · image · rerank</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="TaskLogs.dc.html"><span class="ic"><i data-lucide="image"></i></span><div style="flex:1"><div class="nm">Tasks &amp; drawing</div><div class="ds">Async jobs · webhook callbacks</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Chat2Link.dc.html"><span class="ic"><i data-lucide="link"></i></span><div style="flex:1"><div class="nm">Chat handoff</div><div class="ds">Shared conversation link</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+      </div>
+
+      <div class="grp">Admin &amp; system</div>
+      <div class="grid">
+        <a class="pc" href="Channels.dc.html"><span class="ic"><i data-lucide="cable"></i></span><div style="flex:1"><div class="nm">Channels</div><div class="ds">Upstream provider health</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Users.dc.html"><span class="ic"><i data-lucide="users"></i></span><div style="flex:1"><div class="nm">Users</div><div class="ds">Roles, groups, quotas</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="SystemSettings.dc.html"><span class="ic"><i data-lucide="settings"></i></span><div style="flex:1"><div class="nm">System settings</div><div class="ds">Auth, billing, security</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="SettingsSite.dc.html"><span class="ic"><i data-lucide="globe"></i></span><div style="flex:1"><div class="nm">Settings · Site</div><div class="ds">Branding, nav, display</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="SettingsBilling.dc.html"><span class="ic"><i data-lucide="credit-card"></i></span><div style="flex:1"><div class="nm">Settings · Billing</div><div class="ds">Quota, ratios, payments</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="SettingsContent.dc.html"><span class="ic"><i data-lucide="file-text"></i></span><div style="flex:1"><div class="nm">Settings · Content</div><div class="ds">Announcements, pages, FAQ</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="SettingsModels.dc.html"><span class="ic"><i data-lucide="boxes"></i></span><div style="flex:1"><div class="nm">Settings · Models</div><div class="ds">Routing, affinity, adapters</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="SettingsOperations.dc.html"><span class="ic"><i data-lucide="server"></i></span><div style="flex:1"><div class="nm">Settings · Operations</div><div class="ds">Cache, workers, logs, backups</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="SettingsSecurity.dc.html"><span class="ic"><i data-lucide="lock"></i></span><div style="flex:1"><div class="nm">Settings · Security</div><div class="ds">Rate limits, filters, SSRF</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Setup.dc.html"><span class="ic"><i data-lucide="rocket"></i></span><div style="flex:1"><div class="nm">Setup wizard</div><div class="ds">First-run · stepper</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="ErrorPages.dc.html"><span class="ic"><i data-lucide="triangle-alert"></i></span><div style="flex:1"><div class="nm">Error pages</div><div class="ds">404 · 500 · 503 · 403</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="ModelsAdmin.dc.html"><span class="ic"><i data-lucide="boxes"></i></span><div style="flex:1"><div class="nm">Models admin</div><div class="ds">Metadata, ratios, deployments</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Subscriptions.dc.html"><span class="ic"><i data-lucide="badge-dollar-sign"></i></span><div style="flex:1"><div class="nm">Subscriptions</div><div class="ds">Plan, usage, invoices</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="RedemptionCodes.dc.html"><span class="ic"><i data-lucide="ticket"></i></span><div style="flex:1"><div class="nm">Redemption codes</div><div class="ds">Generate &amp; track codes</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+        <a class="pc" href="Overlays.dc.html"><span class="ic"><i data-lucide="layers"></i></span><div style="flex:1"><div class="nm">Overlays &amp; components</div><div class="ds">Dialogs, drawers, menus, toasts</div></div><i data-lucide="arrow-up-right" class="ar"></i></a>
+      </div>
+
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid var(--border);padding:28px 0"><div class="wrap" style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--text-muted)"><span>42 screens · YouBox Design System</span><span style="font-family:var(--font-mono);font-size:11px">// every model, one box</span></div></footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1120,&quot;height&quot;:880},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

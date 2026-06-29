@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 28px}
+  .eyb{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 14px}
+  a{text-decoration:none;color:inherit}
+  .navlink{font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-secondary);padding:8px 12px;border-radius:6px}
+  .navlink:hover{color:var(--text);background:var(--surface-hover)}
+  .navlink.on{color:var(--text-strong)}
+  .mono{font-family:var(--font-mono)}
+  .uptime{display:flex;gap:2px;align-items:flex-end;height:30px}
+  .uptime span{flex:1;height:100%;border-radius:2px;background:var(--success);min-width:2px}
+  .uptime span.d{background:var(--warning)}
+  .uptime span.o{background:var(--danger)}
+  .srow{display:flex;align-items:center;gap:16px;padding:16px 20px;border-top:1px solid var(--divider)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <header style="position:sticky;top:0;z-index:200;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--border)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;gap:28px">
+      <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong);font-weight:700">Box</b></span></a>
+      <nav style="display:flex;align-items:center;gap:2px;margin-left:6px"><a class="navlink" href="Marketplace.dc.html">Models</a><a class="navlink" href="Rankings.dc.html">Rankings</a><a class="navlink" href="Docs.dc.html">Docs</a><a class="navlink" href="Marketplace.dc.html">Pricing</a><a class="navlink on" href="Status.dc.html">Status</a></nav>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px"><button class="yb-iconbtn" aria-label="Toggle theme"><i data-lucide="sun"></i></button><a class="yb-btn yb-btn--ghost yb-btn--sm" href="SignIn.dc.html"><span>Sign in</span></a><a class="yb-btn yb-btn--primary yb-btn--sm" href="SignUp.dc.html"><span>Get API key</span></a></div>
+    </div>
+  </header>
+
+  <section style="padding:48px 0 64px">
+    <div class="wrap">
+      <p class="eyb">// System status</p>
+
+      <!-- overall banner -->
+      <div style="display:flex;align-items:center;gap:18px;padding:24px 26px;border:1px solid var(--brand-border);border-radius:16px;background:var(--surface-card);box-shadow:var(--glow-soft);margin-bottom:14px">
+        <span style="width:48px;height:48px;border-radius:12px;background:var(--success-subtle);color:var(--success);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="circle-check-big" style="width:24px;height:24px"></i></span>
+        <div style="flex:1"><div style="font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--text-strong)">All systems operational</div><div class="mono" style="font-size:12px;color:var(--text-muted);margin-top:4px">Last checked 38 seconds ago · auto-refresh on</div></div>
+        <a class="yb-btn yb-btn--secondary yb-btn--sm" href="#"><i data-lucide="bell"></i><span>Subscribe</span></a>
+      </div>
+
+      <!-- metric strip -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px">
+        <div class="yb-card"><span class="yb-stat__label">Uptime (90d)</span><div class="yb-stat__value" style="margin-top:8px">99.98<span class="yb-stat__unit">%</span></div></div>
+        <div class="yb-card"><span class="yb-stat__label">Gateway latency</span><div class="yb-stat__value" style="margin-top:8px">42<span class="yb-stat__unit">ms</span></div></div>
+        <div class="yb-card"><span class="yb-stat__label">Error rate (24h)</span><div class="yb-stat__value" style="margin-top:8px">0.02<span class="yb-stat__unit">%</span></div></div>
+        <div class="yb-card"><span class="yb-stat__label">Open incidents</span><div class="yb-stat__value" style="margin-top:8px">0</div></div>
+      </div>
+
+      <!-- core services -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-.01em;margin:0;color:var(--text-strong)">Core services</h2><span class="mono" style="font-size:11px;color:var(--text-muted)">90-day history</span></div>
+      <div class="yb-card" style="padding:0;overflow:hidden;margin-bottom:32px">
+        <div class="srow" style="border-top:none">
+          <span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="route" style="width:17px;height:17px"></i></span>
+          <div style="width:200px;flex:none"><div style="font-size:14px;font-weight:500;color:var(--text)">API gateway</div><div class="mono" style="font-size:11px;color:var(--text-muted)">api.youbox.dev/v1</div></div>
+          <div class="uptime" style="flex:1"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right;flex:none">100%</span>
+          <span class="yb-badge yb-badge--success" ><span class="yb-badge__dot"></span>Operational</span>
+        </div>
+        <div class="srow">
+          <span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="layout-dashboard" style="width:17px;height:17px"></i></span>
+          <div style="width:200px;flex:none"><div style="font-size:14px;font-weight:500;color:var(--text)">Dashboard &amp; console</div><div class="mono" style="font-size:11px;color:var(--text-muted)">app.youbox.dev</div></div>
+          <div class="uptime" style="flex:1"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="d"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right;flex:none">99.99%</span>
+          <span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Operational</span>
+        </div>
+        <div class="srow">
+          <span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="credit-card" style="width:17px;height:17px"></i></span>
+          <div style="width:200px;flex:none"><div style="font-size:14px;font-weight:500;color:var(--text)">Billing &amp; payments</div><div class="mono" style="font-size:11px;color:var(--text-muted)">stripe · creem</div></div>
+          <div class="uptime" style="flex:1"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right;flex:none">100%</span>
+          <span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Operational</span>
+        </div>
+        <div class="srow">
+          <span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="webhook" style="width:17px;height:17px"></i></span>
+          <div style="width:200px;flex:none"><div style="font-size:14px;font-weight:500;color:var(--text)">Webhooks &amp; events</div><div class="mono" style="font-size:11px;color:var(--text-muted)">events.youbox.dev</div></div>
+          <div class="uptime" style="flex:1"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="d"></span><span class="d"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right;flex:none">99.96%</span>
+          <span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Operational</span>
+        </div>
+      </div>
+
+      <!-- providers -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-.01em;margin:0;color:var(--text-strong)">Upstream providers</h2><span class="mono" style="font-size:11px;color:var(--text-muted)">routed capacity</span></div>
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="srow" style="border-top:none"><span class="yb-avatar yb-avatar--sm" style="background:#565663">An</span><div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--text)">Anthropic</div><div class="mono" style="font-size:11px;color:var(--text-muted)">8 models · 0.41s median</div></div><span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right">100%</span><span class="yb-badge yb-badge--success" ><span class="yb-badge__dot"></span>Operational</span></div>
+        <div class="srow"><span class="yb-avatar yb-avatar--sm" style="background:#3B3B47">Op</span><div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--text)">OpenAI</div><div class="mono" style="font-size:11px;color:var(--text-muted)">14 models · 0.50s median</div></div><span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right">99.99%</span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Operational</span></div>
+        <div class="srow"><span class="yb-avatar yb-avatar--sm" style="background:#8B9097">Go</span><div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--text)">Google Vertex</div><div class="mono" style="font-size:11px;color:var(--text-muted)">18 models · 1.12s median</div></div><span class="mono" style="font-size:12px;color:var(--warning);width:54px;text-align:right">99.41%</span><span class="yb-badge yb-badge--warning" ><span class="yb-badge__dot"></span>Degraded</span></div>
+        <div class="srow"><span class="yb-avatar yb-avatar--sm" style="background:#74747F">Me</span><div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--text)">Meta / Bedrock</div><div class="mono" style="font-size:11px;color:var(--text-muted)">22 models · 0.55s median</div></div><span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right">99.96%</span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Operational</span></div>
+        <div class="srow"><span class="yb-avatar yb-avatar--sm" style="background:#807C75">De</span><div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--text)">DeepSeek</div><div class="mono" style="font-size:11px;color:var(--text-muted)">4 models · 0.44s median</div></div><span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right">100%</span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Operational</span></div>
+        <div class="srow"><span class="yb-avatar yb-avatar--sm" style="background:#A7ABB1">Mi</span><div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--text)">Mistral AI</div><div class="mono" style="font-size:11px;color:var(--text-muted)">7 models · 0.98s median</div></div><span class="mono" style="font-size:12px;color:var(--warning);width:54px;text-align:right">99.62%</span><span class="yb-badge yb-badge--warning"><span class="yb-badge__dot"></span>Degraded</span></div>
+        <div class="srow"><span class="yb-avatar yb-avatar--sm" style="background:#565663">Co</span><div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--text)">Cohere</div><div class="mono" style="font-size:11px;color:var(--text-muted)">5 models · 0.39s median</div></div><span class="mono" style="font-size:12px;color:var(--text);width:54px;text-align:right">100%</span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>Operational</span></div>
+      </div>
+
+      <!-- incidents -->
+      <div style="margin-top:32px;margin-bottom:14px"><h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-.01em;margin:0;color:var(--text-strong)">Recent incidents</h2></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="yb-card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span class="yb-badge yb-badge--warning" >Degraded</span><span style="font-size:14px;font-weight:600;color:var(--text-strong)">Elevated latency on Google Vertex</span><span style="flex:1"></span><span class="mono" style="font-size:11px;color:var(--text-muted)">Jun 26 · 09:12 UTC</span></div><p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin:0">Vertex endpoints in us-central1 showed elevated p95 latency. YouBox auto-failover routed Gemini traffic to Vertex europe-west4 with no request errors. Monitoring continues.</p></div>
+        <div class="yb-card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span class="yb-badge yb-badge--success" >Resolved</span><span style="font-size:14px;font-weight:600;color:var(--text-strong)">Webhook delivery delays</span><span style="flex:1"></span><span class="mono" style="font-size:11px;color:var(--text-muted)">Jun 21 · 14:40 UTC</span></div><p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin:0">A queue backlog delayed event delivery by up to 4 minutes for 22 minutes. No events were dropped. Root cause was a Redis failover; capacity has been increased.</p></div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid var(--border);padding:32px 0"><div class="wrap" style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--text-muted)"><span>© 2026 YouBox, Inc.</span><span class="mono" style="font-size:11px">// status.youbox.dev</span></div></footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1040,&quot;height&quot;:880},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>
