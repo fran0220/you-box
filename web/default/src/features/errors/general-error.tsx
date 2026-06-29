@@ -21,6 +21,7 @@ import { ServerCrash } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { getHttpStatus } from './lib/http-status'
 import { ErrorPageShell } from './error-page-shell'
 
 const FEEDBACK_URL = '/about'
@@ -28,14 +29,6 @@ const FEEDBACK_URL = '/about'
 type GeneralErrorProps = React.HTMLAttributes<HTMLDivElement> & {
   minimal?: boolean
   error?: unknown
-}
-
-function getHttpStatus(error: unknown): number | undefined {
-  if (typeof error !== 'object' || error === null) return undefined
-  const response = (error as Record<string, unknown>).response
-  if (typeof response !== 'object' || response === null) return undefined
-  const status = (response as Record<string, unknown>).status
-  return typeof status === 'number' ? status : undefined
 }
 
 export function GeneralError({
@@ -57,10 +50,17 @@ export function GeneralError({
 
   if (minimal) {
     return (
-      <div className={cn('h-svh w-full', className)}>
-        <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
-          <span className='font-medium'>{title}</span>
-          <p className='text-muted-foreground text-center'>
+      <div
+        className={cn(
+          'bg-background text-foreground flex h-svh w-full items-center justify-center px-6',
+          className
+        )}
+      >
+        <div className='flex max-w-md flex-col items-center gap-2 text-center'>
+          <span className='font-display text-text-strong font-semibold'>
+            {title}
+          </span>
+          <p className='text-text-secondary text-center text-sm leading-relaxed'>
             {t('We apologize for the inconvenience.')} <br /> {description}
           </p>
         </div>
