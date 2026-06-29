@@ -20,22 +20,23 @@ import { useQuery } from '@tanstack/react-query'
 import { Construction } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { sanitizeHtml } from '@/lib/sanitize'
+import { cn } from '@/lib/utils'
 import { Markdown } from '@/components/ui/markdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AppShell } from '@/components/layout'
+import { EmptyState } from '@/components/youbox/empty-state'
 import { getAboutContent } from './api'
+import { resolveAboutContentMode } from './lib/about-content'
 
-function isValidUrl(value: string) {
-  try {
-    const url = new URL(value)
-    return url.protocol === 'http:' || url.protocol === 'https:'
-  } catch {
-    return false
-  }
-}
-
-function isLikelyHtml(value: string) {
-  return /<\/?[a-z][\s\S]*>/i.test(value)
+function AboutLoadingSkeleton() {
+  return (
+    <div className='mx-auto flex w-full max-w-[1000px] flex-col gap-4 px-7 py-12'>
+      <Skeleton className='h-8 w-[45%]' />
+      <Skeleton className='h-4 w-full' />
+      <Skeleton className='h-4 w-[90%]' />
+      <Skeleton className='h-4 w-[80%]' />
+    </div>
+  )
 }
 
 function EmptyAboutState() {
@@ -43,37 +44,57 @@ function EmptyAboutState() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <div className='flex min-h-[60vh] items-center justify-center p-8'>
-      <div className='max-w-2xl space-y-6 text-center'>
-        <div className='flex justify-center'>
-          <Construction className='text-muted-foreground h-24 w-24' />
-        </div>
-        <div className='space-y-2'>
-          <h2 className='text-2xl font-bold'>{t('No About Content Set')}</h2>
-          <p className='text-muted-foreground'>
-            {t(
-              'The administrator has not configured any about content yet. You can set it in the settings page, supporting HTML or URL.'
-            )}
-          </p>
-        </div>
-        <div className='space-y-4 text-sm'>
-          <p className='text-muted-foreground'>
-            {t('BoxAI')} © {currentYear}
-          </p>
-          <p className='text-muted-foreground'>
-            {t('This project must be used in compliance with the')}{' '}
-            <a
-              href='/about'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-primary hover:underline'
-            >
-              {t('AGPL v3.0 License')}
-            </a>
-            .
-          </p>
-        </div>
+    <div className='mx-auto flex w-full max-w-2xl flex-col items-center justify-center px-7 py-16'>
+      <EmptyState
+        icon={Construction}
+        title={t('No About Content Set')}
+        description={t(
+          'The administrator has not configured any about content yet. You can set it in the settings page, supporting HTML or URL.'
+        )}
+        className='min-h-0 py-8'
+      />
+      <div className='border-border bg-card mt-2 w-full max-w-lg space-y-4 rounded-lg border border-dashed px-6 py-8 text-center text-sm'>
+        <p className='text-muted-foreground'>
+          {t('BoxAI')} © {currentYear}
+        </p>
+        <p className='text-muted-foreground'>
+          {t('This project must be used in compliance with the')}{' '}
+          <a
+            href='/about'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='text-brand font-medium hover:underline'
+          >
+            {t('AGPL v3.0 License')}
+          </a>
+          .
+        </p>
       </div>
+    </div>
+  )
+}
+
+function AboutContentPanel(props: {
+  mode: 'html' | 'markdown'
+  rawContent: string
+}) {
+  return (
+    <div
+      className={cn(
+        'bg-card border-border mx-auto w-full max-w-[1000px] rounded-lg border',
+        'px-6 py-8 md:px-10 md:py-10'
+      )}
+    >
+      {props.mode === 'html' ? (
+        <div
+          className='prose prose-neutral dark:prose-invert font-sans max-w-none'
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(props.rawContent) }}
+        />
+      ) : (
+        <Markdown className='prose-neutral dark:prose-invert font-sans max-w-none'>
+          {props.rawContent}
+        </Markdown>
+      )}
     </div>
   )
 }
@@ -86,24 +107,17 @@ export function About() {
   })
 
   const rawContent = data?.data?.trim() ?? ''
-  const hasContent = rawContent.length > 0
-  const isUrl = hasContent && isValidUrl(rawContent)
-  const isHtml = hasContent && !isUrl && isLikelyHtml(rawContent)
+  const mode = resolveAboutContentMode(rawContent)
 
   if (isLoading) {
     return (
       <AppShell variant='public'>
-        <div className='flex flex-col gap-4 py-6'>
-          <Skeleton className='h-8 w-[45%]' />
-          <Skeleton className='h-4 w-full' />
-          <Skeleton className='h-4 w-[90%]' />
-          <Skeleton className='h-4 w-[80%]' />
-        </div>
+        <AboutLoadingSkeleton />
       </AppShell>
     )
   }
 
-  if (!hasContent) {
+  if (mode === 'empty') {
     return (
       <AppShell variant='public'>
         <EmptyAboutState />
@@ -111,7 +125,7 @@ export function About() {
     )
   }
 
-  if (isUrl) {
+  if (mode === 'url') {
     return (
       <AppShell variant='public'>
         <iframe
@@ -125,19 +139,8 @@ export function About() {
 
   return (
     <AppShell variant='public'>
-      <div className='py-2'>
-        <div className='bg-card border-border mx-auto max-w-6xl rounded-lg border p-6 md:p-10'>
-          {isHtml ? (
-            <div
-              className='prose prose-neutral dark:prose-invert max-w-none'
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(rawContent) }}
-            />
-          ) : (
-            <Markdown className='prose-neutral dark:prose-invert max-w-none'>
-              {rawContent}
-            </Markdown>
-          )}
-        </div>
+      <div className='px-7 py-10 md:py-12'>
+        <AboutContentPanel mode={mode} rawContent={rawContent} />
       </div>
     </AppShell>
   )
