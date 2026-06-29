@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { describe, expect, it } from 'vitest'
-import { loginFormSchema } from './constants'
+import { loginFormSchema, registerFormSchema, forgotPasswordFormSchema } from './constants'
 
 describe('loginFormSchema', () => {
   it('rejects empty username and password', () => {
@@ -60,6 +60,77 @@ describe('loginFormSchema', () => {
     const result = loginFormSchema.safeParse({
       username: 'root',
       password: 'rootpassword42',
+    })
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('registerFormSchema', () => {
+  it('rejects empty fields', () => {
+    const result = registerFormSchema.safeParse({
+      username: '',
+      password: '',
+      confirmPassword: '',
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects password shorter than 8 characters', () => {
+    const result = registerFormSchema.safeParse({
+      username: 'newuser',
+      password: 'short',
+      confirmPassword: 'short',
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.some((i) => i.path[0] === 'password')).toBe(
+        true
+      )
+    }
+  })
+
+  it('rejects password longer than 20 characters', () => {
+    const result = registerFormSchema.safeParse({
+      username: 'newuser',
+      password: 'a'.repeat(21),
+      confirmPassword: 'a'.repeat(21),
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects mismatched confirm password', () => {
+    const result = registerFormSchema.safeParse({
+      username: 'newuser',
+      password: 'ValidPass1!',
+      confirmPassword: 'ValidPass2!',
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(
+        result.error.issues.some((i) => i.path[0] === 'confirmPassword')
+      ).toBe(true)
+    }
+  })
+
+  it('accepts valid registration payload', () => {
+    const result = registerFormSchema.safeParse({
+      username: 'newuser',
+      password: 'ValidPass1!',
+      confirmPassword: 'ValidPass1!',
+    })
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('forgotPasswordFormSchema', () => {
+  it('rejects invalid email', () => {
+    const result = forgotPasswordFormSchema.safeParse({ email: 'not-an-email' })
+    expect(result.success).toBe(false)
+  })
+
+  it('accepts valid email', () => {
+    const result = forgotPasswordFormSchema.safeParse({
+      email: 'user@example.com',
     })
     expect(result.success).toBe(true)
   })

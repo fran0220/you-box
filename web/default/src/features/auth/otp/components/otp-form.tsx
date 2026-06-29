@@ -204,7 +204,7 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
             type='button'
             variant='link'
             size='sm'
-            className='text-primary h-auto p-0'
+            className='text-foreground h-auto p-0 underline-offset-4 hover:opacity-80'
             onClick={handleToggleMode}
           >
             {useBackupCode ? t('Use authenticator code') : t('Use backup code')}
@@ -214,7 +214,7 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
             type='button'
             variant='link'
             size='sm'
-            className='text-primary h-auto p-0'
+            className='text-foreground h-auto p-0 underline-offset-4 hover:opacity-80'
             onClick={handleBackToLogin}
           >
             {t('Back to login')}
