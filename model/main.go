@@ -294,6 +294,10 @@ func migrateDB() error {
 		&CustomOAuthProvider{},
 		&UserOAuthBinding{},
 		&PerfMetric{},
+		&SystemTask{},
+		&SystemInstance{},
+		&SystemTask{},
+		&SystemTaskLock{},
 	}, youBoxMigrationModels()...)
 	err := DB.AutoMigrate(migrationModels...)
 	if err != nil {
@@ -344,6 +348,9 @@ func migrateDBFast() error {
 		{&CustomOAuthProvider{}, "CustomOAuthProvider"},
 		{&UserOAuthBinding{}, "UserOAuthBinding"},
 		{&PerfMetric{}, "PerfMetric"},
+		{&SystemInstance{}, "SystemInstance"},
+		{&SystemTask{}, "SystemTask"},
+		{&SystemTaskLock{}, "SystemTaskLock"},
 	}
 	migrations = append(migrations, youBoxMigrationSpecs()...)
 	// 动态计算migration数量，确保errChan缓冲区足够大
