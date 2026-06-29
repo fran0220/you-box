@@ -1,0 +1,24 @@
+{
+  "fr": {
+    "Disabled plans are hidden from customers.": "Les forfaits désactivés sont masqués pour les clients.",
+    "End": "Fin",
+    "Exact subscription length in seconds.": "Durée exacte de l'abonnement en secondes.",
+    "Let customers pay for this plan using their account balance.": "Permettre aux clients de payer ce forfait avec le solde de leur compte.",
+    "Pay": "Payer",
+    "minutes": "minutes"
+  },
+  "ja": {
+    "Pay": "支払う"
+  },
+  "ru": {
+    "End": "Конец",
+    "Pay": "Оплатить"
+  },
+  "vi": {
+    "Disabled plans are hidden from customers.": "Các gói đã vô hiệu hóa sẽ ẩn với khách hàng.",
+    "End": "Kết thúc",
+    "Exact subscription length in seconds.": "Thời hạn đăng ký chính xác tính bằng giây.",
+    "Let customers pay for this plan using their account balance.": "Cho phép khách hàng thanh toán gói này bằng số dư tài khoản.",
+    "Pay": "Thanh toán"
+  }
+}

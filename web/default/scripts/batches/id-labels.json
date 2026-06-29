@@ -1,0 +1,32 @@
+{
+  "zh": {
+    "Discord ID": "Discord 用户 ID",
+    "GitHub ID": "GitHub 用户 ID",
+    "Telegram ID": "Telegram 用户 ID",
+    "WeChat ID": "微信 ID"
+  },
+  "fr": {
+    "Discord ID": "ID Discord",
+    "GitHub ID": "ID GitHub",
+    "Telegram ID": "ID Telegram",
+    "WeChat ID": "ID WeChat"
+  },
+  "ja": {
+    "Discord ID": "Discord ID",
+    "GitHub ID": "GitHub ID",
+    "Telegram ID": "Telegram ID",
+    "WeChat ID": "WeChat ID"
+  },
+  "ru": {
+    "Discord ID": "ID Discord",
+    "GitHub ID": "ID GitHub",
+    "Telegram ID": "ID Telegram",
+    "WeChat ID": "ID WeChat"
+  },
+  "vi": {
+    "Discord ID": "ID Discord",
+    "GitHub ID": "ID GitHub",
+    "Telegram ID": "ID Telegram",
+    "WeChat ID": "ID WeChat"
+  }
+}

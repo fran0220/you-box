@@ -1,0 +1,23 @@
+{
+  "zh": {
+    "Are you sure you want to manually complete this order? The user will be credited with the corresponding quota.": "您确定要手动完成此订单吗？用户将获得相应的额度。",
+    "Redemption successful! Added: {{quota}}": "兑换成功！已添加：{{quota}}"
+  },
+  "fr": {
+    "10 / page": "10 par page",
+    "20 / page": "20 par page",
+    "50 / page": "50 par page",
+    "100 / page": "100 par page",
+    "Enter your redemption code": "Saisir votre code de réduction",
+    "Quota": "Quota",
+    "Redeem code": "Code de réduction",
+    "Transactions": "Transactions"
+  },
+  "vi": {
+    "Amount to pay:": "Số tiền cần thanh toán:",
+    "Balance": "Số dư"
+  },
+  "ru": {
+    "Complete Order": "Завершить заказ"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "zh": {
+    "Applications ranked by token usage, attributed via the HTTP-Referer and X-Title request headers.": "按令牌用量排名的应用，依据 HTTP-Referer 和 X-Title 请求头归因。",
+    "Tokens": "令牌"
+  },
+  "vi": {
+    "Tokens": "Token"
+  }
+}

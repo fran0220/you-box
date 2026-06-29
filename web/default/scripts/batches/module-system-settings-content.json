@@ -1,0 +1,13 @@
+{
+  "zh": {
+    "Configure API documentation links for the dashboard": "配置仪表盘的 API 文档链接",
+    "Configure monitoring status page groups for the dashboard": "配置仪表盘的监控状态页分组",
+    "Create or update system announcements for the dashboard": "创建或更新仪表盘系统公告",
+    "Enable Data Dashboard": "启用数据仪表盘",
+    "How to reset my quota?": "如何重置我的额度？",
+    "Visit Settings → General and adjust quota options...": "前往「设置 → 通用」调整额度选项…"
+  },
+  "vi": {
+    "Add": "Thêm"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "zh": {
+    "Query": "查询",
+    "Size": "尺寸",
+    "tokens": "令牌"
+  },
+  "fr": {
+    "Query": "Requête",
+    "Size": "Taille"
+  },
+  "ja": {
+    "Query": "クエリ",
+    "Size": "サイズ"
+  },
+  "ru": {
+    "Query": "Запрос",
+    "Size": "Размер"
+  },
+  "vi": {
+    "Query": "Truy vấn",
+    "Rerank": "Xếp hạng lại",
+    "Size": "Kích thước",
+    "tokens": "token"
+  }
+}

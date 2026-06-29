@@ -1,0 +1,50 @@
+{
+  "en": {
+    "Decrement": "Decrement",
+    "Increment": "Increment",
+    "Scroll to bottom": "Scroll to bottom",
+    "Delete row": "Delete row",
+    "Remove tag": "Remove tag",
+    "Edit group": "Edit group"
+  },
+  "zh": {
+    "Decrement": "减少",
+    "Increment": "增加",
+    "Scroll to bottom": "滚动到底部",
+    "Delete row": "删除行",
+    "Remove tag": "移除标签",
+    "Edit group": "编辑分组"
+  },
+  "fr": {
+    "Decrement": "Diminuer",
+    "Increment": "Augmenter",
+    "Scroll to bottom": "Faire défiler vers le bas",
+    "Delete row": "Supprimer la ligne",
+    "Remove tag": "Supprimer l'étiquette",
+    "Edit group": "Modifier le groupe"
+  },
+  "ja": {
+    "Decrement": "減らす",
+    "Increment": "増やす",
+    "Scroll to bottom": "一番下までスクロール",
+    "Delete row": "行を削除",
+    "Remove tag": "タグを削除",
+    "Edit group": "グループを編集"
+  },
+  "ru": {
+    "Decrement": "Уменьшить",
+    "Increment": "Увеличить",
+    "Scroll to bottom": "Прокрутить вниз",
+    "Delete row": "Удалить строку",
+    "Remove tag": "Удалить тег",
+    "Edit group": "Редактировать группу"
+  },
+  "vi": {
+    "Decrement": "Giảm",
+    "Increment": "Tăng",
+    "Scroll to bottom": "Cuộn xuống cuối",
+    "Delete row": "Xóa hàng",
+    "Remove tag": "Xóa thẻ",
+    "Edit group": "Chỉnh sửa nhóm"
+  }
+}

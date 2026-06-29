@@ -1,0 +1,10 @@
+{
+  "zh": {
+    "{{count}} incidents in the last 24 hours": "最近 24 小时 {{count}} 起事件",
+    "{{tokens}}+ tokens": "{{tokens}}+ 令牌",
+    "{{value}} tokens": "{{value}} 令牌",
+    "Data Dashboard": "仪表盘",
+    "Dashboard Preferences": "仪表盘偏好设置",
+    "Data dashboard module is disabled": "仪表盘模块已禁用"
+  }
+}

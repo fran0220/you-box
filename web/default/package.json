@@ -15,6 +15,11 @@
     "copyright:check": "node scripts/add-copyright.mjs --check",
     "copyright": "node scripts/add-copyright.mjs",
     "i18n:sync": "node scripts/sync-i18n.mjs",
+    "i18n:keys-by-feature": "node scripts/i18n-keys-by-feature.mjs",
+    "i18n:page-audit": "node scripts/i18n-page-audit.mjs",
+    "i18n:find-hardcoded": "node scripts/i18n-find-hardcoded.mjs",
+    "i18n:apply": "node scripts/i18n-apply-translations.mjs",
+    "i18n:apply-all": "node scripts/i18n-apply-all-batches.mjs",
     "knip": "knip",
     "test": "vitest run --passWithNoTests"
   },

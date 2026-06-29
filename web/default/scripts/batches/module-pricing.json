@@ -1,0 +1,43 @@
+{
+  "zh": {
+    "Average TTFT": "平均首令牌延迟",
+    "Open in Playground": "在试用区中打开",
+    "Provider notes": "提供商说明",
+    "Refine the catalog by provider, model type, price, and more.": "按提供商、模型类型、价格等筛选目录。",
+    "Sustained tokens per second": "持续每秒令牌数",
+    "Token unit": "令牌单位",
+    "Total tokens": "总令牌数",
+    "with the API key from your token settings.": "替换为令牌设置中的 API 密钥。"
+  },
+  "fr": {
+    "Filter options": "Options de filtre",
+    "Filter options...": "Options de filtre…",
+    "Incidents": "Incidents",
+    "Latency short": "Lat.",
+    "Maximum prompt price": "Prix maximum du prompt",
+    "Show less": "Afficher moins",
+    "Show {{count}} more": "Afficher {{count}} de plus",
+    "Open in Playground": "Ouvrir dans le bac à sable"
+  },
+  "ja": {
+    "Open in Playground": "プレイグラウンドで開く"
+  },
+  "ru": {
+    "No models found.": "Модели не найдены.",
+    "Open in Playground": "Открыть в песочнице"
+  },
+  "vi": {
+    "All Types": "Tất cả loại",
+    "Filter options": "Tùy chọn lọc",
+    "Filter options...": "Tùy chọn lọc…",
+    "Maximum prompt price": "Giá prompt tối đa",
+    "Search models...": "Tìm kiếm mô hình…",
+    "Show less": "Thu gọn",
+    "Show {{count}} more": "Hiển thị thêm {{count}}",
+    "Sustained tokens per second": "Số token duy trì mỗi giây",
+    "Token": "token",
+    "tokens": "token",
+    "Vendor": "Nhà cung cấp",
+    "Open in Playground": "Mở trong khu thử nghiệm"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "zh": {
+    "Passkey": "通行密钥"
+  },
+  "fr": {
+    "Fair password": "Mot de passe correct",
+    "Good password": "Bon mot de passe",
+    "Passkey verification failed": "Échec de la vérification Passkey",
+    "Strong password": "Mot de passe fort",
+    "Weak password": "Mot de passe faible"
+  },
+  "vi": {
+    "Fair password": "Mật khẩu trung bình",
+    "Good password": "Mật khẩu tốt",
+    "Passkey verification failed": "Xác minh Passkey thất bại",
+    "Strong password": "Mật khẩu mạnh",
+    "Weak password": "Mật khẩu yếu"
+  }
+}

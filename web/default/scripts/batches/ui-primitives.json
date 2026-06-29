@@ -1,0 +1,32 @@
+{
+  "en": {
+    "Breadcrumb": "Breadcrumb",
+    "Pagination": "Pagination",
+    "More pages": "More pages"
+  },
+  "zh": {
+    "Breadcrumb": "面包屑导航",
+    "Pagination": "分页",
+    "More pages": "更多页面"
+  },
+  "fr": {
+    "Breadcrumb": "Fil d'Ariane",
+    "Pagination": "Pagination",
+    "More pages": "Plus de pages"
+  },
+  "ja": {
+    "Breadcrumb": "パンくずリスト",
+    "Pagination": "ページネーション",
+    "More pages": "さらにページ"
+  },
+  "ru": {
+    "Breadcrumb": "Навигационная цепочка",
+    "Pagination": "Пагинация",
+    "More pages": "Больше страниц"
+  },
+  "vi": {
+    "Breadcrumb": "Đường dẫn",
+    "Pagination": "Phân trang",
+    "More pages": "Thêm trang"
+  }
+}
