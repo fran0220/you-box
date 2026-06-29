@@ -69,7 +69,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   ]
 
   return (
-    <div className='grid h-svh grid-cols-1 lg:grid-cols-[1fr_0.85fr]'>
+    <div className='bg-background text-foreground grid min-h-svh h-svh grid-cols-1 lg:grid-cols-[1fr_0.85fr]'>
       {/* Form column */}
       <div className='relative flex items-center justify-center overflow-y-auto px-4 py-10 sm:px-8'>
         <div className='absolute top-4 left-4 sm:top-8 sm:left-8'>{brand}</div>

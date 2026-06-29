@@ -1951,6 +1951,8 @@
     "Forest Whisper": "フォレストウィスパー",
     "Forgot password": "パスワードを忘れた場合",
     "Forgot password?": "パスワードをお忘れですか？",
+    "Show password": "パスワードを表示",
+    "Hide password": "パスワードを非表示",
     "Form reset to saved values": "フォームが保存された値にリセットされました",
     "Format": "形式",
     "Format JSON": "JSONをフォーマット",
