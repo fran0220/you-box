@@ -256,7 +256,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
       to='/pricing/$modelId'
       params={{ modelId: props.model.model_name }}
       search={(prev: Record<string, unknown>) => prev}
-      className='group block h-full outline-none'
+      className='group block h-full rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]'
     >
       <YouboxModelCard
         interactive

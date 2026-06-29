@@ -76,9 +76,9 @@ export function Features(_props: FeaturesProps) {
             <div className='border-brand-border bg-brand-subtle flex size-16 items-center justify-center rounded-2xl border'>
               <Shield className='text-brand/80 size-7' strokeWidth={1.5} />
             </div>
-            <div className='bg-brand text-brand-on absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full'>
+            <div className='bg-brand text-brand-foreground absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full'>
               <svg
-                className='size-2.5 text-white'
+                className='size-2.5'
                 fill='none'
                 viewBox='0 0 24 24'
                 stroke='currentColor'

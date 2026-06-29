@@ -17,13 +17,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useQuery } from '@tanstack/react-query'
-import { Construction } from 'lucide-react'
+import { AlertCircle, Construction } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { sanitizeHtml } from '@/lib/sanitize'
 import { cn } from '@/lib/utils'
 import { Markdown } from '@/components/ui/markdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AppShell } from '@/components/layout'
+import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/youbox/empty-state'
 import { getAboutContent } from './api'
 import { resolveAboutContentMode } from './lib/about-content'
@@ -35,6 +36,28 @@ function AboutLoadingSkeleton() {
       <Skeleton className='h-4 w-full' />
       <Skeleton className='h-4 w-[90%]' />
       <Skeleton className='h-4 w-[80%]' />
+    </div>
+  )
+}
+
+function AboutErrorState(props: { onRetry: () => void }) {
+  const { t } = useTranslation()
+
+  return (
+    <div className='mx-auto flex w-full max-w-2xl flex-col items-center justify-center px-7 py-16'>
+      <EmptyState
+        icon={AlertCircle}
+        title={t('Failed to load about content')}
+        description={t(
+          'Something went wrong while loading this page. Please try again.'
+        )}
+        className='min-h-0 py-8'
+        action={
+          <Button variant='secondary' onClick={() => props.onRetry()}>
+            {t('Try again')}
+          </Button>
+        }
+      />
     </div>
   )
 }
@@ -101,7 +124,7 @@ function AboutContentPanel(props: {
 
 export function About() {
   const { t } = useTranslation()
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['about-content'],
     queryFn: getAboutContent,
   })
@@ -113,6 +136,14 @@ export function About() {
     return (
       <AppShell variant='public'>
         <AboutLoadingSkeleton />
+      </AppShell>
+    )
+  }
+
+  if (isError) {
+    return (
+      <AppShell variant='public'>
+        <AboutErrorState onRetry={() => void refetch()} />
       </AppShell>
     )
   }
