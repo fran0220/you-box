@@ -218,10 +218,10 @@ func (a *Adaptor) SetupRequestHeader(c *gin.Context, header *http.Header, info *
 	}
 	if info.ChannelType == constant.ChannelTypeOpenRouter {
 		if header.Get("HTTP-Referer") == "" {
-			header.Set("HTTP-Referer", "https://api.you-box.com")
+			header.Set("HTTP-Referer", common.OpenRouterReferer())
 		}
 		if header.Get("X-OpenRouter-Title") == "" {
-			header.Set("X-OpenRouter-Title", "BoxAI")
+			header.Set("X-OpenRouter-Title", common.OpenRouterTitle())
 		}
 	}
 	return nil
@@ -632,7 +632,7 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycom
 		if info.IsStream {
 			usage, err = OpenaiImageStreamHandler(c, info, resp)
 		} else {
-			usage, err = OpenaiHandlerWithUsage(c, info, resp)
+			usage, err = OpenaiImageHandler(c, info, resp)
 		}
 	case relayconstant.RelayModeRerank:
 		usage, err = common_handler.RerankHandler(c, info, resp)
