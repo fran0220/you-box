@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, CircleCheckBig } from 'lucide-react'
 import { m, useReducedMotion, useScroll, useTransform } from 'motion/react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useStatus } from '@/hooks/use-status'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -120,9 +120,10 @@ export function Hero(props: HeroProps) {
           className='font-display landing-animate-fade-up text-[clamp(2.75rem,7vw,4.875rem)] leading-[1.02] font-bold tracking-[-0.04em] opacity-0'
           style={{ animationDelay: '60ms' }}
         >
-          {t('Every model,')}
-          <br />
-          {t('one box.')}
+          <Trans
+            i18nKey='Hero headline'
+            components={{ br: <br /> }}
+          />
         </h1>
 
         <p

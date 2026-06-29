@@ -103,6 +103,8 @@ For commercial licensing, please contact support@quantumnous.com
   --color-surface-hover: var(--surface-hover);
   --color-surface-inset: var(--surface-inset);
   --color-text-strong: var(--text-strong);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-faint: var(--text-faint);
   --color-field: var(--field-bg);
   --color-field-border: var(--field-border);
   --color-code: var(--code-bg);

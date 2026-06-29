@@ -426,7 +426,7 @@ function SidebarGroupLabel({
     props: mergeProps<'div'>(
       {
         className: cn(
-          'text-faint font-mono flex h-8 shrink-0 items-center rounded-md px-[11px] text-[10px] font-medium tracking-[0.1em] uppercase ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-base ease-out group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+          'text-[var(--text-faint)] font-mono flex h-8 shrink-0 items-center rounded-md px-[11px] text-[10px] font-medium tracking-[0.1em] uppercase ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-base ease-out group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
           className
         ),
       },
@@ -501,7 +501,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<'li'>) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button group/menu-button text-secondary flex w-full items-center gap-[11px] overflow-hidden rounded-lg px-[11px] py-2 text-left text-[13.5px] font-medium ring-sidebar-ring outline-hidden transition-[width,height,padding,background-color,color] duration-fast ease-out group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-surface-hover hover:text-foreground focus-visible:ring-2 active:bg-surface-hover active:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-surface-hover data-open:hover:text-foreground data-active:bg-surface-2 data-active:font-medium data-active:text-strong [&_svg]:size-[17px] [&_svg]:shrink-0 [&>span:last-child]:truncate',
+  'peer/menu-button group/menu-button text-sidebar-foreground flex w-full items-center gap-[11px] overflow-hidden rounded-lg px-[11px] py-2 text-left text-[13.5px] font-medium ring-sidebar-ring outline-hidden transition-[width,height,padding,background-color,color] duration-fast ease-out group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-surface-hover hover:text-foreground focus-visible:ring-2 active:bg-surface-hover active:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-surface-hover data-open:hover:text-foreground data-active:bg-surface-2 data-active:font-medium data-active:text-strong [&_svg]:size-[17px] [&_svg]:shrink-0 [&>span:last-child]:truncate',
   {
     variants: {
       variant: {
@@ -707,7 +707,7 @@ function SidebarMenuSubButton({
     props: mergeProps<'a'>(
       {
         className: cn(
-          'text-secondary flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-lg px-2 ring-sidebar-ring outline-hidden group-data-[collapsible=icon]:hidden hover:bg-surface-hover hover:text-foreground focus-visible:ring-2 active:bg-surface-hover active:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm data-[size=sm]:text-xs data-active:bg-surface-2 data-active:font-medium data-active:text-strong [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
+          'text-sidebar-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-lg px-2 ring-sidebar-ring outline-hidden group-data-[collapsible=icon]:hidden hover:bg-surface-hover hover:text-foreground focus-visible:ring-2 active:bg-surface-hover active:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm data-[size=sm]:text-xs data-active:bg-surface-2 data-active:font-medium data-active:text-strong [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
           className
         ),
       },

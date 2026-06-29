@@ -503,8 +503,7 @@ export const STATIC_I18N_KEYS = [
   'Every month',
 
   // Home hero (design-system gap closure)
-  'Every model,',
-  'one box.',
+  'Hero headline',
   'One API · 300+ models',
   'YouBox is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.',
   'Get your API key',
