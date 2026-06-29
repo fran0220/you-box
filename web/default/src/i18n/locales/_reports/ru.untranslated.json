@@ -1,7 +1,6 @@
 {
   "Active ({{count}})": "Active ({{count}})",
   "Any length": "Any length",
-  "Any price": "Any price",
   "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
   "BoxAI <noreply@example.com>": "BoxAI <noreply@example.com>",
   "by {{vendor}}": "by {{vendor}}",
@@ -59,8 +58,6 @@
   "Per hour": "Per hour",
   "Please fix the highlighted fields": "Please fix the highlighted fields",
   "Please wait for the current generation to complete": "Please wait for the current generation to complete",
-  "Prompt pricing": "Prompt pricing",
-  "Providers": "Providers",
   "Redemption Details": "Redemption Details",
   "Refine the catalog by provider, modality, price, and more.": "Refine the catalog by provider, modality, price, and more.",
   "Remove filter: {{label}}": "Remove filter: {{label}}",

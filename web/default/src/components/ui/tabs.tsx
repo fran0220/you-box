@@ -116,7 +116,13 @@ function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
   return (
     <TabsPrimitive.Panel
       data-slot='tabs-content'
-      className={cn('flex-1 text-sm outline-none', className)}
+      className={cn(
+        'flex-1 text-sm outline-none',
+        // Base UI keeps inactive panels mounted with `hidden`; ensure they never
+        // participate in layout (VAL-PRICING-018 stacking).
+        'data-[hidden]:hidden',
+        className
+      )}
       {...props}
     />
   )

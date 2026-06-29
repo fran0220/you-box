@@ -173,15 +173,15 @@ export function Footer(props: FooterProps) {
         links: [
           {
             text: t('footer.columns.docs.links.quickStart'),
-            href: '/api-docs',
+            href: '/docs',
           },
           {
             text: t('footer.columns.docs.links.installation'),
-            href: '/api-docs',
+            href: '/docs',
           },
           {
             text: t('footer.columns.docs.links.apiDocs'),
-            href: '/api-docs',
+            href: '/docs',
           },
         ],
       },

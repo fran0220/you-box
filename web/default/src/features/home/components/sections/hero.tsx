@@ -51,7 +51,7 @@ export function Hero(props: HeroProps) {
   const { scrollY } = useScroll()
   // Subtle parallax: the brand glow drifts down as the page scrolls (depth cue).
   const glowY = useTransform(scrollY, [0, 600], [0, 120])
-  const docsUrl = (status?.docs_link as string | undefined) || '/api-docs'
+  const docsUrl = (status?.docs_link as string | undefined) || '/docs'
 
   const renderDocsButton = () => {
     const isExternal = docsUrl.startsWith('http')
