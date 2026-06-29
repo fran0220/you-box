@@ -39,7 +39,7 @@ func SetApiRouter(router *gin.Engine) {
 			perfMetricsRoute.GET("", controller.GetPerfMetrics)
 		}
 		apiRouter.GET("/rankings", middleware.HeaderNavModuleAuth("rankings"), controller.GetRankings)
-		apiRouter.GET("/apps", middleware.HeaderNavModuleAuth("rankings"), controller.GetAppRankings)
+		registerYouBoxRoutes(apiRouter)
 		apiRouter.GET("/verification", middleware.EmailVerificationRateLimit(), middleware.TurnstileCheck(), controller.SendEmailVerification)
 		apiRouter.GET("/reset_password", middleware.CriticalRateLimit(), middleware.TurnstileCheck(), controller.SendPasswordResetEmail)
 		apiRouter.POST("/user/reset", middleware.CriticalRateLimit(), anonymousRequestBodyLimit, controller.ResetPassword)
@@ -281,16 +281,6 @@ func SetApiRouter(router *gin.Engine) {
 			tokenRoute.DELETE("/:id", controller.DeleteToken)
 			tokenRoute.POST("/batch", controller.DeleteTokenBatch)
 			tokenRoute.POST("/batch/keys", middleware.CriticalRateLimit(), middleware.DisableCache(), controller.GetTokenKeysBatch)
-		}
-		// Playground presets (saved model + parameter configurations), scoped
-		// to the requesting user.
-		presetRoute := apiRouter.Group("/preset")
-		presetRoute.Use(middleware.UserAuth())
-		{
-			presetRoute.GET("/", controller.GetUserPresets)
-			presetRoute.POST("/", controller.CreatePreset)
-			presetRoute.PUT("/:id", controller.UpdatePreset)
-			presetRoute.DELETE("/:id", controller.DeletePreset)
 		}
 
 		usageRoute := apiRouter.Group("/usage")

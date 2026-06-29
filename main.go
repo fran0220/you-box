@@ -19,7 +19,6 @@ import (
 	"github.com/QuantumNous/new-api/middleware"
 	"github.com/QuantumNous/new-api/model"
 	"github.com/QuantumNous/new-api/oauth"
-	"github.com/QuantumNous/new-api/pkg/appusage"
 	perfmetrics "github.com/QuantumNous/new-api/pkg/perf_metrics"
 	"github.com/QuantumNous/new-api/relay"
 	"github.com/QuantumNous/new-api/router"
@@ -114,11 +113,7 @@ func main() {
 	// Subscription quota reset task (daily/weekly/monthly/custom)
 	service.StartSubscriptionQuotaResetTask()
 
-	// API key recurring spend-limit reset task (daily/weekly/monthly)
-	service.StartTokenSpendLimitResetTask()
-
-	// Auto top-up balance monitoring (low-balance alerts)
-	service.StartAutoTopUpTask()
+	service.StartYouBoxBackgroundTasks()
 
 	// Wire task polling adaptor factory (breaks service -> relay import cycle)
 	service.GetTaskAdaptorFunc = func(platform constant.TaskPlatform) service.TaskPollingAdaptor {
@@ -305,7 +300,7 @@ func InitResources() error {
 	}
 
 	perfmetrics.Init()
-	appusage.Init()
+	service.InitYouBoxRuntimeResources()
 
 	// 启动系统监控
 	common.StartSystemMonitor()

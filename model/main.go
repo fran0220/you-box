@@ -255,7 +255,7 @@ func migrateDB() error {
 		return err
 	}
 
-	err := DB.AutoMigrate(
+	migrationModels := append([]interface{}{
 		&Channel{},
 		&Token{},
 		&User{},
@@ -281,9 +281,8 @@ func migrateDB() error {
 		&CustomOAuthProvider{},
 		&UserOAuthBinding{},
 		&PerfMetric{},
-		&Preset{},
-		&AppUsage{},
-	)
+	}, youBoxMigrationModels()...)
+	err := DB.AutoMigrate(migrationModels...)
 	if err != nil {
 		return err
 	}
@@ -332,9 +331,8 @@ func migrateDBFast() error {
 		{&CustomOAuthProvider{}, "CustomOAuthProvider"},
 		{&UserOAuthBinding{}, "UserOAuthBinding"},
 		{&PerfMetric{}, "PerfMetric"},
-		{&Preset{}, "Preset"},
-		{&AppUsage{}, "AppUsage"},
 	}
+	migrations = append(migrations, youBoxMigrationSpecs()...)
 	// 动态计算migration数量，确保errChan缓冲区足够大
 	errChan := make(chan error, len(migrations))
 
