@@ -5,7 +5,6 @@ import { describe, expect, test } from 'vitest'
 import {
   DEFAULT_THEME_CUSTOMIZATION,
   MONOCHROME_THEME_PRESET,
-  resolveThemeFont,
   THEME_PRESET_VALUES,
 } from './theme-customization'
 
@@ -19,10 +18,5 @@ describe('theme-customization', () => {
 
   test('default customization uses monochrome preset', () => {
     expect(DEFAULT_THEME_CUSTOMIZATION.preset).toBe(MONOCHROME_THEME_PRESET)
-  })
-
-  test('resolveThemeFont maps default to sans on monochrome canvas', () => {
-    expect(resolveThemeFont('default')).toBe('sans')
-    expect(resolveThemeFont('serif')).toBe('serif')
   })
 })

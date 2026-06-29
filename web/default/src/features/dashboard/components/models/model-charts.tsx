@@ -60,7 +60,7 @@ export function ModelCharts(props: ModelChartsProps) {
   const { customization } = useThemeCustomization()
   const chartRadius = useThemeRadiusPx(
     '--radius-md',
-    `${customization.preset}:${customization.radius}`
+    `${customization.preset}:${resolvedTheme}`
   )
   const [activeTab, setActiveTab] = useState<ModelAnalyticsChartTab>(
     props.defaultChartTab ?? 'trend'

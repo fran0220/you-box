@@ -283,7 +283,7 @@ export function ThroughputBarChart(props: {
   const { customization } = useThemeCustomization()
   const barRadius = useThemeRadiusPx(
     '--radius-sm',
-    `${customization.preset}:${customization.radius}`
+    `${customization.preset}:${resolvedTheme}`
   )
 
   const filtered = useMemo(

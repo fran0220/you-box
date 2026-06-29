@@ -14,6 +14,7 @@ export const DESIGN_LAB_GALLERY_MARKER_IDS = [
   'tabs-pill',
   'tabs-line',
   'table',
+  'dialog-marker',
   'dialog',
   'tooltip',
   'popover',

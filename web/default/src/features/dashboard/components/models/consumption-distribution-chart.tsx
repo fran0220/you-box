@@ -62,7 +62,7 @@ export function ConsumptionDistributionChart(
   const { customization } = useThemeCustomization()
   const chartRadius = useThemeRadiusPx(
     '--radius-md',
-    `${customization.preset}:${customization.radius}`
+    `${customization.preset}:${resolvedTheme}`
   )
   const [chartType, setChartType] = useState<ConsumptionDistributionChartType>(
     props.defaultChartType ?? 'bar'

@@ -10,7 +10,9 @@ and more) from one unified app shell.
 
 - **Framework**: React 19 + TypeScript
 - **Bundler / dev server**: Rsbuild (Rspack), config in `rsbuild.config.ts`
-- **UI**: Base UI primitives + Tailwind CSS v4, `cn()` for class merging
+- **UI**: YouBox monochrome design system (tokens in `src/styles/theme.css`),
+  reskinned `src/components/ui/*` primitives, high-level `src/components/youbox/*`
+  compositions, Base UI + Tailwind CSS v4, `cn()` for class merging
 - **Routing**: TanStack Router (file-based routes under `src/routes`, search
   params validated with Zod)
 - **Data**: TanStack Query + axios (`@/lib/api`), Zustand for client state
@@ -98,7 +100,14 @@ bun run build      # production build to dist/
 bun run typecheck  # tsc -b
 bun run lint       # eslint .
 bun run test       # vitest run --passWithNoTests
+bun run knip       # unused files/deps audit (cleanup gate)
 ```
+
+In development, `/design-lab` is an acceptance gallery for UI primitives and
+YouBox compositions (`import.meta.env.DEV` only). Theme is class-based
+(`.dark` default) via `src/context/theme-provider.tsx` (not `next-themes`).
+User-adjustable layout prefs are density and content width only
+(`theme-presets.css`).
 
 `bun run dev` starts the Rsbuild dev server, which proxies backend paths
 (`/api`, `/api/*`, `/mj`, `/mj/*`, `/pg`, `/pg/*`) to the Go backend. The

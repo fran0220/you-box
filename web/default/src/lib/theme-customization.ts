@@ -19,11 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 /**
  * Theme customization constants and types.
  *
- * Lives in `lib/` (not `context/`) so it can be imported alongside the
- * provider without breaking React Fast Refresh boundaries.
- *
- * Color/radius preset axes are frozen under the monochrome YouBox canvas;
- * only layout/density/font preferences remain user-selectable.
+ * Color, radius, and font are fixed on the YouBox monochrome canvas (`theme.css`).
+ * Only density and content layout remain user-selectable.
  */
 
 /** Monochrome canvas identity; legacy colorful preset cookies map here. */
@@ -31,33 +28,17 @@ export const MONOCHROME_THEME_PRESET = 'default' as const
 
 export type ThemePreset = typeof MONOCHROME_THEME_PRESET
 
-export type ThemeRadius = 'default' | 'none' | 'sm' | 'md' | 'lg' | 'xl'
 export type ThemeScale = 'default' | 'sm' | 'lg' | 'xl'
 export type ContentLayout = 'full' | 'centered'
 
-/**
- * Font axis for the theme.
- *
- * - `default` — resolves to sans on the monochrome canvas.
- * - `sans` — humanist sans (Public Sans).
- * - `serif` — editorial serif (Lora + CJK fallbacks).
- */
-export type ThemeFont = 'default' | 'sans' | 'serif'
-
-export type ResolvedThemeFont = Exclude<ThemeFont, 'default'>
-
 export type ThemeCustomization = {
   preset: ThemePreset
-  font: ThemeFont
-  radius: ThemeRadius
   scale: ThemeScale
   contentLayout: ContentLayout
 }
 
 export const DEFAULT_THEME_CUSTOMIZATION: ThemeCustomization = {
   preset: MONOCHROME_THEME_PRESET,
-  font: 'default',
-  radius: 'default',
   scale: 'default',
   contentLayout: 'full',
 }
@@ -65,21 +46,6 @@ export const DEFAULT_THEME_CUSTOMIZATION: ThemeCustomization = {
 /** Only the monochrome preset is valid; stale colorful cookies are rejected. */
 export const THEME_PRESET_VALUES: ReadonlySet<ThemePreset> = new Set([
   MONOCHROME_THEME_PRESET,
-])
-
-export const THEME_FONT_VALUES: ReadonlySet<ThemeFont> = new Set([
-  'default',
-  'sans',
-  'serif',
-])
-
-export const THEME_RADIUS_VALUES: ReadonlySet<ThemeRadius> = new Set([
-  'default',
-  'none',
-  'sm',
-  'md',
-  'lg',
-  'xl',
 ])
 
 export const THEME_SCALE_VALUES: ReadonlySet<ThemeScale> = new Set([
@@ -96,22 +62,6 @@ export const CONTENT_LAYOUT_VALUES: ReadonlySet<ContentLayout> = new Set([
 
 export const THEME_COOKIE_KEYS = {
   preset: 'theme_preset',
-  font: 'theme_font',
-  radius: 'theme_radius',
   scale: 'theme_scale',
   contentLayout: 'theme_content_layout',
 } as const
-
-/**
- * Resolve a user font preference into the concrete font that should drive the
- * DOM. On the monochrome canvas, `default` always resolves to sans.
- */
-export function resolveThemeFont(
-  font: ThemeFont,
-  _preset: ThemePreset = MONOCHROME_THEME_PRESET
-): ResolvedThemeFont {
-  if (font === 'default') {
-    return 'sans'
-  }
-  return font
-}

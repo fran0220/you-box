@@ -43,7 +43,7 @@ describe('design-lab registry', () => {
       ).toBe(true)
       expect(found, `regex did not capture marker id "${id}"`).toContain(id)
     }
-    expect(DESIGN_LAB_GALLERY_MARKER_IDS).toHaveLength(23)
+    expect(DESIGN_LAB_GALLERY_MARKER_IDS).toHaveLength(24)
     expect(found.size).toBe(DESIGN_LAB_GALLERY_MARKER_IDS.length)
   })
 })
