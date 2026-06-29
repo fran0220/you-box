@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  .eyb{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 16px}
+  a{text-decoration:none;color:inherit}
+  .navlink{font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-secondary);padding:8px 12px;border-radius:6px;transition:color .14s,background .14s}
+  .navlink:hover{color:var(--text);background:var(--surface-hover)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <!-- NAV -->
+  <header style="position:sticky;top:0;z-index:200;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--border)">
+    <div class="wrap" style="height:64px;display:flex;align-items:center;gap:28px">
+      <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em">
+        <span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span>
+        <span style="color:var(--text-secondary)">You<b style="color:var(--text-strong);font-weight:700">Box</b></span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:2px;margin-left:6px">
+        <a class="navlink" href="Marketplace.dc.html">Models</a>
+        <a class="navlink" href="Rankings.dc.html">Rankings</a>
+        <a class="navlink" href="Docs.dc.html">Docs</a>
+        <a class="navlink" href="Marketplace.dc.html">Pricing</a>
+        <a class="navlink" href="Status.dc.html">Status</a>
+      </nav>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="yb-iconbtn" aria-label="Toggle theme"><i data-lucide="sun"></i></button>
+        <a class="yb-btn yb-btn--ghost yb-btn--sm" href="SignIn.dc.html"><span>Sign in</span></a>
+        <a class="yb-btn yb-btn--primary yb-btn--sm" href="SignUp.dc.html"><span>Get API key</span><i data-lucide="arrow-right"></i></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section style="position:relative;overflow:hidden;padding:80px 0 56px">
+    <div style="position:absolute;top:-220px;left:50%;transform:translateX(-50%);width:820px;height:620px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07),transparent 64%);pointer-events:none"></div>
+    <div class="wrap" style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center">
+      <a href="Status.dc.html" style="display:inline-flex;align-items:center;gap:9px;padding:6px 8px 6px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);font-size:12.5px;color:var(--text-secondary);margin-bottom:26px"><span style="width:7px;height:7px;border-radius:50%;background:var(--success)"></span>All systems operational<span style="width:1px;height:12px;background:var(--divider);margin:0 2px"></span><span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">99.98% uptime</span><i data-lucide="arrow-right" style="width:13px;height:13px;color:var(--text-muted)"></i></a>
+      <p class="eyb" style="text-align:center">// One API · 300+ models</p>
+      <h1 style="font-family:var(--font-display);font-size:78px;line-height:1.0;letter-spacing:-.04em;font-weight:700;margin:0 0 24px;color:var(--text-strong)">Every model,<br>one box.</h1>
+      <p style="font-size:20px;line-height:1.55;color:var(--text-secondary);max-width:32em;margin:0 0 32px">YouBox is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center">
+        <a class="yb-btn yb-btn--primary yb-btn--lg" href="SignUp.dc.html"><span>Get your API key</span><i data-lucide="arrow-right"></i></a>
+        <a class="yb-btn yb-btn--secondary yb-btn--lg" href="#"><i data-lucide="book-open"></i><span>Read the docs</span></a>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:22px;font-size:13px;color:var(--text-muted)"><i data-lucide="circle-check-big" style="width:15px;height:15px;color:var(--success)"></i> No markup on tokens. Drop-in OpenAI-compatible SDK.</div>
+
+      <div class="yb-code" style="width:100%;max-width:680px;margin-top:48px;text-align:left">
+        <div class="yb-code__bar"><span class="yb-code__dots"><i></i><i></i><i></i></span><span class="yb-code__file">route.ts</span><span class="yb-code__spacer"></span><button class="yb-code__copy"><i data-lucide="copy"></i>Copy</button></div>
+        <pre class="yb-code__pre"><code><span style="color:var(--orange-300)">import</span> OpenAI <span style="color:var(--orange-300)">from</span> <span style="color:var(--teal-300)">"openai"</span>;
+
+<span style="color:var(--orange-300)">const</span> yb = <span style="color:var(--orange-300)">new</span> <span style="color:var(--blue-500)">OpenAI</span>({
+  baseURL: <span style="color:var(--teal-300)">"https://api.youbox.dev/v1"</span>,
+  apiKey: process.env.<span style="color:var(--ink-100)">YOUBOX_KEY</span>,
+});
+
+<span style="color:var(--orange-300)">const</span> res = <span style="color:var(--orange-300)">await</span> yb.chat.completions.<span style="color:var(--blue-500)">create</span>({
+  model: <span style="color:var(--teal-300)">"anthropic/claude-opus-4.6"</span>,
+  messages: [{ role: <span style="color:var(--teal-300)">"user"</span>, content: <span style="color:var(--teal-300)">"Hello!"</span> }],
+});</code></pre>
+      </div>
+
+      <div style="display:flex;gap:0;margin-top:48px;padding-top:30px;border-top:1px solid var(--divider);width:100%;max-width:680px;justify-content:space-between">
+        <div class="yb-stat" style="align-items:center"><span class="yb-stat__label">Models</span><span class="yb-stat__value">312</span></div>
+        <div class="yb-stat" style="align-items:center"><span class="yb-stat__label">Providers</span><span class="yb-stat__value">34</span></div>
+        <div class="yb-stat" style="align-items:center"><span class="yb-stat__label">Tokens routed</span><span class="yb-stat__value">1.4<span class="yb-stat__unit">T / day</span></span></div>
+        <div class="yb-stat" style="align-items:center"><span class="yb-stat__label">Uptime</span><span class="yb-stat__value">99.98<span class="yb-stat__unit">%</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROVIDERS -->
+  <section style="padding:8px 0 56px">
+    <div class="wrap" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;opacity:.92">
+      <span style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-right:6px">Route to</span>
+      <span class="chip" style="display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:13px;color:var(--text-secondary);font-weight:500"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent)"></span>Anthropic</span>
+      <span class="chip" style="display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:13px;color:var(--text-secondary);font-weight:500"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent)"></span>OpenAI</span>
+      <span class="chip" style="display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:13px;color:var(--text-secondary);font-weight:500"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent)"></span>Google</span>
+      <span class="chip" style="display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:13px;color:var(--text-secondary);font-weight:500"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent)"></span>Meta</span>
+      <span class="chip" style="display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:13px;color:var(--text-secondary);font-weight:500"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent)"></span>Mistral AI</span>
+      <span class="chip" style="display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:13px;color:var(--text-secondary);font-weight:500"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent)"></span>DeepSeek</span>
+      <span class="chip" style="padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:13px;color:var(--text-muted);font-weight:500">+28 more</span>
+    </div>
+  </section>
+
+  <!-- MARKETPLACE PREVIEW -->
+  <section style="padding:64px 0">
+    <div class="wrap">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:30px;flex-wrap:wrap">
+        <div style="max-width:560px">
+          <p class="eyb">// Marketplace</p>
+          <h2 style="font-family:var(--font-display);font-size:38px;letter-spacing:-.025em;line-height:1.08;margin:0 0 12px;font-weight:700;color:var(--text-strong)">One catalog. Every model.</h2>
+          <p style="font-size:17px;color:var(--text-secondary);line-height:1.55;margin:0">Compare price, context, and throughput across providers. Switch models with a single string — no new integration.</p>
+        </div>
+        <a class="yb-btn yb-btn--secondary" href="Marketplace.dc.html"><span>Browse all 312</span><i data-lucide="arrow-right"></i></a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+
+        <div class="yb-model">
+          <div class="yb-model__head">
+            <span class="yb-avatar yb-avatar--lg" style="background:#565663">An</span>
+            <div class="yb-model__title"><div class="yb-model__name">Claude Opus 4.6 <span class="yb-badge yb-badge--brand">New</span></div><div class="yb-model__by">Anthropic · 200K context</div></div>
+            <button class="yb-model__fav" aria-label="Favorite"><i data-lucide="star"></i></button>
+          </div>
+          <p class="yb-model__desc">Frontier reasoning model with state-of-the-art coding and long-horizon agentic performance.</p>
+          <div class="yb-model__tags"><span class="yb-tag">vision</span><span class="yb-tag">tools</span><span class="yb-tag">200K ctx</span></div>
+          <div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$3.00</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$15.00</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">Throughput</span><span class="v">118 tok/s</span></div></div>
+        </div>
+
+        <div class="yb-model">
+          <div class="yb-model__head">
+            <span class="yb-avatar yb-avatar--lg" style="background:#3B3B47">Op</span>
+            <div class="yb-model__title"><div class="yb-model__name">GPT-5.2</div><div class="yb-model__by">OpenAI · 256K context</div></div>
+            <button class="yb-model__fav" aria-label="Favorite"><i data-lucide="star"></i></button>
+          </div>
+          <p class="yb-model__desc">General-purpose multimodal flagship with fast streaming and broad tool support.</p>
+          <div class="yb-model__tags"><span class="yb-tag">vision</span><span class="yb-tag">tools</span><span class="yb-tag">audio</span></div>
+          <div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$2.50</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$10.00</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">Throughput</span><span class="v">142 tok/s</span></div></div>
+        </div>
+
+        <div class="yb-model">
+          <div class="yb-model__head">
+            <span class="yb-avatar yb-avatar--lg" style="background:#8B9097">Go</span>
+            <div class="yb-model__title"><div class="yb-model__name">Gemini 3 Pro</div><div class="yb-model__by">Google · 1M context</div></div>
+            <button class="yb-model__fav" aria-label="Favorite"><i data-lucide="star"></i></button>
+          </div>
+          <p class="yb-model__desc">Long-context multimodal model tuned for documents, video, and retrieval-heavy workloads.</p>
+          <div class="yb-model__tags"><span class="yb-tag">vision</span><span class="yb-tag">1M ctx</span><span class="yb-tag">tools</span></div>
+          <div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$1.25</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$5.00</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">Throughput</span><span class="v">96 tok/s</span></div></div>
+        </div>
+
+        <div class="yb-model">
+          <div class="yb-model__head">
+            <span class="yb-avatar yb-avatar--lg" style="background:#807C75">De</span>
+            <div class="yb-model__title"><div class="yb-model__name">DeepSeek V4 <span class="yb-badge yb-badge--neutral">Cheap</span></div><div class="yb-model__by">DeepSeek · 128K context</div></div>
+            <button class="yb-model__fav" aria-label="Favorite"><i data-lucide="star"></i></button>
+          </div>
+          <p class="yb-model__desc">Cost-efficient reasoning model with a dedicated chain-of-thought mode.</p>
+          <div class="yb-model__tags"><span class="yb-tag">reasoning</span><span class="yb-tag">open</span></div>
+          <div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$0.27</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$1.10</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">Throughput</span><span class="v">72 tok/s</span></div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section style="padding:64px 0">
+    <div class="wrap">
+      <div style="max-width:620px;margin-bottom:34px">
+        <p class="eyb">// Why YouBox</p>
+        <h2 style="font-family:var(--font-display);font-size:38px;letter-spacing:-.025em;line-height:1.08;margin:0 0 12px;font-weight:700;color:var(--text-strong)">Built for production traffic.</h2>
+        <p style="font-size:17px;color:var(--text-secondary);line-height:1.55;margin:0">Everything you need to run LLM workloads at scale, without locking into a single provider.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div style="display:flex;flex-direction:column;gap:12px;padding:26px;background:var(--surface-card);border:1px solid var(--border);border-radius:14px">
+          <span style="width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--brand-subtle);color:var(--brand)"><i data-lucide="git-fork" style="width:21px;height:21px"></i></span>
+          <h3 style="font-family:var(--font-display);font-size:18px;margin:0;letter-spacing:-.01em;color:var(--text-strong)">Automatic failover</h3>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.55;margin:0">If a provider degrades or rate-limits, YouBox retries the next best model in milliseconds.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:26px;background:var(--surface-card);border:1px solid var(--border);border-radius:14px">
+          <span style="width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--brand-subtle);color:var(--brand)"><i data-lucide="route" style="width:21px;height:21px"></i></span>
+          <h3 style="font-family:var(--font-display);font-size:18px;margin:0;letter-spacing:-.01em;color:var(--text-strong)">Smart cost routing</h3>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.55;margin:0">Route by price, latency, or context. Set a budget and let YouBox pick the cheapest viable model.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:26px;background:var(--surface-card);border:1px solid var(--border);border-radius:14px">
+          <span style="width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--brand-subtle);color:var(--brand)"><i data-lucide="plug" style="width:21px;height:21px"></i></span>
+          <h3 style="font-family:var(--font-display);font-size:18px;margin:0;letter-spacing:-.01em;color:var(--text-strong)">Drop-in compatible</h3>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.55;margin:0">OpenAI-compatible endpoint. Change one base URL and keep your existing SDK and code.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:26px;background:var(--surface-card);border:1px solid var(--border);border-radius:14px">
+          <span style="width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--brand-subtle);color:var(--brand)"><i data-lucide="gauge" style="width:21px;height:21px"></i></span>
+          <h3 style="font-family:var(--font-display);font-size:18px;margin:0;letter-spacing:-.01em;color:var(--text-strong)">Unified analytics</h3>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.55;margin:0">Spend, latency, and token usage across every provider in one dashboard. Per-key, per-model.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:26px;background:var(--surface-card);border:1px solid var(--border);border-radius:14px">
+          <span style="width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--brand-subtle);color:var(--brand)"><i data-lucide="shield-check" style="width:21px;height:21px"></i></span>
+          <h3 style="font-family:var(--font-display);font-size:18px;margin:0;letter-spacing:-.01em;color:var(--text-strong)">Zero data retention</h3>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.55;margin:0">Prompts and completions are never logged or stored. Pass-through to providers that honor ZDR.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:26px;background:var(--surface-card);border:1px solid var(--border);border-radius:14px">
+          <span style="width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--brand-subtle);color:var(--brand)"><i data-lucide="wallet" style="width:21px;height:21px"></i></span>
+          <h3 style="font-family:var(--font-display);font-size:18px;margin:0;letter-spacing:-.01em;color:var(--text-strong)">Pass-through pricing</h3>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.55;margin:0">Pay exactly what providers charge. One balance covers every model. No subscription, no markup.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICKSTART -->
+  <section style="padding:64px 0">
+    <div class="wrap" style="display:grid;grid-template-columns:.9fr 1.1fr;gap:48px;align-items:center">
+      <div>
+        <p class="eyb">// Quickstart</p>
+        <h2 style="font-family:var(--font-display);font-size:38px;letter-spacing:-.025em;line-height:1.08;margin:0 0 8px;font-weight:700;color:var(--text-strong)">Live in three steps.</h2>
+        <div style="display:flex;flex-direction:column;gap:22px;margin-top:24px">
+          <div style="display:flex;gap:14px"><span style="flex:none;width:28px;height:28px;border-radius:50%;background:var(--brand-subtle);color:var(--brand);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:600">1</span><div><p style="font-weight:600;font-size:15px;margin:0 0 3px;color:var(--text)">Create an API key</p><p style="font-size:14px;color:var(--text-secondary);margin:0;line-height:1.5">Sign up and generate a key from your dashboard in seconds.</p></div></div>
+          <div style="display:flex;gap:14px"><span style="flex:none;width:28px;height:28px;border-radius:50%;background:var(--brand-subtle);color:var(--brand);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:600">2</span><div><p style="font-weight:600;font-size:15px;margin:0 0 3px;color:var(--text)">Point your SDK at YouBox</p><p style="font-size:14px;color:var(--text-secondary);margin:0;line-height:1.5">Swap the base URL. Keep your existing OpenAI client untouched.</p></div></div>
+          <div style="display:flex;gap:14px"><span style="flex:none;width:28px;height:28px;border-radius:50%;background:var(--brand-subtle);color:var(--brand);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:600">3</span><div><p style="font-weight:600;font-size:15px;margin:0 0 3px;color:var(--text)">Pick any model</p><p style="font-size:14px;color:var(--text-secondary);margin:0;line-height:1.5">Pass a provider-prefixed slug and route to 300+ models instantly.</p></div></div>
+        </div>
+      </div>
+      <div class="yb-code">
+        <div class="yb-code__bar"><span class="yb-code__dots"><i></i><i></i><i></i></span><span class="yb-code__lang">bash</span><span class="yb-code__spacer"></span><button class="yb-code__copy"><i data-lucide="copy"></i>Copy</button></div>
+        <pre class="yb-code__pre"><code><span style="color:var(--text-muted)"># 1 — set your key</span>
+<span style="color:var(--orange-300)">export</span> YOUBOX_KEY=<span style="color:var(--teal-300)">"yb-prod-7f3a..."</span>
+
+<span style="color:var(--text-muted)"># 2 — call any model, OpenAI-style</span>
+curl https://api.youbox.dev/v1/chat/completions \
+  -H <span style="color:var(--teal-300)">"Authorization: Bearer $YOUBOX_KEY"</span> \
+  -d <span style="color:var(--teal-300)">'{
+    "model": "google/gemini-3-pro",
+    "messages": [{"role":"user","content":"Hi"}]
+  }'</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section style="padding:64px 0">
+    <div class="wrap">
+      <div style="max-width:620px;margin:0 auto 36px;text-align:center">
+        <p class="eyb" style="text-align:center">// Pricing</p>
+        <h2 style="font-family:var(--font-display);font-size:38px;letter-spacing:-.025em;line-height:1.08;margin:0 0 12px;font-weight:700;color:var(--text-strong)">Pay for tokens, not the gateway.</h2>
+        <p style="font-size:17px;color:var(--text-secondary);line-height:1.55;margin:0">Start free. Scale to enterprise volume on the same key.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch">
+        <div style="display:flex;flex-direction:column;gap:18px;padding:30px;background:var(--surface-card);border:1px solid var(--border);border-radius:20px">
+          <div style="font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--text-strong)">Hobby</div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:42px;letter-spacing:-.03em;line-height:1;display:flex;align-items:baseline;gap:6px;color:var(--text-strong)">$0<span style="font-family:var(--font-mono);font-size:14px;font-weight:400;color:var(--text-muted)">/ mo</span></div>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:11px;flex:1">
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>Pay-as-you-go credits</li>
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>All 312 models</li>
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>5 requests / sec</li>
+          </ul>
+          <a class="yb-btn yb-btn--secondary yb-btn--block" href="SignUp.dc.html"><span>Start free</span></a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;padding:30px;background:var(--surface-card);border:1px solid var(--brand-border);border-radius:20px;box-shadow:var(--glow-soft);position:relative">
+          <span class="yb-badge yb-badge--brand" style="position:absolute;top:-10px;right:24px">Most popular</span>
+          <div style="font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--text-strong)">Pro</div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:42px;letter-spacing:-.03em;line-height:1;display:flex;align-items:baseline;gap:6px;color:var(--text-strong)">$20<span style="font-family:var(--font-mono);font-size:14px;font-weight:400;color:var(--text-muted)">/ mo</span></div>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:11px;flex:1">
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>Everything in Hobby</li>
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>500 requests / sec</li>
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>Priority failover routing</li>
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>Usage analytics & alerts</li>
+          </ul>
+          <a class="yb-btn yb-btn--primary yb-btn--block" href="SignUp.dc.html"><span>Start Pro trial</span></a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;padding:30px;background:var(--surface-card);border:1px solid var(--border);border-radius:20px">
+          <div style="font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--text-strong)">Enterprise</div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:42px;letter-spacing:-.03em;line-height:1;display:flex;align-items:baseline;gap:6px;color:var(--text-strong)">Custom</div>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:11px;flex:1">
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>Volume token discounts</li>
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>SSO, SAML & audit logs</li>
+            <li style="display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--text-secondary)"><i data-lucide="check" style="width:16px;height:16px;color:var(--success);flex:none;margin-top:1px"></i>Dedicated capacity & SLA</li>
+          </ul>
+          <a class="yb-btn yb-btn--secondary yb-btn--block" href="#"><span>Contact sales</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="border-top:1px solid var(--border);padding:54px 0 40px;margin-top:40px">
+    <div class="wrap">
+      <div style="display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:32px">
+        <div>
+          <div style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong)"><span style="display:inline-flex;width:24px;height:24px;border-radius:6px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:15px;height:15px"></i></span>You<b>Box</b></div>
+          <p style="font-size:13px;color:var(--text-muted);margin:14px 0 0;max-width:24em;line-height:1.5">Every model, one box. The unified gateway and marketplace for large language models.</p>
+        </div>
+        <div><h4 style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin:0 0 14px;font-weight:500">Product</h4><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="Marketplace.dc.html">Models</a><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="Rankings.dc.html">Rankings</a><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="Playground.dc.html">Playground</a></div>
+        <div><h4 style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin:0 0 14px;font-weight:500">Developers</h4><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="Docs.dc.html">Documentation</a><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="Docs.dc.html">API reference</a><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="Status.dc.html">Status</a></div>
+        <div><h4 style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin:0 0 14px;font-weight:500">Company</h4><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="About.dc.html">About</a><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="Legal.dc.html">Privacy</a><a style="display:block;font-size:14px;color:var(--text-secondary);margin-bottom:10px" href="Legal.dc.html">Terms</a></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:40px;padding-top:24px;border-top:1px solid var(--divider);font-size:13px;color:var(--text-muted)"><span>© 2026 YouBox, Inc.</span><span style="font-family:var(--font-mono);font-size:11px">// api.youbox.dev</span></div>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:860},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() {
+    const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); };
+    run(); setTimeout(run, 250); setTimeout(run, 700);
+  }
+  renderVals() {
+    return { theme: this.props.theme === 'light' ? 'light' : 'dark' };
+  }
+}
+</script>
+</body>
+</html>

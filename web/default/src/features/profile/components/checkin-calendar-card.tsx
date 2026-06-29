@@ -280,7 +280,7 @@ export function CheckinCalendarCard({
               className='flex h-auto min-w-0 flex-1 items-start gap-3 p-0 text-left whitespace-normal hover:bg-transparent'
               onClick={() => setCollapsed((v) => !v)}
             >
-              <div className='bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-11 sm:w-11'>
+              <div className='bg-brand-subtle text-brand flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-11 sm:w-11'>
                 <CalendarDays
                   className='h-4 w-4 sm:h-5 sm:w-5'
                   strokeWidth={2}
@@ -292,7 +292,7 @@ export function CheckinCalendarCard({
                     {t('Daily Check-in')}
                   </h3>
                   {checkedToday && (
-                    <div className='bg-teal-subtle text-teal inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium sm:gap-1.5 sm:px-2.5 sm:text-xs'>
+                    <div className='bg-success-subtle text-success inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium sm:gap-1.5 sm:px-2.5 sm:text-xs'>
                       <Sparkles className='h-2.5 w-2.5 sm:h-3 sm:w-3' />
                       {t('Checked in')}
                     </div>
@@ -423,13 +423,13 @@ export function CheckinCalendarCard({
                           'relative flex h-9 w-full flex-col items-center justify-center rounded-lg px-0 text-xs font-medium sm:h-10 sm:text-sm',
                           !dayObj.isCurrentMonth &&
                             'text-muted-foreground/40 cursor-default',
-                          isToday && 'hover:bg-primary/90',
+                          isToday && 'hover:bg-brand-hover',
                           !isToday && isCheckedIn && 'font-semibold'
                         )}
                       >
                         <span className='tabular-nums'>{dayNum}</span>
                         {isCheckedIn && !isToday && (
-                          <span className='bg-teal absolute bottom-0.5 h-1 w-1 rounded-full sm:bottom-1' />
+                          <span className='bg-success absolute bottom-0.5 h-1 w-1 rounded-full sm:bottom-1' />
                         )}
                       </Button>
                     )

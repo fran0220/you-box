@@ -44,9 +44,9 @@ const ACCENT_CLASSES: Record<
   }
 > = {
   emerald: {
-    activeText: 'text-teal',
-    activeBorder: 'border-teal',
-    badge: 'bg-teal-subtle text-teal',
+    activeText: 'text-success',
+    activeBorder: 'border-success',
+    badge: 'bg-success-subtle text-success',
   },
   amber: {
     activeText: 'text-warning',
@@ -236,7 +236,7 @@ export function HeroTerminalDemo(props: HeroTerminalDemoProps) {
             )
           })}
           <div className='ml-auto flex items-center gap-2 pr-2 sm:pr-3'>
-            <span className='bg-teal inline-block size-1.5 rounded-full' />
+            <span className='bg-success inline-block size-1.5 rounded-full' />
             <span className='text-foreground/40 font-mono text-[10px] tracking-wider uppercase'>
               200 ok
             </span>
@@ -503,7 +503,7 @@ function CodeLine(props: { children: ReactNode; indent?: number }) {
 }
 
 function Command(props: { children: ReactNode }) {
-  return <span className='text-teal font-medium'>{props.children}</span>
+  return <span className='text-success font-medium'>{props.children}</span>
 }
 
 function Flag(props: { children: ReactNode }) {

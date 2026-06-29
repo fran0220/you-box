@@ -41,10 +41,10 @@ interface AnimatedNumberProps {
 const defaultFormat = (n: number) => Math.round(n).toLocaleString()
 
 function prefersReducedMotion() {
-  return (
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false
+  }
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
 /**
@@ -65,7 +65,6 @@ export function AnimatedNumber({
   startOnView = false,
 }: AnimatedNumberProps) {
   const ref = useRef<HTMLSpanElement>(null)
-  const fromRef = useRef(0)
   const startedRef = useRef(false)
   const rafRef = useRef(0)
 
@@ -73,12 +72,13 @@ export function AnimatedNumber({
   const formatRef = useRef(format)
   formatRef.current = format
 
-  // Captured once: avoids a flash to 0 when `value` changes (React keeps the
-  // children stable; the effect owns textContent thereafter).
+  const initialNumeric = Number.isFinite(value) ? value : 0
+  const fromRef = useRef(initialNumeric)
+
+  // Final value is always in the DOM; count-up is progressive enhancement only.
   const [initialText] = useState(() => {
     const fmt = format ?? defaultFormat
-    const safe = Number.isFinite(value) ? value : 0
-    return prefersReducedMotion() ? fmt(safe) : fmt(0)
+    return fmt(initialNumeric)
   })
 
   useEffect(() => {

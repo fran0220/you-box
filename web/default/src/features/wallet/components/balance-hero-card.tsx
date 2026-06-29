@@ -101,7 +101,7 @@ export function BalanceHeroCard({ user, loading }: BalanceHeroCardProps) {
       <PanelBody className='flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between'>
         <div className='min-w-0'>
           <Eyebrow>{t('Balance')}</Eyebrow>
-          <div className='font-display text-foreground mt-1 text-[40px] font-bold tracking-[-0.03em] break-all'>
+          <div className='text-foreground mt-1 font-display text-[40px] font-bold tracking-[-0.035em] break-all sm:text-[52px]'>
             <AnimatedNumber
               value={quota}
               format={formatQuota}

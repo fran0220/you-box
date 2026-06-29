@@ -125,6 +125,15 @@ export function getChannelTypeIcon(type: number): string {
 // ============================================================================
 
 /**
+ * Whether the channel status should show a danger StatusBadge in the table
+ * (manual/auto disabled — monochrome design uses danger token only here).
+ */
+export function channelStatusShowsDangerBadge(status: number): boolean {
+  const config = getChannelStatusBadge(status)
+  return config.variant === 'danger'
+}
+
+/**
  * Get status badge configuration
  */
 export function getChannelStatusBadge(status: number) {

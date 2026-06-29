@@ -23,6 +23,9 @@ import { useTranslation } from 'react-i18next'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Main } from '@/components/layout'
+import { EmptyState } from '@/components/youbox'
+import { isSidebarModuleEnabled } from '@/lib/nav-modules'
 import { ChatShell } from '@/features/chat/components/chat-shell'
 import { useActiveChatKey } from '@/features/chat/hooks/use-active-chat-key'
 import { useChatPresets } from '@/features/chat/hooks/use-chat-presets'
@@ -32,6 +35,11 @@ import {
 } from '@/features/chat/lib/chat-links'
 
 export const Route = createFileRoute('/_authenticated/chat/$chatId')({
+  beforeLoad: () => {
+    if (!isSidebarModuleEnabled('chat', 'chat')) {
+      throw redirect({ to: '/dashboard' })
+    }
+  },
   loader: async ({ params }) => {
     if (!Number.isInteger(Number(params.chatId))) {
       throw redirect({ to: '/dashboard' })
@@ -98,52 +106,53 @@ function ChatRouteComponent() {
   const content = (() => {
     if (!preset) {
       return (
-        <div className='flex h-full flex-col items-center justify-center gap-4 p-6 text-center'>
-          <MessageCircleWarning className='text-muted-foreground h-12 w-12' />
-          <div className='space-y-1'>
-            <h2 className='text-lg font-semibold'>
-              {t('Chat preset not found')}
-            </h2>
-            <p className='text-muted-foreground'>
-              {t(
-                'The requested chat preset does not exist or has been removed.'
-              )}
-            </p>
-          </div>
-          <Button variant='outline' render={<Link to='/dashboard' />}>
-            {t('Return to dashboard')}
-          </Button>
-        </div>
+        <EmptyState
+          className='h-full'
+          icon={MessageCircleWarning}
+          title={t('Chat preset not found')}
+          description={t(
+            'The requested chat preset does not exist or has been removed.'
+          )}
+          action={
+            <Button variant='outline' render={<Link to='/dashboard' />}>
+              {t('Return to dashboard')}
+            </Button>
+          }
+        />
       )
     }
 
     if (!isWebLink) {
       return (
-        <div className='flex h-full flex-col items-center justify-center gap-4 p-6 text-center'>
-          <MessageCircleWarning className='text-muted-foreground h-12 w-12' />
-          <div className='space-y-1'>
-            <h2 className='text-lg font-semibold'>
-              {t('Use sidebar shortcut')}
-            </h2>
-            <p className='text-muted-foreground'>
-              {preset.name}{' '}
+        <EmptyState
+          className='h-full'
+          icon={MessageCircleWarning}
+          title={t('Use sidebar shortcut')}
+          description={
+            <>
+              <span className='font-medium text-foreground'>{preset.name}</span>{' '}
               {t(
                 'opens in an external client. Trigger it from the sidebar or API key actions to launch the configured application.'
               )}
-            </p>
-          </div>
-          <Button variant='outline' render={<Link to='/dashboard' />}>
-            {t('Return to dashboard')}
-          </Button>
-        </div>
+            </>
+          }
+          action={
+            <Button variant='outline' render={<Link to='/dashboard' />}>
+              {t('Return to dashboard')}
+            </Button>
+          }
+        />
       )
     }
 
     if (requiresActiveKey && isPending) {
       return (
         <div className='flex h-full flex-col items-center justify-center gap-4'>
-          <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
-          <p className='text-muted-foreground text-sm'>
+          <Loader2
+            aria-hidden='true'
+            className='text-muted-foreground size-8 animate-spin'
+          />
+          <p className='text-muted-foreground font-mono text-sm'>
             {t('Preparing your chat link…')}
           </p>
         </div>
@@ -154,7 +163,9 @@ function ChatRouteComponent() {
       const message =
         error instanceof Error
           ? error.message
-          : 'Unable to generate chat link. Please check your API keys.'
+          : t(
+              'Unable to generate chat link. Please check your API keys.'
+            )
       return (
         <div className='flex h-full flex-col items-center justify-center p-6'>
           <Alert variant='destructive' className='max-w-xl'>
@@ -186,8 +197,10 @@ function ChatRouteComponent() {
   })()
 
   return (
-    <ChatShell activeChatId={chatId} preset={preset} resolvedUrl={iframeSrc}>
-      {content}
-    </ChatShell>
+    <Main className='h-full min-h-0 p-0'>
+      <ChatShell activeChatId={chatId} preset={preset} resolvedUrl={iframeSrc}>
+        {content}
+      </ChatShell>
+    </Main>
   )
 }

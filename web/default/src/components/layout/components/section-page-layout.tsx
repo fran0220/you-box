@@ -77,33 +77,44 @@ export function SectionPageLayout(props: SectionPageLayoutProps) {
   return (
     <PageFooterProvider container={footerContainer}>
       <Main>
-        <div className='shrink-0 px-3 pt-3 pb-2.5 sm:px-4 sm:pt-5 sm:pb-3'>
-          {breadcrumb != null && (
-            <div className='mb-2 sm:mb-3'>{breadcrumb}</div>
-          )}
-          <div className='flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:gap-x-4'>
-            {/* min-w keeps the title readable; crowded actions wrap below
+        {(breadcrumb != null || title != null || actions != null) && (
+          <div className='mx-auto w-full max-w-[var(--container-lg,1100px)] shrink-0 px-[var(--gutter,24px)] pt-7 pb-4'>
+            {breadcrumb != null && (
+              <div className='mb-2 sm:mb-3'>{breadcrumb}</div>
+            )}
+            {(title != null || actions != null) && (
+              <div className='flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:gap-x-4'>
+                {/* min-w keeps the title readable; crowded actions wrap below
                 instead of squeezing the heading to a sliver */}
-            <div className='min-w-[min(100%,12rem)] flex-1'>
-              <h2 className='font-display truncate text-lg font-bold tracking-[-0.025em] sm:text-xl'>
-                {title}
-              </h2>
-            </div>
-            {actions != null && (
-              <div className='flex max-w-full min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-x-4'>
-                {actions}
+                {title != null ? (
+                  <div className='min-w-[min(100%,12rem)] flex-1'>
+                    <h2 className='font-display truncate text-lg font-bold tracking-[-0.025em] sm:text-xl'>
+                      {title}
+                    </h2>
+                  </div>
+                ) : (
+                  <div className='flex-1' />
+                )}
+                {actions != null && (
+                  <div className='flex max-w-full min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-x-4'>
+                    {actions}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        </div>
+        )}
 
-        <div className='min-h-0 flex-1 overflow-auto px-3 pt-1 pb-3 sm:px-4 sm:pt-1.5 sm:pb-4'>
+        <div
+          data-app-content-scroll
+          className='mx-auto min-h-0 w-full max-w-[var(--container-lg,1100px)] flex-1 overflow-auto px-[var(--gutter,24px)] pt-1 pb-16'
+        >
           {content}
         </div>
 
         <div
           ref={setFooterContainer}
-          className='bg-background shrink-0 border-t px-3 py-2.5 empty:hidden sm:px-4 sm:py-3'
+          className='bg-background mx-auto w-full max-w-[var(--container-lg,1100px)] shrink-0 border-t px-[var(--gutter,24px)] py-3 empty:hidden'
         />
       </Main>
     </PageFooterProvider>

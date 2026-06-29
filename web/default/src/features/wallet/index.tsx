@@ -24,6 +24,7 @@ import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import { SectionPageLayout } from '@/components/layout'
 import { InlineAlert } from '@/components/patterns'
+import { PageHeader } from '@/components/youbox'
 import { AffiliateRewardsCard } from './components/affiliate-rewards-card'
 import { BalanceHeroCard } from './components/balance-hero-card'
 import { BillingHistoryDialog } from './components/dialogs/billing-history-dialog'
@@ -316,10 +317,17 @@ export function Wallet(props: WalletProps) {
   return (
     <>
       <SectionPageLayout>
-        <SectionPageLayout.Title>{t('Wallet')}</SectionPageLayout.Title>
         <SectionPageLayout.Content>
+          <div className='mx-auto w-full max-w-[1120px] space-y-5'>
+            <PageHeader
+              eyebrow={t('Wallet')}
+              title={t('Wallet')}
+              subtitle={t(
+                'Top up your balance, redeem codes, and review billing history.'
+              )}
+            />
           {(userError || topupError) && (
-            <div className='mx-auto mb-4 w-full max-w-7xl'>
+            <div className='w-full'>
               <InlineAlert
                 tone='danger'
                 title={t('Failed to load')}
@@ -344,7 +352,7 @@ export function Wallet(props: WalletProps) {
               </InlineAlert>
             </div>
           )}
-          <div className='mx-auto grid w-full max-w-7xl gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] xl:items-start'>
+          <div className='grid w-full gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] xl:items-start'>
             <div className='flex flex-col gap-4'>
               <BalanceHeroCard user={user} loading={userLoading} />
 
@@ -402,6 +410,7 @@ export function Wallet(props: WalletProps) {
                 loading={affiliateLoading}
               />
             </div>
+          </div>
           </div>
         </SectionPageLayout.Content>
       </SectionPageLayout>

@@ -22,35 +22,40 @@ import { useAuthStore } from '@/stores/auth-store'
 import { getFreshModuleAccess } from '@/lib/nav-modules'
 import { Pricing } from '@/features/pricing'
 
-// Array facets are stored as single comma-joined strings (e.g.
-// `?providers=OpenAI,Anthropic`); the useFilters hook parses/serializes them.
-// Every field uses `.catch(...)` so malformed URLs degrade to "no filter"
-// rather than throwing. `?model=` drives the URL-based detail selection.
-const pricingSearchSchema = z.object({
-  search: z.string().optional().catch(undefined),
-  sort: z.string().optional().catch(undefined),
-  // multi-select facets (comma-joined)
-  providers: z.string().optional().catch(undefined),
-  groups: z.string().optional().catch(undefined),
-  categories: z.string().optional().catch(undefined),
-  inputModalities: z.string().optional().catch(undefined),
-  outputModalities: z.string().optional().catch(undefined),
-  series: z.string().optional().catch(undefined),
-  supportedParameters: z.string().optional().catch(undefined),
-  endpointTypes: z.string().optional().catch(undefined),
-  quotaTypes: z.string().optional().catch(undefined),
-  // range facets
-  ctxMin: z.number().optional().catch(undefined),
-  ctxMax: z.number().optional().catch(undefined),
-  priceMin: z.number().optional().catch(undefined),
-  priceMax: z.number().optional().catch(undefined),
-  // presentation
-  tokenUnit: z.enum(['M', 'K']).optional().catch(undefined),
-  view: z.enum(['list', 'card', 'table']).optional().catch(undefined),
-  rechargePrice: z.boolean().optional().catch(undefined),
-  // URL-driven detail selection (quick-peek drawer / detail surface)
-  model: z.string().optional().catch(undefined),
-})
+const pricingSearchSchema = z.preprocess(
+  (raw) => {
+    if (raw == null || typeof raw !== 'object') return raw
+    const next = { ...(raw as Record<string, unknown>) }
+    const legacyKeys = [
+      'inputModalities',
+      'outputModalities',
+      'series',
+      'supportedParameters',
+      'ctxMin',
+      'ctxMax',
+    ]
+    for (const key of legacyKeys) {
+      delete next[key]
+    }
+    return next
+  },
+  z.object({
+    search: z.string().optional().catch(undefined),
+    sort: z.string().optional().catch(undefined),
+    providers: z.string().optional().catch(undefined),
+    modelTypes: z.string().optional().catch(undefined),
+    groups: z.string().optional().catch(undefined),
+    categories: z.string().optional().catch(undefined),
+    endpointTypes: z.string().optional().catch(undefined),
+    quotaTypes: z.string().optional().catch(undefined),
+    priceMin: z.number().optional().catch(undefined),
+    priceMax: z.number().optional().catch(undefined),
+    tokenUnit: z.enum(['M', 'K']).optional().catch(undefined),
+    view: z.enum(['list', 'card', 'table']).optional().catch(undefined),
+    rechargePrice: z.boolean().optional().catch(undefined),
+    model: z.string().optional().catch(undefined),
+  })
+)
 
 export const Route = createFileRoute('/pricing/')({
   validateSearch: pricingSearchSchema,

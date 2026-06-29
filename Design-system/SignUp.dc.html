@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .oauth{display:flex;align-items:center;justify-content:center;gap:9px;height:44px;border:1px solid var(--field-border);border-radius:10px;background:var(--surface-2);font-size:14px;font-weight:500;color:var(--text);cursor:pointer;font-family:var(--font-sans)}
+  .oauth:hover{background:var(--surface-3)}
+  .mono{font-family:var(--font-mono)}
+  .chk{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-secondary);white-space:nowrap}
+  .chk i{color:var(--success);width:15px;height:15px;flex:none}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);color:var(--text);font-family:var(--font-sans);padding:40px 24px;position:relative;overflow:hidden">
+  <div style="position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:680px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.05),transparent 65%);pointer-events:none"></div>
+
+  <div style="width:100%;max-width:400px;position:relative">
+    <a href="Index.dc.html" style="display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:21px;letter-spacing:-.02em;margin-bottom:8px"><span style="display:inline-flex;width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:18px;height:18px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></a>
+    <h1 style="font-family:var(--font-display);font-size:26px;letter-spacing:-.02em;font-weight:700;margin:0;text-align:center;color:var(--text-strong)">Create your account</h1>
+    <p style="font-size:14px;color:var(--text-secondary);margin:8px 0 0;text-align:center">Start free with $5 in credits — no card required.</p>
+
+    <div style="display:flex;justify-content:center;gap:16px;margin:18px 0 0;flex-wrap:wrap">
+      <span class="chk"><i data-lucide="check"></i>312 models</span>
+      <span class="chk"><i data-lucide="check"></i>OpenAI-compatible</span>
+      <span class="chk"><i data-lucide="check"></i>No markup</span>
+    </div>
+
+    <div class="yb-card yb-card--pad-lg" style="margin-top:22px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+        <button class="oauth"><i data-lucide="github" style="width:17px;height:17px"></i>GitHub</button>
+        <button class="oauth"><i data-lucide="chrome" style="width:17px;height:17px"></i>Google</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><span style="flex:1;height:1px;background:var(--divider)"></span><span class="mono" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">or</span><span style="flex:1;height:1px;background:var(--divider)"></span></div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="yb-field"><label class="yb-field__label">Username</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="user"></i></span><input class="yb-input yb-input--with-icon" value="jordan-m"></div></div>
+        <div class="yb-field"><label class="yb-field__label">Work email</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="mail"></i></span><input class="yb-input yb-input--with-icon" type="email" value="jordan@cortex.dev"></div></div>
+        <div class="yb-field"><label class="yb-field__label">Password</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="lock"></i></span><input class="yb-input yb-input--with-icon" type="password" value="strongpass99"></div>
+          <div style="display:flex;gap:5px;margin-top:8px"><span style="flex:1;height:4px;border-radius:999px;background:var(--ink-200)"></span><span style="flex:1;height:4px;border-radius:999px;background:var(--ink-200)"></span><span style="flex:1;height:4px;border-radius:999px;background:var(--ink-200)"></span><span style="flex:1;height:4px;border-radius:999px;background:var(--surface-3)"></span></div>
+          <span class="yb-field__hint" style="margin-top:6px;display:block">Strong — add a symbol to max it out.</span>
+        </div>
+        <label style="display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text-secondary);cursor:pointer;line-height:1.5"><span style="width:16px;height:16px;border-radius:4px;background:var(--brand);color:var(--brand-on);display:inline-flex;align-items:center;justify-content:center;flex:none;margin-top:1px"><i data-lucide="check" style="width:12px;height:12px"></i></span> I agree to the <a href="#" style="color:var(--text);border-bottom:1px solid var(--border-strong)">Terms</a> and <a href="#" style="color:var(--text);border-bottom:1px solid var(--border-strong)">Privacy Policy</a>.</label>
+        <a class="yb-btn yb-btn--primary yb-btn--lg yb-btn--block" href="Otp.dc.html"><span>Create account</span><i data-lucide="arrow-right"></i></a>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--text-secondary);margin:20px 0 0;text-align:center">Already have an account? <a href="SignIn.dc.html" style="color:var(--text);font-weight:500;border-bottom:1px solid var(--border-strong)">Sign in</a></p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:860},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

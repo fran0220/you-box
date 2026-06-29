@@ -152,6 +152,19 @@ docker run --name you-box -d --restart always \
 
 🎉 After deployment is complete, visit `http://localhost:3000` to start using!
 
+### Default web UI (`web/default`)
+
+The bundled React console and public site use the **YouBox** monochrome design
+system (dark-first, class-based `.dark` / light via `src/context/theme-provider.tsx`).
+Local development:
+
+```bash
+cd web/default && bun install && bun run dev
+```
+
+Proxy the Go API with `VITE_REACT_APP_SERVER_URL=http://localhost:3000` (see
+`web/default/README.md` for layout, Model Plaza, i18n, and `bun run knip`).
+
 > [!WARNING]
 > When operating this project as a public generative AI service or API resale service, users should first complete all required filing, licensing, content safety, real-name verification, log retention, tax, payment, and upstream authorization obligations.
 

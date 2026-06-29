@@ -63,9 +63,11 @@ function LoadingStep({
   return (
     <div className='flex items-center gap-3'>
       {status === 'loading' && (
-        <Loader2 className='text-primary h-5 w-5 animate-spin' />
+        <Loader2 className='text-muted-foreground h-5 w-5 animate-spin' />
       )}
-      {status === 'done' && <CheckCircle2 className='text-success h-5 w-5' />}
+      {status === 'done' && (
+        <CheckCircle2 className='text-muted-foreground h-5 w-5' />
+      )}
       {status === 'pending' && (
         <Circle className='text-muted-foreground/40 h-5 w-5' />
       )}
@@ -111,7 +113,7 @@ export function DeploymentAccessGuard({
     return (
       <div className='mx-auto mt-8 max-w-md'>
         <div className='flex flex-col items-center justify-center py-12'>
-          <Loader2 className='text-primary mb-6 h-10 w-10 animate-spin' />
+          <Loader2 className='text-muted-foreground mb-6 h-10 w-10 animate-spin' />
           <div className='space-y-3'>
             <LoadingStep
               label={t('Loading configuration')}

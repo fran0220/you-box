@@ -141,7 +141,7 @@ export const CHANNEL_STATUS_CONFIG = {
     label: 'Disabled',
   },
   [CHANNEL_STATUS.AUTO_DISABLED]: {
-    variant: 'warning' as const,
+    variant: 'danger' as const,
     label: 'Auto Disabled',
   },
 }

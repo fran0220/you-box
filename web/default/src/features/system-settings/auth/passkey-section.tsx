@@ -42,6 +42,8 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -184,14 +186,25 @@ export function PasskeySection(props: PasskeySectionProps) {
     form.reset(buildFormDefaults(normalized))
   }
 
+  const handleReset = () => {
+    form.reset(buildFormDefaults(baselineRef.current))
+    toast.success(t('Form reset to saved values'))
+  }
+
   return (
-    <SettingsSection title={t('Passkey Authentication')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={(event) => form.handleSubmit(onSubmit)(event)}>
-          <SettingsPageFormActions
-            onSave={() => form.handleSubmit(onSubmit)()}
-            isSaving={updateOption.isPending}
-          />
+    <>
+      <FormNavigationGuard when={form.formState.isDirty} />
+
+      <SettingsSection title={t('Passkey Authentication')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={(event) => form.handleSubmit(onSubmit)(event)}>
+            <SettingsPageFormActions
+              onSave={() => form.handleSubmit(onSubmit)()}
+              onReset={handleReset}
+              isSaving={updateOption.isPending}
+              isResetDisabled={!form.formState.isDirty}
+            />
+            <FormDirtyIndicator isDirty={form.formState.isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -403,8 +416,9 @@ export function PasskeySection(props: PasskeySectionProps) {
               </FormItem>
             )}
           />
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

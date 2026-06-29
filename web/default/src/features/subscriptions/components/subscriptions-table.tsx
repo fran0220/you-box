@@ -38,7 +38,7 @@ export function SubscriptionsTable() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   // Shared with PlanPreviewPanel — same queryKey, single fetch.
-  const { data, isLoading } = useAdminPlans()
+  const { data, isLoading, isFetching, isError, refetch } = useAdminPlans()
 
   const plans = useMemo(() => data || [], [data])
 
@@ -58,6 +58,11 @@ export function SubscriptionsTable() {
       table={table}
       columns={columns}
       isLoading={isLoading}
+      isFetching={isFetching}
+      isError={isError}
+      onRetry={() => {
+        void refetch()
+      }}
       statHeader={<SubscriptionsStatCards plans={plans} loading={isLoading} />}
       emptyTitle={t('No subscription plans yet')}
       emptyDescription={t(

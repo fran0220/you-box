@@ -17,13 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 /*
- * Theme axes — density scaling and content layout.
+ * YouBox layout axes — density scaling and content width.
  *
- * The legacy color presets (rose-garden, ocean-breeze, anthropic, …), the
- * radius axis, and the serif font axis are frozen under the YouBox design
- * system: brand color, radius, and typography are core brand tokens defined
- * in ./theme.css and must not be overridden by user-selectable presets.
- * Only non-brand accessibility/layout axes remain:
+ * Brand color, radius, and typography are fixed in ./theme.css.
  *
  *   <body data-theme-scale="sm" data-theme-content-layout="centered" />
  */

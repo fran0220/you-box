@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { type ComponentProps, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { Eyebrow } from './eyebrow'
+import { Eyebrow } from '@/components/youbox/eyebrow'
 
 /**
  * Panel — the standard YouBox surface card: `surface-card` background,

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .crow{display:grid;grid-template-columns:36px 1.3fr 1fr .8fr .7fr .8fr 90px auto;gap:14px;align-items:center;padding:14px 18px;border-top:1px solid var(--divider);font-size:13px}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav on" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="Marketplace.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <div style="border-top:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:10px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></div>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Channels</div>
+      <div style="flex:1"></div>
+      <button class="yb-iconbtn" aria-label="Notifications"><i data-lucide="bell"></i></button>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <div style="padding:28px 28px 64px;max-width:1200px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px">
+        <div><h1 style="font-family:var(--font-display);font-size:26px;letter-spacing:-.02em;font-weight:700;margin:0 0 4px;color:var(--text-strong)">Upstream channels</h1><p style="font-size:14px;color:var(--text-secondary);margin:0">Provider connections YouBox routes through. Priority and weight control failover order.</p></div>
+        <div style="display:flex;gap:10px"><button class="yb-btn yb-btn--secondary"><i data-lucide="activity"></i><span>Test all</span></button><button class="yb-btn yb-btn--primary"><i data-lucide="plus"></i><span>Add channel</span></button></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px">
+        <div class="yb-card"><span class="yb-stat__label">Channels</span><div class="yb-stat__value" style="margin-top:8px">12</div></div>
+        <div class="yb-card"><div style="display:flex;justify-content:space-between"><span class="yb-stat__label">Healthy</span><span class="yb-badge yb-badge--success" >10</span></div><div class="yb-stat__value" style="margin-top:8px">10</div></div>
+        <div class="yb-card"><div style="display:flex;justify-content:space-between"><span class="yb-stat__label">Degraded</span><span class="yb-badge yb-badge--warning" >2</span></div><div class="yb-stat__value" style="margin-top:8px">2</div></div>
+        <div class="yb-card"><span class="yb-stat__label">Avg latency</span><div class="yb-stat__value" style="margin-top:8px">0.48<span class="yb-stat__unit">s</span></div></div>
+      </div>
+
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="crow" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span></span><span>Channel</span><span>Type</span><span>Models</span><span>Priority</span><span>Weight</span><span>Status</span><span></span></div>
+        <div class="crow"><span class="yb-avatar yb-avatar--sm" style="background:#565663">An</span><span><div style="color:var(--text);font-weight:500">Anthropic Direct</div><div class="mono" style="font-size:11px;color:var(--text-muted)">api.anthropic.com</div></span><span><span class="yb-badge yb-badge--neutral">native</span></span><span class="mono" style="color:var(--text)">8</span><span class="mono" style="color:var(--text)">100</span><span class="mono" style="color:var(--text)">×3</span><span><span class="yb-badge yb-badge--success" ><span class="yb-badge__dot"></span>0.41s</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="crow"><span class="yb-avatar yb-avatar--sm" style="background:#3B3B47">Op</span><span><div style="color:var(--text);font-weight:500">OpenAI Direct</div><div class="mono" style="font-size:11px;color:var(--text-muted)">api.openai.com</div></span><span><span class="yb-badge yb-badge--neutral">native</span></span><span class="mono" style="color:var(--text)">14</span><span class="mono" style="color:var(--text)">100</span><span class="mono" style="color:var(--text)">×3</span><span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>0.50s</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="crow"><span class="yb-avatar yb-avatar--sm" style="background:#74747F">AW</span><span><div style="color:var(--text);font-weight:500">AWS Bedrock</div><div class="mono" style="font-size:11px;color:var(--text-muted)">bedrock.us-east-1</div></span><span><span class="yb-badge yb-badge--neutral">proxy</span></span><span class="mono" style="color:var(--text)">22</span><span class="mono" style="color:var(--text)">80</span><span class="mono" style="color:var(--text)">×2</span><span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>0.55s</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="crow"><span class="yb-avatar yb-avatar--sm" style="background:#8B9097">GV</span><span><div style="color:var(--text);font-weight:500">Google Vertex</div><div class="mono" style="font-size:11px;color:var(--text-muted)">us-central1-aiplatform</div></span><span><span class="yb-badge yb-badge--neutral">proxy</span></span><span class="mono" style="color:var(--text)">18</span><span class="mono" style="color:var(--text)">70</span><span class="mono" style="color:var(--text)">×2</span><span><span class="yb-badge yb-badge--warning" ><span class="yb-badge__dot"></span>1.12s</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="crow"><span class="yb-avatar yb-avatar--sm" style="background:#807C75">De</span><span><div style="color:var(--text);font-weight:500">DeepSeek</div><div class="mono" style="font-size:11px;color:var(--text-muted)">api.deepseek.com</div></span><span><span class="yb-badge yb-badge--neutral">native</span></span><span class="mono" style="color:var(--text)">4</span><span class="mono" style="color:var(--text)">60</span><span class="mono" style="color:var(--text)">×1</span><span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>0.44s</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="crow"><span class="yb-avatar yb-avatar--sm" style="background:#A7ABB1">Mi</span><span><div style="color:var(--text);font-weight:500">Mistral AI</div><div class="mono" style="font-size:11px;color:var(--text-muted)">api.mistral.ai</div></span><span><span class="yb-badge yb-badge--neutral">native</span></span><span class="mono" style="color:var(--text)">7</span><span class="mono" style="color:var(--text)">50</span><span class="mono" style="color:var(--text)">×1</span><span><span class="yb-badge yb-badge--warning"><span class="yb-badge__dot"></span>0.98s</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+        <div class="crow"><span class="yb-avatar yb-avatar--sm" style="background:#565663">Co</span><span><div style="color:var(--text);font-weight:500">Cohere</div><div class="mono" style="font-size:11px;color:var(--text-muted)">api.cohere.com</div></span><span><span class="yb-badge yb-badge--neutral">native</span></span><span class="mono" style="color:var(--text)">5</span><span class="mono" style="color:var(--text)">40</span><span class="mono" style="color:var(--text)">×1</span><span><span class="yb-badge yb-badge--success"><span class="yb-badge__dot"></span>0.39s</span></span><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:880},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

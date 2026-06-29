@@ -361,7 +361,7 @@ export function ChannelsTable() {
 
     return [
       {
-        label: 'All Types',
+        label: t('All Types'),
         value: 'all',
         count: totalTypes,
       },

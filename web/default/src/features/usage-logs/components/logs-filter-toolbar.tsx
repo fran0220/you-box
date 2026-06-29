@@ -36,6 +36,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { DataTableViewOptions } from '@/components/data-table'
 
+const filterShellClass =
+  'bg-card/80 border-border rounded-lg border p-2.5 sm:p-3'
+
 interface LogsFilterToolbarProps<TData> {
   table: Table<TData>
   primaryFilters: ReactNode
@@ -108,9 +111,7 @@ export function LogsFilterToolbar<TData>(props: LogsFilterToolbarProps<TData>) {
   if (isMobile && props.mobilePinnedFilters != null) {
     return (
       <Drawer open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-        <div
-          className={cn('bg-card/50 rounded-lg border p-2.5', props.className)}
-        >
+        <div className={cn(filterShellClass, props.className)}>
           <div className='grid gap-2'>{props.mobilePinnedFilters}</div>
 
           <div className='mt-2 flex flex-col gap-2'>
@@ -189,12 +190,7 @@ export function LogsFilterToolbar<TData>(props: LogsFilterToolbarProps<TData>) {
   }
 
   return (
-    <div
-      className={cn(
-        'bg-card/50 rounded-lg border p-2.5 sm:p-3',
-        props.className
-      )}
-    >
+    <div className={cn(filterShellClass, props.className)}>
       <div className='grid grid-cols-1 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]'>
         {props.primaryFilters}
         {advancedOpen && props.advancedFilters}

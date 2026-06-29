@@ -71,18 +71,18 @@ export function LegalConsent({
               href='/user-agreement'
               target='_blank'
               rel='noopener noreferrer'
-              className='text-primary hover:underline'
+              className='text-foreground underline underline-offset-4 hover:opacity-80'
             >
               {t('User Agreement')}
             </a>
           )}
-          {hasUserAgreement && hasPrivacyPolicy && ' and the '}
+          {hasUserAgreement && hasPrivacyPolicy && t(' and the ')}
           {hasPrivacyPolicy && (
             <a
               href='/privacy-policy'
               target='_blank'
               rel='noopener noreferrer'
-              className='text-primary hover:underline'
+              className='text-foreground underline underline-offset-4 hover:opacity-80'
             >
               {t('Privacy Policy')}
             </a>

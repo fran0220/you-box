@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .mono{font-family:var(--font-mono)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text);font-family:var(--font-sans);padding:32px;position:relative;overflow:hidden">
+  <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:640px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.045),transparent 65%);pointer-events:none"></div>
+  <div style="width:100%;max-width:460px;position:relative">
+    <a href="Index.dc.html" style="display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em;margin-bottom:26px"><span style="display:inline-flex;width:28px;height:28px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:17px;height:17px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></a>
+    <div class="yb-card yb-card--pad-lg">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="width:40px;height:40px;border-radius:10px;background:var(--brand-subtle);color:var(--brand);display:flex;align-items:center;justify-content:center"><i data-lucide="link" style="width:20px;height:20px"></i></span><div><div style="font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--text-strong)">Open in YouBox Chat</div><div class="mono" style="font-size:12px;color:var(--text-muted)">youbox.dev/chat2link/9f3a7c</div></div></div>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin:0 0 18px">You've been handed a conversation with a model preconfigured. Continue it in your workspace — your key and balance apply.</p>
+
+      <!-- preview -->
+      <div style="background:var(--surface-inset);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="display:flex;align-items:center;gap:9px"><span class="yb-avatar yb-avatar--sm" style="background:#565663">An</span><span style="font-size:13px;font-weight:600;color:var(--text)">Backoff &amp; retry helper</span></div><span class="yb-badge yb-badge--neutral" ><span class="yb-badge__dot"></span>claude-opus-4.6</span></div>
+        <div style="display:flex;gap:9px;justify-content:flex-end;margin-bottom:8px"><div style="max-width:80%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px 10px 3px 10px;padding:8px 11px;font-size:12.5px;color:var(--text);line-height:1.5">How do I retry a flaky fetch?</div></div>
+        <div style="display:flex;gap:9px"><div style="max-width:82%;background:transparent;font-size:12.5px;color:var(--text-secondary);line-height:1.5;padding:2px 0">Use capped exponential backoff with full jitter…</div></div>
+        <div class="mono" style="font-size:11px;color:var(--text-faint);margin-top:8px;text-align:right">12 messages · 3,210 tokens</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a class="yb-btn yb-btn--primary yb-btn--lg yb-btn--block" href="Chat.dc.html"><i data-lucide="messages-square"></i><span>Continue this chat</span></a>
+        <a class="yb-btn yb-btn--secondary yb-btn--block" href="SignIn.dc.html"><span>Sign in to a different account</span></a>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin:16px 0 0;text-align:center;line-height:1.5">Shared links are read-only previews until you continue. The original sender can't see your messages.</p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:760},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

@@ -36,6 +36,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { FilterTabs } from '@/components/data-table'
+import { PageHeader } from '@/components/youbox'
 import {
   Eyebrow,
   Panel,
@@ -289,41 +290,45 @@ export function OverviewInsights() {
 
   return (
     <div className='flex flex-col gap-4'>
-      {/* 1. header: greeting + range select + primary action */}
-      <div className='flex flex-wrap items-center gap-3'>
-        <p className='text-muted-foreground min-w-0 flex-1 basis-60 truncate text-sm'>
-          {t(greetingKey())}
-          {user?.username ? `, ${user.username}` : ''}.{' '}
-          {t("Here's your activity for {{range}}.", {
-            range: rangeLabel[rangeDays].toLowerCase(),
-          })}
-        </p>
-        <div className='flex shrink-0 items-center gap-2'>
-          <Select
-            value={String(rangeDays)}
-            onValueChange={(v) => setRangeDays(Number(v) as RangeDays)}
-          >
-            <SelectTrigger
-              size='sm'
-              className='w-36'
-              aria-label={t('Time range')}
+      <PageHeader
+        className='mb-1'
+        title={
+          <>
+            {t(greetingKey())}
+            {user?.username ? `, ${user.username}` : ''}
+          </>
+        }
+        subtitle={t("Here's your activity for {{range}}.", {
+          range: rangeLabel[rangeDays].toLowerCase(),
+        })}
+        actions={
+          <>
+            <Select
+              value={String(rangeDays)}
+              onValueChange={(v) => setRangeDays(Number(v) as RangeDays)}
             >
-              <SelectValue>{rangeLabel[rangeDays]}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {RANGE_OPTIONS.map((days) => (
-                <SelectItem key={days} value={String(days)}>
-                  {rangeLabel[days]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button size='sm' render={<Link to='/keys' />}>
-            <Plus data-icon='inline-start' />
-            {t('New Key')}
-          </Button>
-        </div>
-      </div>
+              <SelectTrigger
+                size='sm'
+                className='w-36'
+                aria-label={t('Time range')}
+              >
+                <SelectValue>{rangeLabel[rangeDays]}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {RANGE_OPTIONS.map((days) => (
+                  <SelectItem key={days} value={String(days)}>
+                    {rangeLabel[days]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button size='sm' render={<Link to='/keys' />}>
+              <Plus data-icon='inline-start' />
+              {t('New Key')}
+            </Button>
+          </>
+        }
+      />
 
       {/* 2. stat row */}
       <StatCardRow columns={4}>

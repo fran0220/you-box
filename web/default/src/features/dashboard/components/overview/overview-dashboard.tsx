@@ -61,7 +61,6 @@ import { AnnouncementsPanel } from './announcements-panel'
 import { ApiInfoPanel } from './api-info-panel'
 import { FAQPanel } from './faq-panel'
 import { OverviewInsights } from './overview-insights'
-import { PerformanceHealthPanel } from './performance-health-panel'
 import { UptimePanel } from './uptime-panel'
 
 const SETUP_GUIDE_VISIBILITY_STORAGE_KEY =
@@ -181,17 +180,17 @@ function SetupGuideBackdrop(props: { compact?: boolean }) {
     <>
       <div
         className={cn(
-          'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_48%_120%_at_78%_0%,color-mix(in_oklch,var(--primary)_8%,transparent)_0%,transparent_62%),linear-gradient(112deg,color-mix(in_oklch,var(--card)_98%,var(--primary)_2%)_0%,color-mix(in_oklch,var(--card)_94%,var(--muted)_6%)_48%,color-mix(in_oklch,var(--background)_92%,var(--accent)_8%)_100%)] dark:opacity-65',
+          'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_48%_120%_at_78%_0%,color-mix(in_srgb,var(--brand)_6%,transparent)_0%,transparent_62%),linear-gradient(112deg,var(--surface-card)_0%,color-mix(in_srgb,var(--surface-inset)_88%,var(--background)_12%)_100%)]',
           props.compact
-            ? '[mask-image:linear-gradient(90deg,black_0%,black_48%,transparent_74%)] opacity-55'
-            : 'opacity-85'
+            ? '[mask-image:linear-gradient(90deg,black_0%,black_48%,transparent_74%)] opacity-70'
+            : 'opacity-90'
         )}
         aria-hidden='true'
       />
       <div
         className={cn(
-          'text-foreground/5 dark:text-foreground/8 pointer-events-none absolute inset-y-0 right-0 hidden overflow-hidden font-mono sm:block',
-          props.compact ? 'w-1/2 opacity-45' : 'w-[58%] opacity-75'
+          'text-muted-foreground/15 pointer-events-none absolute inset-y-0 right-0 hidden overflow-hidden font-mono sm:block',
+          props.compact ? 'w-1/2 opacity-50' : 'w-[58%] opacity-80'
         )}
         aria-hidden='true'
       >
@@ -207,7 +206,7 @@ function SetupGuideBackdrop(props: { compact?: boolean }) {
         </pre>
       </div>
       <div
-        className='from-background/35 to-background/70 dark:from-background/20 dark:to-background/80 pointer-events-none absolute inset-0 bg-linear-to-b via-transparent'
+        className='from-background/40 to-background/75 pointer-events-none absolute inset-0 bg-linear-to-b via-transparent'
         aria-hidden='true'
       />
     </>
@@ -364,11 +363,11 @@ function RequestPreview(props: {
         )}
       </div>
 
-      <div className='bg-foreground/[0.035] my-3 rounded-xl p-3 font-mono text-xs'>
+      <div className='bg-surface-inset border-divider my-3 rounded-xl border p-3 font-mono text-xs'>
         <div className='mb-2 flex items-center gap-1.5'>
-          <span className='bg-destructive size-2 rounded-full' />
-          <span className='bg-warning size-2 rounded-full' />
-          <span className='bg-success size-2 rounded-full' />
+          <span className='bg-muted-foreground/40 size-2 rounded-full' />
+          <span className='bg-muted-foreground/25 size-2 rounded-full' />
+          <span className='bg-muted-foreground/15 size-2 rounded-full' />
         </div>
         <div className='flex flex-col gap-1 overflow-hidden'>
           {previewLines.map((line, index) => (
@@ -759,11 +758,6 @@ export function OverviewDashboard() {
                   'lg:grid-cols-2'
               )}
             >
-              {isAdmin && (
-                <CardStaggerItem className='lg:col-span-2'>
-                  <PerformanceHealthPanel />
-                </CardStaggerItem>
-              )}
               {showApiInfoPanel && (
                 <CardStaggerItem>
                   <ApiInfoPanel />

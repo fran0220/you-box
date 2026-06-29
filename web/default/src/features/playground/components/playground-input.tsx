@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   PaperclipIcon,
   UploadIcon,
@@ -70,15 +70,6 @@ const isMacPlatform = () =>
 // Max size for an uploaded (base64-inlined) image.
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024
 
-const suggestions = [
-  { icon: BarChartIcon, text: 'Analyze data', color: 'var(--teal)' },
-  { icon: BoxIcon, text: 'Surprise me', color: 'var(--brand)' },
-  { icon: NotepadTextIcon, text: 'Summarize text', color: 'var(--warning)' },
-  { icon: CodeSquareIcon, text: 'Code', color: 'var(--info)' },
-  { icon: GraduationCapIcon, text: 'Get advice', color: 'var(--teal)' },
-  { icon: null, text: 'More' },
-]
-
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -101,6 +92,34 @@ export function PlaygroundInput({
   const [imageUrls, setImageUrls] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const isMac = isMacPlatform()
+
+  const suggestions = useMemo(
+    () => [
+      {
+        icon: BarChartIcon,
+        textKey: 'Analyze data' as const,
+        color: 'var(--brand)',
+      },
+      {
+        icon: BoxIcon,
+        textKey: 'Surprise me' as const,
+        color: 'var(--text-muted)',
+      },
+      {
+        icon: NotepadTextIcon,
+        textKey: 'Summarize text' as const,
+        color: 'var(--text-muted)',
+      },
+      { icon: CodeSquareIcon, textKey: 'Code' as const, color: 'var(--brand)' },
+      {
+        icon: GraduationCapIcon,
+        textKey: 'Get advice' as const,
+        color: 'var(--text-muted)',
+      },
+      { icon: null, textKey: 'More' as const, color: undefined },
+    ],
+    []
+  )
 
   const handleSubmit = (message: PromptInputMessage) => {
     if (!message.text?.trim() || disabled) return
@@ -317,19 +336,27 @@ export function PlaygroundInput({
       </PromptInput>
 
       <Suggestions>
-        {suggestions.map(({ icon: Icon, text: suggestionText, color }) => (
-          <Suggestion
-            className={`text-xs font-normal sm:text-sm ${
-              suggestionText === 'More' ? 'hidden sm:flex' : ''
-            }`}
-            key={suggestionText}
-            onClick={() => handleSuggestionClick(suggestionText)}
-            suggestion={suggestionText}
-          >
-            {Icon && <Icon size={16} style={{ color }} />}
-            {suggestionText}
-          </Suggestion>
-        ))}
+        {suggestions.map(({ icon: Icon, textKey, color }) => {
+          const label = t(textKey)
+          return (
+            <Suggestion
+              className={cn(
+                'text-xs font-normal sm:text-sm',
+                textKey === 'More' && 'hidden sm:flex'
+              )}
+              key={textKey}
+              onClick={() => handleSuggestionClick(label)}
+              suggestion={label}
+            >
+              {Icon && color ? (
+                <Icon size={16} style={{ color }} />
+              ) : Icon ? (
+                <Icon size={16} className='text-muted-foreground' />
+              ) : null}
+              {label}
+            </Suggestion>
+          )
+        })}
       </Suggestions>
     </div>
   )

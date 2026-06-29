@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 0;border-top:1px solid var(--divider)}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="ModelsAdmin.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="Subscriptions.dc.html"><i data-lucide="badge-dollar-sign"></i>Subscriptions</a>
+      <a class="snav" href="RedemptionCodes.dc.html"><i data-lucide="ticket"></i>Redemption</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <a class="snav on" href="Profile.dc.html" style="margin:0;border-top:1px solid var(--border);border-radius:0;padding:12px 18px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></a>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Profile</div>
+      <div style="flex:1"></div>
+      <button class="yb-btn yb-btn--ghost yb-btn--sm"><span>Discard</span></button>
+      <button class="yb-btn yb-btn--primary yb-btn--sm"><i data-lucide="check"></i><span>Save</span></button>
+    </header>
+
+    <div style="padding:28px 28px 64px;max-width:980px;display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start">
+      <!-- account card -->
+      <div style="position:sticky;top:88px;display:flex;flex-direction:column;gap:16px">
+        <div class="yb-card" style="text-align:center"><span class="yb-avatar yb-avatar--xl" style="background:#565663;margin:0 auto 14px;width:72px;height:72px;font-size:28px">JM</span><div style="font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--text-strong)">Jordan Maru</div><div class="mono" style="font-size:12px;color:var(--text-muted);margin-top:3px">jordan@cortex.dev</div><div style="display:flex;gap:6px;justify-content:center;margin-top:12px"><span class="yb-badge yb-badge--brand" >Admin</span><span class="yb-badge yb-badge--neutral">Enterprise</span></div><button class="yb-btn yb-btn--secondary yb-btn--sm yb-btn--block" style="margin-top:16px"><i data-lucide="image"></i><span>Change avatar</span></button></div>
+        <div class="yb-card"><div class="mono" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:12px">Check-in streak</div><div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text-strong)">12</span><span style="font-size:13px;color:var(--text-secondary)">days · +$0.50 bonus</span></div><div style="display:flex;gap:4px;margin-top:12px"><span style="flex:1;height:24px;border-radius:4px;background:var(--ink-100)"></span><span style="flex:1;height:24px;border-radius:4px;background:var(--ink-200)"></span><span style="flex:1;height:24px;border-radius:4px;background:var(--ink-300)"></span><span style="flex:1;height:24px;border-radius:4px;background:var(--ink-200)"></span><span style="flex:1;height:24px;border-radius:4px;background:var(--ink-100)"></span><span style="flex:1;height:24px;border-radius:4px;background:var(--ink-200)"></span><span style="flex:1;height:24px;border-radius:4px;background:var(--surface-3)"></span></div></div>
+      </div>
+
+      <!-- forms -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="yb-card">
+          <div style="font-size:14px;font-weight:600;color:var(--text-strong);margin-bottom:4px">Profile details</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px">
+            <div class="yb-field"><label class="yb-field__label">Display name</label><input class="yb-input" value="Jordan Maru"></div>
+            <div class="yb-field"><label class="yb-field__label">Username</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="at-sign"></i></span><input class="yb-input yb-input--with-icon" value="jordan-m"></div></div>
+            <div class="yb-field" style="grid-column:span 2"><label class="yb-field__label">Email</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="mail"></i></span><input class="yb-input yb-input--with-icon" value="jordan@cortex.dev"></div></div>
+            <div class="yb-field"><label class="yb-field__label">Timezone</label><input class="yb-input" value="America/New_York"></div>
+            <div class="yb-field"><label class="yb-field__label">Language</label><input class="yb-input" value="English (US)"></div>
+          </div>
+        </div>
+
+        <div class="yb-card">
+          <div style="font-size:14px;font-weight:600;color:var(--text-strong)">Security</div>
+          <div class="row"><div><div style="font-size:14px;color:var(--text);font-weight:500">Password</div><div style="font-size:13px;color:var(--text-muted);margin-top:2px">Last changed 3 months ago</div></div><button class="yb-btn yb-btn--secondary yb-btn--sm"><span>Change</span></button></div>
+          <div class="row"><div><div style="font-size:14px;color:var(--text);font-weight:500;display:flex;align-items:center;gap:8px">Two-factor authentication <span class="yb-badge yb-badge--success" >On</span></div><div style="font-size:13px;color:var(--text-muted);margin-top:2px">TOTP via authenticator app</div></div><button class="yb-btn yb-btn--ghost yb-btn--sm"><span>Manage</span></button></div>
+          <div class="row"><div><div style="font-size:14px;color:var(--text);font-weight:500">Passkeys</div><div style="font-size:13px;color:var(--text-muted);margin-top:2px">2 registered · MacBook, iPhone</div></div><button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="plus"></i><span>Add</span></button></div>
+          <div class="row"><div><div style="font-size:14px;color:var(--text);font-weight:500">Active sessions</div><div style="font-size:13px;color:var(--text-muted);margin-top:2px">3 devices · New York, SF</div></div><button class="yb-btn yb-btn--ghost yb-btn--sm" style="color:var(--danger)"><span>Sign out all</span></button></div>
+        </div>
+
+        <div class="yb-card">
+          <div style="font-size:14px;font-weight:600;color:var(--text-strong)">Connected accounts</div>
+          <div class="row"><div style="display:flex;align-items:center;gap:11px"><span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text);display:flex;align-items:center;justify-content:center"><i data-lucide="github" style="width:18px;height:18px"></i></span><div><div style="font-size:14px;color:var(--text);font-weight:500">GitHub</div><div class="mono" style="font-size:12px;color:var(--text-muted)">@jordan-m</div></div></div><span class="yb-badge yb-badge--success" >Connected</span></div>
+          <div class="row"><div style="display:flex;align-items:center;gap:11px"><span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;justify-content:center"><i data-lucide="chrome" style="width:18px;height:18px"></i></span><div><div style="font-size:14px;color:var(--text);font-weight:500">Google</div><div style="font-size:12px;color:var(--text-muted)">Not connected</div></div></div><button class="yb-btn yb-btn--secondary yb-btn--sm"><span>Connect</span></button></div>
+        </div>
+
+        <div class="yb-card" style="border-color:var(--danger-subtle)">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:20px"><div><div style="font-size:14px;font-weight:600;color:var(--text-strong)">Delete account</div><div style="font-size:13px;color:var(--text-muted);margin-top:2px">Permanently remove your account, keys, and history.</div></div><button class="yb-btn yb-btn--danger yb-btn--sm"><i data-lucide="trash-2"></i><span>Delete</span></button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

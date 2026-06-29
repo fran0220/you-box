@@ -19,8 +19,9 @@ For commercial licensing, please contact support@quantumnous.com
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
+import { EmptyState } from '@/components/youbox'
 import {
   MarketShareSection,
   ModelsSection,
@@ -55,17 +56,13 @@ export function Rankings() {
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
+    <AppShell variant='public'>
       <div className='relative'>
         <div
           aria-hidden
-          className='pointer-events-none absolute -top-48 left-1/2 size-[560px] -translate-x-1/2 rounded-full blur-[10px]'
-          style={{
-            background:
-              'radial-gradient(circle, color-mix(in oklch, var(--brand) 14%, transparent), transparent 62%)',
-          }}
+          className='pointer-events-none absolute -top-48 left-1/2 size-[560px] -translate-x-1/2 rounded-full blur-[10px] [background:radial-gradient(circle,color-mix(in_oklch,var(--brand)_14%,transparent),transparent_62%)]'
         />
-        <PageTransition className='relative mx-auto w-full max-w-[1280px] space-y-8 px-3 pt-16 pb-10 sm:px-6 sm:pt-20 sm:pb-12 xl:px-8'>
+        <PageTransition className='relative space-y-8 pb-10 sm:pb-12'>
           <RankingsHero period={period} onPeriodChange={handlePeriodChange} />
 
           {rankingsQuery.isLoading ? (
@@ -106,7 +103,7 @@ export function Rankings() {
           )}
         </PageTransition>
       </div>
-    </PublicLayout>
+    </AppShell>
   )
 }
 
@@ -123,13 +120,10 @@ function RankingsLoading() {
 function RankingsError(props: { message: string }) {
   const { t } = useTranslation()
   return (
-    <div className='bg-card rounded-xl border border-dashed px-6 py-12 text-center'>
-      <h2 className='text-foreground text-base font-semibold'>
-        {t('Unable to load rankings')}
-      </h2>
-      <p className='text-muted-foreground mx-auto mt-2 max-w-md text-sm'>
-        {props.message}
-      </p>
-    </div>
+    <EmptyState
+      className='border-border bg-surface-card rounded-xl border border-dashed'
+      title={t('Unable to load rankings')}
+      description={props.message}
+    />
   )
 }

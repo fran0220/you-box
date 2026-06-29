@@ -19,7 +19,6 @@ For commercial licensing, please contact support@quantumnous.com
 import { useCallback, useMemo } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
-  CONTEXT_LENGTH_MIN,
   DEFAULT_SORT,
   DEFAULT_TOKEN_UNIT,
   FILTER_SECTIONS,
@@ -33,19 +32,8 @@ import {
   filterAndSortModels,
   type ModelFilters,
 } from '../lib/filters'
-import type { EnrichedPricingModel, Modality, TokenUnit } from '../types'
-
-// ----------------------------------------------------------------------------
-// URL <-> state serialization
-// ----------------------------------------------------------------------------
-//
-// Array facets are serialized as a SINGLE comma-joined string per param
-// (e.g. `?providers=OpenAI,Anthropic`). This keeps URLs short and the zod
-// schema simple (each facet is `z.string().optional()`). The hook owns parse/
-// serialize so components only ever see/produce `string[]`.
-//
-// Ranges are serialized as two numeric params: `ctxMin`/`ctxMax` (tokens) and
-// `priceMin`/`priceMax` (USD per 1M input tokens). Absent param == open bound.
+import type { ModelTypeValue } from '../lib/model-type'
+import type { EnrichedPricingModel, TokenUnit } from '../types'
 
 const ARRAY_SEPARATOR = ','
 
@@ -65,7 +53,6 @@ function serializeList(values: string[]): string | undefined {
 function normalizeViewMode(value: unknown): ViewMode {
   if (value === VIEW_MODES.TABLE) return VIEW_MODES.TABLE
   if (value === VIEW_MODES.CARD) return VIEW_MODES.CARD
-  // Absent / unknown => the default dense list (URL param omitted).
   return VIEW_MODES.LIST
 }
 
@@ -74,15 +61,10 @@ function toNumberOr(value: unknown, fallback: number): number {
   return Number.isFinite(n) ? n : fallback
 }
 
-/** A removable active-filter pill descriptor. */
 export type ActiveFilter = {
-  /** Facet key this pill belongs to (FILTER_SECTIONS value, or 'search'/range). */
-  facet: FilterSection | 'search' | 'contextRange' | 'promptPriceRange'
-  /** The selected value (for array facets), or '' for search/range pills. */
+  facet: FilterSection | 'search' | 'promptPriceRange'
   value: string
-  /** Human-readable label for the pill (already localized by the hook). */
   label: string
-  /** Remove just this selection. */
   onRemove: () => void
 }
 
@@ -92,28 +74,18 @@ export function useFilters(models: EnrichedPricingModel[]) {
   const search = useSearch({ from: '/pricing/' })
   const navigate = useNavigate({ from: '/pricing/' })
 
-  // ---- read state from URL (single source of truth) ----
   const searchInput = (search.search as string) || ''
   const sortBy = (search.sort as string) || DEFAULT_SORT
 
   const providers = useMemo(() => parseList(search.providers), [search.providers])
+  const modelTypes = useMemo(
+    () => parseList(search.modelTypes) as ModelTypeValue[],
+    [search.modelTypes]
+  )
   const groups = useMemo(() => parseList(search.groups), [search.groups])
   const categories = useMemo(
     () => parseList(search.categories),
     [search.categories]
-  )
-  const inputModalities = useMemo(
-    () => parseList(search.inputModalities) as Modality[],
-    [search.inputModalities]
-  )
-  const outputModalities = useMemo(
-    () => parseList(search.outputModalities) as Modality[],
-    [search.outputModalities]
-  )
-  const series = useMemo(() => parseList(search.series), [search.series])
-  const supportedParameters = useMemo(
-    () => parseList(search.supportedParameters),
-    [search.supportedParameters]
   )
   const endpointTypes = useMemo(
     () => parseList(search.endpointTypes),
@@ -124,13 +96,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
     [search.quotaTypes]
   )
 
-  const contextRange = useMemo<[number, number]>(
-    () => [
-      toNumberOr(search.ctxMin, CONTEXT_LENGTH_MIN),
-      toNumberOr(search.ctxMax, 0),
-    ],
-    [search.ctxMin, search.ctxMax]
-  )
   const promptPriceRange = useMemo<[number, number]>(
     () => [toNumberOr(search.priceMin, 0), toNumberOr(search.priceMax, -1)],
     [search.priceMin, search.priceMax]
@@ -140,12 +105,11 @@ export function useFilters(models: EnrichedPricingModel[]) {
   const viewMode = normalizeViewMode(search.view)
   const showRechargePrice = search.rechargePrice === true
 
-  // ---- URL writers ----
   const updateFilters = useCallback(
     (updates: Record<string, unknown>) => {
       navigate({
         replace: true,
-        search: (prev) => {
+        search: (prev: Record<string, unknown>) => {
           const next: Record<string, unknown> = { ...prev, ...updates }
           for (const key of Object.keys(next)) {
             if (next[key] === undefined || next[key] === null) {
@@ -159,33 +123,18 @@ export function useFilters(models: EnrichedPricingModel[]) {
     [navigate]
   )
 
-  // Map facet key -> URL param + current array (keeps toggle generic).
   const facetState: Record<FilterSection, string[]> = useMemo(
     () => ({
       [FILTER_SECTIONS.PROVIDER]: providers,
+      [FILTER_SECTIONS.MODEL_TYPE]: modelTypes,
       [FILTER_SECTIONS.GROUP]: groups,
       [FILTER_SECTIONS.CATEGORY]: categories,
-      [FILTER_SECTIONS.INPUT_MODALITY]: inputModalities,
-      [FILTER_SECTIONS.OUTPUT_MODALITY]: outputModalities,
-      [FILTER_SECTIONS.SERIES]: series,
-      [FILTER_SECTIONS.SUPPORTED_PARAMETER]: supportedParameters,
       [FILTER_SECTIONS.ENDPOINT_TYPE]: endpointTypes,
       [FILTER_SECTIONS.PRICING_TYPE]: quotaTypes,
     }),
-    [
-      providers,
-      groups,
-      categories,
-      inputModalities,
-      outputModalities,
-      series,
-      supportedParameters,
-      endpointTypes,
-      quotaTypes,
-    ]
+    [providers, modelTypes, groups, categories, endpointTypes, quotaTypes]
   )
 
-  /** Add or remove a single value within a facet (URL param == facet key). */
   const toggleFacetValue = useCallback(
     (facet: FilterSection, value: string) => {
       const current = facetState[facet] ?? []
@@ -197,7 +146,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
     [facetState, updateFilters]
   )
 
-  /** Replace the entire selection for a facet. */
   const setFacetValues = useCallback(
     (facet: FilterSection, values: string[]) => {
       updateFilters({ [facet]: serializeList(values) })
@@ -212,14 +160,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
   const setSortBy = useCallback(
     (v: string) =>
       updateFilters({ sort: v === DEFAULT_SORT ? undefined : v }),
-    [updateFilters]
-  )
-  const setContextRange = useCallback(
-    ([min, max]: [number, number]) =>
-      updateFilters({
-        ctxMin: min > CONTEXT_LENGTH_MIN ? min : undefined,
-        ctxMax: max > 0 ? max : undefined,
-      }),
     [updateFilters]
   )
   const setPromptPriceRange = useCallback(
@@ -238,7 +178,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
   )
   const setViewMode = useCallback(
     (v: ViewMode) =>
-      // LIST is the default; omit the param so the URL stays clean.
       updateFilters({ view: v === VIEW_MODES.LIST ? undefined : v }),
     [updateFilters]
   )
@@ -247,35 +186,26 @@ export function useFilters(models: EnrichedPricingModel[]) {
     [updateFilters]
   )
 
-  // ---- derived: filtered models ----
   const filters = useMemo<ModelFilters>(
     () => ({
       search: searchInput,
       providers,
+      modelTypes,
       groups,
       categories,
-      inputModalities,
-      outputModalities,
-      series,
-      supportedParameters,
       endpointTypes,
       quotaTypes,
-      contextRange,
       promptPriceRange,
       sortBy,
     }),
     [
       searchInput,
       providers,
+      modelTypes,
       groups,
       categories,
-      inputModalities,
-      outputModalities,
-      series,
-      supportedParameters,
       endpointTypes,
       quotaTypes,
-      contextRange,
       promptPriceRange,
       sortBy,
     ]
@@ -286,9 +216,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
     return filterAndSortModels(models, filters)
   }, [models, filters])
 
-  // ---- active filter pills ----
-  const hasContextRange =
-    contextRange[0] > CONTEXT_LENGTH_MIN || contextRange[1] > 0
   const hasPriceRange = promptPriceRange[0] > 0 || promptPriceRange[1] >= 0
 
   const activeFilters = useMemo<ActiveFilter[]>(() => {
@@ -306,14 +233,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
         })
       }
     }
-    if (hasContextRange) {
-      pills.push({
-        facet: 'contextRange',
-        value: '',
-        label: 'Context length',
-        onRemove: () => setContextRange([CONTEXT_LENGTH_MIN, 0]),
-      })
-    }
     if (hasPriceRange) {
       pills.push({
         facet: 'promptPriceRange',
@@ -323,54 +242,35 @@ export function useFilters(models: EnrichedPricingModel[]) {
       })
     }
     return pills
-  }, [
-    facetState,
-    hasContextRange,
-    hasPriceRange,
-    toggleFacetValue,
-    setContextRange,
-    setPromptPriceRange,
-  ])
+  }, [facetState, hasPriceRange, toggleFacetValue, setPromptPriceRange])
 
   const activeFilterCount = activeFilters.length
   const hasActiveFilters = activeFilterCount > 0
 
-  /** Clear a single facet's selection (and ranges via the pseudo-facets). */
   const clearFacet = useCallback(
-    (
-      facet: FilterSection | 'contextRange' | 'promptPriceRange'
-    ) => {
-      if (facet === 'contextRange') {
-        setContextRange([CONTEXT_LENGTH_MIN, 0])
-      } else if (facet === 'promptPriceRange') {
+    (facet: FilterSection | 'promptPriceRange') => {
+      if (facet === 'promptPriceRange') {
         setPromptPriceRange([0, -1])
       } else {
         updateFilters({ [facet]: undefined })
       }
     },
-    [updateFilters, setContextRange, setPromptPriceRange]
+    [updateFilters, setPromptPriceRange]
   )
 
-  /** Clear all facets + ranges (keeps search, sort, view, tokenUnit, recharge). */
   const clearFilters = useCallback(() => {
     updateFilters({
       [FILTER_SECTIONS.PROVIDER]: undefined,
+      [FILTER_SECTIONS.MODEL_TYPE]: undefined,
       [FILTER_SECTIONS.GROUP]: undefined,
       [FILTER_SECTIONS.CATEGORY]: undefined,
-      [FILTER_SECTIONS.INPUT_MODALITY]: undefined,
-      [FILTER_SECTIONS.OUTPUT_MODALITY]: undefined,
-      [FILTER_SECTIONS.SERIES]: undefined,
-      [FILTER_SECTIONS.SUPPORTED_PARAMETER]: undefined,
       [FILTER_SECTIONS.ENDPOINT_TYPE]: undefined,
       [FILTER_SECTIONS.PRICING_TYPE]: undefined,
-      ctxMin: undefined,
-      ctxMax: undefined,
       priceMin: undefined,
       priceMax: undefined,
     })
   }, [updateFilters])
 
-  /** Clear everything including search. */
   const clearAll = useCallback(() => {
     clearFilters()
     updateFilters({ search: undefined })
@@ -381,48 +281,35 @@ export function useFilters(models: EnrichedPricingModel[]) {
   }, [updateFilters])
 
   return {
-    // raw search/sort/view/units
     searchInput,
     sortBy,
     tokenUnit,
     viewMode,
     showRechargePrice,
-    // per-facet selected arrays
     providers,
+    modelTypes,
     groups,
     categories,
-    inputModalities,
-    outputModalities,
-    series,
-    supportedParameters,
     endpointTypes,
     quotaTypes,
-    // ranges
-    contextRange,
     promptPriceRange,
-    // generic facet helpers
     facetState,
     toggleFacetValue,
     setFacetValues,
-    // setters
     setSearchInput,
     setSortBy,
-    setContextRange,
     setPromptPriceRange,
     setTokenUnit,
     setViewMode,
     setShowRechargePrice,
-    // derived
     filteredModels,
     activeFilters,
     activeFilterCount,
     hasActiveFilters,
-    // clears
     clearFacet,
     clearFilters,
     clearAll,
     clearSearch,
-    // constants re-exported for convenience
     SORT_OPTIONS,
   }
 }

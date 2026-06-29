@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SectionPageLayout } from '@/components/layout'
+import { PageHeader } from '@/components/youbox'
 import { listDeployments } from './api'
 import { DeploymentAccessGuard } from './components/deployment-access-guard'
 import { DeploymentsTable } from './components/deployments-table'
@@ -42,12 +43,18 @@ import {
 
 const route = getRouteApi('/_authenticated/models/$section')
 
-const SECTION_META: Record<ModelsSectionId, { titleKey: string }> = {
+const SECTION_META: Record<
+  ModelsSectionId,
+  { titleKey: string; subtitleKey: string }
+> = {
   metadata: {
     titleKey: 'Metadata',
+    subtitleKey:
+      'Catalog metadata for models exposed to users — vendors, ratios, and sync.',
   },
   deployments: {
     titleKey: 'Deployments',
+    subtitleKey: 'GPU deployments managed through io.net when enabled.',
   },
 }
 
@@ -55,15 +62,13 @@ function ModelsContent() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { tabCategory, setTabCategory } = useModels()
+  const { tabCategory, setTabCategory, metadataConfiguredTotal } = useModels()
   const params = route.useParams()
   const activeSection = (params.section ??
     MODELS_DEFAULT_SECTION) as ModelsSectionId
 
-  // Deployment create dialog state
   const [createDeploymentOpen, setCreateDeploymentOpen] = useState(false)
 
-  // keep context state in sync (for components that rely on it)
   useEffect(() => {
     if (tabCategory !== activeSection) {
       setTabCategory(activeSection)
@@ -81,15 +86,12 @@ function ModelsContent() {
     refresh: refreshDeploymentSettings,
   } = useModelDeploymentSettings()
 
-  // Ensure settings are fresh when switching to deployments section
   useEffect(() => {
     if (activeSection === 'deployments') {
       refreshDeploymentSettings()
     }
   }, [activeSection, refreshDeploymentSettings])
 
-  // Prefetch deployments list while connection check is in progress
-  // This allows the data to be ready as soon as the guard passes
   useEffect(() => {
     if (
       activeSection === 'deployments' &&
@@ -100,7 +102,7 @@ function ModelsContent() {
       queryClient.prefetchQuery({
         queryKey: deploymentsQueryKeys.list(defaultParams),
         queryFn: () => listDeployments(defaultParams),
-        staleTime: 30 * 1000, // 30 seconds
+        staleTime: 30 * 1000,
       })
     }
   }, [activeSection, isIoNetEnabled, loadingPhase, queryClient])
@@ -115,26 +117,38 @@ function ModelsContent() {
     [navigate]
   )
 
-  const meta = SECTION_META[activeSection] ?? SECTION_META.metadata
+  const sectionMeta = SECTION_META[activeSection] ?? SECTION_META.metadata
+
+  const pageTitle = t('Models')
+  const subtitle =
+    activeSection === 'metadata' && metadataConfiguredTotal != null
+      ? t('{{count}} configured models', { count: metadataConfiguredTotal })
+      : t(sectionMeta.subtitleKey)
+
+  const headerActions =
+    activeSection === 'metadata' ? (
+      <ModelsPrimaryButtons />
+    ) : (
+      <Button onClick={() => setCreateDeploymentOpen(true)} size='sm'>
+        <Plus className='h-4 w-4' aria-hidden />
+        {t('Create deployment')}
+      </Button>
+    )
 
   return (
     <>
       <SectionPageLayout>
-        <SectionPageLayout.Title>{t(meta.titleKey)}</SectionPageLayout.Title>
-        <SectionPageLayout.Actions>
-          {activeSection === 'metadata' ? (
-            <ModelsPrimaryButtons />
-          ) : (
-            <Button onClick={() => setCreateDeploymentOpen(true)} size='sm'>
-              <Plus className='h-4 w-4' />
-              {t('Create deployment')}
-            </Button>
-          )}
-        </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <div className='space-y-4'>
+          <div className='mx-auto w-full max-w-[1200px] space-y-5'>
+            <PageHeader
+              eyebrow={pageTitle}
+              title={pageTitle}
+              subtitle={subtitle}
+              actions={headerActions}
+            />
+
             <Tabs value={activeSection} onValueChange={handleSectionChange}>
-              <TabsList className='max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto'>
+              <TabsList variant='line' className='w-full justify-start'>
                 {MODELS_SECTION_IDS.map((section) => (
                   <TabsTrigger key={section} value={section}>
                     {t(SECTION_META[section].titleKey)}
@@ -142,6 +156,7 @@ function ModelsContent() {
                 ))}
               </TabsList>
             </Tabs>
+
             {activeSection === 'metadata' ? (
               <ModelsTable />
             ) : (

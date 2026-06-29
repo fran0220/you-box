@@ -14,12 +14,21 @@ export default defineConfig(({ envMode }) => {
     'http://localhost:3000'
 
   const isProd = envMode === 'production'
-  const devProxy = Object.fromEntries(
-    (['/api', '/mj', '/pg'] as const).map((key) => [
-      key,
-      { target: serverUrl, changeOrigin: true },
-    ]),
-  ) as Record<string, { target: string; changeOrigin: boolean }>
+  // Prefix keys like `/api` would also match SPA routes such as `/api-tools`; use
+  // pathname filters so only backend API paths proxy to the Go server.
+  const devProxy = [
+    {
+      pathFilter: (pathname: string) =>
+        pathname === '/api' ||
+        pathname.startsWith('/api/') ||
+        pathname === '/mj' ||
+        pathname.startsWith('/mj/') ||
+        pathname === '/pg' ||
+        pathname.startsWith('/pg/'),
+      target: serverUrl,
+      changeOrigin: true,
+    },
+  ]
 
   return {
     plugins: [pluginReact()],

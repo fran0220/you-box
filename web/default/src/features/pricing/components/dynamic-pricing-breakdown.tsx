@@ -260,7 +260,7 @@ export function DynamicPricingBreakdown({
                   key={`tier-mobile-${i}`}
                   className={cn(
                     'rounded-md border p-2',
-                    isMatched && 'border-emerald-500/40 bg-emerald-500/10'
+                    isMatched && 'border-success/40 bg-success-subtle'
                   )}
                 >
                   <div className='mb-1.5 flex flex-wrap items-center gap-1.5'>
@@ -273,7 +273,7 @@ export function DynamicPricingBreakdown({
                     {isMatched && (
                       <Badge
                         variant='secondary'
-                        className='bg-teal-subtle text-teal'
+                        className='bg-success-subtle text-success'
                       >
                         {t('Matched')}
                       </Badge>
@@ -336,7 +336,7 @@ export function DynamicPricingBreakdown({
                       key={`tier-${i}`}
                       className={cn(
                         isMatched &&
-                          'bg-emerald-50/70 hover:bg-emerald-50/70 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/10'
+                          'bg-success-subtle hover:bg-success-subtle'
                       )}
                     >
                       <TableCell className='py-2.5 align-top'>
@@ -350,7 +350,7 @@ export function DynamicPricingBreakdown({
                           {isMatched && (
                             <Badge
                               variant='secondary'
-                              className='bg-teal-subtle text-teal'
+                              className='bg-success-subtle text-success'
                             >
                               {t('Matched')}
                             </Badge>

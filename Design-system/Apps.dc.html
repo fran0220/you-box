@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 28px}
+  .eyb{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 14px}
+  a{text-decoration:none;color:inherit}
+  .navlink{font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-secondary);padding:8px 12px;border-radius:6px}
+  .navlink:hover{color:var(--text);background:var(--surface-hover)}
+  .navlink.on{color:var(--text-strong)}
+  .ar{display:grid;grid-template-columns:48px 1fr 150px 150px 110px;align-items:center;gap:16px;padding:15px 20px;border-top:1px solid var(--divider)}
+  .mono{font-family:var(--font-mono)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <header style="position:sticky;top:0;z-index:200;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--border)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;gap:28px">
+      <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong);font-weight:700">Box</b></span></a>
+      <nav style="display:flex;align-items:center;gap:2px;margin-left:6px"><a class="navlink" href="Marketplace.dc.html">Models</a><a class="navlink on" href="Rankings.dc.html">Rankings</a><a class="navlink" href="Docs.dc.html">Docs</a><a class="navlink" href="Status.dc.html">Status</a></nav>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px"><button class="yb-iconbtn" aria-label="Toggle theme"><i data-lucide="sun"></i></button><a class="yb-btn yb-btn--ghost yb-btn--sm" href="SignIn.dc.html"><span>Sign in</span></a><a class="yb-btn yb-btn--primary yb-btn--sm" href="SignUp.dc.html"><span>Get API key</span></a></div>
+    </div>
+  </header>
+
+  <section style="padding:48px 0 64px">
+    <div class="wrap">
+      <p class="eyb">// App rankings</p>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:10px"><h1 style="font-family:var(--font-display);font-size:40px;letter-spacing:-.03em;font-weight:700;margin:0;color:var(--text-strong)">Top apps</h1><div class="yb-tabs yb-tabs--pill"><a class="yb-tab" href="Rankings.dc.html">Models</a><span class="yb-tab yb-tab--active">Apps</span></div></div>
+      <p style="font-size:16px;color:var(--text-secondary);margin:0 0 28px;max-width:46em">Applications ranked by tokens routed, attributed via the <code class="mono" style="font-size:13px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--text)">HTTP-Referer</code> and <code class="mono" style="font-size:13px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--text)">X-Title</code> request headers.</p>
+
+      <div style="display:flex;gap:34px;padding:24px 0;border-top:1px solid var(--divider);border-bottom:1px solid var(--divider);margin-bottom:24px">
+        <div class="yb-stat"><span class="yb-stat__label">Apps tracked</span><span class="yb-stat__value">2,140</span></div>
+        <div class="yb-stat"><span class="yb-stat__label">Tokens this week</span><span class="yb-stat__value">9.7<span class="yb-stat__unit">T</span></span></div>
+        <div class="yb-stat"><span class="yb-stat__label">New this week</span><span class="yb-stat__value" style="color:var(--success)">+182</span></div>
+      </div>
+
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="ar" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>#</span><span>App</span><span style="text-align:right">Requests</span><span style="text-align:right">Tokens</span><span style="text-align:right">Growth</span></div>
+
+        <div class="ar"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">1</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#565663">Cl</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Cline</div><div class="mono" style="font-size:11px;color:var(--text-muted)">cline.bot</div></span></span><span class="mono" style="color:var(--text);text-align:right">14.2M</span><span class="mono" style="color:var(--text);text-align:right">2.81T</span><span style="text-align:right"><span class="yb-badge yb-badge--success" >+34%</span></span></div>
+
+        <div class="ar"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">2</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#3B3B47">Ro</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Roo Code</div><div class="mono" style="font-size:11px;color:var(--text-muted)">roocode.com</div></span></span><span class="mono" style="color:var(--text);text-align:right">9.8M</span><span class="mono" style="color:var(--text);text-align:right">1.92T</span><span style="text-align:right"><span class="yb-badge yb-badge--success">+21%</span></span></div>
+
+        <div class="ar"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">3</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#8B9097">Ke</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Kilo Code</div><div class="mono" style="font-size:11px;color:var(--text-muted)">kilocode.ai</div></span></span><span class="mono" style="color:var(--text);text-align:right">6.1M</span><span class="mono" style="color:var(--text);text-align:right">1.34T</span><span style="text-align:right"><span class="yb-badge yb-badge--success">+58%</span></span></div>
+
+        <div class="ar"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">4</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#807C75">Si</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">SillyTavern</div><div class="mono" style="font-size:11px;color:var(--text-muted)">sillytavern.app</div></span></span><span class="mono" style="color:var(--text);text-align:right">5.4M</span><span class="mono" style="color:var(--text);text-align:right">0.98T</span><span style="text-align:right"><span class="yb-badge yb-badge--neutral">+4%</span></span></div>
+
+        <div class="ar"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">5</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#74747F">Op</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Open WebUI</div><div class="mono" style="font-size:11px;color:var(--text-muted)">openwebui.com</div></span></span><span class="mono" style="color:var(--text);text-align:right">4.0M</span><span class="mono" style="color:var(--text);text-align:right">0.71T</span><span style="text-align:right"><span class="yb-badge yb-badge--success">+12%</span></span></div>
+
+        <div class="ar"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">6</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#A7ABB1">Li</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">LibreChat</div><div class="mono" style="font-size:11px;color:var(--text-muted)">librechat.ai</div></span></span><span class="mono" style="color:var(--text);text-align:right">2.9M</span><span class="mono" style="color:var(--text);text-align:right">0.52T</span><span style="text-align:right"><span class="yb-badge yb-badge--danger" >−7%</span></span></div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:880},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

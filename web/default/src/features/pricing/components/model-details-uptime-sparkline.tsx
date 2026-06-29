@@ -26,7 +26,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { formatUptimePct } from '@/features/performance-metrics/lib/format'
-import { aggregateUptime, type UptimeDayPoint } from '../lib/mock-stats'
+import { aggregateUptime, type UptimeDayPoint } from '../lib/chart-types'
 
 // ---------------------------------------------------------------------------
 // Uptime sparkline

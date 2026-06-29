@@ -20,7 +20,7 @@ import { useState } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Edit, Trash2, Save } from 'lucide-react'
+import { Plus, Edit, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { getBgColorClass } from '@/lib/colors'
@@ -64,9 +64,11 @@ import {
 } from '@/components/ui/table'
 import { Dialog } from '@/components/dialog'
 import { StatusBadge } from '@/components/status-badge'
-import { SettingsSwitchField } from '../components/settings-form-layout'
+import { EmptyState } from '@/components/youbox'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
+import { ContentListEditorShell } from './content-list-editor-shell'
+import { useContentListSettingsForm } from './use-content-list-settings-form'
 
 type ApiInfo = {
   id: number
@@ -133,20 +135,35 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
     () => parseApiInfoList(data) ?? []
   )
   const [isEnabled, setIsEnabled] = useState(enabled)
-  const [hasChanges, setHasChanges] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [showDialog, setShowDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [editingApiInfo, setEditingApiInfo] = useState<ApiInfo | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<'single' | 'batch'>('single')
 
-  const form = useForm<ApiInfoFormValues>({
+  const dialogForm = useForm<ApiInfoFormValues>({
     resolver: zodResolver(apiInfoSchema),
     defaultValues: {
       url: '',
       route: '',
       description: '',
       color: 'blue',
+    },
+  })
+
+  const listFormBridge = useContentListSettingsForm({
+    serialized: JSON.stringify(apiInfoList),
+    baselineSerialized: data || '[]',
+    save: async (value) => {
+      await updateOption.mutateAsync({
+        key: 'console_setting.api_info',
+        value,
+      })
+    },
+    onDiscard: (baselinePayload) => {
+      const parsed = parseApiInfoList(baselinePayload)
+      if (parsed) setApiInfoList(parsed)
+      setSelectedIds([])
     },
   })
 
@@ -179,7 +196,7 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
 
   const handleAdd = () => {
     setEditingApiInfo(null)
-    form.reset({
+    dialogForm.reset({
       url: '',
       route: '',
       description: '',
@@ -190,7 +207,7 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
 
   const handleEdit = (apiInfo: ApiInfo) => {
     setEditingApiInfo(apiInfo)
-    form.reset({
+    dialogForm.reset({
       url: apiInfo.url,
       route: apiInfo.route,
       description: apiInfo.description,
@@ -219,16 +236,14 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
       setApiInfoList((prev) =>
         prev.filter((item) => item.id !== editingApiInfo.id)
       )
-      setHasChanges(true)
-      toast.success(t('API info deleted. Click "Save Settings" to apply.'))
+      toast.success(t('API info deleted. Use Save Changes in the bar below to apply.'))
     } else if (deleteTarget === 'batch') {
       setApiInfoList((prev) =>
         prev.filter((item) => !selectedIds.includes(item.id))
       )
       setSelectedIds([])
-      setHasChanges(true)
       toast.success(
-        t('{{count}} API entries deleted. Click "Save Settings" to apply.', {
+        t('{{count}} API entries deleted. Use Save Changes in the bar below to apply.', {
           count: selectedIds.length,
         })
       )
@@ -244,28 +259,13 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
           item.id === editingApiInfo.id ? { ...item, ...values } : item
         )
       )
-      toast.success(t('API info updated. Click "Save Settings" to apply.'))
+      toast.success(t('API info updated. Use Save Changes in the bar below to apply.'))
     } else {
       const newId = Math.max(...apiInfoList.map((item) => item.id), 0) + 1
       setApiInfoList((prev) => [...prev, { id: newId, ...values }])
-      toast.success(t('API info added. Click "Save Settings" to apply.'))
+      toast.success(t('API info added. Use Save Changes in the bar below to apply.'))
     }
-    setHasChanges(true)
     setShowDialog(false)
-  }
-
-  const handleSaveAll = async () => {
-    try {
-      const result = await updateOption.mutateAsync({
-        key: 'console_setting.api_info',
-        value: JSON.stringify(apiInfoList),
-      })
-      if (result.success) {
-        setHasChanges(false)
-      }
-    } catch {
-      toast.error(t('Failed to save API info'))
-    }
   }
 
   const toggleSelectAll = (checked: boolean) => {
@@ -282,9 +282,15 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
 
   return (
     <SettingsSection title={t('API Addresses')}>
-      <div className='space-y-4'>
-        <div className='flex flex-wrap items-center justify-between gap-2'>
-          <div className='flex flex-wrap items-center gap-2'>
+      <ContentListEditorShell
+        form={listFormBridge.form}
+        registration={listFormBridge.registration}
+        isDirty={listFormBridge.isDirty}
+        enabled={isEnabled}
+        onEnabledChange={handleToggleEnabled}
+        enabledLabel={t('Enabled')}
+        toolbar={
+          <>
             <Button onClick={handleAdd} size='sm'>
               <Plus className='mr-2 h-4 w-4' />
               {t('Add API')}
@@ -299,25 +305,10 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
               {t('Delete (')}
               {selectedIds.length})
             </Button>
-            <Button
-              onClick={handleSaveAll}
-              size='sm'
-              variant='secondary'
-              disabled={!hasChanges || updateOption.isPending}
-            >
-              <Save className='mr-2 h-4 w-4' />
-              {updateOption.isPending ? t('Saving...') : t('Save Settings')}
-            </Button>
-          </div>
-          <SettingsSwitchField
-            checked={isEnabled}
-            onCheckedChange={handleToggleEnabled}
-            label={t('Enabled')}
-            className='border-b-0 py-0'
-          />
-        </div>
-
-        <div className='rounded-md border'>
+          </>
+        }
+      >
+        <div className='overflow-hidden rounded-lg border'>
           <Table>
             <TableHeader>
               <TableRow>
@@ -340,8 +331,15 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
             <TableBody>
               {apiInfoList.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className='h-24 text-center'>
-                    {t('No API Domains yet. Click "Add API" to create one.')}
+                  <TableCell colSpan={6} className='p-0'>
+                    <EmptyState
+                      className='border-0 py-10'
+                      title={t(
+                        'No API Domains yet. Click "Add API" to create one.'
+                      )}
+                      actionLabel={t('Add API')}
+                      onAction={handleAdd}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -412,7 +410,7 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
             </TableBody>
           </Table>
         </div>
-      </div>
+      </ContentListEditorShell>
 
       <Dialog
         open={showDialog}
@@ -436,14 +434,14 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
           </>
         }
       >
-        <Form {...form}>
+        <Form {...dialogForm}>
           <form
             id={API_INFO_FORM_ID}
-            onSubmit={form.handleSubmit(handleSubmitForm)}
+            onSubmit={dialogForm.handleSubmit(handleSubmitForm)}
             className='space-y-4'
           >
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='url'
               render={({ field }) => (
                 <FormItem>
@@ -459,7 +457,7 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='route'
               render={({ field }) => (
                 <FormItem>
@@ -472,7 +470,7 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='description'
               render={({ field }) => (
                 <FormItem>
@@ -490,7 +488,7 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
               )}
             />
             <FormField
-              control={form.control}
+              control={dialogForm.control}
               name='color'
               render={({ field }) => (
                 <FormItem>

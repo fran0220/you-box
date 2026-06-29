@@ -58,7 +58,7 @@ export function StickySaveBar({
         className
       )}
     >
-      <div className='bg-background/95 border-t px-3 py-2.5 backdrop-blur-md sm:px-4'>
+      <div className='border-border bg-card/95 supports-[backdrop-filter]:bg-card/80 border-t px-3 py-2.5 backdrop-blur-md sm:px-4'>
         <div className='flex items-center justify-between gap-3'>
           <p className='text-muted-foreground min-w-0 truncate text-sm'>
             {t('You have unsaved changes')}

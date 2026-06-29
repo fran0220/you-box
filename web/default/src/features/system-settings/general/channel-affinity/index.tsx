@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Edit, FileText, Plus, RefreshCw, Trash2, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -44,26 +44,25 @@ import { Textarea } from '@/components/ui/textarea'
 import { Dialog } from '@/components/dialog'
 import { SettingRow } from '@/components/settings'
 import { StatusBadge, StatusBadgeList } from '@/components/status-badge'
-import { SettingsPageActionsPortal } from '../../components/settings-page-context'
+import { FormDirtyIndicator } from '../../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../../components/form-navigation-guard'
+import {
+  SettingsPageActionsPortal,
+  SettingsPageFormActions,
+} from '../../components/settings-page-context'
 import { SettingsSection } from '../../components/settings-section'
 import { useUpdateOption } from '../../hooks/use-update-option'
 import { getCacheStats, clearAllCache, clearRuleCache } from './api'
+import {
+  buildChannelAffinityFormDefaults,
+  compareChannelAffinityBaselines,
+  flattenChannelAffinityForSave,
+  parseRules,
+  rulesToJsonText,
+} from './channel-affinity-form-state'
 import { RULE_TEMPLATES, cloneTemplate, makeUniqueName } from './constants'
 import { RuleEditorDialog } from './rule-editor-dialog'
 import type { AffinityRule, CacheStats, ChannelAffinitySettings } from './types'
-
-function parseRules(jsonStr: string): AffinityRule[] {
-  try {
-    const arr = JSON.parse(jsonStr || '[]')
-    if (!Array.isArray(arr)) return []
-    return arr.map(
-      (r: Record<string, unknown>, i: number) =>
-        ({ id: i, ...r }) as AffinityRule
-    )
-  } catch {
-    return []
-  }
-}
 
 function RuleBadgeList(props: { items: string[] }) {
   return (
@@ -120,10 +119,6 @@ function ChannelAffinityConfirmDialog(props: {
   )
 }
 
-function serializeRules(rules: AffinityRule[]): string {
-  return JSON.stringify(rules.map(({ id: _, ...rest }) => rest))
-}
-
 interface Props {
   defaultValues: ChannelAffinitySettings
 }
@@ -172,33 +167,68 @@ export function ChannelAffinitySection(props: Props) {
   const [clearRuleName, setClearRuleName] = useState<string | null>(null)
   const [fillTemplateDialogOpen, setFillTemplateDialogOpen] = useState(false)
 
+  const currentFormSlice = useMemo(
+    () => ({
+      enabled,
+      switchOnSuccess,
+      keepOnChannelDisabled,
+      maxEntries,
+      defaultTtl,
+      rules,
+      editMode,
+      rulesJson: jsonText,
+    }),
+    [
+      enabled,
+      switchOnSuccess,
+      keepOnChannelDisabled,
+      maxEntries,
+      defaultTtl,
+      rules,
+      editMode,
+      jsonText,
+    ]
+  )
+
+  const isDirty = useMemo(() => {
+    try {
+      const flat = flattenChannelAffinityForSave(currentFormSlice)
+      const changed = compareChannelAffinityBaselines(
+        flat,
+        props.defaultValues
+      )
+      return Object.keys(changed).length > 0
+    } catch {
+      return true
+    }
+  }, [currentFormSlice, props.defaultValues])
+
+  const handleDiscard = useCallback(() => {
+    const next = buildChannelAffinityFormDefaults(props.defaultValues)
+    setEnabled(next.enabled)
+    setSwitchOnSuccess(next.switchOnSuccess)
+    setKeepOnChannelDisabled(next.keepOnChannelDisabled)
+    setMaxEntries(next.maxEntries)
+    setDefaultTtl(next.defaultTtl)
+    setRules(next.rules)
+    setEditMode(next.editMode)
+    setJsonText(next.rulesJson)
+  }, [props.defaultValues])
+
   // Resync local editor state from refetched options
   // (adjust-state-during-render).
   const [prevDefaults, setPrevDefaults] = useState(props.defaultValues)
   if (prevDefaults !== props.defaultValues) {
     setPrevDefaults(props.defaultValues)
-    setEnabled(props.defaultValues['channel_affinity_setting.enabled'])
-    setSwitchOnSuccess(
-      props.defaultValues['channel_affinity_setting.switch_on_success']
-    )
-    setKeepOnChannelDisabled(
-      props.defaultValues['channel_affinity_setting.keep_on_channel_disabled']
-    )
-    setMaxEntries(props.defaultValues['channel_affinity_setting.max_entries'])
-    setDefaultTtl(
-      props.defaultValues['channel_affinity_setting.default_ttl_seconds']
-    )
-    const parsed = parseRules(
-      props.defaultValues['channel_affinity_setting.rules']
-    )
-    setRules(parsed)
-    setJsonText(
-      JSON.stringify(
-        parsed.map(({ id: _, ...r }) => r),
-        null,
-        2
-      )
-    )
+    const next = buildChannelAffinityFormDefaults(props.defaultValues)
+    setEnabled(next.enabled)
+    setSwitchOnSuccess(next.switchOnSuccess)
+    setKeepOnChannelDisabled(next.keepOnChannelDisabled)
+    setMaxEntries(next.maxEntries)
+    setDefaultTtl(next.defaultTtl)
+    setRules(next.rules)
+    setEditMode(next.editMode)
+    setJsonText(next.rulesJson)
   }
 
   const refreshCache = useCallback(async () => {
@@ -250,91 +280,44 @@ export function ChannelAffinitySection(props: Props) {
   }
 
   const handleSave = async () => {
-    let rulesJson: string
-    if (editMode === 'json') {
-      try {
-        const parsed = JSON.parse(jsonText)
-        if (!Array.isArray(parsed)) {
-          toast.error(t('Rules JSON must be an array'))
-          return
-        }
-        rulesJson = JSON.stringify(parsed)
-      } catch {
+    setSaving(true)
+    let flat: Record<string, string | number | boolean>
+    try {
+      flat = flattenChannelAffinityForSave(currentFormSlice)
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('array')) {
+        toast.error(t('Rules JSON must be an array'))
+      } else {
         toast.error(t('Invalid rules JSON format'))
-        return
       }
-    } else {
-      rulesJson = serializeRules(rules)
+      setSaving(false)
+      return
     }
 
-    setSaving(true)
+    const changed = compareChannelAffinityBaselines(flat, props.defaultValues)
+    const entries = Object.entries(changed)
+    if (entries.length === 0) {
+      toast.info(t('No changes to save'))
+      setSaving(false)
+      return
+    }
+
     try {
-      const updates: { key: string; value: string }[] = []
-
-      if (enabled !== props.defaultValues['channel_affinity_setting.enabled'])
-        updates.push({
-          key: 'channel_affinity_setting.enabled',
-          value: String(enabled),
-        })
-      if (
-        switchOnSuccess !==
-        props.defaultValues['channel_affinity_setting.switch_on_success']
-      )
-        updates.push({
-          key: 'channel_affinity_setting.switch_on_success',
-          value: String(switchOnSuccess),
-        })
-      if (
-        keepOnChannelDisabled !==
-        props.defaultValues['channel_affinity_setting.keep_on_channel_disabled']
-      )
-        updates.push({
-          key: 'channel_affinity_setting.keep_on_channel_disabled',
-          value: String(keepOnChannelDisabled),
-        })
-      if (
-        maxEntries !==
-        props.defaultValues['channel_affinity_setting.max_entries']
-      )
-        updates.push({
-          key: 'channel_affinity_setting.max_entries',
-          value: String(maxEntries),
-        })
-      if (
-        defaultTtl !==
-        props.defaultValues['channel_affinity_setting.default_ttl_seconds']
-      )
-        updates.push({
-          key: 'channel_affinity_setting.default_ttl_seconds',
-          value: String(defaultTtl),
-        })
-
-      const origRules = props.defaultValues['channel_affinity_setting.rules']
-      const origSerialized = (() => {
-        try {
-          return JSON.stringify(JSON.parse(origRules || '[]'))
-        } catch {
-          return '[]'
-        }
-      })()
-      if (rulesJson !== origSerialized) {
-        updates.push({
-          key: 'channel_affinity_setting.rules',
-          value: rulesJson,
+      for (const [key, value] of entries) {
+        await updateOption.mutateAsync({
+          key,
+          value:
+            typeof value === 'boolean' || typeof value === 'number'
+              ? String(value)
+              : value,
         })
       }
-
-      if (updates.length === 0) {
-        toast.info(t('No changes'))
-        return
-      }
-
-      for (const u of updates) {
-        await updateOption.mutateAsync(u)
-      }
-      toast.success(t('Saved successfully'))
-    } catch {
-      toast.error(t('Failed to save'))
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : t('Failed to update setting')
+      )
     } finally {
       setSaving(false)
     }
@@ -382,13 +365,7 @@ export function ChannelAffinitySection(props: Props) {
   }
 
   const switchToJsonMode = () => {
-    setJsonText(
-      JSON.stringify(
-        rules.map(({ id: _, ...r }) => r),
-        null,
-        2
-      )
-    )
+    setJsonText(rulesToJsonText(rules))
     setEditMode('json')
   }
 
@@ -413,6 +390,15 @@ export function ChannelAffinitySection(props: Props) {
 
   return (
     <>
+      <FormNavigationGuard when={isDirty} />
+      <SettingsPageFormActions
+        onSave={() => void handleSave()}
+        onReset={handleDiscard}
+        isSaving={saving || updateOption.isPending}
+        isResetDisabled={!isDirty}
+      />
+      <FormDirtyIndicator isDirty={isDirty} />
+
       <SettingsSection title={t('Channel Affinity')}>
         <Alert>
           <AlertDescription className='text-xs'>
@@ -535,9 +521,6 @@ export function ChannelAffinitySection(props: Props) {
           <Button variant='outline' size='sm' onClick={handleFillTemplates}>
             <FileText className='mr-1 h-3 w-3' />
             {t('Fill Templates')}
-          </Button>
-          <Button size='sm' onClick={handleSave} disabled={saving}>
-            {saving ? t('Saving...') : t('Save')}
           </Button>
           <Button
             variant='outline'

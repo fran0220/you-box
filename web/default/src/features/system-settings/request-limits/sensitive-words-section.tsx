@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import {
@@ -31,6 +30,8 @@ import {
 } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -38,7 +39,7 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
-import { useResetForm } from '../hooks/use-reset-form'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 
 const sensitiveSchema = z.object({
@@ -58,33 +59,35 @@ export function SensitiveWordsSection({
 }: SensitiveWordsSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
-  const form = useForm<SensitiveFormValues>({
-    resolver: zodResolver(sensitiveSchema),
-    defaultValues,
-  })
-
-  useResetForm(form, defaultValues)
-
-  const onSubmit = async (values: SensitiveFormValues) => {
-    const updates = Object.entries(values).filter(
-      ([key, value]) =>
-        value !== defaultValues[key as keyof SensitiveFormValues]
-    )
-
-    for (const [key, value] of updates) {
-      await updateOption.mutateAsync({ key, value: value ?? '' })
-    }
-  }
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<SensitiveFormValues>({
+      resolver: zodResolver(sensitiveSchema),
+      defaultValues,
+      onSubmit: async (_data, changedFields) => {
+        for (const [key, value] of Object.entries(changedFields)) {
+          await updateOption.mutateAsync({
+            key,
+            value: (value ?? '') as string | boolean | number,
+          })
+        }
+      },
+    })
 
   return (
-    <SettingsSection title={t('Sensitive Words')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-            saveLabel='Save sensitive words'
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Sensitive Words')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={isSubmitting || updateOption.isPending}
+              isResetDisabled={!isDirty}
+              saveLabel='Save sensitive words'
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -151,8 +154,9 @@ export function SensitiveWordsSection({
               </FormItem>
             )}
           />
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

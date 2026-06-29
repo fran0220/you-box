@@ -74,3 +74,27 @@ export async function fetchUpstreamRatios(request: FetchUpstreamRatiosRequest) {
   )
   return res.data
 }
+
+export async function getPerformanceStats() {
+  const res = await api.get<{
+    success: boolean
+    message?: string
+    data: unknown
+  }>('/api/performance/stats')
+  if (!res.data.success) {
+    throw new Error(res.data.message ?? 'Failed to load performance stats')
+  }
+  return res.data.data
+}
+
+export async function getPerformanceLogs() {
+  const res = await api.get<{
+    success: boolean
+    message?: string
+    data: unknown
+  }>('/api/performance/logs')
+  if (!res.data.success) {
+    throw new Error(res.data.message ?? 'Failed to load performance logs')
+  }
+  return res.data.data
+}

@@ -44,7 +44,7 @@ const route = getRouteApi('/_authenticated/models/$section')
 
 export function ModelsTable() {
   const { t } = useTranslation()
-  const { selectedVendor } = useModels()
+  const { selectedVendor, setMetadataConfiguredTotal } = useModels()
   const isMobile = useMediaQuery('(max-width: 640px)')
 
   // Table state
@@ -92,6 +92,20 @@ export function ModelsTable() {
   const syncFilter =
     (columnFilters.find((f) => f.id === 'sync_official')?.value as string[]) ||
     []
+
+  // Unfiltered model count for page header (not affected by table filters)
+  const { data: configuredTotalData } = useQuery({
+    queryKey: modelsQueryKeys.list({ p: 1, page_size: 1 }),
+    queryFn: () => getModels({ p: 1, page_size: 1 }),
+    staleTime: 60 * 1000,
+  })
+
+  useEffect(() => {
+    const total = configuredTotalData?.data?.total
+    if (total != null) {
+      setMetadataConfiguredTotal(total)
+    }
+  }, [configuredTotalData?.data?.total, setMetadataConfiguredTotal])
 
   // Fetch vendors for filter
   const { data: vendorsData } = useQuery({

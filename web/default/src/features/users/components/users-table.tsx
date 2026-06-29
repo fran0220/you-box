@@ -141,7 +141,10 @@ export function UsersTable() {
 
       if (!result.success) {
         toast.error(
-          result.message || `Failed to ${hasFilter ? 'search' : 'load'} users`
+          result.message ||
+            (hasFilter || hasColumnFilter
+              ? t('Failed to search users')
+              : t('Failed to load users'))
         )
         return { items: [], total: 0 }
       }

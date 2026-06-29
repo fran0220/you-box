@@ -18,7 +18,6 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useState } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Code2, Palette } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -35,6 +34,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -42,7 +43,7 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
-import { useResetForm } from '../hooks/use-reset-form'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import { safeNumberFieldProps } from '../utils/numeric-field'
 import { RateLimitVisualEditor } from './rate-limit-visual-editor'
@@ -93,34 +94,36 @@ export function RateLimitSection({ defaultValues }: RateLimitSectionProps) {
 
   const rateLimitSchema = createRateLimitSchema(t)
 
-  const form = useForm<RateLimitFormValues>({
-    resolver: zodResolver(rateLimitSchema),
-    mode: 'onChange', // Enable real-time validation
-    defaultValues,
-  })
-
-  useResetForm(form, defaultValues)
-
-  const onSubmit = async (values: RateLimitFormValues) => {
-    const updates = Object.entries(values).filter(
-      ([key, value]) =>
-        value !== defaultValues[key as keyof RateLimitFormValues]
-    )
-
-    for (const [key, value] of updates) {
-      await updateOption.mutateAsync({ key, value: value ?? '' })
-    }
-  }
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<RateLimitFormValues>({
+      resolver: zodResolver(rateLimitSchema),
+      mode: 'onChange',
+      defaultValues,
+      onSubmit: async (_data, changedFields) => {
+        for (const [key, value] of Object.entries(changedFields)) {
+          await updateOption.mutateAsync({
+            key,
+            value: (value ?? '') as string | boolean | number,
+          })
+        }
+      },
+    })
 
   return (
-    <SettingsSection title={t('Rate Limiting')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-            saveLabel='Save rate limits'
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Rate Limiting')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={isSubmitting || updateOption.isPending}
+              isResetDisabled={!isDirty}
+              saveLabel='Save rate limits'
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -299,8 +302,9 @@ export function RateLimitSection({ defaultValues }: RateLimitSectionProps) {
               </FormItem>
             )}
           />
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

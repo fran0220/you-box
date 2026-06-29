@@ -16,12 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import {
   Form,
   FormControl,
@@ -34,6 +33,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -42,6 +43,7 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import {
   formatJsonForTextarea,
@@ -106,6 +108,40 @@ type FlatGeminiSettings = {
   'gemini.remove_function_response_id_enabled': boolean
 }
 
+const buildFormDefaults = (
+  values: GeminiSettingsFormInput
+): GeminiSettingsFormInput => ({
+  gemini: {
+    safety_settings: formatJsonForTextarea(values.gemini.safety_settings),
+    version_settings: formatJsonForTextarea(values.gemini.version_settings),
+    supported_imagine_models: formatJsonForTextarea(
+      values.gemini.supported_imagine_models
+    ),
+    thinking_adapter_enabled: values.gemini.thinking_adapter_enabled,
+    thinking_adapter_budget_tokens_percentage:
+      values.gemini.thinking_adapter_budget_tokens_percentage,
+    function_call_thought_signature_enabled:
+      values.gemini.function_call_thought_signature_enabled ?? true,
+    remove_function_response_id_enabled:
+      values.gemini.remove_function_response_id_enabled ?? true,
+  },
+})
+
+const flattenGeminiValues = (values: GeminiSettingsFormValues): FlatGeminiSettings => ({
+  'gemini.safety_settings': normalizeJsonString(values.gemini.safety_settings),
+  'gemini.version_settings': normalizeJsonString(values.gemini.version_settings),
+  'gemini.supported_imagine_models': normalizeJsonString(
+    values.gemini.supported_imagine_models
+  ),
+  'gemini.thinking_adapter_enabled': values.gemini.thinking_adapter_enabled,
+  'gemini.thinking_adapter_budget_tokens_percentage':
+    values.gemini.thinking_adapter_budget_tokens_percentage,
+  'gemini.function_call_thought_signature_enabled':
+    values.gemini.function_call_thought_signature_enabled,
+  'gemini.remove_function_response_id_enabled':
+    values.gemini.remove_function_response_id_enabled,
+})
+
 type GeminiSettingsCardProps = {
   defaultValues: GeminiSettingsFormInput
 }
@@ -113,118 +149,33 @@ type GeminiSettingsCardProps = {
 export function GeminiSettingsCard({ defaultValues }: GeminiSettingsCardProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
-  const normalizedDefaultsRef = useRef<FlatGeminiSettings>({
-    'gemini.safety_settings': normalizeJsonString(
-      defaultValues.gemini.safety_settings
-    ),
-    'gemini.version_settings': normalizeJsonString(
-      defaultValues.gemini.version_settings
-    ),
-    'gemini.supported_imagine_models': normalizeJsonString(
-      defaultValues.gemini.supported_imagine_models
-    ),
-    'gemini.thinking_adapter_enabled':
-      defaultValues.gemini.thinking_adapter_enabled,
-    'gemini.thinking_adapter_budget_tokens_percentage': Number(
-      defaultValues.gemini.thinking_adapter_budget_tokens_percentage
-    ),
-    'gemini.function_call_thought_signature_enabled':
-      defaultValues.gemini.function_call_thought_signature_enabled ?? true,
-    'gemini.remove_function_response_id_enabled':
-      defaultValues.gemini.remove_function_response_id_enabled ?? true,
-  })
 
-  const buildFormDefaults = (
-    values: GeminiSettingsFormInput
-  ): GeminiSettingsFormInput => ({
-    gemini: {
-      safety_settings: formatJsonForTextarea(values.gemini.safety_settings),
-      version_settings: formatJsonForTextarea(values.gemini.version_settings),
-      supported_imagine_models: formatJsonForTextarea(
-        values.gemini.supported_imagine_models
-      ),
-      thinking_adapter_enabled: values.gemini.thinking_adapter_enabled,
-      thinking_adapter_budget_tokens_percentage:
-        values.gemini.thinking_adapter_budget_tokens_percentage,
-      function_call_thought_signature_enabled:
-        values.gemini.function_call_thought_signature_enabled ?? true,
-      remove_function_response_id_enabled:
-        values.gemini.remove_function_response_id_enabled ?? true,
-    },
-  })
+  const resolvedDefaults = useMemo(
+    () => buildFormDefaults(defaultValues),
+    [defaultValues]
+  )
 
-  const form = useForm<
-    GeminiSettingsFormInput,
-    unknown,
-    GeminiSettingsFormValues
-  >({
-    resolver: zodResolver(schema),
-    defaultValues: buildFormDefaults(defaultValues),
-  })
-
-  useEffect(() => {
-    normalizedDefaultsRef.current = {
-      'gemini.safety_settings': normalizeJsonString(
-        defaultValues.gemini.safety_settings
-      ),
-      'gemini.version_settings': normalizeJsonString(
-        defaultValues.gemini.version_settings
-      ),
-      'gemini.supported_imagine_models': normalizeJsonString(
-        defaultValues.gemini.supported_imagine_models
-      ),
-      'gemini.thinking_adapter_enabled':
-        defaultValues.gemini.thinking_adapter_enabled,
-      'gemini.thinking_adapter_budget_tokens_percentage': Number(
-        defaultValues.gemini.thinking_adapter_budget_tokens_percentage
-      ),
-      'gemini.function_call_thought_signature_enabled':
-        defaultValues.gemini.function_call_thought_signature_enabled ?? true,
-      'gemini.remove_function_response_id_enabled':
-        defaultValues.gemini.remove_function_response_id_enabled ?? true,
-    }
-
-    form.reset(buildFormDefaults(defaultValues))
-  }, [defaultValues, form])
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<GeminiSettingsFormValues>({
+      resolver: zodResolver(schema) as Resolver<
+        GeminiSettingsFormValues,
+        unknown,
+        GeminiSettingsFormValues
+      >,
+      defaultValues: resolvedDefaults as GeminiSettingsFormValues,
+      onSubmit: async (values, changedFields) => {
+        const flattened = flattenGeminiValues(values)
+        for (const key of Object.keys(changedFields)) {
+          if (!(key in flattened)) continue
+          await updateOption.mutateAsync({
+            key,
+            value: flattened[key as keyof FlatGeminiSettings],
+          })
+        }
+      },
+    })
 
   const isAdapterEnabled = form.watch('gemini.thinking_adapter_enabled')
-
-  const onSubmit = async (values: GeminiSettingsFormValues) => {
-    const normalized: FlatGeminiSettings = {
-      'gemini.safety_settings': normalizeJsonString(
-        values.gemini.safety_settings
-      ),
-      'gemini.version_settings': normalizeJsonString(
-        values.gemini.version_settings
-      ),
-      'gemini.supported_imagine_models': normalizeJsonString(
-        values.gemini.supported_imagine_models
-      ),
-      'gemini.thinking_adapter_enabled': values.gemini.thinking_adapter_enabled,
-      'gemini.thinking_adapter_budget_tokens_percentage':
-        values.gemini.thinking_adapter_budget_tokens_percentage,
-      'gemini.function_call_thought_signature_enabled':
-        values.gemini.function_call_thought_signature_enabled,
-      'gemini.remove_function_response_id_enabled':
-        values.gemini.remove_function_response_id_enabled,
-    }
-
-    const updates = (
-      Object.keys(normalized) as Array<keyof FlatGeminiSettings>
-    ).filter((key) => normalized[key] !== normalizedDefaultsRef.current[key])
-
-    if (updates.length === 0) {
-      toast.info(t('No changes to save'))
-      return
-    }
-
-    for (const key of updates) {
-      await updateOption.mutateAsync({
-        key,
-        value: normalized[key],
-      })
-    }
-  }
 
   const imaginePlaceholder = useMemo(
     () => JSON.stringify(['gemini-2.0-flash-exp-image-generation'], null, 2),
@@ -232,91 +183,154 @@ export function GeminiSettingsCard({ defaultValues }: GeminiSettingsCardProps) {
   )
 
   return (
-    <SettingsSection title={t('Gemini')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-          />
-          <FormField
-            control={form.control}
-            name='gemini.safety_settings'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Safety Settings')}</FormLabel>
-                <FormControl>
-                  <Textarea rows={8} {...field} />
-                </FormControl>
-                <FormDescription>
-                  {t(
-                    'Provide per-category safety overrides as JSON. Use `default` for fallback values.'
-                  )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
 
-          <FormField
-            control={form.control}
-            name='gemini.version_settings'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Version Overrides')}</FormLabel>
-                <FormControl>
-                  <Textarea rows={8} {...field} />
-                </FormControl>
-                <FormDescription>
-                  {t(
-                    'Map model identifiers to Gemini API versions. A `default` entry applies when no specific match is found.'
-                  )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <SettingsSection title={t('Gemini')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
+            <FormField
+              control={form.control}
+              name='gemini.safety_settings'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Safety Settings')}</FormLabel>
+                  <FormControl>
+                    <Textarea rows={8} {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      'Provide per-category safety overrides as JSON. Use `default` for fallback values.'
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name='gemini.supported_imagine_models'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('Supported Imagine Models')}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    rows={6}
-                    placeholder={imaginePlaceholder}
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  {t(
-                    'Accepts a JSON array of model identifiers that support the Imagine API.'
-                  )}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name='gemini.version_settings'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Version Overrides')}</FormLabel>
+                  <FormControl>
+                    <Textarea rows={8} {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      'Map model identifiers to Gemini API versions. A `default` entry applies when no specific match is found.'
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <SettingsControlGroup>
+            <FormField
+              control={form.control}
+              name='gemini.supported_imagine_models'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Supported Imagine Models')}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={6}
+                      placeholder={imaginePlaceholder}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      'Accepts a JSON array of model identifiers that support the Imagine API.'
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <SettingsControlGroup>
+              <SettingRowGroup>
+                <FormField
+                  control={form.control}
+                  name='gemini.thinking_adapter_enabled'
+                  render={({ field }) => (
+                    <SettingRowFormItem
+                      label={t('Thinking Suffix Adapter')}
+                      description={
+                        <>
+                          {t('Supports `-thinking`, `-thinking-')}
+                          {'{{budget}}'}
+                          {t(
+                            '`, and `-nothinking` suffixes while routing to the correct Gemini variant.'
+                          )}
+                        </>
+                      }
+                      control={
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      }
+                    />
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='gemini.thinking_adapter_budget_tokens_percentage'
+                  render={({ field }) => (
+                    <SettingRowFormItem
+                      label={t('Budget Tokens Ratio')}
+                      description={t(
+                        'Budget tokens = max tokens × ratio. Accepts a decimal between 0.002 and 1. Recommended to keep aligned with upstream billing.'
+                      )}
+                      control={
+                        <FormControl>
+                          <Input
+                            className='w-32'
+                            {...field}
+                            value={String(field.value ?? '')}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
+                          />
+                        </FormControl>
+                      }
+                    />
+                  )}
+                />
+              </SettingRowGroup>
+
+              {!isAdapterEnabled && (
+                <p className='text-muted-foreground text-sm'>
+                  {t(
+                    'Gemini will continue to auto-detect thinking mode even with the adapter disabled. Enable this only when you need finer control over pricing and budgeting.'
+                  )}
+                </p>
+              )}
+            </SettingsControlGroup>
+
             <SettingRowGroup>
               <FormField
                 control={form.control}
-                name='gemini.thinking_adapter_enabled'
+                name='gemini.function_call_thought_signature_enabled'
                 render={({ field }) => (
                   <SettingRowFormItem
-                    label={t('Thinking Suffix Adapter')}
-                    description={
-                      <>
-                        {t('Supports `-thinking`, `-thinking-')}
-                        {'{{budget}}'}
-                        {t(
-                          '`, and `-nothinking` suffixes while routing to the correct Gemini variant.'
-                        )}
-                      </>
-                    }
+                    label={t('Enable FunctionCall thoughtSignature Fill')}
+                    description={t(
+                      'Fill thoughtSignature only for Gemini/Vertex channels using the OpenAI format'
+                    )}
                     control={
                       <FormControl>
                         <Switch
@@ -331,22 +345,18 @@ export function GeminiSettingsCard({ defaultValues }: GeminiSettingsCardProps) {
 
               <FormField
                 control={form.control}
-                name='gemini.thinking_adapter_budget_tokens_percentage'
+                name='gemini.remove_function_response_id_enabled'
                 render={({ field }) => (
                   <SettingRowFormItem
-                    label={t('Budget Tokens Ratio')}
+                    label={t('Remove functionResponse.id field')}
                     description={t(
-                      'Budget tokens = max tokens × ratio. Accepts a decimal between 0.002 and 1. Recommended to keep aligned with upstream billing.'
+                      'Vertex AI does not support functionResponse.id. Enable this to remove the field automatically.'
                     )}
                     control={
                       <FormControl>
-                        <Input
-                          className='w-32'
-                          {...field}
-                          value={String(field.value ?? '')}
-                          onChange={(event) =>
-                            field.onChange(event.target.value)
-                          }
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
                         />
                       </FormControl>
                     }
@@ -354,61 +364,9 @@ export function GeminiSettingsCard({ defaultValues }: GeminiSettingsCardProps) {
                 )}
               />
             </SettingRowGroup>
-
-            {!isAdapterEnabled && (
-              <p className='text-muted-foreground text-sm'>
-                {t(
-                  'Gemini will continue to auto-detect thinking mode even with the adapter disabled. Enable this only when you need finer control over pricing and budgeting.'
-                )}
-              </p>
-            )}
-          </SettingsControlGroup>
-
-          <SettingRowGroup>
-            <FormField
-              control={form.control}
-              name='gemini.function_call_thought_signature_enabled'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Enable FunctionCall thoughtSignature Fill')}
-                  description={t(
-                    'Fill thoughtSignature only for Gemini/Vertex channels using the OpenAI format'
-                  )}
-                  control={
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='gemini.remove_function_response_id_enabled'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Remove functionResponse.id field')}
-                  description={t(
-                    'Vertex AI does not support functionResponse.id. Enable this to remove the field automatically.'
-                  )}
-                  control={
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
-          </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

@@ -69,16 +69,16 @@ export function Features(_props: FeaturesProps) {
         'Enterprise-grade security with comprehensive permission management'
       ),
       span: 'md:col-span-1',
-      icon: <Shield className='text-teal size-4' />,
+      icon: <Shield className='text-brand size-4' />,
       visual: (
         <div className='mt-4 flex items-center justify-center'>
           <div className='relative'>
-            <div className='border-teal/20 bg-teal-subtle flex size-16 items-center justify-center rounded-2xl border'>
-              <Shield className='text-teal/70 size-7' strokeWidth={1.5} />
+            <div className='border-brand-border bg-brand-subtle flex size-16 items-center justify-center rounded-2xl border'>
+              <Shield className='text-brand/80 size-7' strokeWidth={1.5} />
             </div>
-            <div className='bg-teal absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full'>
+            <div className='bg-brand text-brand-foreground absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full'>
               <svg
-                className='size-2.5 text-white'
+                className='size-2.5'
                 fill='none'
                 viewBox='0 0 24 24'
                 stroke='currentColor'
@@ -176,8 +176,8 @@ export function Features(_props: FeaturesProps) {
   ]
 
   return (
-    <section className='relative z-10 px-6 py-24 md:py-32'>
-      <div className='mx-auto max-w-6xl'>
+    <section className='relative z-10 py-24 md:py-32'>
+      <div>
         <AnimateInView className='mb-16 max-w-lg'>
           <p className='yb-eyebrow mb-3'>
             {'// '}

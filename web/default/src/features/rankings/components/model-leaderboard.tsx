@@ -124,7 +124,7 @@ function ModelList(props: {
                   : 'text-muted-foreground/80 truncate text-xs italic'
               }
             >
-              by{' '}
+              {t('by')}{' '}
               <VendorLink vendor={row.vendor}>
                 {row.vendor.toLowerCase()}
               </VendorLink>
@@ -132,6 +132,7 @@ function ModelList(props: {
             <ProgressBar
               value={row.total_tokens}
               max={props.maxTokens}
+              tone='brand'
               label={t('Token share relative to the top model')}
               className={compact ? 'mt-1 h-1 max-w-40' : 'mt-1.5 h-1 max-w-56'}
             />

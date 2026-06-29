@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .fl label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:7px}
+  .fl input,.fl textarea{width:100%;box-sizing:border-box;background:var(--field-bg);color:var(--text);border:1px solid var(--field-border);border-radius:10px;font-family:var(--font-sans);font-size:14px;padding:10px 12px;outline:none;resize:vertical}
+  .imgtile{aspect-ratio:1;border-radius:12px;border:1px solid var(--border);background:linear-gradient(135deg,var(--ink-800),var(--ink-700));display:flex;align-items:flex-end;padding:12px}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav on" href="ApiTools.dc.html"><i data-lucide="wand-sparkles"></i>API tools</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="TaskLogs.dc.html"><i data-lucide="image"></i>Tasks &amp; drawing</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="ModelsAdmin.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <a class="snav" href="Profile.dc.html" style="margin:0;border-top:1px solid var(--border);border-radius:0;padding:12px 18px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></a>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">API tools</div>
+      <div style="flex:1"></div>
+      <button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="code"></i><span>View code</span></button>
+    </header>
+
+    <div style="padding:24px 28px 64px;max-width:1080px">
+      <p style="font-size:14px;color:var(--text-secondary);margin:0 0 18px">Try embeddings, image generation, and rerank against your configured models — authenticated with your session.</p>
+      <div class="yb-tabs yb-tabs--pill" style="margin-bottom:22px"><button class="yb-tab"><i data-lucide="layers"></i>Embeddings</button><button class="yb-tab yb-tab--active"><i data-lucide="image"></i>Image</button><button class="yb-tab"><i data-lucide="list-ordered"></i>Rerank</button></div>
+
+      <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start">
+        <!-- form -->
+        <div class="yb-card fl" style="display:flex;flex-direction:column;gap:16px">
+          <div><label>Model</label><input value="black-forest/flux-1.2-pro"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><span class="yb-tag yb-tag--active">flux-1.2-pro</span><span class="yb-tag">dall-e-3</span><span class="yb-tag">sdxl</span></div></div>
+          <div><label>Prompt</label><textarea rows="4">A serene watercolor of a lighthouse at dawn, soft fog, muted palette.</textarea></div>
+          <div style="display:flex;gap:12px"><div style="flex:1"><label>Size</label><input value="1024 × 1024"></div><div style="flex:1"><label>Count</label><input value="2"></div></div>
+          <button class="yb-btn yb-btn--primary"><i data-lucide="play"></i><span>Generate image</span></button>
+          <div class="mono" style="font-size:11px;color:var(--text-muted)">≈ $0.08 · billed to your balance on success</div>
+        </div>
+
+        <!-- result -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="mono" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)">Result · 2 images · 3.1s</div><button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="download"></i><span>Download all</span></button></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="imgtile"><span class="yb-badge yb-badge--neutral" style="background:rgba(0,0,0,.4);backdrop-filter:blur(6px)"><i data-lucide="image" style="width:12px;height:12px"></i> 1024²</span></div>
+            <div class="imgtile" style="background:linear-gradient(135deg,var(--ink-700),var(--ink-600))"><span class="yb-badge yb-badge--neutral" style="background:rgba(0,0,0,.4);backdrop-filter:blur(6px)"><i data-lucide="image" style="width:12px;height:12px"></i> 1024²</span></div>
+          </div>
+          <div class="yb-card" style="margin-top:16px;padding:0;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--divider)"><i data-lucide="terminal" style="width:15px;height:15px;color:var(--text-muted)"></i><span class="mono" style="font-size:12px;color:var(--text-secondary)">Equivalent request</span></div>
+            <pre class="mono" style="margin:0;padding:14px;font-size:12.5px;line-height:1.6;color:var(--ink-200);overflow:auto">POST /v1/images/generations
+{ "model": "black-forest/flux-1.2-pro",
+  "prompt": "A serene watercolor…", "n": 2, "size": "1024x1024" }</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

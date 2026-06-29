@@ -20,7 +20,7 @@ import { CircleDashed, Ticket, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber, formatQuota } from '@/lib/format'
 import { AnimatedNumber } from '@/components/ui/animated-number'
-import { StatCard, StatCardRow } from '@/components/patterns'
+import { StatCard, StatCardRow } from '@/components/youbox'
 import { REDEMPTION_STATUS } from '../constants'
 import type { Redemption } from '../types'
 

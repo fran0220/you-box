@@ -17,12 +17,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -30,7 +32,7 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
-import { useResetForm } from '../hooks/use-reset-form'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import { safeNumberFieldProps } from '../utils/numeric-field'
 
@@ -53,31 +55,38 @@ export function SystemBehaviorSection({
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
 
-  const form = useForm({
-    resolver: zodResolver(behaviorSchema),
-    defaultValues,
-  })
-
-  useResetForm(form, defaultValues)
-
-  const onSubmit = async (data: BehaviorFormValues) => {
-    const updates = Object.entries(data).filter(
-      ([key, value]) => value !== defaultValues[key as keyof BehaviorFormValues]
-    )
-
-    for (const [key, value] of updates) {
-      await updateOption.mutateAsync({ key, value })
-    }
-  }
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<BehaviorFormValues>({
+      resolver: zodResolver(behaviorSchema) as Resolver<
+        BehaviorFormValues,
+        unknown,
+        BehaviorFormValues
+      >,
+      defaultValues,
+      onSubmit: async (_data, changedFields) => {
+        for (const [key, value] of Object.entries(changedFields)) {
+          await updateOption.mutateAsync({
+            key,
+            value: value as string | boolean | number,
+          })
+        }
+      },
+    })
 
   return (
-    <SettingsSection title={t('System Behavior')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('System Behavior')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <FormField
               control={form.control}
@@ -162,8 +171,9 @@ export function SystemBehaviorSection({
               )}
             />
           </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

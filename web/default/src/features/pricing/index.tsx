@@ -23,8 +23,10 @@ import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { MOTION_TRANSITION } from '@/lib/motion'
 import { Button } from '@/components/ui/button'
-import { PublicLayout } from '@/components/layout'
+import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
+import { EmptyState as YouboxEmptyState } from '@/components/youbox/empty-state'
+import { PageHeader } from '@/components/youbox'
 import {
   EmptyState,
   LoadingSkeleton,
@@ -66,11 +68,9 @@ export function Pricing() {
     showRechargePrice,
     facetState,
     toggleFacetValue,
-    contextRange,
     promptPriceRange,
     setSearchInput,
     setSortBy,
-    setContextRange,
     setPromptPriceRange,
     setTokenUnit,
     setViewMode,
@@ -113,14 +113,13 @@ export function Pricing() {
   // The toolbar and sidebar share the same facet contract.
   const sidebarProps = {
     models,
+    vendors,
     facetState,
     toggleFacetValue,
     vendorIcons,
     groupRatios: groupRatio,
-    contextRange,
     promptPriceRange,
     priceCeiling,
-    onContextRangeChange: setContextRange,
     onPromptPriceRangeChange: setPromptPriceRange,
     hasActiveFilters,
     onClearFilters: clearFilters,
@@ -129,24 +128,25 @@ export function Pricing() {
   const renderPricingContent = () => {
     if (showFavoritesOnly && displayedModels.length === 0) {
       return (
-        <div className='flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed px-6 py-12 text-center'>
-          <Star className='text-muted-foreground/40 mb-3 size-10' />
-          <h3 className='text-foreground mb-1 text-base font-semibold'>
-            {t('No favorite models yet')}
-          </h3>
-          <p className='text-muted-foreground mb-5 max-w-xs text-sm'>
-            {favorites.size === 0
+        <YouboxEmptyState
+          icon={Star}
+          title={t('No favorite models yet')}
+          description={
+            favorites.size === 0
               ? t('Tap the star on a model to pin it here.')
-              : t('No favorites match your current filters.')}
-          </p>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => setShowFavoritesOnly(false)}
-          >
-            {t('Show all models')}
-          </Button>
-        </div>
+              : t('No favorites match your current filters.')
+          }
+          className='border-border bg-card min-h-[320px] rounded-lg border border-dashed'
+          action={
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setShowFavoritesOnly(false)}
+            >
+              {t('Show all models')}
+            </Button>
+          }
+        />
       )
     }
 
@@ -200,45 +200,45 @@ export function Pricing() {
 
   if (isLoading) {
     return (
-      <PublicLayout showMainContainer={false}>
-        <div className='mx-auto w-full max-w-[1600px] px-3 pt-8 pb-8 sm:px-6 sm:pt-10 xl:px-8'>
+      <AppShell variant='public'>
+        <PageTransition className='pb-10'>
           <LoadingSkeleton viewMode={viewMode} />
-        </div>
-      </PublicLayout>
+        </PageTransition>
+      </AppShell>
     )
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
-      <PageTransition className='mx-auto w-full max-w-[1600px] px-3 pt-8 pb-10 sm:px-6 sm:pt-10 xl:px-8'>
-        {/* Slim, left-aligned header */}
-        <header className='mb-4 flex flex-wrap items-end justify-between gap-3'>
-          <div>
-            <h1 className='font-display text-2xl font-bold tracking-[-0.02em] sm:text-3xl'>
-              {t('Models')}
-            </h1>
-            <p className='text-muted-foreground mt-1 text-sm'>
-              {t('{{count}} models from {{vendors}} providers', {
-                count: models.length,
-                vendors: vendors.length,
-              })}
-            </p>
-          </div>
-          <Button
-            render={
-              <Link to='/pricing/compare' search={{ models: undefined }} />
-            }
-            variant='outline'
-            size='sm'
-            className='gap-1.5'
-          >
-            <Scale className='size-4' />
-            {t('Compare models')}
-          </Button>
-        </header>
+    <AppShell variant='public'>
+      <PageTransition className='pb-10'>
+        <PageHeader
+          className='mb-5'
+          eyebrow={t('Model Plaza')}
+          title={t('Models')}
+          subtitle={t('{{count}} models from {{vendors}} providers', {
+            count: models.length,
+            vendors: vendors.length,
+          })}
+          actions={
+            <Button
+              render={
+                <Link to='/pricing/compare' search={{ models: undefined }} />
+              }
+              variant='outline'
+              size='sm'
+              className='gap-1.5'
+            >
+              <Scale className='size-4' aria-hidden='true' />
+              {t('Compare models')}
+            </Button>
+          }
+        />
 
         {/* Sticky control strip: search + toolbar + pills */}
-        <div className='bg-background/80 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-10 -mx-3 mb-4 space-y-2.5 px-3 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 xl:-mx-8 xl:px-8'>
+        <div
+          data-pricing-control-strip
+          className='bg-background/80 supports-[backdrop-filter]:bg-background/60 border-border/60 sticky top-[var(--app-header-height,3rem)] z-10 -mx-4 mb-4 space-y-2.5 border-b px-4 py-2.5 backdrop-blur md:-mx-6 md:px-6'
+        >
           <div className='flex flex-col gap-2.5 lg:flex-row lg:items-center'>
             <SearchBar
               value={searchInput}
@@ -273,7 +273,7 @@ export function Pricing() {
         <div className='grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]'>
           <PricingSidebar
             {...sidebarProps}
-            className='hover-scrollbar sticky top-20 hidden max-h-[calc(100dvh-6rem)] self-start overflow-y-auto pr-1 xl:flex'
+            className='hover-scrollbar sticky top-[var(--app-header-height,3rem)] hidden max-h-[calc(100dvh-var(--app-header-height,3rem)-1rem)] self-start overflow-y-auto pr-1 xl:flex'
           />
 
           <main className='min-w-0'>
@@ -303,6 +303,6 @@ export function Pricing() {
           </main>
         </div>
       </PageTransition>
-    </PublicLayout>
+    </AppShell>
   )
 }

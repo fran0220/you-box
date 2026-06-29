@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .mono{font-family:var(--font-mono)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font-family:var(--font-sans);position:relative;overflow:hidden">
+  <div style="position:absolute;top:-220px;left:50%;transform:translateX(-50%);width:760px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.045),transparent 65%);pointer-events:none"></div>
+
+  <header style="height:64px;display:flex;align-items:center;padding:0 28px;position:relative">
+    <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></a>
+  </header>
+
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:32px;position:relative">
+    <div style="text-align:center;max-width:480px">
+      <span style="width:64px;height:64px;border-radius:16px;display:inline-flex;align-items:center;justify-content:center;background:var(--brand-subtle);color:var(--brand);margin-bottom:24px"><i data-lucide="{{ icon }}" style="width:30px;height:30px"></i></span>
+      <div style="font-family:var(--font-display);font-size:120px;line-height:1;font-weight:700;letter-spacing:-.04em;color:var(--text-strong);margin-bottom:12px">{{ code }}</div>
+      <div class="mono" style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--brand);margin-bottom:16px">// {{ tag }}</div>
+      <h1 style="font-family:var(--font-display);font-size:28px;letter-spacing:-.02em;font-weight:700;margin:0 0 12px;color:var(--text-strong)">{{ title }}</h1>
+      <p style="font-size:16px;color:var(--text-secondary);line-height:1.6;margin:0 0 28px">{{ message }}</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a class="yb-btn yb-btn--primary" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i><span>Back to dashboard</span></a>
+        <a class="yb-btn yb-btn--secondary" href="Index.dc.html"><i data-lucide="arrow-left"></i><span>Go home</span></a>
+      </div>
+      <div class="mono" style="font-size:12px;color:var(--text-faint);margin-top:32px">request-id: req_9f3a7c2e4b1d · {{ stamp }}</div>
+    </div>
+  </div>
+
+  <footer style="height:56px;display:flex;align-items:center;justify-content:center;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted)" class="mono">// status.youbox.dev — all systems normal</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1000,&quot;height&quot;:760},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;code&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;404&quot;,&quot;401&quot;,&quot;403&quot;,&quot;500&quot;,&quot;503&quot;],&quot;default&quot;:&quot;404&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Error&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() {
+    const code = String(this.props.code || '404');
+    const map = {
+      '404': { icon: 'compass', tag: 'Not found', title: 'This page took a wrong turn.', message: "We couldn't find what you were looking for. The model, page, or route may have moved.", stamp: 'no upstream hit' },
+      '500': { icon: 'server-crash', tag: 'Internal error', title: 'Something broke on our end.', message: 'An unexpected error occurred while routing your request. Our team has been notified automatically.', stamp: 'gateway 500' },
+      '503': { icon: 'wrench', tag: 'Maintenance', title: 'Down for scheduled maintenance.', message: "We're upgrading the gateway and will be back shortly. Your keys and balance are untouched.", stamp: 'maintenance window' },
+      '403': { icon: 'shield-x', tag: 'Forbidden', title: 'You don\u2019t have access to this.', message: 'Your account lacks permission for this resource. Ask an admin to grant access, or switch accounts.', stamp: 'role check failed' },
+      '401': { icon: 'lock', tag: 'Unauthorized', title: 'Please sign in to continue.', message: 'Your session has expired or no valid API key was provided. Sign in again to pick up where you left off.', stamp: 'no valid session' }
+    };
+    const d = map[code] || map['404'];
+    return { theme: this.props.theme === 'light' ? 'light' : 'dark', code, ...d };
+  }
+}
+</script>
+</body>
+</html>

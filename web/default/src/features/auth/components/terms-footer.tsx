@@ -34,8 +34,8 @@ export function TermsFooter({
   const { t } = useTranslation()
   const text =
     variant === 'sign-in'
-      ? 'By clicking sign in, you agree to our'
-      : 'By creating an account, you agree to our'
+      ? t('By clicking sign in, you agree to our')
+      : t('By creating an account, you agree to our')
 
   const hasUserAgreement = Boolean(status?.user_agreement_enabled)
   const hasPrivacyPolicy = Boolean(status?.privacy_policy_enabled)
@@ -45,11 +45,11 @@ export function TermsFooter({
   }
 
   const agreementLink = {
-    label: 'User Agreement',
+    label: t('User Agreement'),
     href: '/user-agreement',
   }
   const privacyLink = {
-    label: 'Privacy Policy',
+    label: t('Privacy Policy'),
     href: '/privacy-policy',
   }
 
@@ -69,7 +69,7 @@ export function TermsFooter({
       {firstLink && (
         <a
           href={firstLink.href}
-          className='hover:text-primary underline underline-offset-4'
+          className='text-foreground underline underline-offset-4 hover:opacity-80'
         >
           {firstLink.label}
         </a>
@@ -80,7 +80,7 @@ export function TermsFooter({
           {t('and')}{' '}
           <a
             href={secondLink.href}
-            className='hover:text-primary underline underline-offset-4'
+            className='text-foreground underline underline-offset-4 hover:opacity-80'
           >
             {secondLink.label}
           </a>

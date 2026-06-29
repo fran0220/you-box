@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  .eyb{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 14px}
+  a{text-decoration:none;color:inherit}
+  .navlink{font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-secondary);padding:8px 12px;border-radius:6px}
+  .navlink:hover{color:var(--text);background:var(--surface-hover)}
+  .navlink.on{color:var(--text-strong)}
+  .filt{font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer}
+  .filt input{accent-color:var(--brand);width:15px;height:15px}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <header style="position:sticky;top:0;z-index:200;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--border)">
+    <div class="wrap" style="height:64px;display:flex;align-items:center;gap:28px">
+      <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em">
+        <span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span>
+        <span style="color:var(--text-secondary)">You<b style="color:var(--text-strong);font-weight:700">Box</b></span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:2px;margin-left:6px">
+        <a class="navlink on" href="Marketplace.dc.html">Models</a>
+        <a class="navlink" href="Rankings.dc.html">Rankings</a>
+        <a class="navlink" href="Docs.dc.html">Docs</a>
+        <a class="navlink" href="Marketplace.dc.html">Pricing</a>
+      </nav>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="yb-iconbtn" aria-label="Toggle theme"><i data-lucide="sun"></i></button>
+        <a class="yb-btn yb-btn--ghost yb-btn--sm" href="SignIn.dc.html"><span>Sign in</span></a>
+        <a class="yb-btn yb-btn--primary yb-btn--sm" href="SignUp.dc.html"><span>Get API key</span></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HEADER -->
+  <section style="border-bottom:1px solid var(--border);padding:48px 0 32px">
+    <div class="wrap">
+      <p class="eyb">// Marketplace · 312 models</p>
+      <h1 style="font-family:var(--font-display);font-size:40px;letter-spacing:-.03em;font-weight:700;margin:0 0 10px;color:var(--text-strong)">Browse the model catalog</h1>
+      <p style="font-size:17px;color:var(--text-secondary);margin:0 0 26px;max-width:46em">Every model on YouBox, with live price, context window and throughput. Filter by capability, sort by what matters, and switch with one string.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <div class="yb-input-wrap" style="flex:1;min-width:280px;max-width:480px"><span class="yb-ic-l"><i data-lucide="search"></i></span><input class="yb-input yb-input--with-icon" placeholder="Search 312 models, providers, or slugs…"></div>
+        <div class="yb-tabs yb-tabs--pill">
+          <button class="yb-tab yb-tab--active">All <span class="yb-tab__count">312</span></button>
+          <button class="yb-tab">Chat</button>
+          <button class="yb-tab">Image</button>
+          <button class="yb-tab">Audio</button>
+          <button class="yb-tab">Embed</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <section style="padding:26px 0 64px">
+    <div class="wrap" style="display:grid;grid-template-columns:236px 1fr;gap:32px;align-items:start">
+
+      <!-- FILTERS -->
+      <aside style="position:sticky;top:88px;display:flex;flex-direction:column;gap:24px">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px">Modality</div>
+          <label class="filt"><input type="checkbox" checked> Text</label>
+          <label class="filt"><input type="checkbox" checked> Vision</label>
+          <label class="filt"><input type="checkbox"> Tool calling</label>
+          <label class="filt"><input type="checkbox"> Audio</label>
+          <label class="filt"><input type="checkbox"> Image gen</label>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px">Context window</div>
+          <label class="filt"><input type="radio" name="ctx"> 8K+</label>
+          <label class="filt"><input type="radio" name="ctx" checked> 128K+</label>
+          <label class="filt"><input type="radio" name="ctx"> 1M+</label>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:10px">Max input price</div>
+          <input type="range" min="0" max="20" value="12" style="width:100%;accent-color:var(--brand)">
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:4px"><span>$0</span><span>$12.00 / 1M</span></div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px">Provider</div>
+          <label class="filt"><input type="checkbox"> Anthropic</label>
+          <label class="filt"><input type="checkbox"> OpenAI</label>
+          <label class="filt"><input type="checkbox"> Google</label>
+          <label class="filt"><input type="checkbox"> Meta</label>
+          <label class="filt"><input type="checkbox"> Mistral AI</label>
+          <a style="display:inline-block;margin-top:8px;font-size:12px;color:var(--brand);font-family:var(--font-mono)" href="#">+ 29 more</a>
+        </div>
+      </aside>
+
+      <!-- GRID -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <span style="font-size:13px;color:var(--text-muted)"><b style="color:var(--text);font-weight:600">312</b> models · showing 1–10</span>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary)"><span style="color:var(--text-muted)">Sort</span><button class="yb-btn yb-btn--secondary yb-btn--sm"><i data-lucide="arrow-down-wide-narrow"></i><span>Trending</span><i data-lucide="chevron-down"></i></button></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#565663">An</span><div class="yb-model__title"><div class="yb-model__name">Claude Opus 4.6 <span class="yb-badge yb-badge--brand">New</span></div><div class="yb-model__by">anthropic/claude-opus-4.6 · 200K</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">Frontier reasoning model with state-of-the-art coding and long-horizon agentic performance.</p><div class="yb-model__tags"><span class="yb-tag">vision</span><span class="yb-tag">tools</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$3.00</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$15.00</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">tok/s</span><span class="v">118</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#3B3B47">Op</span><div class="yb-model__title"><div class="yb-model__name">GPT-5.2</div><div class="yb-model__by">openai/gpt-5.2 · 256K</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">General-purpose multimodal flagship with fast streaming and broad tool support.</p><div class="yb-model__tags"><span class="yb-tag">vision</span><span class="yb-tag">tools</span><span class="yb-tag">audio</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$2.50</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$10.00</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">tok/s</span><span class="v">142</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#8B9097">Go</span><div class="yb-model__title"><div class="yb-model__name">Gemini 3 Pro</div><div class="yb-model__by">google/gemini-3-pro · 1M</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">Long-context multimodal model tuned for documents, video, and retrieval-heavy workloads.</p><div class="yb-model__tags"><span class="yb-tag">vision</span><span class="yb-tag">1M ctx</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$1.25</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$5.00</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">tok/s</span><span class="v">96</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#74747F">Me</span><div class="yb-model__title"><div class="yb-model__name">Llama 4 405B</div><div class="yb-model__by">meta/llama-4-405b · 128K</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">Open-weights flagship. Self-hostable, with strong reasoning at an aggressive price point.</p><div class="yb-model__tags"><span class="yb-tag">open</span><span class="yb-tag">tools</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$0.90</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$0.90</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">tok/s</span><span class="v">84</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#A7ABB1">Mi</span><div class="yb-model__title"><div class="yb-model__name">Mistral Large 3</div><div class="yb-model__by">mistral/mistral-large-3 · 128K</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">European frontier model with excellent multilingual coverage and function calling.</p><div class="yb-model__tags"><span class="yb-tag">tools</span><span class="yb-tag">multilingual</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$2.00</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$6.00</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">tok/s</span><span class="v">110</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#807C75">De</span><div class="yb-model__title"><div class="yb-model__name">DeepSeek V4 <span class="yb-badge yb-badge--neutral">Cheap</span></div><div class="yb-model__by">deepseek/deepseek-v4 · 128K</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">Cost-efficient reasoning model with a dedicated chain-of-thought mode.</p><div class="yb-model__tags"><span class="yb-tag">reasoning</span><span class="yb-tag">open</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$0.27</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$1.10</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">tok/s</span><span class="v">72</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#9A9AA4">Bl</span><div class="yb-model__title"><div class="yb-model__name">FLUX 1.2 Pro</div><div class="yb-model__by">black-forest/flux-1.2-pro · image</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">High-fidelity text-to-image generation with sharp typography and prompt adherence.</p><div class="yb-model__tags"><span class="yb-tag">image</span><span class="yb-tag">512px–2K</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Per image</span><span class="v"><b>$0.040</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">avg</span><span class="v">3.2s</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#3B3B47">Op</span><div class="yb-model__title"><div class="yb-model__name">Whisper Large v4</div><div class="yb-model__by">openai/whisper-large-v4 · audio</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">Robust multilingual speech-to-text with word-level timestamps.</p><div class="yb-model__tags"><span class="yb-tag">audio</span><span class="yb-tag">99 langs</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Per minute</span><span class="v"><b>$0.006</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">RTF</span><span class="v">0.1×</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#565663">Co</span><div class="yb-model__title"><div class="yb-model__name">Embed 4</div><div class="yb-model__by">cohere/embed-4 · 8K</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">Multilingual embeddings for retrieval and semantic search at scale.</p><div class="yb-model__tags"><span class="yb-tag">embeddings</span><span class="yb-tag">1024 dim</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$0.10</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">dim</span><span class="v">1024</span></div></div></div>
+
+          <div class="yb-model"><div class="yb-model__head"><span class="yb-avatar yb-avatar--lg" style="background:#565663">Co</span><div class="yb-model__title"><div class="yb-model__name">Command R+ 2</div><div class="yb-model__by">cohere/command-r2 · 128K</div></div><button class="yb-model__fav"><i data-lucide="star"></i></button></div><p class="yb-model__desc">RAG-optimized model with grounded citations and tool use baked in.</p><div class="yb-model__tags"><span class="yb-tag">tools</span><span class="yb-tag">RAG</span></div><div class="yb-model__foot"><div class="yb-model__metric"><span class="k">Input / 1M</span><span class="v"><b>$2.50</b></span></div><div class="yb-model__metric"><span class="k">Output / 1M</span><span class="v"><b>$10.00</b></span></div><div class="yb-model__spacer"></div><div class="yb-model__metric" style="align-items:flex-end"><span class="k">tok/s</span><span class="v">90</span></div></div></div>
+
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:32px">
+          <button class="yb-iconbtn yb-iconbtn--solid"><i data-lucide="chevron-left"></i></button>
+          <button class="yb-btn yb-btn--secondary yb-btn--sm" style="background:var(--surface-3)"><span>1</span></button>
+          <button class="yb-btn yb-btn--ghost yb-btn--sm"><span>2</span></button>
+          <button class="yb-btn yb-btn--ghost yb-btn--sm"><span>3</span></button>
+          <span style="color:var(--text-muted);padding:0 4px">…</span>
+          <button class="yb-btn yb-btn--ghost yb-btn--sm"><span>32</span></button>
+          <button class="yb-iconbtn yb-iconbtn--solid"><i data-lucide="chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:860},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() {
+    const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); };
+    run(); setTimeout(run, 250); setTimeout(run, 700);
+  }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

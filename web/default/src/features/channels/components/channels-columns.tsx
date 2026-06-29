@@ -345,35 +345,50 @@ function StatusCell({ channel }: { channel: Channel }) {
     }
   }
 
+  const showProblemBadge =
+    status === CHANNEL_STATUS.MANUAL_DISABLED ||
+    status === CHANNEL_STATUS.AUTO_DISABLED
+
   return (
-    <TooltipProvider delay={100}>
-      <Tooltip>
-        <TooltipTrigger render={<span className='inline-flex' />}>
-          <Switch
-            size='sm'
-            checked={isEnabled}
-            onCheckedChange={handleToggle}
-            disabled={isToggling}
-            aria-label={isEnabled ? t('Disable') : t('Enable')}
-          />
-        </TooltipTrigger>
-        <TooltipContent side='top' className='max-w-xs'>
-          <div className='space-y-1 text-xs'>
-            <div>{label}</div>
-            {statusReason && (
-              <div>
-                {t('Reason:')} {statusReason}
-              </div>
-            )}
-            {statusTime && (
-              <div>
-                {t('Time:')} {statusTime}
-              </div>
-            )}
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div className='inline-flex items-center gap-2'>
+      {showProblemBadge && (
+        <StatusBadge
+          label={label}
+          variant={config.variant}
+          appearance='soft'
+          size='sm'
+          copyable={false}
+        />
+      )}
+      <TooltipProvider delay={100}>
+        <Tooltip>
+          <TooltipTrigger render={<span className='inline-flex' />}>
+            <Switch
+              size='sm'
+              checked={isEnabled}
+              onCheckedChange={handleToggle}
+              disabled={isToggling}
+              aria-label={isEnabled ? t('Disable') : t('Enable')}
+            />
+          </TooltipTrigger>
+          <TooltipContent side='top' className='max-w-xs'>
+            <div className='space-y-1 text-xs'>
+              <div>{label}</div>
+              {statusReason && (
+                <div>
+                  {t('Reason:')} {statusReason}
+                </div>
+              )}
+              {statusTime && (
+                <div>
+                  {t('Time:')} {statusTime}
+                </div>
+              )}
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
   )
 }
 
@@ -607,10 +622,12 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
                 )}
               </Button>
               <div className='flex items-center gap-1.5'>
-                <span className='font-semibold'>Tag：{tag}</span>
+                <span className='font-semibold'>
+                  {t('Tag: {{tag}}', { tag })}
+                </span>
                 <StatusBadge
-                  label={`${childrenCount} channels`}
-                  variant='blue'
+                  label={t('{{count}} channels', { count: childrenCount })}
+                  variant='neutral'
                   size='sm'
                   copyable={false}
                 />
@@ -839,7 +856,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           if (hasEnabled) {
             return (
               <StatusBadge
-                label={`Active (${childrenCount})`}
+                label={t('Active ({{count}})', { count: childrenCount })}
                 variant='success'
                 size='sm'
                 copyable={false}
@@ -848,7 +865,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           } else {
             return (
               <StatusBadge
-                label={`Inactive (${childrenCount})`}
+                label={t('Inactive ({{count}})', { count: childrenCount })}
                 variant='neutral'
                 size='sm'
                 copyable={false}

@@ -185,13 +185,10 @@ export function DataTableBulkActions<TData>({
         open={showTagDialog}
         onOpenChange={setShowTagDialog}
         title={t('Set Tag')}
-        description={
-          <>
-            {t('Set a tag for')}
-            {selectedIds.length}{' '}
-            {t('selected channel(s). Leave empty to remove tag.')}
-          </>
-        }
+        description={t(
+          'Set a tag for {{count}} selected channel(s). Leave empty to remove tag.',
+          { count: selectedIds.length }
+        )}
         contentHeight='auto'
         bodyClassName='space-y-4'
         footer={
@@ -227,13 +224,10 @@ export function DataTableBulkActions<TData>({
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
         title={t('Delete Channels?')}
-        description={
-          <>
-            {t('Are you sure you want to delete')}
-            {selectedIds.length}{' '}
-            {t('channel(s)? This action cannot be undone.')}
-          </>
-        }
+        description={t(
+          'Are you sure you want to delete {{count}} channel(s)? This action cannot be undone.',
+          { count: selectedIds.length }
+        )}
         contentHeight='auto'
         footer={
           <>

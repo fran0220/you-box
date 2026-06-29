@@ -153,14 +153,21 @@ export function PerformanceHealthPanel() {
           />
         </StatCardRow>
 
-        {loading ? (
+        {metricsQuery.isError ? (
+          <p className='text-muted-foreground text-center text-sm'>
+            {t('Failed to load')}
+          </p>
+        ) : loading ? (
           <div className='space-y-1'>
             {Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className='h-6 w-full rounded' />
             ))}
           </div>
+        ) : !hasData ? (
+          <p className='text-muted-foreground py-4 text-center text-sm'>
+            {t('No performance data yet')}
+          </p>
         ) : (
-          hasData && (
             <div className='overflow-hidden rounded-md border'>
               <table className='w-full text-sm'>
                 <thead className='bg-surface-2'>
@@ -222,7 +229,6 @@ export function PerformanceHealthPanel() {
                 </tbody>
               </table>
             </div>
-          )
         )}
       </div>
     </Panel>

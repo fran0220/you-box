@@ -38,9 +38,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
+  SettingRowFormItem,
+  SettingRowGroup,
   SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
@@ -306,26 +306,26 @@ export function OAuthSection(props: OAuthSectionProps) {
               </TabsList>
 
               <TabsContent value='github' className={oauthTabContentClassName}>
-                <FormField
-                  control={form.control}
-                  name='GitHubOAuthEnabled'
-                  render={({ field }) => (
-                    <SettingsSwitchItem>
-                      <SettingsSwitchContent>
-                        <FormLabel>{t('Enable GitHub OAuth')}</FormLabel>
-                        <FormDescription>
-                          {t('Allow users to sign in with GitHub')}
-                        </FormDescription>
-                      </SettingsSwitchContent>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </SettingsSwitchItem>
-                  )}
-                />
+                <SettingRowGroup>
+                  <FormField
+                    control={form.control}
+                    name='GitHubOAuthEnabled'
+                    render={({ field }) => (
+                      <SettingRowFormItem
+                        label={t('Enable GitHub OAuth')}
+                        description={t('Allow users to sign in with GitHub')}
+                        control={
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                    )}
+                  />
+                </SettingRowGroup>
 
                 <FormField
                   control={form.control}
@@ -378,26 +378,26 @@ export function OAuthSection(props: OAuthSectionProps) {
               </TabsContent>
 
               <TabsContent value='discord' className={oauthTabContentClassName}>
-                <FormField
-                  control={form.control}
-                  name='discord.enabled'
-                  render={({ field }) => (
-                    <SettingsSwitchItem>
-                      <SettingsSwitchContent>
-                        <FormLabel>{t('Enable Discord OAuth')}</FormLabel>
-                        <FormDescription>
-                          {t('Allow users to sign in with Discord')}
-                        </FormDescription>
-                      </SettingsSwitchContent>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </SettingsSwitchItem>
-                  )}
-                />
+                <SettingRowGroup>
+                  <FormField
+                    control={form.control}
+                    name='discord.enabled'
+                    render={({ field }) => (
+                      <SettingRowFormItem
+                        label={t('Enable Discord OAuth')}
+                        description={t('Allow users to sign in with Discord')}
+                        control={
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                    )}
+                  />
+                </SettingRowGroup>
 
                 <FormField
                   control={form.control}
@@ -450,26 +450,26 @@ export function OAuthSection(props: OAuthSectionProps) {
               </TabsContent>
 
               <TabsContent value='oidc' className={oauthTabContentClassName}>
-                <FormField
-                  control={form.control}
-                  name='oidc.enabled'
-                  render={({ field }) => (
-                    <SettingsSwitchItem>
-                      <SettingsSwitchContent>
-                        <FormLabel>{t('Enable OIDC')}</FormLabel>
-                        <FormDescription>
-                          {t('Allow users to sign in with OpenID Connect')}
-                        </FormDescription>
-                      </SettingsSwitchContent>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </SettingsSwitchItem>
-                  )}
-                />
+                <SettingRowGroup>
+                  <FormField
+                    control={form.control}
+                    name='oidc.enabled'
+                    render={({ field }) => (
+                      <SettingRowFormItem
+                        label={t('Enable OIDC')}
+                        description={t('Allow users to sign in with OpenID Connect')}
+                        control={
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                    )}
+                  />
+                </SettingRowGroup>
 
                 <FormField
                   control={form.control}
@@ -630,26 +630,26 @@ export function OAuthSection(props: OAuthSectionProps) {
                 value='telegram'
                 className={oauthTabContentClassName}
               >
-                <FormField
-                  control={form.control}
-                  name='TelegramOAuthEnabled'
-                  render={({ field }) => (
-                    <SettingsSwitchItem>
-                      <SettingsSwitchContent>
-                        <FormLabel>{t('Enable Telegram OAuth')}</FormLabel>
-                        <FormDescription>
-                          {t('Allow users to sign in with Telegram')}
-                        </FormDescription>
-                      </SettingsSwitchContent>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </SettingsSwitchItem>
-                  )}
-                />
+                <SettingRowGroup>
+                  <FormField
+                    control={form.control}
+                    name='TelegramOAuthEnabled'
+                    render={({ field }) => (
+                      <SettingRowFormItem
+                        label={t('Enable Telegram OAuth')}
+                        description={t('Allow users to sign in with Telegram')}
+                        control={
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                    )}
+                  />
+                </SettingRowGroup>
 
                 <FormField
                   control={form.control}
@@ -702,26 +702,26 @@ export function OAuthSection(props: OAuthSectionProps) {
               </TabsContent>
 
               <TabsContent value='linuxdo' className={oauthTabContentClassName}>
-                <FormField
-                  control={form.control}
-                  name='LinuxDOOAuthEnabled'
-                  render={({ field }) => (
-                    <SettingsSwitchItem>
-                      <SettingsSwitchContent>
-                        <FormLabel>{t('Enable LinuxDO OAuth')}</FormLabel>
-                        <FormDescription>
-                          {t('Allow users to sign in with LinuxDO')}
-                        </FormDescription>
-                      </SettingsSwitchContent>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </SettingsSwitchItem>
-                  )}
-                />
+                <SettingRowGroup>
+                  <FormField
+                    control={form.control}
+                    name='LinuxDOOAuthEnabled'
+                    render={({ field }) => (
+                      <SettingRowFormItem
+                        label={t('Enable LinuxDO OAuth')}
+                        description={t('Allow users to sign in with LinuxDO')}
+                        control={
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                    )}
+                  />
+                </SettingRowGroup>
 
                 <FormField
                   control={form.control}
@@ -801,26 +801,26 @@ export function OAuthSection(props: OAuthSectionProps) {
               </TabsContent>
 
               <TabsContent value='wechat' className={oauthTabContentClassName}>
-                <FormField
-                  control={form.control}
-                  name='WeChatAuthEnabled'
-                  render={({ field }) => (
-                    <SettingsSwitchItem>
-                      <SettingsSwitchContent>
-                        <FormLabel>{t('Enable WeChat Auth')}</FormLabel>
-                        <FormDescription>
-                          {t('Allow users to sign in with WeChat')}
-                        </FormDescription>
-                      </SettingsSwitchContent>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </SettingsSwitchItem>
-                  )}
-                />
+                <SettingRowGroup>
+                  <FormField
+                    control={form.control}
+                    name='WeChatAuthEnabled'
+                    render={({ field }) => (
+                      <SettingRowFormItem
+                        label={t('Enable WeChat Auth')}
+                        description={t('Allow users to sign in with WeChat')}
+                        control={
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                    )}
+                  />
+                </SettingRowGroup>
 
                 <FormField
                   control={form.control}

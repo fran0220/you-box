@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { PageHeader } from '@/components/youbox'
 import type { RankingPeriod } from '../types'
 
 const PERIODS: { id: RankingPeriod; labelKey: string }[] = [
@@ -33,42 +34,31 @@ type RankingsHeroProps = {
   onPeriodChange: (period: RankingPeriod) => void
 }
 
-/**
- * Hero strip for the rankings page. Intentionally minimal — title +
- * subtitle + period tabs only.
- */
 export function RankingsHero(props: RankingsHeroProps) {
   const { t } = useTranslation()
 
   return (
-    <section className='space-y-5'>
-      <div className='space-y-2'>
-        <h1 className='font-display text-[clamp(1.75rem,4vw,2.5rem)] leading-[1.1] font-bold tracking-[-0.025em]'>
-          {t('Rankings')}
-        </h1>
-        <p className='text-muted-foreground/80 max-w-2xl text-sm'>
-          {t(
-            'Discover the most-used models and rising vendors on the platform, updated from live usage data.'
-          )}
-        </p>
-      </div>
+    <section className='space-y-6'>
+      <PageHeader
+        eyebrow={t('Rankings')}
+        title={t('Most used models on YouBox')}
+        subtitle={t(
+          'Ranked by tokens routed across all customers. Updated from live usage data.'
+        )}
+        className='[&_h1]:text-[clamp(1.75rem,4vw,2.5rem)] [&_h1]:tracking-[-0.03em]'
+      />
 
-      {/* Underline tabs for period — clean and unobtrusive. */}
       <Tabs
         value={props.period}
         onValueChange={(value) => props.onPeriodChange(value as RankingPeriod)}
       >
         <TabsList
-          variant='line'
+          variant='default'
           aria-label={t('Period')}
-          className='border-border/60 w-full justify-start gap-0 border-b group-data-horizontal/tabs:h-auto'
+          className='w-full max-w-full flex-wrap justify-start sm:w-fit'
         >
           {PERIODS.map((p) => (
-            <TabsTrigger
-              key={p.id}
-              value={p.id}
-              className='flex-none px-3 py-2'
-            >
+            <TabsTrigger key={p.id} value={p.id} className='flex-none'>
               {t(p.labelKey)}
             </TabsTrigger>
           ))}

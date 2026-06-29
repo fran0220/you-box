@@ -17,8 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -57,8 +58,12 @@ import {
   SettingRowGroup,
   SettingsForm,
 } from '../components/settings-form-layout'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { getPerformanceLogs, getPerformanceStats } from '../api'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import { safeNumberFieldProps } from '../utils/numeric-field'
 
@@ -216,8 +221,21 @@ type PerformanceStats = {
 export function PerformanceSection(props: Props) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
-  const [stats, setStats] = useState<PerformanceStats | null>(null)
-  const [logInfo, setLogInfo] = useState<LogInfo | null>(null)
+  const queryClient = useQueryClient()
+  const { data: stats = null } = useQuery({
+    queryKey: ['performance', 'stats'],
+    queryFn: getPerformanceStats,
+    staleTime: 30_000,
+    retry: false,
+    select: (data) => data as PerformanceStats,
+  })
+  const { data: logInfo = null } = useQuery({
+    queryKey: ['performance', 'logs'],
+    queryFn: getPerformanceLogs,
+    staleTime: 30_000,
+    retry: false,
+    select: (data) => data as LogInfo,
+  })
   const [logCleanupMode, setLogCleanupMode] = useState('by_count')
   const [logCleanupValue, setLogCleanupValue] = useState(10)
   const [logCleanupLoading, setLogCleanupLoading] = useState(false)
@@ -227,77 +245,53 @@ export function PerformanceSection(props: Props) {
     [props.defaultValues]
   )
 
-  const form = useForm<PerfFormInput, unknown, PerfFormValues>({
-    resolver: zodResolver(perfSchema),
-    defaultValues: formDefaults,
-  })
-
   const baselineRef = useRef<FlatPerfDefaults>(props.defaultValues)
-  const baselineSerializedRef = useRef<string>(
-    JSON.stringify(props.defaultValues)
-  )
 
   useEffect(() => {
-    const serialized = JSON.stringify(props.defaultValues)
-    if (serialized === baselineSerializedRef.current) return
     baselineRef.current = props.defaultValues
-    baselineSerializedRef.current = serialized
-    form.reset(buildFormDefaults(props.defaultValues))
-  }, [props.defaultValues, form])
+  }, [props.defaultValues])
 
-  const fetchStats = useCallback(async () => {
-    try {
-      const res = await api.get('/api/performance/stats')
-      if (res.data.success) setStats(res.data.data)
-    } catch {
-      /* ignore */
-    }
-  }, [])
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<PerfFormValues>({
+      resolver: zodResolver(perfSchema) as Resolver<
+        PerfFormValues,
+        unknown,
+        PerfFormValues
+      >,
+      defaultValues: formDefaults as PerfFormValues,
+      onSubmit: async (values) => {
+        const normalized = normalizeFormValues(values)
+        const changedKeys = (
+          Object.keys(normalized) as Array<keyof FlatPerfDefaults>
+        ).filter((key) => normalized[key] !== baselineRef.current[key])
 
-  const fetchLogInfo = useCallback(async () => {
-    try {
-      const res = await api.get('/api/performance/logs')
-      if (res.data.success) setLogInfo(res.data.data)
-    } catch {
-      /* ignore */
-    }
-  }, [])
+        for (const key of changedKeys) {
+          await updateOption.mutateAsync({
+            key,
+            value: normalized[key],
+          })
+        }
 
-  useEffect(() => {
-    fetchStats()
-    fetchLogInfo()
-  }, [fetchStats, fetchLogInfo])
+        baselineRef.current = normalized
+        form.reset(buildFormDefaults(normalized) as PerfFormValues)
+        void queryClient.invalidateQueries({ queryKey: ['performance', 'stats'] })
+      },
+    })
 
-  const onSubmit = async (values: PerfFormValues) => {
-    const normalized = normalizeFormValues(values)
-    const changedKeys = (
-      Object.keys(normalized) as Array<keyof FlatPerfDefaults>
-    ).filter((key) => normalized[key] !== baselineRef.current[key])
+  const refreshStats = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: ['performance', 'stats'] })
+  }, [queryClient])
 
-    if (changedKeys.length === 0) {
-      toast.info(t('No changes to save'))
-      return
-    }
-
-    for (const key of changedKeys) {
-      await updateOption.mutateAsync({
-        key,
-        value: normalized[key],
-      })
-    }
-
-    baselineRef.current = normalized
-    baselineSerializedRef.current = JSON.stringify(normalized)
-    form.reset(buildFormDefaults(normalized))
-    fetchStats()
-  }
+  const refreshLogInfo = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: ['performance', 'logs'] })
+  }, [queryClient])
 
   const clearDiskCache = async () => {
     try {
       const res = await api.delete('/api/performance/disk_cache')
       if (res.data.success) {
         toast.success(t('Disk cache cleared'))
-        fetchStats()
+        refreshStats()
       }
     } catch {
       toast.error(t('Cleanup failed'))
@@ -309,7 +303,7 @@ export function PerformanceSection(props: Props) {
       const res = await api.post('/api/performance/reset_stats')
       if (res.data.success) {
         toast.success(t('Statistics reset'))
-        fetchStats()
+        refreshStats()
       }
     } catch {
       toast.error(t('Reset failed'))
@@ -321,7 +315,7 @@ export function PerformanceSection(props: Props) {
       const res = await api.post('/api/performance/gc')
       if (res.data.success) {
         toast.success(t('GC executed'))
-        fetchStats()
+        refreshStats()
       }
     } catch {
       toast.error(t('GC execution failed'))
@@ -349,7 +343,7 @@ export function PerformanceSection(props: Props) {
       } else {
         toast.error(res.data.message || t('Cleanup failed'))
       }
-      fetchLogInfo()
+      refreshLogInfo()
     } catch {
       toast.error(t('Cleanup failed'))
     } finally {
@@ -386,13 +380,19 @@ export function PerformanceSection(props: Props) {
       : 0
 
   return (
-    <SettingsSection title={t('Performance Settings')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-          />
+    <>
+      <FormNavigationGuard when={isDirty} />
+
+      <SettingsSection title={t('Performance Settings')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
+            />
+            <FormDirtyIndicator isDirty={isDirty} />
           {/* Disk Cache Settings */}
           <div>
             <h4 className='font-medium'>{t('Disk Cache Settings')}</h4>
@@ -886,7 +886,7 @@ export function PerformanceSection(props: Props) {
       <div className='space-y-4'>
         <div className='flex items-center gap-2'>
           <h4 className='font-medium'>{t('Performance Monitor')}</h4>
-          <Button variant='outline' size='sm' onClick={fetchStats}>
+          <Button variant='outline' size='sm' onClick={refreshStats}>
             {t('Refresh Stats')}
           </Button>
           <AlertDialog>
@@ -1062,6 +1062,7 @@ export function PerformanceSection(props: Props) {
           </>
         )}
       </div>
-    </SettingsSection>
+      </SettingsSection>
+    </>
   )
 }

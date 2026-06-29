@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 import { VCHART_OPTION } from '@/lib/vchart'
 import { useVChartThemeColors } from '@/lib/vchart-theme'
 import { useThemeCustomization } from '@/context/theme-customization-provider'
-import type { LatencyTimePoint, UptimeDayPoint } from '../lib/mock-stats'
+import type { LatencyTimePoint, UptimeDayPoint } from '../lib/chart-types'
 
 function formatHourLabel(iso: string): string {
   const date = new Date(iso)
@@ -283,7 +283,7 @@ export function ThroughputBarChart(props: {
   const { customization } = useThemeCustomization()
   const barRadius = useThemeRadiusPx(
     '--radius-sm',
-    `${customization.preset}:${customization.radius}`
+    `${customization.preset}:${resolvedTheme}`
   )
 
   const filtered = useMemo(

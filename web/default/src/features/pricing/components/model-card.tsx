@@ -16,14 +16,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { memo } from 'react'
+import { memo, type ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Copy, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
-import { Metric } from '@/components/patterns'
+import {
+  ModelCard as YouboxModelCard,
+  type ModelCardMetric,
+} from '@/components/youbox/model-card'
 import { StatusBadge } from '@/components/status-badge'
 import { DEFAULT_TOKEN_UNIT } from '../constants'
 import { useFavorites } from '../hooks/use-favorites'
@@ -59,8 +61,6 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   const tags = parseTags(props.model.tags)
   const groups = props.model.enable_groups || []
   const endpoints = props.model.supported_endpoint_types || []
-  const modelIconKey = props.model.icon || props.model.vendor_icon
-  const modelIcon = modelIconKey ? getLobeIcon(modelIconKey, 28) : null
   const initial = props.model.model_name?.charAt(0).toUpperCase() || '?'
   const isDynamicPricing =
     props.model.billing_mode === 'tiered_expr' &&
@@ -84,199 +84,157 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
     Math.max(endpoints.length - 2, 0) +
     Math.max(tags.length - 2, 0)
 
-  const handleCopy = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    copyToClipboard(props.model.model_name || '')
-  }
-
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    toggleFavorite(props.model.model_name)
-  }
-
-  const renderPriceMetrics = () => {
+  const buildPriceMetrics = (): ModelCardMetric[] => {
     if (dynamicSummary) {
       if (dynamicSummary.isSpecialExpression) {
-        return (
-          <span className='min-w-0 text-xs'>
-            <span className='text-warning'>
-              {t('Special billing expression')}
-            </span>
-            <code className='text-muted-foreground/70 mt-0.5 line-clamp-1 block font-mono text-[11px] break-all'>
-              {dynamicSummary.rawExpression}
-            </code>
-          </span>
-        )
+        return []
       }
       if (dynamicSummary.primaryEntries.length === 0) {
-        return (
-          <span className='text-muted-foreground text-xs'>
-            {t('Dynamic Pricing')}
-          </span>
-        )
+        return []
       }
-      return dynamicSummary.primaryEntries.map((entry) => (
-        <Metric
-          key={entry.key}
-          k={`${t(entry.shortLabel)} / ${tokenUnitLabel}`}
-          v={entry.formatted}
-        />
-      ))
+      return dynamicSummary.primaryEntries.map((entry) => ({
+        key: `${t(entry.shortLabel)} / ${tokenUnitLabel}`,
+        value: entry.formatted,
+      }))
     }
 
     if (!isTokenBased) {
-      return (
-        <Metric
-          k={t('Per request')}
-          v={formatRequestPrice(
+      return [
+        {
+          key: t('Per request'),
+          value: formatRequestPrice(
             props.model,
             showRechargePrice,
             priceRate,
             usdExchangeRate
-          )}
-        />
-      )
+          ),
+        },
+      ]
     }
 
-    return (
-      <>
-        <Metric
-          k={`${t('Input')} / ${tokenUnitLabel}`}
-          v={formatPrice(
-            props.model,
-            'input',
-            tokenUnit,
-            showRechargePrice,
-            priceRate,
-            usdExchangeRate
-          )}
-        />
-        <Metric
-          k={`${t('Output')} / ${tokenUnitLabel}`}
-          v={formatPrice(
-            props.model,
-            'output',
-            tokenUnit,
-            showRechargePrice,
-            priceRate,
-            usdExchangeRate
-          )}
-        />
-        {hasCachedPrice && (
-          <Metric
-            k={`${t('Cached')} / ${tokenUnitLabel}`}
-            v={formatPrice(
-              props.model,
-              'cache',
-              tokenUnit,
-              showRechargePrice,
-              priceRate,
-              usdExchangeRate
-            )}
-          />
-        )}
-      </>
-    )
+    const metrics: ModelCardMetric[] = [
+      {
+        key: `${t('Input')} / ${tokenUnitLabel}`,
+        value: formatPrice(
+          props.model,
+          'input',
+          tokenUnit,
+          showRechargePrice,
+          priceRate,
+          usdExchangeRate
+        ),
+      },
+      {
+        key: `${t('Output')} / ${tokenUnitLabel}`,
+        value: formatPrice(
+          props.model,
+          'output',
+          tokenUnit,
+          showRechargePrice,
+          priceRate,
+          usdExchangeRate
+        ),
+      },
+    ]
+    if (hasCachedPrice) {
+      metrics.push({
+        key: `${t('Cached')} / ${tokenUnitLabel}`,
+        value: formatPrice(
+          props.model,
+          'cache',
+          tokenUnit,
+          showRechargePrice,
+          priceRate,
+          usdExchangeRate
+        ),
+      })
+    }
+    return metrics
   }
 
-  return (
-    <Link
-      to='/pricing/$modelId'
-      params={{ modelId: props.model.model_name }}
-      // Retain catalog filter/sort/view/unit URL state across navigation.
-      search={(prev) => prev}
-      className={cn(
-        'group bg-card border-border duration-base focus-visible:ring-ring/40 relative flex flex-col rounded-lg border p-3 transition-all ease-out outline-none focus-visible:ring-2 sm:p-4',
-        'hover:border-brand-border hover:shadow-[var(--glow-brand)] motion-safe:hover:-translate-y-0.5'
+  const priceMetrics = buildPriceMetrics()
+
+  const authorLine = [
+    props.model.vendor_name
+      ? t('by {{vendor}}', { vendor: props.model.vendor_name })
+      : null,
+    primaryGroup,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+  const dynamicBadge = isDynamicPricing ? (
+    <StatusBadge
+      label={t('Dynamic Pricing')}
+      variant='warning'
+      copyable={false}
+      size='sm'
+    />
+  ) : null
+
+  const trailingActions = (
+    <div className='flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100'>
+      <button
+        type='button'
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          toggleFavorite(props.model.model_name)
+        }}
+        aria-pressed={favorited}
+        aria-label={
+          favorited ? t('Remove from favorites') : t('Add to favorites')
+        }
+        title={
+          favorited ? t('Remove from favorites') : t('Add to favorites')
+        }
+        className={cn(
+          'rounded-md p-1.5 transition-colors',
+          favorited
+            ? 'text-brand hover:bg-brand-subtle'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+        )}
+      >
+        <Star
+          className={cn('size-3.5', favorited && 'fill-current')}
+          aria-hidden='true'
+        />
+      </button>
+      <button
+        type='button'
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          copyToClipboard(props.model.model_name || '')
+        }}
+        className='text-muted-foreground hover:text-foreground hover:bg-muted rounded-md p-1.5 transition-colors'
+        title={t('Copy model name')}
+        aria-label={t('Copy model name')}
+      >
+        <Copy className='size-3.5' aria-hidden='true' />
+      </button>
+    </div>
+  )
+
+  const footerExtras: ReactNode = (
+    <>
+      {dynamicSummary?.isSpecialExpression && (
+        <div className='mt-3 min-w-0 text-xs'>
+          <span className='text-warning'>{t('Special billing expression')}</span>
+          <code className='text-muted-foreground/70 mt-0.5 line-clamp-1 block font-mono text-[11px] break-all'>
+            {dynamicSummary.rawExpression}
+          </code>
+        </div>
       )}
-    >
-      {/* Header: icon + name + meta + hover actions (star / copy) */}
-      <div className='flex items-start justify-between gap-2.5 sm:gap-3'>
-        <div className='flex min-w-0 items-start gap-2.5 sm:gap-3'>
-          <div className='bg-muted/40 flex size-9 shrink-0 items-center justify-center rounded-lg sm:size-10 sm:rounded-xl'>
-            {modelIcon || (
-              <span className='text-muted-foreground text-sm font-bold'>
-                {initial}
-              </span>
-            )}
-          </div>
-          <div className='min-w-0'>
-            <h3 className='text-foreground truncate font-mono text-[15px] leading-tight font-bold'>
-              {props.model.model_name}
-            </h3>
-            <div className='mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5'>
-              {props.model.vendor_name && (
-                <span className='text-muted-foreground/80 text-xs'>
-                  {t('by {{vendor}}', { vendor: props.model.vendor_name })}
-                </span>
-              )}
-              {primaryGroup && (
-                <span className='text-muted-foreground text-xs font-medium'>
-                  {primaryGroup}
-                </span>
-              )}
-              {isDynamicPricing && (
-                <StatusBadge
-                  label={t('Dynamic Pricing')}
-                  variant='warning'
-                  copyable={false}
-                  size='sm'
-                />
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className='flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100'>
-          <button
-            type='button'
-            onClick={handleToggleFavorite}
-            aria-pressed={favorited}
-            aria-label={
-              favorited ? t('Remove from favorites') : t('Add to favorites')
-            }
-            title={
-              favorited ? t('Remove from favorites') : t('Add to favorites')
-            }
-            className={cn(
-              'rounded-md p-1.5 transition-colors',
-              favorited
-                ? 'text-brand hover:bg-brand-subtle'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            )}
-          >
-            <Star
-              className={cn('size-3.5', favorited && 'fill-current')}
-              aria-hidden='true'
-            />
-          </button>
-          <button
-            type='button'
-            onClick={handleCopy}
-            className='text-muted-foreground hover:text-foreground hover:bg-muted rounded-md p-1.5 transition-colors'
-            title={t('Copy model name')}
-            aria-label={t('Copy model name')}
-          >
-            <Copy className='size-3.5' />
-          </button>
-        </div>
-      </div>
-
-      {/* Description */}
-      <p className='text-muted-foreground mt-2 line-clamp-2 flex-1 text-[13px] leading-relaxed sm:mt-3 sm:min-h-[2.5rem]'>
-        {props.model.description || t('No description available.')}
-      </p>
-
-      {/* Footer: price Metrics + perf summary; endpoint/tag chips below. */}
-      <div className='mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1.5 sm:mt-3'>
-        <div className='flex min-w-0 flex-wrap items-start gap-x-4 gap-y-1.5 sm:gap-x-5'>
-          {renderPriceMetrics()}
-        </div>
-        <ModelPerfBadge perf={props.perf} className='row-span-2 self-start' />
-
-        <div className='flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-0.5 sm:gap-x-3'>
+      {dynamicSummary &&
+        !dynamicSummary.isSpecialExpression &&
+        dynamicSummary.primaryEntries.length === 0 && (
+          <p className='text-muted-foreground mt-3 text-xs'>
+            {t('Dynamic Pricing')}
+          </p>
+        )}
+      <div className='mt-3 flex min-w-0 flex-wrap items-center justify-between gap-2'>
+        <div className='flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-0.5'>
           {bottomTags.map((item) => (
             <span key={item} className='text-muted-foreground/70 text-xs'>
               {item}
@@ -288,7 +246,37 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
             </span>
           )}
         </div>
+        <ModelPerfBadge perf={props.perf} />
       </div>
+    </>
+  )
+
+  return (
+    <Link
+      to='/pricing/$modelId'
+      params={{ modelId: props.model.model_name }}
+      search={(prev: Record<string, unknown>) => prev}
+      className='group block h-full rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]'
+    >
+      <YouboxModelCard
+        interactive
+        className='h-full'
+        avatarFallback={initial}
+        name={
+          <span className='truncate font-mono text-[15px] font-bold'>
+            {props.model.model_name}
+          </span>
+        }
+        author={authorLine || undefined}
+        badge={dynamicBadge}
+        description={
+          props.model.description || t('No description available.')
+        }
+        metrics={priceMetrics.length > 0 ? priceMetrics : undefined}
+        trailing={trailingActions}
+      >
+        {footerExtras}
+      </YouboxModelCard>
     </Link>
   )
 })

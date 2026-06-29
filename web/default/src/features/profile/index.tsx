@@ -16,9 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { useStatus } from '@/hooks/use-status'
-import { Main } from '@/components/layout'
+import { SectionPageLayout } from '@/components/layout'
+import { PageHeader } from '@/components/youbox'
 import {
   CardStaggerContainer,
   CardStaggerItem,
@@ -34,6 +36,7 @@ import { TwoFACard } from './components/two-fa-card'
 import { useProfile } from './hooks'
 
 export function Profile() {
+  const { t } = useTranslation()
   const { profile, loading, refreshProfile } = useProfile()
   const { status } = useStatus()
   const permissions = useAuthStore((s) => s.auth.user?.permissions)
@@ -46,9 +49,17 @@ export function Profile() {
   const canConfigureSidebar = permissions?.sidebar_settings !== false
 
   return (
-    <Main>
-      <div className='min-h-0 flex-1 overflow-auto px-3 py-3 sm:px-4 sm:py-6'>
-        <CardStaggerContainer className='mx-auto grid w-full max-w-7xl gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start'>
+    <SectionPageLayout>
+      <SectionPageLayout.Content>
+        <div className='mx-auto w-full max-w-[980px] space-y-5'>
+          <PageHeader
+            eyebrow={t('Account')}
+            title={t('Profile')}
+            subtitle={t(
+              'Manage your account, security, bindings, and preferences.'
+            )}
+          />
+          <CardStaggerContainer className='grid w-full gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start'>
           <CardStaggerItem className='lg:self-start'>
             <div className='lg:sticky lg:top-6'>
               <AccountCard profile={profile} loading={loading} />
@@ -79,8 +90,9 @@ export function Profile() {
               )}
             </div>
           </CardStaggerItem>
-        </CardStaggerContainer>
-      </div>
-    </Main>
+          </CardStaggerContainer>
+        </div>
+      </SectionPageLayout.Content>
+    </SectionPageLayout>
   )
 }

@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button'
 import {
   FILTER_SECTIONS,
   getEndpointTypeLabels,
-  getModalityLabels,
+  getModelTypeLabels,
   getQuotaTypeLabels,
 } from '../constants'
 import { type ActiveFilter } from '../hooks/use-filters'
@@ -52,20 +52,17 @@ export function PricingFilterPills(props: PricingFilterPillsProps) {
   // pill reads "Chat"/"Token-based"/"Image" — matching its sidebar checkbox.
   const endpointLabels = getEndpointTypeLabels(t)
   const quotaLabels = getQuotaTypeLabels(t)
-  const modalityLabels = getModalityLabels(t)
+  const modelTypeLabels = getModelTypeLabels(t)
   const resolveLabel = (filter: ActiveFilter): string => {
     switch (filter.facet) {
-      case 'contextRange':
-        return t('Context length')
       case 'promptPriceRange':
         return t('Prompt pricing')
       case FILTER_SECTIONS.ENDPOINT_TYPE:
         return endpointLabels[filter.value as keyof typeof endpointLabels] ?? filter.label
       case FILTER_SECTIONS.PRICING_TYPE:
         return quotaLabels[filter.value as keyof typeof quotaLabels] ?? filter.label
-      case FILTER_SECTIONS.INPUT_MODALITY:
-      case FILTER_SECTIONS.OUTPUT_MODALITY:
-        return modalityLabels[filter.value as keyof typeof modalityLabels] ?? filter.label
+      case FILTER_SECTIONS.MODEL_TYPE:
+        return modelTypeLabels[filter.value] ?? filter.label
       default:
         return filter.label
     }

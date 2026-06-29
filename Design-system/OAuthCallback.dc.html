@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .mono{font-family:var(--font-mono)}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  *,*::before,*::after{transition:none!important}
+  .spin{animation:sp 1s linear infinite}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text);font-family:var(--font-sans);padding:32px;position:relative;overflow:hidden">
+  <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:600px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.045),transparent 65%);pointer-events:none"></div>
+  <div style="width:100%;max-width:400px;position:relative">
+    <a href="Index.dc.html" style="display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em;margin-bottom:28px"><span style="display:inline-flex;width:28px;height:28px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:17px;height:17px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></a>
+
+    <div class="yb-card yb-card--pad-lg" style="text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px">
+        <span style="width:46px;height:46px;border-radius:12px;background:var(--surface-3);color:var(--text);display:flex;align-items:center;justify-content:center"><i data-lucide="github" style="width:22px;height:22px"></i></span>
+        <span style="display:flex;gap:5px;color:var(--text-faint)"><span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span><span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span><span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span></span>
+        <span style="width:46px;height:46px;border-radius:12px;background:var(--brand);color:var(--brand-on);display:flex;align-items:center;justify-content:center"><i data-lucide="box" style="width:22px;height:22px"></i></span>
+      </div>
+      <div style="display:inline-flex;align-items:center;gap:8px;margin:0 auto 14px;color:var(--text-secondary);font-size:13px"><i data-lucide="loader-circle" class="spin" style="width:16px;height:16px"></i>Verifying with GitHub…</div>
+      <h1 style="font-family:var(--font-display);font-size:22px;letter-spacing:-.02em;font-weight:700;margin:0 0 8px;color:var(--text-strong)">Connecting your account</h1>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin:0 0 20px">Hang tight — we're exchanging the authorization code and signing you in. This usually takes a second.</p>
+      <div style="height:4px;border-radius:999px;background:var(--surface-3);overflow:hidden;margin-bottom:18px"><div style="width:70%;height:100%;background:var(--ink-100)"></div></div>
+      <a href="SignIn.dc.html" style="font-size:13px;color:var(--text-muted)">Taking too long? Back to sign in</a>
+    </div>
+
+    <!-- result variants -->
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <div class="yb-card" style="flex:1;padding:13px;display:flex;align-items:center;gap:10px"><span style="width:30px;height:30px;border-radius:8px;background:var(--success-subtle);color:var(--success);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="check" style="width:16px;height:16px"></i></span><div><div style="font-size:12.5px;font-weight:600;color:var(--text-strong)">Success</div><div class="mono" style="font-size:10px;color:var(--text-muted)">redirect → dashboard</div></div></div>
+      <div class="yb-card" style="flex:1;padding:13px;display:flex;align-items:center;gap:10px"><span style="width:30px;height:30px;border-radius:8px;background:var(--danger-subtle);color:var(--danger);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="x" style="width:16px;height:16px"></i></span><div><div style="font-size:12.5px;font-weight:600;color:var(--text-strong)">Denied</div><div class="mono" style="font-size:10px;color:var(--text-muted)">state mismatch</div></div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:720},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

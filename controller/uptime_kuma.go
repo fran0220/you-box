@@ -21,18 +21,78 @@ const (
 	uptimeKeySuffix  = "_24"
 	apiStatusPath    = "/api/status-page/"
 	apiHeartbeatPath = "/api/status-page/heartbeat/"
+	historyBarCount  = 40
+	historyFetchMax  = 90
 )
 
+// Uptime suffixes ordered longest window first (Uptime Kuma status-page API).
+var uptimeKeySuffixes = []string{"_720", "_90", "_30", "_24"}
+
 type Monitor struct {
-	Name   string  `json:"name"`
-	Uptime float64 `json:"uptime"`
-	Status int     `json:"status"`
-	Group  string  `json:"group,omitempty"`
+	Name      string  `json:"name"`
+	Uptime    float64 `json:"uptime"`
+	Uptime24h float64 `json:"uptime_24h,omitempty"`
+	Status    int     `json:"status"`
+	Group     string  `json:"group,omitempty"`
+	History   []int   `json:"history,omitempty"`
 }
 
 type UptimeGroupResult struct {
 	CategoryName string    `json:"categoryName"`
 	Monitors     []Monitor `json:"monitors"`
+}
+
+func resolveUptime(uptimeList map[string]float64, monitorID string) (primary float64, uptime24h float64) {
+	for _, suffix := range uptimeKeySuffixes {
+		if uptime, exists := uptimeList[monitorID+suffix]; exists {
+			primary = uptime
+			break
+		}
+	}
+	if uptime, exists := uptimeList[monitorID+uptimeKeySuffix]; exists {
+		uptime24h = uptime
+	}
+	return primary, uptime24h
+}
+
+func buildMonitorHistory(heartbeats []struct {
+	Status int `json:"status"`
+}, targetBars int) []int {
+	if len(heartbeats) == 0 || targetBars <= 0 {
+		return nil
+	}
+
+	// Heartbeats are newest-first; reverse to oldest-first for left-to-right bars.
+	statuses := make([]int, 0, len(heartbeats))
+	for i := len(heartbeats) - 1; i >= 0; i-- {
+		statuses = append(statuses, heartbeats[i].Status)
+	}
+
+	if len(statuses) <= targetBars {
+		return statuses
+	}
+
+	// Downsample evenly to targetBars buckets.
+	out := make([]int, targetBars)
+	step := float64(len(statuses)) / float64(targetBars)
+	for i := 0; i < targetBars; i++ {
+		start := int(float64(i) * step)
+		end := int(float64(i+1) * step)
+		if end <= start {
+			end = start + 1
+		}
+		if end > len(statuses) {
+			end = len(statuses)
+		}
+		worst := statuses[start]
+		for j := start + 1; j < end; j++ {
+			if statuses[j] < worst {
+				worst = statuses[j]
+			}
+		}
+		out[i] = worst
+	}
+	return out
 }
 
 func getAndDecode(ctx context.Context, client *http.Client, url string, dest interface{}) error {
@@ -113,12 +173,18 @@ func fetchGroupData(ctx context.Context, client *http.Client, groupConfig map[st
 
 			monitorID := strconv.Itoa(m.ID)
 
-			if uptime, exists := heartbeatData.UptimeList[monitorID+uptimeKeySuffix]; exists {
-				monitor.Uptime = uptime
+			uptime, uptime24h := resolveUptime(heartbeatData.UptimeList, monitorID)
+			monitor.Uptime = uptime
+			if uptime24h > 0 {
+				monitor.Uptime24h = uptime24h
 			}
 
 			if heartbeats, exists := heartbeatData.HeartbeatList[monitorID]; exists && len(heartbeats) > 0 {
 				monitor.Status = heartbeats[0].Status
+				if len(heartbeats) > historyFetchMax {
+					heartbeats = heartbeats[:historyFetchMax]
+				}
+				monitor.History = buildMonitorHistory(heartbeats, historyBarCount)
 			}
 
 			result.Monitors = append(result.Monitors, monitor)
@@ -126,6 +192,22 @@ func fetchGroupData(ctx context.Context, client *http.Client, groupConfig map[st
 	}
 
 	return result
+}
+
+// GetPublicStatusPageURL returns the first configured Uptime Kuma public status page URL.
+func GetPublicStatusPageURL() string {
+	groups := console_setting.GetUptimeKumaGroups()
+	if len(groups) == 0 {
+		return ""
+	}
+	url, _ := groups[0]["url"].(string)
+	slug, _ := groups[0]["slug"].(string)
+	url = strings.TrimSuffix(strings.TrimSpace(url), "/")
+	slug = strings.TrimSpace(slug)
+	if url == "" || slug == "" {
+		return ""
+	}
+	return url + "/status/" + slug
 }
 
 func GetUptimeKumaStatus(c *gin.Context) {

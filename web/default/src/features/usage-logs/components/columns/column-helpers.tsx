@@ -136,7 +136,7 @@ export function createDurationColumn<T>(config: {
         duration.durationSec > warningThresholdSec ? 'danger' : 'success'
 
       const durationBgMap: Record<string, string> = {
-        success: 'border-teal/20 bg-teal-subtle/50 border',
+        success: 'border-success/20 bg-success-subtle/50 border',
         warning: 'border border-warning/30 bg-warning-subtle',
         danger: 'border-destructive/20 bg-danger-subtle/50 border',
       }

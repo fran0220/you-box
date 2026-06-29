@@ -97,7 +97,9 @@ export function VendorMutateDialog({
 
       if (response.success) {
         toast.success(
-          isEdit ? 'Vendor updated successfully' : 'Vendor created successfully'
+          isEdit
+            ? t('Vendor updated successfully')
+            : t('Vendor created successfully')
         )
         queryClient.invalidateQueries({ queryKey: vendorsQueryKeys.lists() })
         queryClient.invalidateQueries({ queryKey: modelsQueryKeys.lists() })

@@ -26,7 +26,7 @@ const progressFillVariants = cva(
     variants: {
       tone: {
         brand: 'bg-brand',
-        teal: 'bg-teal',
+        teal: 'bg-success',
         success: 'bg-success',
         warning: 'bg-warning',
         danger: 'bg-destructive',

@@ -23,7 +23,7 @@ import { getRoleLabel } from '@/lib/roles'
 
 /**
  * Custom hook to format user display information
- * Centralizes user display logic used across ProfileDropdown and MobileDrawer
+ * Centralizes user display logic used across ProfileDropdown and public mobile nav
  */
 export function useUserDisplay(user: AuthUser | null | undefined) {
   const { t } = useTranslation()

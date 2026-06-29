@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .irow{display:grid;grid-template-columns:1fr auto auto auto auto;gap:16px;align-items:center;padding:13px 18px;border-top:1px solid var(--divider);font-size:13px}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="ModelsAdmin.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav on" href="Subscriptions.dc.html"><i data-lucide="badge-dollar-sign"></i>Subscriptions</a>
+      <a class="snav" href="RedemptionCodes.dc.html"><i data-lucide="ticket"></i>Redemption</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <a class="snav" href="Profile.dc.html" style="margin:0;border-top:1px solid var(--border);border-radius:0;padding:12px 18px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></a>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Subscriptions</div>
+      <div style="flex:1"></div>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <div style="padding:28px 28px 64px;max-width:1080px">
+      <!-- current plan -->
+      <div class="yb-card yb-card--pad-lg" style="border-color:var(--brand-border);box-shadow:var(--glow-soft);margin-bottom:18px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+          <div><div style="display:flex;align-items:center;gap:10px"><span class="mono" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)">Current plan</span><span class="yb-badge yb-badge--brand" >Active</span></div><div style="font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--text-strong);margin-top:6px">Pro</div><div class="mono" style="font-size:13px;color:var(--text-secondary);margin-top:4px">$20 / month · renews Jul 26, 2026</div></div>
+          <div style="display:flex;gap:10px"><button class="yb-btn yb-btn--secondary"><span>Change plan</span></button><button class="yb-btn yb-btn--ghost"><span>Cancel</span></button></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-top:24px;padding-top:20px;border-top:1px solid var(--divider)">
+          <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px"><span style="color:var(--text-secondary)">Requests</span><span class="mono" style="color:var(--text)">2.41M / 5M</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:48%;height:100%;border-radius:999px;background:var(--ink-100)"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px"><span style="color:var(--text-secondary)">Rate limit</span><span class="mono" style="color:var(--text)">312 / 500 rps</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:62%;height:100%;border-radius:999px;background:var(--ink-200)"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px"><span style="color:var(--text-secondary)">Seats</span><span class="mono" style="color:var(--text)">4 / 10</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:40%;height:100%;border-radius:999px;background:var(--ink-300)"></div></div></div>
+        </div>
+      </div>
+
+      <!-- available plans -->
+      <div style="font-size:14px;font-weight:600;color:var(--text-strong);margin:24px 0 14px">Available plans</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px">
+        <div class="yb-card"><div style="font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--text-strong)">Hobby</div><div style="font-family:var(--font-display);font-weight:700;font-size:32px;letter-spacing:-.02em;color:var(--text-strong);margin:8px 0">$0<span class="mono" style="font-size:13px;font-weight:400;color:var(--text-muted)"> /mo</span></div><div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">5 rps · pay-as-you-go · all models</div><button class="yb-btn yb-btn--ghost yb-btn--block"><span>Downgrade</span></button></div>
+        <div class="yb-card" style="border-color:var(--brand-border)"><div style="display:flex;align-items:center;justify-content:space-between"><div style="font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--text-strong)">Pro</div><span class="yb-badge yb-badge--brand" >Current</span></div><div style="font-family:var(--font-display);font-weight:700;font-size:32px;letter-spacing:-.02em;color:var(--text-strong);margin:8px 0">$20<span class="mono" style="font-size:13px;font-weight:400;color:var(--text-muted)"> /mo</span></div><div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">500 rps · priority routing · alerts</div><button class="yb-btn yb-btn--secondary yb-btn--block" disabled><span>Your plan</span></button></div>
+        <div class="yb-card"><div style="font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--text-strong)">Enterprise</div><div style="font-family:var(--font-display);font-weight:700;font-size:32px;letter-spacing:-.02em;color:var(--text-strong);margin:8px 0">Custom</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">SSO · SLA · volume discounts</div><button class="yb-btn yb-btn--primary yb-btn--block"><span>Contact sales</span></button></div>
+      </div>
+
+      <!-- invoices -->
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 18px;font-size:14px;font-weight:600;color:var(--text-strong);border-bottom:1px solid var(--divider)">Invoices</div>
+        <div class="irow"><span class="mono" style="color:var(--text)">Jun 2026</span><span class="mono" style="color:var(--text-muted)">INV-2026-0612</span><span class="mono" style="color:var(--text)">$20.00</span><span><span class="yb-badge yb-badge--success" >Paid</span></span><a class="mono" style="font-size:12px;color:var(--text-secondary)">PDF</a></div>
+        <div class="irow"><span class="mono" style="color:var(--text)">May 2026</span><span class="mono" style="color:var(--text-muted)">INV-2026-0511</span><span class="mono" style="color:var(--text)">$20.00</span><span><span class="yb-badge yb-badge--success">Paid</span></span><a class="mono" style="font-size:12px;color:var(--text-secondary)">PDF</a></div>
+        <div class="irow"><span class="mono" style="color:var(--text)">Apr 2026</span><span class="mono" style="color:var(--text-muted)">INV-2026-0410</span><span class="mono" style="color:var(--text)">$20.00</span><span><span class="yb-badge yb-badge--success">Paid</span></span><a class="mono" style="font-size:12px;color:var(--text-secondary)">PDF</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

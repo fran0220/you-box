@@ -57,7 +57,7 @@ import {
   type SortOption,
   type ViewMode,
 } from '../constants'
-import type { EnrichedPricingModel, TokenUnit } from '../types'
+import type { EnrichedPricingModel, PricingVendor, TokenUnit } from '../types'
 import { PricingSidebar } from './pricing-sidebar'
 
 export interface PricingToolbarProps {
@@ -79,10 +79,9 @@ export interface PricingToolbarProps {
   toggleFacetValue: (facet: FilterSection, value: string) => void
   vendorIcons: Record<string, string | undefined>
   groupRatios?: Record<string, number>
-  contextRange: [number, number]
+  vendors: PricingVendor[]
   promptPriceRange: [number, number]
   priceCeiling: number
-  onContextRangeChange: (value: [number, number]) => void
   onPromptPriceRangeChange: (value: [number, number]) => void
   hasActiveFilters: boolean
   onClearFilters: () => void
@@ -219,20 +218,19 @@ export function PricingToolbar(props: PricingToolbarProps) {
           <SheetHeader className={sideDrawerHeaderClassName()}>
             <SheetTitle>{t('Filters')}</SheetTitle>
             <SheetDescription>
-              {t('Refine the catalog by provider, modality, price, and more.')}
+              {t('Refine the catalog by provider, model type, price, and more.')}
             </SheetDescription>
           </SheetHeader>
           <div className={sideDrawerFormClassName('gap-0')}>
             <PricingSidebar
               models={props.models}
+              vendors={props.vendors}
               facetState={props.facetState}
               toggleFacetValue={props.toggleFacetValue}
               vendorIcons={props.vendorIcons}
               groupRatios={props.groupRatios}
-              contextRange={props.contextRange}
               promptPriceRange={props.promptPriceRange}
               priceCeiling={props.priceCeiling}
-              onContextRangeChange={props.onContextRangeChange}
               onPromptPriceRangeChange={props.onPromptPriceRangeChange}
               hasActiveFilters={props.hasActiveFilters}
               onClearFilters={props.onClearFilters}

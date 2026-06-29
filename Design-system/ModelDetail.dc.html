@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  a{text-decoration:none;color:inherit}
+  .navlink{font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-secondary);padding:8px 12px;border-radius:6px}
+  .navlink:hover{color:var(--text);background:var(--surface-hover)}
+  .navlink.on{color:var(--text-strong)}
+  .row{display:grid;grid-template-columns:1.6fr .9fr .9fr .9fr .8fr;align-items:center;gap:12px;padding:14px 18px;border-top:1px solid var(--divider)}
+  .mono{font-family:var(--font-mono)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <header style="position:sticky;top:0;z-index:200;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--border)">
+    <div class="wrap" style="height:64px;display:flex;align-items:center;gap:28px">
+      <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong);font-weight:700">Box</b></span></a>
+      <nav style="display:flex;align-items:center;gap:2px;margin-left:6px"><a class="navlink on" href="Marketplace.dc.html">Models</a><a class="navlink" href="Rankings.dc.html">Rankings</a><a class="navlink" href="Docs.dc.html">Docs</a><a class="navlink" href="Marketplace.dc.html">Pricing</a></nav>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px"><button class="yb-iconbtn" aria-label="Toggle theme"><i data-lucide="sun"></i></button><a class="yb-btn yb-btn--ghost yb-btn--sm" href="SignIn.dc.html"><span>Sign in</span></a><a class="yb-btn yb-btn--primary yb-btn--sm" href="SignUp.dc.html"><span>Get API key</span></a></div>
+    </div>
+  </header>
+
+  <section style="padding:28px 0 60px">
+    <div class="wrap">
+      <!-- breadcrumb -->
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-bottom:24px" class="mono"><a href="Marketplace.dc.html" style="color:var(--text-secondary)">Models</a><i data-lucide="chevron-right" style="width:14px;height:14px"></i><span style="color:var(--text-secondary)">Anthropic</span><i data-lucide="chevron-right" style="width:14px;height:14px"></i><span style="color:var(--text)">claude-opus-4.6</span></div>
+
+      <!-- hero -->
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:start">
+        <div>
+          <div style="display:flex;align-items:flex-start;gap:18px">
+            <span class="yb-avatar yb-avatar--xl" style="background:#565663">An</span>
+            <div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><h1 style="font-family:var(--font-display);font-size:34px;letter-spacing:-.025em;font-weight:700;margin:0;color:var(--text-strong)">Claude Opus 4.6</h1><span class="yb-badge yb-badge--brand">New</span><span class="yb-badge yb-badge--success" >Operational</span></div>
+              <div class="mono" style="font-size:13px;color:var(--text-muted);margin-top:6px;display:flex;align-items:center;gap:10px">anthropic/claude-opus-4.6 <button class="yb-iconbtn yb-iconbtn--sm" aria-label="Copy slug"><i data-lucide="copy"></i></button></div>
+            </div>
+          </div>
+          <p style="font-size:16px;line-height:1.6;color:var(--text-secondary);margin:22px 0 0;max-width:48em">Claude Opus 4.6 is Anthropic's frontier reasoning model, with state-of-the-art performance on coding, agentic tool use, and long-horizon tasks. It supports a 200K-token context window, vision input, and parallel tool calling. Routed through YouBox with automatic failover across 3 upstream providers.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><span class="yb-tag" >vision</span><span class="yb-tag">tools</span><span class="yb-tag">200K ctx</span><span class="yb-tag">streaming</span><span class="yb-tag">json mode</span></div>
+          <div style="display:flex;gap:34px;margin-top:30px;padding-top:24px;border-top:1px solid var(--divider)">
+            <div class="yb-stat"><span class="yb-stat__label">Context</span><span class="yb-stat__value">200<span class="yb-stat__unit">K</span></span></div>
+            <div class="yb-stat"><span class="yb-stat__label">Input / 1M</span><span class="yb-stat__value">$3.00</span></div>
+            <div class="yb-stat"><span class="yb-stat__label">Output / 1M</span><span class="yb-stat__value">$15.00</span></div>
+            <div class="yb-stat"><span class="yb-stat__label">Throughput</span><span class="yb-stat__value">118<span class="yb-stat__unit">tok/s</span></span></div>
+          </div>
+        </div>
+        <!-- action card -->
+        <div class="yb-card" style="position:sticky;top:88px">
+          <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)">Use this model</div>
+          <div style="margin:14px 0;display:flex;flex-direction:column;gap:10px">
+            <a class="yb-btn yb-btn--primary yb-btn--block" href="Playground.dc.html"><i data-lucide="play"></i><span>Open in Playground</span></a>
+            <a class="yb-btn yb-btn--secondary yb-btn--block" href="ApiKeys.dc.html"><i data-lucide="key-round"></i><span>Get an API key</span></a>
+          </div>
+          <div style="border-top:1px solid var(--divider);margin-top:6px;padding-top:14px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-muted)">Uptime (30d)</span><span class="mono" style="color:var(--success)">99.98%</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-muted)">Median latency</span><span class="mono" style="color:var(--text)">0.42s</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-muted)">Providers</span><span class="mono" style="color:var(--text)">3 active</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-muted)">Weekly tokens</span><span class="mono" style="color:var(--text)">48.2B</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- providers table -->
+      <div style="margin-top:48px">
+        <h2 style="font-family:var(--font-display);font-size:22px;letter-spacing:-.01em;font-weight:600;margin:0 0 4px;color:var(--text-strong)">Providers &amp; endpoints</h2>
+        <p style="font-size:14px;color:var(--text-secondary);margin:0 0 16px">YouBox routes across these upstreams. Failover order follows price, then latency, then uptime.</p>
+        <div class="yb-card" style="padding:0;overflow:hidden">
+          <div class="row" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>Provider</span><span>Input / 1M</span><span>Output / 1M</span><span>Latency</span><span>Uptime</span></div>
+          <div class="row"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#565663">An</span><span><span style="color:var(--text);font-weight:500">Anthropic</span> <span class="yb-badge yb-badge--brand" style="margin-left:6px">Primary</span></span></span><span class="mono" style="color:var(--text)">$3.00</span><span class="mono" style="color:var(--text)">$15.00</span><span class="mono" style="color:var(--text)">0.41s</span><span class="mono" style="color:var(--success)">99.99%</span></div>
+          <div class="row"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#3B3B47">AW</span><span style="color:var(--text);font-weight:500">AWS Bedrock</span></span><span class="mono" style="color:var(--text)">$3.00</span><span class="mono" style="color:var(--text)">$15.00</span><span class="mono" style="color:var(--text)">0.55s</span><span class="mono" style="color:var(--success)">99.96%</span></div>
+          <div class="row"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#8B9097">GC</span><span style="color:var(--text);font-weight:500">Google Vertex</span></span><span class="mono" style="color:var(--text)">$3.15</span><span class="mono" style="color:var(--text)">$15.75</span><span class="mono" style="color:var(--text)">0.49s</span><span class="mono" style="color:var(--warning)">99.91%</span></div>
+        </div>
+      </div>
+
+      <!-- quick call -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px;align-items:start">
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:22px;letter-spacing:-.01em;font-weight:600;margin:0 0 16px;color:var(--text-strong)">Quick call</h2>
+          <div class="yb-code">
+            <div class="yb-code__bar"><span class="yb-code__dots"><i></i><i></i><i></i></span><span class="yb-code__lang">python</span><span class="yb-code__spacer"></span><button class="yb-code__copy"><i data-lucide="copy"></i>Copy</button></div>
+            <pre class="yb-code__pre"><code><span style="color:var(--orange-300)">from</span> openai <span style="color:var(--orange-300)">import</span> OpenAI
+
+yb = <span style="color:var(--blue-500)">OpenAI</span>(
+  base_url=<span style="color:var(--teal-300)">"https://api.youbox.dev/v1"</span>,
+  api_key=os.environ[<span style="color:var(--teal-300)">"YOUBOX_KEY"</span>],
+)
+
+res = yb.chat.completions.<span style="color:var(--blue-500)">create</span>(
+  model=<span style="color:var(--teal-300)">"anthropic/claude-opus-4.6"</span>,
+  messages=[{<span style="color:var(--teal-300)">"role"</span>: <span style="color:var(--teal-300)">"user"</span>, <span style="color:var(--teal-300)">"content"</span>: <span style="color:var(--teal-300)">"Hi"</span>}],
+)</code></pre>
+          </div>
+        </div>
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:22px;letter-spacing:-.01em;font-weight:600;margin:0 0 16px;color:var(--text-strong)">Capabilities</h2>
+          <div class="yb-card" style="display:flex;flex-direction:column;gap:0;padding:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px"><span style="font-size:14px;color:var(--text-secondary)">Vision / image input</span><i data-lucide="check" style="color:var(--success);width:17px;height:17px"></i></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--divider)"><span style="font-size:14px;color:var(--text-secondary)">Tool / function calling</span><i data-lucide="check" style="color:var(--success);width:17px;height:17px"></i></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--divider)"><span style="font-size:14px;color:var(--text-secondary)">Streaming responses</span><i data-lucide="check" style="color:var(--success);width:17px;height:17px"></i></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--divider)"><span style="font-size:14px;color:var(--text-secondary)">Structured / JSON output</span><i data-lucide="check" style="color:var(--success);width:17px;height:17px"></i></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--divider)"><span style="font-size:14px;color:var(--text-secondary)">Audio input</span><i data-lucide="x" style="color:var(--text-faint);width:17px;height:17px"></i></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:860},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

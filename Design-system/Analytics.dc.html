@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .bar2{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+  .bar2 span{width:62%;border-radius:4px 4px 0 0;background:var(--ink-300)}
+  .lr{display:grid;grid-template-columns:1.6fr .8fr .8fr .8fr;gap:14px;align-items:center;padding:12px 18px;border-top:1px solid var(--divider);font-size:13px}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav on" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="ApiTools.dc.html"><i data-lucide="wand-sparkles"></i>API tools</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="ModelsAdmin.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <a class="snav" href="Profile.dc.html" style="margin:0;border-top:1px solid var(--border);border-radius:0;padding:12px 18px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></a>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Dashboard</div>
+      <div style="flex:1"></div>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <div style="padding:24px 28px 64px;max-width:1180px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
+        <div class="yb-tabs yb-tabs--line"><a class="yb-tab" href="Dashboard.dc.html">Overview</a><button class="yb-tab yb-tab--active">Models</button><button class="yb-tab">Users</button></div>
+        <div class="yb-tabs yb-tabs--pill"><button class="yb-tab">7d</button><button class="yb-tab yb-tab--active">30d</button><button class="yb-tab">90d</button></div>
+      </div>
+
+      <!-- stat row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+        <div class="yb-card"><span class="yb-stat__label">Active models</span><div class="yb-stat__value" style="margin-top:8px">18</div></div>
+        <div class="yb-card"><span class="yb-stat__label">Tokens</span><div class="yb-stat__value" style="margin-top:8px">684<span class="yb-stat__unit">M</span></div></div>
+        <div class="yb-card"><span class="yb-stat__label">Spend</span><div class="yb-stat__value" style="margin-top:8px">$1,284</div></div>
+        <div class="yb-card"><span class="yb-stat__label">Cache hit-rate</span><div class="yb-stat__value" style="margin-top:8px">38<span class="yb-stat__unit">%</span></div></div>
+      </div>
+
+      <!-- chart + mix -->
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="yb-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px"><div><div style="font-size:14px;font-weight:600;color:var(--text-strong)">Tokens by model</div><div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:2px">Daily, last 30 days</div></div></div>
+          <div style="height:150px;display:flex;align-items:flex-end;gap:5px">
+            <div class="bar2"><span style="height:48%"></span></div><div class="bar2"><span style="height:60%"></span></div><div class="bar2"><span style="height:52%"></span></div><div class="bar2"><span style="height:72%"></span></div><div class="bar2"><span style="height:64%"></span></div><div class="bar2"><span style="height:80%"></span></div><div class="bar2"><span style="height:70%"></span></div><div class="bar2"><span style="height:58%"></span></div><div class="bar2"><span style="height:86%"></span></div><div class="bar2"><span style="height:92%"></span></div><div class="bar2"><span style="height:74%"></span></div><div class="bar2"><span style="height:66%"></span></div><div class="bar2"><span style="height:90%"></span></div><div class="bar2"><span style="height:100%;background:var(--ink-100)"></span></div>
+          </div>
+        </div>
+        <div class="yb-card">
+          <div style="font-size:14px;font-weight:600;color:var(--text-strong);margin-bottom:16px">Model mix</div>
+          <div style="display:flex;flex-direction:column;gap:13px">
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--text)">claude-opus-4.6</span><span class="mono" style="color:var(--text-muted)">44%</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:100%;height:100%;border-radius:999px;background:var(--ink-100)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--text)">gpt-5.2</span><span class="mono" style="color:var(--text-muted)">28%</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:64%;height:100%;border-radius:999px;background:var(--ink-300)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--text)">gemini-3-pro</span><span class="mono" style="color:var(--text-muted)">18%</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:40%;height:100%;border-radius:999px;background:var(--ink-400)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--text)">deepseek-v4</span><span class="mono" style="color:var(--text-muted)">10%</span></div><div style="height:6px;border-radius:999px;background:var(--surface-3)"><div style="width:22%;height:100%;border-radius:999px;background:var(--ink-500)"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- per-model table -->
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="lr" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>Model</span><span style="text-align:right">Tokens</span><span style="text-align:right">Spend</span><span style="text-align:right">p50 latency</span></div>
+        <div class="lr"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#565663">An</span><span class="mono" style="color:var(--text)">claude-opus-4.6</span></span><span class="mono" style="color:var(--text);text-align:right">301M</span><span class="mono" style="color:var(--text);text-align:right">$612</span><span class="mono" style="color:var(--text-muted);text-align:right">0.41s</span></div>
+        <div class="lr"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#3B3B47">Op</span><span class="mono" style="color:var(--text)">gpt-5.2</span></span><span class="mono" style="color:var(--text);text-align:right">192M</span><span class="mono" style="color:var(--text);text-align:right">$398</span><span class="mono" style="color:var(--text-muted);text-align:right">0.50s</span></div>
+        <div class="lr"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#8B9097">Go</span><span class="mono" style="color:var(--text)">gemini-3-pro</span></span><span class="mono" style="color:var(--text);text-align:right">123M</span><span class="mono" style="color:var(--text);text-align:right">$176</span><span class="mono" style="color:var(--text-muted);text-align:right">0.62s</span></div>
+        <div class="lr"><span style="display:flex;align-items:center;gap:10px"><span class="yb-avatar yb-avatar--sm" style="background:#807C75">De</span><span class="mono" style="color:var(--text)">deepseek-v4</span></span><span class="mono" style="color:var(--text);text-align:right">68M</span><span class="mono" style="color:var(--text);text-align:right">$98</span><span class="mono" style="color:var(--text-muted);text-align:right">0.44s</span></div>
+      </div>
+      <p class="mono" style="font-size:11px;color:var(--text-faint);margin:14px 2px 0">Switch to the <b style="color:var(--text-secondary)">Users</b> tab for per-user spend, top consumers, and signup trends.</p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

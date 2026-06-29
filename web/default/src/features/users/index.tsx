@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { SectionPageLayout } from '@/components/layout'
+import { PageHeader } from '@/components/youbox'
 import { UsersDeleteDialog } from './components/users-delete-dialog'
 import { UsersMutateDrawer } from './components/users-mutate-drawer'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
@@ -28,22 +29,24 @@ function UsersContent() {
   const { t } = useTranslation()
   const { open, setOpen, currentRow, total } = useUsers()
 
+  const subtitle =
+    total != null
+      ? t('{{count}} registered users', { count: total })
+      : t(
+          'Manage accounts, roles, groups, and quotas across your organization.'
+        )
+
   return (
     <>
       <SectionPageLayout>
-        <SectionPageLayout.Title>{t('Users')}</SectionPageLayout.Title>
-        <SectionPageLayout.Actions>
-          <UsersPrimaryButtons />
-        </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
-          <div className='space-y-3'>
-            <p className='text-muted-foreground text-sm'>
-              {/* Count comes from the table query's pagination total; until
-                  it loads we fall back to the fixed subtitle (r2-B8 §1). */}
-              {total != null
-                ? t('{{count}} registered users', { count: total })
-                : t('Registered users')}
-            </p>
+          <div className='mx-auto w-full max-w-[1200px] space-y-5'>
+            <PageHeader
+              eyebrow={t('Users')}
+              title={t('Users')}
+              subtitle={subtitle}
+              actions={<UsersPrimaryButtons />}
+            />
             <UsersTable />
           </div>
         </SectionPageLayout.Content>

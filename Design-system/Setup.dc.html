@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .mono{font-family:var(--font-mono)}
+  .yb-input-wrap span.yb-ic-l{position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;pointer-events:none}
+  .yb-input-wrap span.yb-ic-l svg{position:static}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text);font-family:var(--font-sans);padding:40px;position:relative;overflow:hidden">
+  <div style="position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:680px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.05),transparent 65%);pointer-events:none"></div>
+  <div style="width:100%;max-width:880px;position:relative">
+    <div style="display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:-.02em;margin-bottom:8px"><span style="display:inline-flex;width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:18px;height:18px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <p style="text-align:center;font-size:14px;color:var(--text-secondary);margin:0 0 28px">First-run setup · let's get your gateway online</p>
+
+    <div class="yb-card yb-card--pad-lg">
+      <!-- stepper -->
+      <div style="display:flex;align-items:center;margin-bottom:30px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:30px;height:30px;border-radius:50%;background:var(--brand);color:var(--brand-on);display:flex;align-items:center;justify-content:center"><i data-lucide="check" style="width:16px;height:16px"></i></span><span style="font-size:13px;color:var(--text);font-weight:500">Database</span></div>
+        <div style="flex:1;height:1px;background:var(--brand);margin:0 14px"></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="mono" style="width:30px;height:30px;border-radius:50%;background:var(--brand-subtle);color:var(--brand);border:1px solid var(--brand-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">2</span><span style="font-size:13px;color:var(--text);font-weight:500">Admin account</span></div>
+        <div style="flex:1;height:1px;background:var(--divider);margin:0 14px"></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="mono" style="width:30px;height:30px;border-radius:50%;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:13px">3</span><span style="font-size:13px;color:var(--text-muted)">Site config</span></div>
+        <div style="flex:1;height:1px;background:var(--divider);margin:0 14px"></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="mono" style="width:30px;height:30px;border-radius:50%;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:13px">4</span><span style="font-size:13px;color:var(--text-muted)">Launch</span></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start">
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:22px;letter-spacing:-.01em;font-weight:700;margin:0 0 6px;color:var(--text-strong)">Create the root admin</h2>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin:0 0 22px">This account has full control over channels, users, billing, and settings. You can add more admins later.</p>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="yb-field"><label class="yb-field__label">Admin username</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="user"></i></span><input class="yb-input yb-input--with-icon" value="root"></div></div>
+            <div class="yb-field"><label class="yb-field__label">Email</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="mail"></i></span><input class="yb-input yb-input--with-icon" value="admin@youbox.local"></div></div>
+            <div class="yb-field"><label class="yb-field__label">Password</label><div class="yb-input-wrap"><span class="yb-ic-l"><i data-lucide="lock"></i></span><input class="yb-input yb-input--with-icon" type="password" value="rootpassword42"></div><span class="yb-field__hint">Use at least 12 characters.</span></div>
+          </div>
+        </div>
+        <div style="background:var(--surface-inset);border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div class="mono" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:14px">Environment check</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--text-secondary)">PostgreSQL 16</span><span class="yb-badge yb-badge--success" ><i data-lucide="check"></i>Connected</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--text-secondary)">Redis cache</span><span class="yb-badge yb-badge--success"><i data-lucide="check"></i>Connected</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--text-secondary)">Migrations</span><span class="yb-badge yb-badge--success"><i data-lucide="check"></i>v0.4 applied</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--text-secondary)">SMTP relay</span><span class="yb-badge yb-badge--warning" >Optional</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--text-secondary)">Disk space</span><span class="mono" style="font-size:12px;color:var(--text)">214 GB free</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:28px;padding-top:20px;border-top:1px solid var(--divider)">
+        <button class="yb-btn yb-btn--ghost"><i data-lucide="arrow-left"></i><span>Back</span></button>
+        <button class="yb-btn yb-btn--primary"><span>Continue to site config</span><i data-lucide="arrow-right"></i></button>
+      </div>
+    </div>
+    <p class="mono" style="text-align:center;font-size:11px;color:var(--text-faint);margin-top:20px">// youbox v0.4.2 · setup wizard</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1000,&quot;height&quot;:760},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

@@ -34,6 +34,7 @@ import type {
 type DialogType =
   | 'create-model'
   | 'update-model'
+  | 'vendor-management'
   | 'create-vendor'
   | 'update-vendor'
   | 'missing-models'
@@ -64,6 +65,10 @@ type ModelsContextType = {
   >
   tabCategory: ModelTabCategory
   setTabCategory: (category: ModelTabCategory) => void
+  metadataConfiguredTotal: number | null
+  setMetadataConfiguredTotal: React.Dispatch<
+    React.SetStateAction<number | null>
+  >
 }
 
 // ============================================================================
@@ -96,6 +101,9 @@ export function ModelsProvider({ children }: { children: React.ReactNode }) {
     source: 'official',
   })
   const [tabCategory, setTabCategory] = useState<ModelTabCategory>('metadata')
+  const [metadataConfiguredTotal, setMetadataConfiguredTotal] = useState<
+    number | null
+  >(null)
 
   return (
     <ModelsContext.Provider
@@ -116,6 +124,8 @@ export function ModelsProvider({ children }: { children: React.ReactNode }) {
         setSyncWizardOptions,
         tabCategory,
         setTabCategory,
+        metadataConfiguredTotal,
+        setMetadataConfiguredTotal,
       }}
     >
       {children}

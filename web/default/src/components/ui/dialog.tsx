@@ -78,7 +78,7 @@ function DialogContent({
         // The resting transform keeps the centering translate plus `scale-100`
         // so the starting/ending `scale-95` transition has a stable origin.
         className={cn(
-          'bg-popover text-popover-foreground ring-border fixed top-1/2 left-1/2 z-[var(--z-overlay)] grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 scale-100 gap-4 rounded-xl p-4 text-sm ring-1 outline-none sm:max-w-sm',
+          'bg-card text-card-foreground border-border fixed top-1/2 left-1/2 z-[var(--z-overlay)] grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 scale-100 gap-4 rounded-lg border p-6 text-sm shadow-lg outline-none sm:max-w-sm',
           overlayPopupMotionClassName,
           'data-starting-style:-translate-x-1/2 data-starting-style:-translate-y-1/2 data-starting-style:scale-95 data-ending-style:-translate-x-1/2 data-ending-style:-translate-y-1/2 data-ending-style:scale-95',
           className
@@ -131,7 +131,7 @@ function DialogFooter({
       // full-width stack with the primary action on top (`flex-col-reverse` +
       // full-width children); desktop is a right-aligned row (`justify-end`).
       className={cn(
-        'bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end [&>button]:w-full sm:[&>button]:w-auto',
+        'border-divider -mx-6 -mb-6 flex flex-col-reverse gap-2 rounded-b-lg border-t px-6 pt-4 pb-6 sm:flex-row sm:justify-end [&>button]:w-full sm:[&>button]:w-auto',
         className
       )}
       {...props}
@@ -150,7 +150,10 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
   return (
     <DialogPrimitive.Title
       data-slot='dialog-title'
-      className={cn('text-base leading-none font-medium', className)}
+      className={cn(
+        'font-display text-lg leading-snug font-semibold text-[var(--text-strong)]',
+        className
+      )}
       {...props}
     />
   )

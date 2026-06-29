@@ -17,39 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo, useState } from 'react'
-import {
-  ChevronRight,
-  ExternalLink,
-  Gauge,
-  KeyRound,
-  ScrollText,
-  ShieldCheck,
-  Sigma,
-  Zap,
-} from 'lucide-react'
+import { ChevronRight, KeyRound, ScrollText, ShieldCheck, Zap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { BundledLanguage } from 'shiki/bundle/web'
-import { cn } from '@/lib/utils'
 import { useStatus } from '@/hooks/use-status'
-import { Badge } from '@/components/ui/badge'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CodeBlock } from '@/components/ai-elements/code-block'
-import {
-  buildRateLimits,
-  buildSupportedParameters,
-  formatRateLimit,
-  type SupportedParameter,
-} from '../lib/mock-stats'
 import { replaceModelInPath } from '../lib/model-helpers'
-import { inferApiInfo } from '../lib/model-metadata'
 import type { PricingModel } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -562,244 +536,31 @@ function CodeSamplesSection(props: {
   )
 }
 
-// ---------------------------------------------------------------------------
-// Supported parameters table
-// ---------------------------------------------------------------------------
-
-function SupportedParametersSection(props: { model: PricingModel }) {
-  const { t } = useTranslation()
-  const params = useMemo(
-    () => buildSupportedParameters(props.model),
-    [props.model]
-  )
-
-  if (params.length === 0) return null
-
-  return (
-    <section>
-      <SectionTitle icon={Sigma}>{t('Supported parameters')}</SectionTitle>
-      <div className='border-border/60 overflow-hidden rounded-lg border'>
-        <Table>
-          <TableHeader>
-            <TableRow className='bg-muted/30 hover:bg-muted/30'>
-              <TableHead className='h-9 w-44'>{t('Parameter')}</TableHead>
-              <TableHead className='h-9 w-24'>{t('Type')}</TableHead>
-              <TableHead className='h-9 w-32'>{t('Default / range')}</TableHead>
-              <TableHead className='h-9'>{t('Description')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {params.map((p) => (
-              <TableRow key={p.name} className='hover:bg-muted/20'>
-                <TableCell className='py-2 align-top'>
-                  <div className='flex items-center gap-1.5'>
-                    <code className='font-mono text-sm font-medium'>
-                      {p.name}
-                    </code>
-                    {p.required && (
-                      <Badge
-                        variant='outline'
-                        className='border-destructive/40 text-destructive h-6 px-2 text-sm'
-                      >
-                        {t('required')}
-                      </Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className='py-2 align-top'>
-                  <Badge
-                    variant='secondary'
-                    className='h-7 rounded-full px-2.5 font-mono text-sm font-normal'
-                  >
-                    {p.type}
-                  </Badge>
-                </TableCell>
-                <TableCell className='py-2 align-top'>
-                  <ParamRangeCell param={p} />
-                </TableCell>
-                <TableCell className='text-muted-foreground py-2 align-top'>
-                  {t(p.descriptionKey)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </section>
-  )
-}
-
-function ParamRangeCell(props: { param: SupportedParameter }) {
-  const { defaultValue, range, enumValues } = props.param
-  if (defaultValue !== undefined) {
-    return (
-      <div className='flex flex-wrap items-center gap-1'>
-        <span className='text-muted-foreground text-sm'>=</span>
-        <code className='bg-muted rounded px-1.5 py-0.5 font-mono text-sm'>
-          {String(defaultValue)}
-        </code>
-        {range && (
-          <span className='text-muted-foreground text-sm'>{range}</span>
-        )}
-      </div>
-    )
-  }
-  if (range) {
-    return (
-      <span className='text-muted-foreground font-mono text-sm'>{range}</span>
-    )
-  }
-  if (enumValues && enumValues.length > 0) {
-    return (
-      <div className='flex flex-wrap gap-0.5'>
-        {enumValues.map((v) => (
-          <code
-            key={v}
-            className='bg-muted text-muted-foreground rounded px-1.5 py-0.5 font-mono text-sm'
-          >
-            {v}
-          </code>
-        ))}
-      </div>
-    )
-  }
-  return <span className='text-muted-foreground/60 text-sm'>—</span>
-}
-
-// ---------------------------------------------------------------------------
-// Rate-limits table
-// ---------------------------------------------------------------------------
-
-function RateLimitsSection(props: { model: PricingModel }) {
-  const { t } = useTranslation()
-  const limits = useMemo(() => buildRateLimits(props.model), [props.model])
-
-  if (limits.length === 0) return null
-
-  return (
-    <section>
-      <SectionTitle icon={Gauge}>{t('Rate limits')}</SectionTitle>
-      <div className='border-border/60 overflow-hidden rounded-lg border'>
-        <Table>
-          <TableHeader>
-            <TableRow className='bg-muted/30 hover:bg-muted/30'>
-              <TableHead className='h-9'>{t('Group')}</TableHead>
-              <TableHead className='h-9 text-right'>RPM</TableHead>
-              <TableHead className='h-9 text-right'>TPM</TableHead>
-              <TableHead className='h-9 text-right'>RPD</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {limits.map((l) => (
-              <TableRow key={l.group} className='hover:bg-muted/20'>
-                <TableCell className='py-2 font-mono'>{l.group}</TableCell>
-                <TableCell className='py-2 text-right font-mono'>
-                  {formatRateLimit(l.rpm)}
-                </TableCell>
-                <TableCell className='py-2 text-right font-mono'>
-                  {formatRateLimit(l.tpm)}
-                </TableCell>
-                <TableCell className='py-2 text-right font-mono'>
-                  {formatRateLimit(l.rpd)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      <p className='text-muted-foreground mt-2 text-[11px] leading-relaxed'>
-        {t(
-          'RPM = requests per minute, TPM = tokens per minute, RPD = requests per day. Limits apply per token group. Figures shown are representative defaults — your account’s actual limits may differ.'
-        )}
-      </p>
-    </section>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Provider info card (vendor / tokenizer / license / privacy)
-// ---------------------------------------------------------------------------
-//
-// Exported separately so the Overview tab can render it alongside capabilities
-// and modalities (i.e. "what is this model?" rather than "how do I call it?").
-
 export function ModelDetailsProviderInfo(props: { model: PricingModel }) {
   const { t } = useTranslation()
-  const info = useMemo(() => inferApiInfo(props.model), [props.model])
+  const endpoints = props.model.supported_endpoint_types ?? []
 
   return (
     <section>
-      <SectionTitle icon={ShieldCheck}>
-        {t('Provider & data privacy')}
-      </SectionTitle>
-
+      <SectionTitle icon={ShieldCheck}>{t('Catalog')}</SectionTitle>
       <div className='border-border/60 bg-border/60 grid grid-cols-1 gap-px overflow-hidden rounded-lg border sm:grid-cols-2'>
-        <InfoCell label={t('Provider')}>
-          <div className='flex items-center gap-1.5'>
-            <span className='text-sm font-medium'>{info.vendor_label}</span>
-            {info.homepage && (
-              <a
-                href={info.homepage}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-muted-foreground hover:text-foreground inline-flex items-center gap-0.5 text-[11px]'
-              >
-                {t('Docs')}
-                <ExternalLink className='size-3' />
-              </a>
-            )}
-          </div>
+        <InfoCell label={t('Vendor')}>
+          <span className='text-sm font-medium'>
+            {props.model.vendor_name ?? '—'}
+          </span>
         </InfoCell>
-
-        <InfoCell label={t('Tokenizer')}>
-          <div className='flex flex-col gap-0.5'>
-            <code className='font-mono text-xs'>{info.tokenizer}</code>
-            {info.tokenizer_note && (
-              <span className='text-muted-foreground text-[10px]'>
-                {info.tokenizer_note}
-              </span>
-            )}
-          </div>
-        </InfoCell>
-
-        <InfoCell label={t('License')}>
-          <div className='flex flex-col gap-1'>
-            <span className='text-sm'>{info.license}</span>
-            <Badge
-              variant='outline'
-              className={cn(
-                'h-4 w-fit px-1.5 text-[9px] font-medium',
-                info.license_kind === 'open' &&
-                  'border-success/40 text-success',
-                info.license_kind === 'open-weight' &&
-                  'border-sky-500/40 text-sky-600 dark:text-sky-400',
-                info.license_kind === 'proprietary' &&
-                  'border-warning/40 text-warning'
-              )}
-            >
-              {info.license_kind === 'open'
-                ? t('Open source')
-                : info.license_kind === 'open-weight'
-                  ? t('Open weights')
-                  : info.license_kind === 'proprietary'
-                    ? t('Proprietary')
-                    : t('Unknown')}
-            </Badge>
-          </div>
-        </InfoCell>
-
-        <InfoCell label={t('Data retention')}>
+        <InfoCell label={t('Endpoint types')}>
           <span className='text-sm'>
-            {info.data_retention_days === 0
-              ? t('Zero retention')
-              : `${info.data_retention_days} ${t('days')}`}
-          </span>
-          <span className='text-muted-foreground text-[10px]'>
-            {info.training_opt_out
-              ? t('Not used for upstream training by default')
-              : t('May be used for training by upstream provider')}
+            {endpoints.length > 0 ? endpoints.join(', ') : '—'}
           </span>
         </InfoCell>
+        {props.model.vendor_description ? (
+          <InfoCell label={t('Provider notes')}>
+            <span className='text-muted-foreground text-sm'>
+              {props.model.vendor_description}
+            </span>
+          </InfoCell>
+        ) : null}
       </div>
     </section>
   )
@@ -862,8 +623,6 @@ export function ModelDetailsApi(props: {
     <div className='space-y-6'>
       <CodeSamplesSection model={props.model} endpointMap={props.endpointMap} />
       <AuthSection />
-      <SupportedParametersSection model={props.model} />
-      <RateLimitsSection model={props.model} />
     </div>
   )
 }

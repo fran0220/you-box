@@ -34,6 +34,7 @@ import {
   ModelMetaTag,
   ModelSelectorHeader,
 } from '@/components/ai-elements/model-selector-header'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { ModelGroupSelector } from '@/components/model-group-selector'
 import { getUserModels, getUserGroups, getModelPricingMap } from './api'
@@ -51,7 +52,11 @@ import {
 } from './lib'
 import type { Message as MessageType } from './types'
 
-export function Playground() {
+type PlaygroundProps = {
+  initialModel?: string
+}
+
+export function Playground(props: PlaygroundProps) {
   const { t } = useTranslation()
   const {
     config,
@@ -67,6 +72,12 @@ export function Playground() {
     clearMessages,
     applyPreset,
   } = usePlaygroundState()
+
+  useEffect(() => {
+    const model = props.initialModel?.trim()
+    if (!model) return
+    updateConfig('model', model)
+  }, [props.initialModel, updateConfig])
 
   // Pricing map (model → ratios) used to derive real per-response cost.
   const { data: pricingMap } = useQuery({
@@ -104,7 +115,12 @@ export function Playground() {
   const [parametersSheetOpen, setParametersSheetOpen] = useState(false)
 
   // Load models
-  const { data: modelsData, isLoading: isLoadingModels } = useQuery({
+  const {
+    data: modelsData,
+    isLoading: isLoadingModels,
+    isError: modelsLoadError,
+    isFetched: modelsFetched,
+  } = useQuery({
     queryKey: ['playground-models'],
     queryFn: async () => {
       try {
@@ -115,13 +131,18 @@ export function Playground() {
             ? error.message
             : i18next.t('Failed to load playground models')
         )
-        return []
+        throw error
       }
     },
+    retry: 1,
   })
 
   // Load groups
-  const { data: groupsData } = useQuery({
+  const {
+    data: groupsData,
+    isError: groupsLoadError,
+    isFetched: groupsFetched,
+  } = useQuery({
     queryKey: ['playground-groups'],
     queryFn: async () => {
       try {
@@ -132,10 +153,16 @@ export function Playground() {
             ? error.message
             : i18next.t('Failed to load playground groups')
         )
-        return []
+        throw error
       }
     },
+    retry: 1,
   })
+
+  const modelsLoadFailed =
+    modelsLoadError || (modelsFetched && (modelsData?.length ?? 0) === 0)
+  const groupsLoadFailed =
+    groupsLoadError || (groupsFetched && (groupsData?.length ?? 0) === 0)
 
   // Update models when data changes
   useEffect(() => {
@@ -290,6 +317,22 @@ export function Playground() {
     models.length === 0 ||
     groups.length === 0
 
+  const loadFailureMessage = useMemo(() => {
+    if (modelsLoadFailed && groupsLoadFailed) {
+      return t(
+        'Models and groups could not be loaded. Check your channel configuration and try again.'
+      )
+    }
+    if (modelsLoadFailed) {
+      return t(
+        'Models could not be loaded. Check your channel configuration and try again.'
+      )
+    }
+    return t(
+      'Groups could not be loaded. Check your channel configuration and try again.'
+    )
+  }, [modelsLoadFailed, groupsLoadFailed, t])
+
   const parametersPanel = (
     <PlaygroundParameters
       config={config}
@@ -301,9 +344,16 @@ export function Playground() {
   )
 
   return (
-    <div className='relative flex size-full flex-col overflow-hidden'>
+    <div className='bg-bg text-foreground relative flex size-full flex-col overflow-hidden'>
+      {(modelsLoadFailed || groupsLoadFailed) && !isLoadingModels ? (
+        <Alert variant='destructive' className='mx-4 mt-3 shrink-0 sm:mx-6'>
+          <AlertTitle>{t('Unable to load playground')}</AlertTitle>
+          <AlertDescription>{loadFailureMessage}</AlertDescription>
+        </Alert>
+      ) : null}
       {/* Header: model/group picker + meta tags + reset / mobile parameters */}
       <ModelSelectorHeader
+        className='bg-surface/80 border-border shrink-0 backdrop-blur-sm'
         trigger={
           <ModelGroupSelector
             selectedModel={config.model}
@@ -389,7 +439,7 @@ export function Playground() {
           </div>
 
           {/* Input area: center content and constrain to the same container width */}
-          <div className='mx-auto w-full max-w-4xl'>
+          <div className='border-border bg-bg mx-auto w-full max-w-4xl border-t px-4 py-3 sm:px-6'>
             <PlaygroundInput
               disabled={isGenerating}
               isGenerating={isGenerating}
@@ -402,7 +452,7 @@ export function Playground() {
         </div>
 
         {/* Desktop parameter rail */}
-        <aside className='bg-surface hidden min-h-0 flex-col overflow-y-auto border-l lg:flex'>
+        <aside className='bg-surface-inset border-border hidden min-h-0 flex-col overflow-y-auto border-l lg:flex'>
           {parametersPanel}
         </aside>
       </div>

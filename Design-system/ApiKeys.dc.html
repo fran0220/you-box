@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .krow{display:grid;grid-template-columns:1.4fr 1.3fr .9fr .9fr .7fr auto;gap:16px;align-items:center;padding:15px 18px;border-top:1px solid var(--divider)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav on" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="Marketplace.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <div style="border-top:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:10px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div><button class="yb-iconbtn yb-iconbtn--sm" aria-label="Account"><i data-lucide="chevron-down"></i></button></div>
+  </aside>
+
+  <div style="min-width:0">
+    <header style="height:60px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px)">
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">API keys</div>
+      <div style="flex:1"></div>
+      <a href="Wallet.dc.html" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);font-family:var(--font-mono);font-size:13px;color:var(--text)"><i data-lucide="wallet" style="width:14px;height:14px;color:var(--text-muted)"></i>$842.10</a>
+      <button class="yb-iconbtn" aria-label="Notifications"><i data-lucide="bell"></i></button>
+      <button class="yb-iconbtn" aria-label="Theme"><i data-lucide="sun"></i></button>
+    </header>
+
+    <div style="padding:28px 28px 64px;max-width:1120px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px">
+        <div><h1 style="font-family:var(--font-display);font-size:26px;letter-spacing:-.02em;font-weight:700;margin:0 0 4px;color:var(--text-strong)">API keys</h1><p style="font-size:14px;color:var(--text-secondary);margin:0">Create and manage keys for the YouBox gateway. Treat them like passwords.</p></div>
+        <button class="yb-btn yb-btn--primary"><i data-lucide="plus"></i><span>Create key</span></button>
+      </div>
+
+      <!-- new key alert -->
+      <div style="border:1px solid var(--brand-border);background:var(--brand-subtle);border-radius:14px;padding:18px 20px;margin-bottom:22px">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px"><i data-lucide="circle-check-big" style="width:17px;height:17px;color:var(--success)"></i><span style="font-size:14px;font-weight:600;color:var(--text-strong)">Key created — copy it now</span></div>
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px">This is the only time you'll see the full key. Store it somewhere safe.</p>
+        <div style="display:flex;gap:10px;align-items:center"><div class="mono" style="flex:1;background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:11px 14px;font-size:13px;color:var(--text)">yb-prod-7f3a9c2e4b1d8a6f0e5c3b9d7a1f4e2c8b6d0a3f</div><button class="yb-btn yb-btn--secondary"><i data-lucide="copy"></i><span>Copy</span></button></div>
+      </div>
+
+      <!-- stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px">
+        <div class="yb-card"><span class="yb-stat__label">Total keys</span><div class="yb-stat__value" style="margin-top:8px">6</div></div>
+        <div class="yb-card"><span class="yb-stat__label">Active</span><div class="yb-stat__value" style="margin-top:8px">5</div></div>
+        <div class="yb-card"><span class="yb-stat__label">Requests (30d)</span><div class="yb-stat__value" style="margin-top:8px">2.41<span class="yb-stat__unit">M</span></div></div>
+        <div class="yb-card"><span class="yb-stat__label">Spend (30d)</span><div class="yb-stat__value" style="margin-top:8px">$1,284</div></div>
+      </div>
+
+      <!-- keys table -->
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="krow" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>Name</span><span>Key</span><span>Last used</span><span>Limit</span><span>Status</span><span></span></div>
+        <div class="krow"><span style="color:var(--text);font-weight:500">Production · web</span><span class="mono" style="color:var(--text-muted)">yb-prod-7f3a••••4e2c</span><span class="mono" style="color:var(--text-muted)">2m ago</span><span class="mono" style="color:var(--text)">$2,000/mo</span><span><span class="yb-badge yb-badge--success" >Active</span></span><span style="display:flex;gap:4px"><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="copy"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></span></div>
+        <div class="krow"><span style="color:var(--text);font-weight:500">Production · mobile</span><span class="mono" style="color:var(--text-muted)">yb-prod-91c4••••8b0a</span><span class="mono" style="color:var(--text-muted)">14m ago</span><span class="mono" style="color:var(--text)">$1,000/mo</span><span><span class="yb-badge yb-badge--success">Active</span></span><span style="display:flex;gap:4px"><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="copy"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></span></div>
+        <div class="krow"><span style="color:var(--text);font-weight:500">Staging</span><span class="mono" style="color:var(--text-muted)">yb-test-3d8e••••1a7f</span><span class="mono" style="color:var(--text-muted)">3h ago</span><span class="mono" style="color:var(--text)">$200/mo</span><span><span class="yb-badge yb-badge--success">Active</span></span><span style="display:flex;gap:4px"><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="copy"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></span></div>
+        <div class="krow"><span style="color:var(--text);font-weight:500">CI / e2e</span><span class="mono" style="color:var(--text-muted)">yb-test-5b2a••••9c4d</span><span class="mono" style="color:var(--text-muted)">1d ago</span><span class="mono" style="color:var(--text)">$50/mo</span><span><span class="yb-badge yb-badge--success">Active</span></span><span style="display:flex;gap:4px"><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="copy"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></span></div>
+        <div class="krow"><span style="color:var(--text);font-weight:500">Old laptop</span><span class="mono" style="color:var(--text-muted)">yb-prod-0a1b••••6f3e</span><span class="mono" style="color:var(--text-muted)">42d ago</span><span class="mono" style="color:var(--text)">$500/mo</span><span><span class="yb-badge yb-badge--warning" >Paused</span></span><span style="display:flex;gap:4px"><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="copy"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></span></div>
+        <div class="krow"><span style="color:var(--text-muted);font-weight:500;text-decoration:line-through">Leaked key</span><span class="mono" style="color:var(--text-faint)">yb-prod-revoked</span><span class="mono" style="color:var(--text-muted)">—</span><span class="mono" style="color:var(--text-muted)">—</span><span><span class="yb-badge yb-badge--danger" >Revoked</span></span><span style="display:flex;gap:4px"><button class="yb-iconbtn yb-iconbtn--sm" disabled><i data-lucide="copy"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="ellipsis"></i></button></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:880},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

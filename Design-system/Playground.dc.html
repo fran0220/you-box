@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  a{text-decoration:none;color:inherit}
+  .snav{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+  .snav:hover{background:var(--surface-hover);color:var(--text)}
+  .snav.on{background:var(--surface-2);color:var(--text-strong)}
+  .snav i{width:17px;height:17px;flex:none}
+  .sgrp{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:0 11px;margin:20px 0 7px}
+  .mono{font-family:var(--font-mono)}
+  .param{margin-bottom:20px}
+  .param .lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-secondary);margin-bottom:8px}
+  .param .lab b{font-family:var(--font-mono);color:var(--text);font-weight:500}
+  .param input[type=range]{width:100%;accent-color:var(--brand)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="height:100dvh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--text);font-family:var(--font-sans);overflow:hidden">
+
+  <aside style="border-right:1px solid var(--border);background:var(--surface-inset);display:flex;flex-direction:column">
+    <div style="height:60px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong)">Box</b></span></div>
+    <div style="flex:1;overflow:auto;padding:10px 10px 16px">
+      <div class="sgrp">Workspace</div>
+      <a class="snav" href="Dashboard.dc.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a class="snav on" href="Playground.dc.html"><i data-lucide="flask-conical"></i>Playground</a>
+      <a class="snav" href="Chat.dc.html"><i data-lucide="messages-square"></i>Chat</a>
+      <a class="snav" href="ApiKeys.dc.html"><i data-lucide="key-round"></i>API keys</a>
+      <a class="snav" href="UsageLogs.dc.html"><i data-lucide="scroll-text"></i>Usage logs</a>
+      <a class="snav" href="Wallet.dc.html"><i data-lucide="wallet"></i>Wallet</a>
+      <div class="sgrp">Admin</div>
+      <a class="snav" href="Channels.dc.html"><i data-lucide="cable"></i>Channels</a>
+      <a class="snav" href="Users.dc.html"><i data-lucide="users"></i>Users</a>
+      <a class="snav" href="Marketplace.dc.html"><i data-lucide="boxes"></i>Models</a>
+      <a class="snav" href="SystemSettings.dc.html"><i data-lucide="settings"></i>Settings</a>
+    </div>
+    <div style="border-top:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:10px"><span class="yb-avatar" style="background:#565663">JM</span><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);font-weight:600">Jordan Maru</div><div class="mono" style="font-size:11px;color:var(--text-muted)">Admin</div></div></div>
+  </aside>
+
+  <div style="display:grid;grid-template-columns:1fr 300px;min-width:0">
+    <!-- conversation column -->
+    <div style="display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border)">
+      <header style="height:60px;display:flex;align-items:center;gap:14px;padding:0 22px;border-bottom:1px solid var(--border)">
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-strong)">Playground</div>
+        <div style="display:flex;align-items:center;gap:9px;height:36px;padding:0 12px;border:1px solid var(--field-border);border-radius:8px;background:var(--surface-2);font-size:13px;color:var(--text);cursor:pointer;white-space:nowrap;flex:none"><span class="yb-avatar yb-avatar--sm" style="background:#565663;width:20px;height:20px;font-size:9px">An</span>claude-opus-4.6<i data-lucide="chevron-down" style="width:15px;height:15px;color:var(--text-muted)"></i></div>
+        <div style="flex:1"></div>
+        <button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="code"></i><span>View code</span></button>
+        <button class="yb-btn yb-btn--ghost yb-btn--sm"><i data-lucide="rotate-ccw"></i><span>Clear</span></button>
+      </header>
+
+      <div style="flex:1;overflow:auto;padding:24px 22px;display:flex;flex-direction:column;gap:20px">
+        <!-- system -->
+        <div style="border:1px dashed var(--border-strong);border-radius:12px;padding:14px 16px;background:var(--surface-inset)"><div style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:6px">System</div><div style="font-size:14px;color:var(--text-secondary);line-height:1.55">You are a senior staff engineer. Answer concisely with runnable code and explain trade-offs briefly.</div></div>
+        <!-- user -->
+        <div style="display:flex;gap:12px;justify-content:flex-end"><div style="max-width:74%;background:var(--surface-2);border:1px solid var(--border);border-radius:14px 14px 4px 14px;padding:12px 15px;font-size:14px;line-height:1.6;color:var(--text)">Write a TypeScript function that retries an async call with exponential backoff and jitter.</div><span class="yb-avatar" style="background:#3B3B47">JM</span></div>
+        <!-- assistant -->
+        <div style="display:flex;gap:12px"><span class="yb-avatar" style="background:#565663">An</span><div style="max-width:78%"><div style="font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px">Here's a typed helper with capped exponential backoff and full jitter:</div>
+          <div class="yb-code"><div class="yb-code__bar"><span class="yb-code__dots"><i></i><i></i><i></i></span><span class="yb-code__lang">typescript</span><span class="yb-code__spacer"></span><button class="yb-code__copy"><i data-lucide="copy"></i>Copy</button></div><pre class="yb-code__pre"><code><span style="color:var(--orange-300)">async function</span> <span style="color:var(--blue-500)">retry</span>&lt;T&gt;(
+  fn: () =&gt; <span style="color:var(--blue-500)">Promise</span>&lt;T&gt;, max = <span style="color:var(--teal-300)">5</span>
+): <span style="color:var(--blue-500)">Promise</span>&lt;T&gt; {
+  <span style="color:var(--orange-300)">for</span> (<span style="color:var(--orange-300)">let</span> i = <span style="color:var(--teal-300)">0</span>; ; i++) {
+    <span style="color:var(--orange-300)">try</span> { <span style="color:var(--orange-300)">return await</span> <span style="color:var(--blue-500)">fn</span>(); }
+    <span style="color:var(--orange-300)">catch</span> (e) {
+      <span style="color:var(--orange-300)">if</span> (i &gt;= max) <span style="color:var(--orange-300)">throw</span> e;
+      <span style="color:var(--orange-300)">const</span> d = <span style="color:var(--blue-500)">Math</span>.min(<span style="color:var(--teal-300)">1000</span> * <span style="color:var(--teal-300)">2</span> ** i, <span style="color:var(--teal-300)">15000</span>);
+      <span style="color:var(--orange-300)">await</span> <span style="color:var(--blue-500)">sleep</span>(<span style="color:var(--blue-500)">Math</span>.random() * d);
+    }
+  }
+}</code></pre></div>
+          <div style="display:flex;gap:6px;margin-top:10px;align-items:center"><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="copy"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="rotate-ccw"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="thumbs-up"></i></button><span class="mono" style="font-size:11px;color:var(--text-muted);margin-left:6px">312 tok · 0.4s · $0.005</span></div>
+        </div></div>
+      </div>
+
+      <!-- composer -->
+      <div style="border-top:1px solid var(--border);padding:16px 22px">
+        <div style="border:1px solid var(--field-border);border-radius:14px;background:var(--field-bg);padding:12px 14px">
+          <div style="font-size:14px;color:var(--field-placeholder);min-height:24px">Send a message…</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><div style="display:flex;gap:4px"><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="paperclip"></i></button><button class="yb-iconbtn yb-iconbtn--sm"><i data-lucide="image"></i></button></div><button class="yb-btn yb-btn--primary yb-btn--sm"><span>Send</span><i data-lucide="arrow-up"></i></button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- params rail -->
+    <div style="overflow:auto;padding:20px 18px;background:var(--surface-inset)">
+      <div style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);margin-bottom:16px">Parameters</div>
+      <div class="param"><div class="lab"><span>Temperature</span><b>0.7</b></div><input type="range" min="0" max="2" step="0.1" value="0.7"></div>
+      <div class="param"><div class="lab"><span>Max tokens</span><b>4096</b></div><input type="range" min="256" max="8192" step="256" value="4096"></div>
+      <div class="param"><div class="lab"><span>Top P</span><b>1.0</b></div><input type="range" min="0" max="1" step="0.05" value="1"></div>
+      <div class="param"><div class="lab"><span>Frequency penalty</span><b>0.0</b></div><input type="range" min="0" max="2" step="0.1" value="0"></div>
+      <div style="border-top:1px solid var(--divider);margin:8px 0 18px"></div>
+      <div class="param"><div class="lab"><span>Stream response</span></div><label class="yb-switch"><span class="yb-switch__track" style="background:var(--brand);border-color:transparent"><span class="yb-switch__thumb" style="transform:translateX(17px);background:var(--brand-on)"></span></span></label></div>
+      <div class="param"><div class="lab"><span>JSON mode</span></div><label class="yb-switch"><span class="yb-switch__track"><span class="yb-switch__thumb"></span></span></label></div>
+      <div style="border-top:1px solid var(--divider);margin:8px 0 16px"></div>
+      <div style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:10px">Session</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:var(--text-secondary)">Tokens</span><span class="mono" style="color:var(--text)">3,210</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:var(--text-secondary)">Cost</span><span class="mono" style="color:var(--text)">$0.018</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-secondary)">Latency</span><span class="mono" style="color:var(--text)">0.41s</span></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:840},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

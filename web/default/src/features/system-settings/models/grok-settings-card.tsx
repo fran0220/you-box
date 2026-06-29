@@ -16,15 +16,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useRef } from 'react'
 import * as z from 'zod'
-import { useForm } from 'react-hook-form'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import { FormDirtyIndicator } from '../components/form-dirty-indicator'
+import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
   SettingRowFormItem,
   SettingRowGroup,
@@ -32,18 +32,13 @@ import {
 } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
+import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 import { safeNumberFieldProps } from '../utils/numeric-field'
 
 const XAI_VIOLATION_FEE_DOC_URL =
   'https://docs.x.ai/docs/models#usage-guidelines-violation-fee'
 
-/**
- * The schema uses a nested object so the dotted FormField `name` props line
- * up with react-hook-form's path semantics. Using flat keys like
- * `'grok.violation_deduction_enabled'` causes RHF to silently maintain two
- * parallel value trees and saves never see the user input.
- */
 const grokSchema = z.object({
   grok: z.object({
     violation_deduction_enabled: z.boolean(),
@@ -51,7 +46,6 @@ const grokSchema = z.object({
   }),
 })
 
-type GrokFormInput = z.input<typeof grokSchema>
 type GrokFormValues = z.output<typeof grokSchema>
 
 type FlatGrokDefaults = {
@@ -59,17 +53,17 @@ type FlatGrokDefaults = {
   'grok.violation_deduction_amount': number
 }
 
-const buildFormDefaults = (defaults: FlatGrokDefaults): GrokFormInput => ({
+const buildFormDefaults = (defaults: FlatGrokDefaults) => ({
   grok: {
     violation_deduction_enabled: defaults['grok.violation_deduction_enabled'],
     violation_deduction_amount: defaults['grok.violation_deduction_amount'],
   },
 })
 
-const normalizeFormValues = (values: GrokFormValues): FlatGrokDefaults => ({
-  'grok.violation_deduction_enabled': values.grok.violation_deduction_enabled,
-  'grok.violation_deduction_amount': values.grok.violation_deduction_amount,
-})
+const GROK_FIELD_TO_OPTION_KEY: Record<string, string> = {
+  'grok.violation_deduction_enabled': 'grok.violation_deduction_enabled',
+  'grok.violation_deduction_amount': 'grok.violation_deduction_amount',
+}
 
 interface Props {
   defaultValues: FlatGrokDefaults
@@ -79,124 +73,104 @@ export function GrokSettingsCard(props: Props) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
 
-  const formDefaults = useMemo(
-    () => buildFormDefaults(props.defaultValues),
-    [props.defaultValues]
-  )
-
-  const form = useForm<GrokFormInput, unknown, GrokFormValues>({
-    resolver: zodResolver(grokSchema),
-    defaultValues: formDefaults,
-  })
-
-  const baselineRef = useRef<FlatGrokDefaults>(props.defaultValues)
-  const baselineSerializedRef = useRef<string>(
-    JSON.stringify(props.defaultValues)
-  )
-
-  useEffect(() => {
-    const serialized = JSON.stringify(props.defaultValues)
-    if (serialized === baselineSerializedRef.current) return
-    baselineRef.current = props.defaultValues
-    baselineSerializedRef.current = serialized
-    form.reset(buildFormDefaults(props.defaultValues))
-  }, [props.defaultValues, form])
-
-  const onSubmit = async (values: GrokFormValues) => {
-    const normalized = normalizeFormValues(values)
-    const changedKeys = (
-      Object.keys(normalized) as Array<keyof FlatGrokDefaults>
-    ).filter((key) => normalized[key] !== baselineRef.current[key])
-
-    if (changedKeys.length === 0) {
-      toast.info(t('No changes to save'))
-      return
-    }
-
-    for (const key of changedKeys) {
-      await updateOption.mutateAsync({
-        key,
-        value: normalized[key],
-      })
-    }
-
-    baselineRef.current = normalized
-    baselineSerializedRef.current = JSON.stringify(normalized)
-    form.reset(buildFormDefaults(normalized))
-  }
+  const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
+    useSettingsForm<GrokFormValues>({
+      resolver: zodResolver(grokSchema) as Resolver<
+        GrokFormValues,
+        unknown,
+        GrokFormValues
+      >,
+      defaultValues: buildFormDefaults(props.defaultValues),
+      onSubmit: async (_data, changedFields) => {
+        for (const [key, value] of Object.entries(changedFields)) {
+          const optionKey = GROK_FIELD_TO_OPTION_KEY[key] ?? key
+          await updateOption.mutateAsync({
+            key: optionKey,
+            value: value as string | number | boolean,
+          })
+        }
+      },
+    })
 
   const enabled = form.watch('grok.violation_deduction_enabled')
 
   return (
-    <SettingsSection title={t('Grok Settings')}>
-      <Form {...form}>
-        <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
-          <SettingsPageFormActions
-            onSave={form.handleSubmit(onSubmit)}
-            isSaving={updateOption.isPending}
-          />
-          <SettingRowGroup>
-            <FormField
-              control={form.control}
-              name='grok.violation_deduction_enabled'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Enable violation deduction')}
-                  description={
-                    <>
-                      {t(
-                        'When enabled, violation requests will incur additional charges.'
-                      )}{' '}
-                      <a
-                        href={XAI_VIOLATION_FEE_DOC_URL}
-                        target='_blank'
-                        rel='noreferrer'
-                        className='underline'
-                      >
-                        {t('Official documentation')}
-                      </a>
-                    </>
-                  }
-                  control={
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
+    <>
+      <FormNavigationGuard when={isDirty} />
 
-            <FormField
-              control={form.control}
-              name='grok.violation_deduction_amount'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Violation deduction amount')}
-                  description={t(
-                    'Base amount. Actual deduction = base amount × system group rate.'
-                  )}
-                  disabled={!enabled}
-                  control={
-                    <FormControl>
-                      <Input
-                        className='w-32'
-                        type='number'
-                        step={0.01}
-                        min={0}
-                        {...safeNumberFieldProps(field)}
-                        disabled={!enabled}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
+      <SettingsSection title={t('Grok Settings')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit}>
+            <SettingsPageFormActions
+              onSave={handleSubmit}
+              onReset={handleReset}
+              isSaving={updateOption.isPending || isSubmitting}
+              isResetDisabled={!isDirty}
             />
-          </SettingRowGroup>
-        </SettingsForm>
-      </Form>
-    </SettingsSection>
+            <FormDirtyIndicator isDirty={isDirty} />
+            <SettingRowGroup>
+              <FormField
+                control={form.control}
+                name='grok.violation_deduction_enabled'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Enable violation deduction')}
+                    description={
+                      <>
+                        {t(
+                          'When enabled, violation requests will incur additional charges.'
+                        )}{' '}
+                        <a
+                          href={XAI_VIOLATION_FEE_DOC_URL}
+                          target='_blank'
+                          rel='noreferrer'
+                          className='underline'
+                        >
+                          {t('Official documentation')}
+                        </a>
+                      </>
+                    }
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='grok.violation_deduction_amount'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Violation deduction amount')}
+                    description={t(
+                      'Base amount. Actual deduction = base amount × system group rate.'
+                    )}
+                    disabled={!enabled}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-32'
+                          type='number'
+                          step={0.01}
+                          min={0}
+                          {...safeNumberFieldProps(field)}
+                          disabled={!enabled}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+            </SettingRowGroup>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+    </>
   )
 }

@@ -911,7 +911,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                     {other.admin_info.local_count_tokens ? (
                       <Monitor className='text-info size-3' />
                     ) : (
-                      <Cloud className='text-teal size-3' />
+                      <Cloud className='text-success size-3' />
                     )}
                     <span className='text-xs'>
                       {other.admin_info.local_count_tokens

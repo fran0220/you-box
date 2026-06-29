@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/styles.css">
+<script src="_ds/youbox-design-system-6d62a15a-e879-41b4-932e-756e7ab712b8/_ds_bundle.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{margin:0;background:var(--bg)}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+  .eyb{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 14px}
+  a{text-decoration:none;color:inherit}
+  .navlink{font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-secondary);padding:8px 12px;border-radius:6px}
+  .navlink:hover{color:var(--text);background:var(--surface-hover)}
+  .navlink.on{color:var(--text-strong)}
+  .rk{display:grid;grid-template-columns:48px 1fr 150px 130px 120px;align-items:center;gap:16px;padding:15px 20px;border-top:1px solid var(--divider)}
+  .mono{font-family:var(--font-mono)}
+  .bar{height:6px;border-radius:999px;background:var(--ink-200)}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100dvh;background:var(--bg);color:var(--text);font-family:var(--font-sans)">
+
+  <header style="position:sticky;top:0;z-index:200;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--border)">
+    <div style="max-width:1180px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;gap:28px">
+      <a href="Index.dc.html" style="display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.02em"><span style="display:inline-flex;width:26px;height:26px;border-radius:7px;background:var(--brand);color:var(--brand-on);align-items:center;justify-content:center"><i data-lucide="box" style="width:16px;height:16px"></i></span><span style="color:var(--text-secondary)">You<b style="color:var(--text-strong);font-weight:700">Box</b></span></a>
+      <nav style="display:flex;align-items:center;gap:2px;margin-left:6px"><a class="navlink" href="Marketplace.dc.html">Models</a><a class="navlink on" href="Rankings.dc.html">Rankings</a><a class="navlink" href="Docs.dc.html">Docs</a><a class="navlink" href="Marketplace.dc.html">Pricing</a></nav>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px"><button class="yb-iconbtn" aria-label="Toggle theme"><i data-lucide="sun"></i></button><a class="yb-btn yb-btn--ghost yb-btn--sm" href="SignIn.dc.html"><span>Sign in</span></a><a class="yb-btn yb-btn--primary yb-btn--sm" href="SignUp.dc.html"><span>Get API key</span></a></div>
+    </div>
+  </header>
+
+  <section style="padding:48px 0 64px">
+    <div class="wrap">
+      <p class="eyb">// Rankings</p>
+      <h1 style="font-family:var(--font-display);font-size:40px;letter-spacing:-.03em;font-weight:700;margin:0 0 10px;color:var(--text-strong)">Most used models on YouBox</h1>
+      <p style="font-size:17px;color:var(--text-secondary);margin:0 0 30px;max-width:46em">Ranked by tokens routed across all customers. Updated hourly. A real signal of what developers actually ship with.</p>
+
+      <div style="display:flex;gap:34px;padding:24px 0;border-top:1px solid var(--divider);border-bottom:1px solid var(--divider);margin-bottom:24px">
+        <div class="yb-stat"><span class="yb-stat__label">Tokens this week</span><span class="yb-stat__value">9.7<span class="yb-stat__unit">T</span></span></div>
+        <div class="yb-stat"><span class="yb-stat__label">Active models</span><span class="yb-stat__value">312</span></div>
+        <div class="yb-stat"><span class="yb-stat__label">Top provider share</span><span class="yb-stat__value">31<span class="yb-stat__unit">%</span></span></div>
+        <div class="yb-stat"><span class="yb-stat__label">Avg WoW growth</span><span class="yb-stat__value" style="color:var(--success)">+14<span class="yb-stat__unit">%</span></span></div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+        <div class="yb-tabs yb-tabs--pill"><button class="yb-tab">Today</button><button class="yb-tab yb-tab--active">This week</button><button class="yb-tab">This month</button><button class="yb-tab">All time</button></div>
+        <div class="yb-tabs yb-tabs--pill"><button class="yb-tab yb-tab--active">All</button><button class="yb-tab">Programming</button><button class="yb-tab">Roleplay</button><button class="yb-tab">Marketing</button></div>
+      </div>
+
+      <div class="yb-card" style="padding:0;overflow:hidden">
+        <div class="rk" style="border-top:none;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)"><span>#</span><span>Model</span><span>Tokens / week</span><span style="text-align:right">Share</span><span style="text-align:right">Growth</span></div>
+
+        <div class="rk"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">1</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#565663">An</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Claude Opus 4.6</div><div class="mono" style="font-size:11px;color:var(--text-muted)">anthropic</div></span></span><span class="mono" style="color:var(--text);font-size:15px">3.04T</span><span style="text-align:right"><div class="bar" style="width:100%;margin-bottom:4px"></div><span class="mono" style="font-size:11px;color:var(--text-muted)">31.3%</span></span><span style="text-align:right"><span class="yb-badge yb-badge--success" >+22%</span></span></div>
+
+        <div class="rk"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">2</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#3B3B47">Op</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">GPT-5.2</div><div class="mono" style="font-size:11px;color:var(--text-muted)">openai</div></span></span><span class="mono" style="color:var(--text);font-size:15px">2.41T</span><span style="text-align:right"><div class="bar" style="width:79%;margin-bottom:4px"></div><span class="mono" style="font-size:11px;color:var(--text-muted)">24.8%</span></span><span style="text-align:right"><span class="yb-badge yb-badge--success">+9%</span></span></div>
+
+        <div class="rk"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">3</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#8B9097">Go</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Gemini 3 Pro</div><div class="mono" style="font-size:11px;color:var(--text-muted)">google</div></span></span><span class="mono" style="color:var(--text);font-size:15px">1.58T</span><span style="text-align:right"><div class="bar" style="width:52%;margin-bottom:4px"></div><span class="mono" style="font-size:11px;color:var(--text-muted)">16.3%</span></span><span style="text-align:right"><span class="yb-badge yb-badge--success">+31%</span></span></div>
+
+        <div class="rk"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">4</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#807C75">De</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">DeepSeek V4</div><div class="mono" style="font-size:11px;color:var(--text-muted)">deepseek</div></span></span><span class="mono" style="color:var(--text);font-size:15px">0.92T</span><span style="text-align:right"><div class="bar" style="width:30%;margin-bottom:4px"></div><span class="mono" style="font-size:11px;color:var(--text-muted)">9.5%</span></span><span style="text-align:right"><span class="yb-badge yb-badge--success">+47%</span></span></div>
+
+        <div class="rk"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">5</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#74747F">Me</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Llama 4 405B</div><div class="mono" style="font-size:11px;color:var(--text-muted)">meta</div></span></span><span class="mono" style="color:var(--text);font-size:15px">0.61T</span><span style="text-align:right"><div class="bar" style="width:20%;margin-bottom:4px"></div><span class="mono" style="font-size:11px;color:var(--text-muted)">6.3%</span></span><span style="text-align:right"><span class="yb-badge yb-badge--neutral">+2%</span></span></div>
+
+        <div class="rk"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">6</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#A7ABB1">Mi</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Mistral Large 3</div><div class="mono" style="font-size:11px;color:var(--text-muted)">mistral</div></span></span><span class="mono" style="color:var(--text);font-size:15px">0.44T</span><span style="text-align:right"><div class="bar" style="width:14%;margin-bottom:4px"></div><span class="mono" style="font-size:11px;color:var(--text-muted)">4.5%</span></span><span style="text-align:right"><span class="yb-badge yb-badge--danger" >−6%</span></span></div>
+
+        <div class="rk"><span class="mono" style="font-size:18px;color:var(--text-strong);font-weight:600">7</span><span style="display:flex;align-items:center;gap:12px"><span class="yb-avatar" style="background:#565663">Co</span><span><div style="color:var(--text-strong);font-weight:600;font-size:15px">Command R+ 2</div><div class="mono" style="font-size:11px;color:var(--text-muted)">cohere</div></span></span><span class="mono" style="color:var(--text);font-size:15px">0.28T</span><span style="text-align:right"><div class="bar" style="width:9%;margin-bottom:4px"></div><span class="mono" style="font-size:11px;color:var(--text-muted)">2.9%</span></span><span style="text-align:right"><span class="yb-badge yb-badge--success">+12%</span></span></div>
+
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:860},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._icons(); }
+  componentDidUpdate() { this._icons(); }
+  _icons() { const run = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }; run(); setTimeout(run, 250); setTimeout(run, 700); }
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>

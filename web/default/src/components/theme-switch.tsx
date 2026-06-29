@@ -32,15 +32,19 @@ import {
 
 export function ThemeSwitch() {
   const { t } = useTranslation()
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
 
-  /* Update theme-color meta tag
-   * when theme is updated */
+  /* Sync theme-color meta with the ink canvas token (--background), not legacy azure-tinted values. */
   useEffect(() => {
-    const themeColor = theme === 'dark' ? '#020817' : '#fff'
+    const canvas = getComputedStyle(document.documentElement)
+      .getPropertyValue('--background')
+      .trim()
+    const themeColor =
+      canvas ||
+      (resolvedTheme === 'dark' ? 'rgb(11, 11, 15)' : 'rgb(249, 249, 248)')
     const metaThemeColor = document.querySelector("meta[name='theme-color']")
     if (metaThemeColor) metaThemeColor.setAttribute('content', themeColor)
-  }, [theme])
+  }, [theme, resolvedTheme])
 
   // Theme change with a circular reveal via the View Transitions API,
   // emanating from the click point. flushSync forces the theme class onto

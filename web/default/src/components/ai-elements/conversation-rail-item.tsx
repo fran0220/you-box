@@ -45,7 +45,9 @@ export const ConversationRailItem = ({
     className={cn(
       'duration-instant flex w-full flex-col items-start gap-0.5 rounded-md px-3 py-2.5 text-start transition-colors',
       'focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none',
-      active ? 'bg-surface-2' : 'hover:bg-surface-hover',
+      active
+        ? 'bg-surface-2 text-foreground'
+        : 'hover:bg-surface-hover text-foreground',
       className
     )}
     {...props}
@@ -53,7 +55,7 @@ export const ConversationRailItem = ({
     <span
       className={cn(
         'w-full truncate text-[13px]',
-        active ? 'text-foreground font-semibold' : 'text-foreground font-medium'
+        active ? 'font-semibold text-foreground' : 'font-medium text-foreground'
       )}
     >
       {title}

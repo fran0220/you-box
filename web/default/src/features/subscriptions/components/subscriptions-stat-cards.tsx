@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { CircleDollarSign, Layers, ToggleRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { AnimatedNumber } from '@/components/ui/animated-number'
-import { StatCard, StatCardRow } from '@/components/patterns'
+import { StatCard, StatCardRow } from '@/components/youbox'
 import type { PlanRecord } from '../types'
 
 type SubscriptionsStatCardsProps = {
