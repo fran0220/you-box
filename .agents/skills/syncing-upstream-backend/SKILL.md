@@ -53,7 +53,9 @@ Expected durable overlap hotspots in this fork:
 
 - `main.go` — keep YouBox startup behind `service.StartYouBoxBackgroundTasks()` and `service.InitYouBoxRuntimeResources()`.
 - `router/api-router.go` — keep YouBox routes behind `registerYouBoxRoutes(apiRouter)`.
+- `router/channel-router.go` — when upstream moves inline channel routes into a registry, re-add YouBox-only channel endpoints such as Codex OAuth start/complete routes to the new registry instead of keeping a duplicate inline route block.
 - `model/main.go` — keep YouBox migrations behind `youBoxMigrationModels()` / `youBoxMigrationSpecs()`.
+- `model/log.go` — if ClickHouse log support is present, new audit/login log writes must use the shared log creation path (`createLog`) rather than direct `LOG_DB.Create`, so ClickHouse and alternate log DB behavior stays consistent.
 - `common/constants.go` — keep branding and legacy console rewrites in separate common files.
 - `relay/channel/openai/adaptor.go` — use common branding helpers instead of hard-coded YouBox strings.
 - `controller/user.go`, `model/token.go`, provider relay converters — only touch when the upstream type or hot path truly needs the field/branch.
@@ -91,6 +93,14 @@ Use the result as a merge plan:
 | Deployment files | Cherry-pick only specific env knobs/comments that fit YouBox deployment. |
 | `go.mod` / `go.sum` | Update only with selected backend functionality and verify build. |
 
+When `go.sum` conflicts during dependency-bearing backend patches, prefer restoring a clean side and running `go mod tidy` over hand-merging checksum blocks:
+
+```bash
+git show HEAD:go.sum > go.sum
+go mod tidy
+git add go.mod go.sum
+```
+
 ## Safe implementation workflow
 
 1. Create a dedicated branch from current YouBox branch.
@@ -108,7 +118,8 @@ git diff "$base"..upstream/main -- <path>
    - a struct field required by persistent schema/API compatibility,
    - a provider branch that cannot be expressed elsewhere,
    - a small config helper call.
-6. Never remove YouBox frontend routes, branding, deployment secrets policy, or local API behavior unless the user explicitly approves.
+6. When applying upstream system-task/authz/router refactors, resolve conflicts by preserving both ordering constraints and YouBox seams. Example: set task adaptor factories before starting the system task runner, then call `service.StartYouBoxBackgroundTasks()` after the upstream runner registration.
+7. Never remove YouBox frontend routes, branding, deployment secrets policy, or local API behavior unless the user explicitly approves.
 
 ## Verification
 
