@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { Plus, Scale, X } from 'lucide-react'
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
@@ -39,6 +40,7 @@ import {
 import { StatusBadge } from '@/components/status-badge'
 import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
+import { EmptyState as YouboxEmptyState } from '@/components/youbox/empty-state'
 import { MAX_COMPARE_MODELS, QUOTA_TYPE_VALUES } from '../constants'
 import { usePricingData } from '../hooks/use-pricing-data'
 import { deriveModelTypes } from '../lib/model-type'
@@ -52,17 +54,21 @@ interface ComparePricingContext {
 }
 
 interface CompareRow {
-  label: string
-  render: (model: PricingModel, ctx: ComparePricingContext) => React.ReactNode
+  labelKey: string
+  render: (
+    model: PricingModel,
+    ctx: ComparePricingContext,
+    t: TFunction
+  ) => React.ReactNode
 }
 
 const COMPARE_ROWS: CompareRow[] = [
   {
-    label: 'Vendor',
+    labelKey: 'Vendor',
     render: (model) => model.vendor_name ?? '—',
   },
   {
-    label: 'Input price (/1M)',
+    labelKey: 'Input price (/1M)',
     render: (model, ctx) =>
       model.quota_type === QUOTA_TYPE_VALUES.REQUEST
         ? formatRequestPrice(model, false, ctx.priceRate, ctx.usdExchangeRate)
@@ -76,7 +82,7 @@ const COMPARE_ROWS: CompareRow[] = [
           ),
   },
   {
-    label: 'Output price (/1M)',
+    labelKey: 'Output price (/1M)',
     render: (model, ctx) =>
       model.quota_type === QUOTA_TYPE_VALUES.REQUEST
         ? '—'
@@ -90,12 +96,14 @@ const COMPARE_ROWS: CompareRow[] = [
           ),
   },
   {
-    label: 'Pricing type',
-    render: (model) =>
-      model.quota_type === QUOTA_TYPE_VALUES.TOKEN ? 'Token' : 'Request',
+    labelKey: 'Pricing type',
+    render: (model, _ctx, t) =>
+      model.quota_type === QUOTA_TYPE_VALUES.TOKEN
+        ? t('Token')
+        : t('Request'),
   },
   {
-    label: 'Model types',
+    labelKey: 'Model types',
     render: (model) => {
       const types = deriveModelTypes(model)
       if (types.length === 0) return '—'
@@ -109,7 +117,7 @@ const COMPARE_ROWS: CompareRow[] = [
     },
   },
   {
-    label: 'Endpoints',
+    labelKey: 'Endpoints',
     render: (model) => {
       const eps = model.supported_endpoint_types ?? []
       if (eps.length === 0) return '—'
@@ -117,7 +125,7 @@ const COMPARE_ROWS: CompareRow[] = [
     },
   },
   {
-    label: 'Groups',
+    labelKey: 'Groups',
     render: (model) => {
       const groups = (model.enable_groups ?? []).filter((g) => g && g !== 'auto')
       if (groups.length === 0) return '—'
@@ -248,7 +256,7 @@ export function ModelCompare() {
 
   return (
     <AppShell variant='public'>
-      <PageTransition className='pb-10'>
+      <PageTransition className='mx-auto max-w-[1180px] px-4 pb-10 sm:px-7'>
         <div className='mb-6'>
           <p className='yb-eyebrow mb-3'>
             {'// '}
@@ -265,22 +273,22 @@ export function ModelCompare() {
         </div>
 
         {selectedModels.length === 0 ? (
-          <div className='flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed px-6 py-12 text-center'>
-            <Scale className='text-muted-foreground/40 mb-3 size-10' />
-            <h3 className='text-foreground mb-1 text-base font-semibold'>
-              {t('No models selected')}
-            </h3>
-            <p className='text-muted-foreground mb-5 max-w-xs text-sm'>
-              {t('Add up to {{count}} models to compare them side by side.', {
-                count: MAX_COMPARE_MODELS,
-              })}
-            </p>
-            <AddModelButton
-              models={models || []}
-              selected={selectedNames}
-              onAdd={(name) => setSelected([...selectedNames, name])}
-            />
-          </div>
+          <YouboxEmptyState
+            icon={Scale}
+            title={t('No models selected')}
+            description={t(
+              'Add up to {{count}} models to compare them side by side.',
+              { count: MAX_COMPARE_MODELS }
+            )}
+            className='border-border bg-card min-h-[320px] rounded-xl border border-dashed'
+            action={
+              <AddModelButton
+                models={models || []}
+                selected={selectedNames}
+                onAdd={(name) => setSelected([...selectedNames, name])}
+              />
+            }
+          />
         ) : (
           <div className='space-y-4'>
             <div className='flex flex-wrap items-center gap-2'>
@@ -300,7 +308,7 @@ export function ModelCompare() {
               </Button>
             </div>
 
-            <div className='overflow-x-auto rounded-xl border'>
+            <div className='border-border bg-card overflow-x-auto rounded-xl border'>
               <div
                 className='min-w-fit'
                 style={{ display: 'grid', gridTemplateColumns }}
@@ -349,7 +357,7 @@ export function ModelCompare() {
 
                 {COMPARE_ROWS.map((row, rowIndex) => (
                   <CompareRowCells
-                    key={row.label}
+                    key={row.labelKey}
                     row={row}
                     models={selectedModels}
                     ctx={ctx}
@@ -398,21 +406,21 @@ function CompareRowCells(props: {
     <>
       <div
         className={cn(
-          'text-muted-foreground border-t p-3 text-xs font-medium',
+          'text-muted-foreground border-divider border-t p-3 font-mono text-[11px] font-medium tracking-[0.06em] uppercase',
           striped && 'bg-surface/30'
         )}
       >
-        {t(row.label)}
+        {t(row.labelKey)}
       </div>
       {models.map((model) => (
         <div
-          key={`${row.label}-${model.model_name}`}
+          key={`${row.labelKey}-${model.model_name}`}
           className={cn(
             'border-t border-l p-3 text-sm tabular-nums',
             striped && 'bg-surface/30'
           )}
         >
-          {row.render(model, ctx)}
+          {row.render(model, ctx, t)}
         </div>
       ))}
     </>

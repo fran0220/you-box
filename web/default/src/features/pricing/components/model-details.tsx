@@ -22,6 +22,7 @@ import { ArrowLeft, Boxes, Code2, Info, LayoutGrid } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CopyButton } from '@/components/copy-button'
@@ -31,6 +32,7 @@ import {
   DrawerShell,
 } from '@/components/drawer-layout'
 import { AppShell } from '@/components/layout'
+import { PageTransition } from '@/components/page-transition'
 import { DEFAULT_TOKEN_UNIT, QUOTA_TYPE_VALUES } from '../constants'
 import { usePricingData } from '../hooks/use-pricing-data'
 import { getDynamicPricingTiers } from '../lib/dynamic-price'
@@ -41,6 +43,7 @@ import { ModelDetailsApi, ModelDetailsProviderInfo } from './model-details-api'
 import { ModelDetailsApps } from './model-details-apps'
 import { GroupPricingSection } from './model-details-group-pricing'
 import { PriceSection } from './model-details-price'
+import { ModelDetailsPerformance } from './model-details-performance'
 import { ModelDetailsProviders } from './model-details-providers'
 import { ModelSpecCard } from './model-details-spec-card'
 
@@ -50,7 +53,7 @@ import { ModelSpecCard } from './model-details-spec-card'
 
 function SectionTitle(props: { children: React.ReactNode }) {
   return (
-    <h2 className='text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase'>
+    <h2 className='text-muted-foreground mb-3 font-mono text-[11px] font-medium tracking-[0.06em] uppercase'>
       {props.children}
     </h2>
   )
@@ -69,21 +72,27 @@ function ModelHeader(props: { model: PricingModel }) {
     getDynamicPricingTiers(model).length === 0
 
   return (
-    <div className='pb-4'>
-      <div className='flex items-center gap-2.5'>
-        {modelIcon}
-        <h1 className='font-mono text-xl font-bold tracking-tight sm:text-2xl'>
-          {model.model_name}
-        </h1>
-        <CopyButton
-          value={model.model_name || ''}
-          className='size-6'
-          iconClassName='size-3'
-          tooltip={t('Copy model name')}
-          successTooltip={t('Copied!')}
-          aria-label={t('Copy model name')}
-        />
-      </div>
+    <div className='border-border border-b pb-6'>
+      <div className='flex flex-wrap items-start gap-3'>
+        {modelIcon ? (
+          <span className='bg-surface-2 border-border flex size-11 shrink-0 items-center justify-center rounded-lg border'>
+            {modelIcon}
+          </span>
+        ) : null}
+        <div className='min-w-0 flex-1'>
+          <div className='flex flex-wrap items-center gap-2'>
+            <h1 className='font-mono text-xl font-bold tracking-tight text-foreground sm:text-2xl'>
+              {model.model_name}
+            </h1>
+            <CopyButton
+              value={model.model_name || ''}
+              className='size-6'
+              iconClassName='size-3'
+              tooltip={t('Copy model name')}
+              successTooltip={t('Copied!')}
+              aria-label={t('Copy model name')}
+            />
+          </div>
       <div className='mt-1 flex flex-wrap items-center gap-1.5 text-xs'>
         {model.vendor_name && (
           <span className='text-muted-foreground'>{model.vendor_name}</span>
@@ -111,17 +120,19 @@ function ModelHeader(props: { model: PricingModel }) {
         </p>
       )}
       {tags.length > 0 && (
-        <div className='mt-2.5 flex flex-wrap gap-1'>
+        <div className='mt-2.5 flex flex-wrap gap-1.5'>
           {tags.map((tag) => (
             <span
               key={tag}
-              className='bg-muted text-muted-foreground rounded px-2 py-0.5 text-[11px] font-medium'
+              className='bg-surface-2 text-muted-foreground border-border rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium'
             >
               {tag}
             </span>
           ))}
         </div>
       )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -163,24 +174,24 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
     <div className='@container/details space-y-4'>
       <ModelHeader model={props.model} />
 
-      <Tabs defaultValue='overview' className='gap-4'>
-        <TabsList className='bg-muted/60 grid w-full grid-cols-2 gap-1 rounded-lg p-1 group-data-horizontal/tabs:h-auto @md/details:grid-cols-4'>
+      <Tabs defaultValue='overview' className='gap-5'>
+        <TabsList className='grid h-auto w-full grid-cols-2 gap-1 p-1 @md/details:grid-cols-4'>
           {TAB_VALUES.map((value) => {
             const Icon = TAB_META[value].icon
             return (
               <TabsTrigger
                 key={value}
                 value={value}
-                className='h-8 min-w-0 gap-1.5 rounded-md px-3 text-xs sm:text-sm'
+                className='h-9 min-w-0 gap-1.5 px-3 text-xs sm:text-sm'
               >
-                <Icon className='size-3.5' />
+                <Icon className='size-3.5 shrink-0' aria-hidden='true' />
                 <span className='truncate'>{t(TAB_META[value].labelKey)}</span>
               </TabsTrigger>
             )
           })}
         </TabsList>
 
-        <TabsContent value='overview' className='space-y-6 outline-none'>
+        <TabsContent value='overview' className='space-y-8 outline-none'>
           <ModelSpecCard
             model={props.model}
             priceRate={props.priceRate}
@@ -189,7 +200,7 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
             showRechargePrice={showRechargePrice}
           />
 
-          <section className='bg-card/60 space-y-5 rounded-xl border p-4 shadow-sm'>
+          <Card className='gap-5 p-5 shadow-sm'>
             <SectionTitle>{t('Pricing')}</SectionTitle>
             <PriceSection
               model={props.model}
@@ -211,6 +222,11 @@ export function ModelDetailsContent(props: ModelDetailsContentProps) {
               tokenUnit={props.tokenUnit}
               showRechargePrice={showRechargePrice}
             />
+          </Card>
+
+          <section className='space-y-4'>
+            <SectionTitle>{t('Performance & uptime')}</SectionTitle>
+            <ModelDetailsPerformance model={props.model} />
           </section>
 
           <ModelDetailsProviderInfo model={props.model} />
@@ -316,24 +332,27 @@ export function ModelDetails() {
   if (isLoading) {
     return (
       <AppShell variant='public'>
-        <div className='mx-auto max-w-5xl px-4 sm:px-6'>
-          <Skeleton className='mb-4 h-5 w-16' />
-          <div className='space-y-2'>
-            <Skeleton className='h-7 w-64' />
-            <Skeleton className='h-4 w-40' />
-            <Skeleton className='h-4 w-full max-w-md' />
+        <PageTransition className='pb-10'>
+          <div className='mx-auto max-w-[1180px] px-4 sm:px-7'>
+            <Skeleton className='mb-6 h-4 w-48' />
+            <Skeleton className='mb-4 h-5 w-28' />
+            <div className='space-y-2'>
+              <Skeleton className='h-8 w-72' />
+              <Skeleton className='h-4 w-40' />
+              <Skeleton className='h-4 w-full max-w-lg' />
+            </div>
+            <div className='mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4'>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className='h-20 w-full rounded-lg' />
+              ))}
+            </div>
+            <div className='mt-8 space-y-3'>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className='h-24 w-full rounded-lg' />
+              ))}
+            </div>
           </div>
-          <div className='mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4'>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className='h-16 w-full' />
-            ))}
-          </div>
-          <div className='mt-6 space-y-3'>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className='h-24 w-full' />
-            ))}
-          </div>
-        </div>
+        </PageTransition>
       </AppShell>
     )
   }
@@ -341,35 +360,38 @@ export function ModelDetails() {
   if (!model) {
     return (
       <AppShell variant='public'>
-        <div className='mx-auto max-w-2xl px-4 text-center sm:px-6'>
-          <h2 className='mb-1 text-base font-semibold'>
-            {t('Model not found')}
-          </h2>
-          <p className='text-muted-foreground mb-4 text-sm'>
-            {t("The model you're looking for doesn't exist.")}
-          </p>
-          <Button onClick={handleBack} variant='outline' size='sm'>
-            {t('Back to Models')}
-          </Button>
-        </div>
+        <PageTransition className='pb-10'>
+          <div className='mx-auto max-w-2xl px-4 text-center sm:px-7'>
+            <h2 className='font-display mb-1 text-lg font-semibold tracking-tight'>
+              {t('Model not found')}
+            </h2>
+            <p className='text-muted-foreground mb-5 text-sm'>
+              {t("The model you're looking for doesn't exist.")}
+            </p>
+            <Button onClick={handleBack} variant='outline' size='sm'>
+              {t('Back to Models')}
+            </Button>
+          </div>
+        </PageTransition>
       </AppShell>
     )
   }
 
   return (
     <AppShell variant='public'>
-      <div className='mx-auto max-w-5xl px-4 sm:px-6'>
-        <Button
-          variant='ghost'
-          size='sm'
-          onClick={handleBack}
-          className='text-muted-foreground hover:text-foreground mb-4 h-auto gap-1 px-0 py-1 text-xs'
-        >
-          <ArrowLeft className='size-3.5' />
-          {t('Back to Models')}
-        </Button>
+      <PageTransition className='pb-10'>
+        <div className='mx-auto max-w-[1180px] px-4 sm:px-7'>
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={handleBack}
+            className='text-muted-foreground hover:text-foreground mb-6 h-auto gap-1.5 px-0 py-1 font-mono text-xs'
+          >
+            <ArrowLeft className='size-3.5' aria-hidden='true' />
+            {t('Back to Models')}
+          </Button>
 
-        <ModelDetailsContent
+          <ModelDetailsContent
           model={model}
           groupRatio={groupRatio || {}}
           usableGroup={usableGroup || {}}
@@ -385,7 +407,8 @@ export function ModelDetails() {
             >) || {}
           }
         />
-      </div>
+        </div>
+      </PageTransition>
     </AppShell>
   )
 }
