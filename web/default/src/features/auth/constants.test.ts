@@ -101,8 +101,8 @@ describe('registerFormSchema', () => {
   it('rejects mismatched confirm password', () => {
     const result = registerFormSchema.safeParse({
       username: 'newuser',
-      password: 'ValidPass1!',
-      confirmPassword: 'ValidPass2!',
+      password: 'password12',
+      confirmPassword: 'password13',
     })
     expect(result.success).toBe(false)
     if (!result.success) {
