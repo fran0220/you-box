@@ -12,29 +12,29 @@ import (
 )
 
 type Token struct {
-	Id                 int            `json:"id"`
-	UserId             int            `json:"user_id" gorm:"index"`
-	Key                string         `json:"key" gorm:"type:varchar(128);uniqueIndex"`
-	Status             int            `json:"status" gorm:"default:1"`
-	Name               string         `json:"name" gorm:"index" `
-	CreatedTime        int64          `json:"created_time" gorm:"bigint"`
-	AccessedTime       int64          `json:"accessed_time" gorm:"bigint"`
-	ExpiredTime        int64          `json:"expired_time" gorm:"bigint;default:-1"` // -1 means never expired
-	RemainQuota        int            `json:"remain_quota" gorm:"default:0"`
-	UnlimitedQuota     bool           `json:"unlimited_quota"`
-	ModelLimitsEnabled bool           `json:"model_limits_enabled"`
-	ModelLimits        string         `json:"model_limits" gorm:"type:text"`
-	AllowIps           *string        `json:"allow_ips" gorm:"default:''"`
-	UsedQuota          int            `json:"used_quota" gorm:"default:0"` // used quota
-	Group              string         `json:"group" gorm:"default:''"`
-	CrossGroupRetry    bool           `json:"cross_group_retry"` // 跨分组重试，仅auto分组有效
+	Id                 int     `json:"id"`
+	UserId             int     `json:"user_id" gorm:"index"`
+	Key                string  `json:"key" gorm:"type:varchar(128);uniqueIndex"`
+	Status             int     `json:"status" gorm:"default:1"`
+	Name               string  `json:"name" gorm:"index" `
+	CreatedTime        int64   `json:"created_time" gorm:"bigint"`
+	AccessedTime       int64   `json:"accessed_time" gorm:"bigint"`
+	ExpiredTime        int64   `json:"expired_time" gorm:"bigint;default:-1"` // -1 means never expired
+	RemainQuota        int     `json:"remain_quota" gorm:"default:0"`
+	UnlimitedQuota     bool    `json:"unlimited_quota"`
+	ModelLimitsEnabled bool    `json:"model_limits_enabled"`
+	ModelLimits        string  `json:"model_limits" gorm:"type:text"`
+	AllowIps           *string `json:"allow_ips" gorm:"default:''"`
+	UsedQuota          int     `json:"used_quota" gorm:"default:0"` // used quota
+	Group              string  `json:"group" gorm:"default:''"`
+	CrossGroupRetry    bool    `json:"cross_group_retry"` // 跨分组重试，仅auto分组有效
 	// SpendLimit/ResetPeriod implement an OpenRouter-style recurring spend
 	// budget: every period the key's RemainQuota is reset to SpendLimit. 0 /
 	// "none" disables it. Enforcement reuses the existing RemainQuota path, so
 	// no billing hot-path change is required.
-	SpendLimit    int    `json:"spend_limit" gorm:"default:0"`
-	ResetPeriod   string `json:"reset_period" gorm:"type:varchar(16);default:'none'"`
-	NextResetTime int64  `json:"next_reset_time" gorm:"bigint;default:0"`
+	SpendLimit    int            `json:"spend_limit" gorm:"default:0"`
+	ResetPeriod   string         `json:"reset_period" gorm:"type:varchar(16);default:'none'"`
+	NextResetTime int64          `json:"next_reset_time" gorm:"bigint;default:0"`
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
 }
 
@@ -105,28 +105,35 @@ func sanitizeLikePattern(input string) (string, error) {
 	input = strings.ReplaceAll(input, "!", "!!")
 	input = strings.ReplaceAll(input, `_`, `!_`)
 
-	// 2. 连续的 % 直接拒绝
-	if strings.Contains(input, "%%") {
-		return "", errors.New("搜索模式中不允许包含连续的 % 通配符")
-	}
-
-	// 3. 统计 % 数量，不得超过 2
-	count := strings.Count(input, "%")
-	if count > 2 {
-		return "", errors.New("搜索模式中最多允许包含 2 个 % 通配符")
-	}
-
-	// 4. 含 % 时，去掉 % 后关键词长度必须 >= 2
-	if count > 0 {
-		stripped := strings.ReplaceAll(input, "%", "")
-		if len(stripped) < 2 {
-			return "", errors.New("使用模糊搜索时，关键词长度至少为 2 个字符")
-		}
-		return input, nil
+	if err := validateLikePattern(input); err != nil {
+		return "", err
 	}
 
 	// 5. 无 % 时，精确全匹配
 	return input, nil
+}
+
+func validateLikePattern(input string) error {
+	// 1. 连续的 % 直接拒绝
+	if strings.Contains(input, "%%") {
+		return errors.New("搜索模式中不允许包含连续的 % 通配符")
+	}
+
+	// 2. 统计 % 数量，不得超过 2
+	count := strings.Count(input, "%")
+	if count > 2 {
+		return errors.New("搜索模式中最多允许包含 2 个 % 通配符")
+	}
+
+	// 3. 含 % 时，去掉 % 后关键词长度必须 >= 2
+	if count > 0 {
+		stripped := strings.ReplaceAll(input, "%", "")
+		if len(stripped) < 2 {
+			return errors.New("使用模糊搜索时，关键词长度至少为 2 个字符")
+		}
+	}
+
+	return nil
 }
 
 const searchHardLimit = 100
