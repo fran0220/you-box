@@ -25,7 +25,15 @@
 | `go build ./controller/...` | pass |
 | `bun run typecheck` | pass |
 | `bun run build` | pass |
-| `bun run i18n:sync` | missing=0（zh/ja/ru 部分新 key 待人工润色翻译） |
+| `bun run i18n:sync` | missing=0；gap-closure **109** key 已写入 6 语种 |
+| `verify-harness.mjs` | **85** 路由，**1** 预期 warn（`/500` ERROR_BOUNDARY 误报） |
+
+## Harness 截图（2026-06-29）
+
+- 报告：`/tmp/yb-verify/report.json`
+- 截图目录：`/tmp/yb-verify/shots/{pub|auth}-{name}/dark-{375,768,1280,1536}.png` + `light-1280.png`
+- 公开页抽检：home / status / docs / about / legal-* 均渲染完整（无 NEAR_BLANK / H_OVERFLOW）
+- Status 空数据时 headline 已与 Home pill 对齐为 **All systems operational**（非 Unknown）
 
 ## Harness 路由（公开页新增）
 
