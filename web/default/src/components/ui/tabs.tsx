@@ -116,11 +116,14 @@ function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
   return (
     <TabsPrimitive.Panel
       data-slot='tabs-content'
+      keepMounted={false}
       className={cn(
         'flex-1 text-sm outline-none',
-        // Base UI keeps inactive panels mounted with `hidden`; ensure they never
-        // participate in layout (VAL-PRICING-018 stacking).
+        // Base UI may keep visited panels mounted without the `hidden` attr during
+        // transitions; inactive panels use tabIndex=-1 (VAL-PRICING-018 stacking).
+        '[&[tabindex="-1"]]:hidden',
         'data-[hidden]:hidden',
+        '[hidden]:hidden',
         className
       )}
       {...props}

@@ -14,6 +14,7 @@ import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as DesignLabRouteImport } from './routes/design-lab'
+import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -113,6 +114,11 @@ const ForbiddenRoute = ForbiddenRouteImport.update({
 const DesignLabRoute = DesignLabRouteImport.update({
   id: '/design-lab',
   path: '/design-lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDocsRoute = ApiDocsRouteImport.update({
+  id: '/api-docs',
+  path: '/api-docs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -521,6 +527,7 @@ const AuthenticatedSystemSettingsAuthSectionRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api-docs': typeof ApiDocsRoute
   '/design-lab': typeof DesignLabRoute
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
@@ -601,6 +608,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api-docs': typeof ApiDocsRoute
   '/design-lab': typeof DesignLabRoute
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
@@ -683,6 +691,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(auth)': typeof authRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/api-docs': typeof ApiDocsRoute
   '/design-lab': typeof DesignLabRoute
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
@@ -765,6 +774,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api-docs'
     | '/design-lab'
     | '/forbidden'
     | '/login'
@@ -845,6 +855,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api-docs'
     | '/design-lab'
     | '/forbidden'
     | '/login'
@@ -926,6 +937,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(auth)'
     | '/_authenticated'
+    | '/api-docs'
     | '/design-lab'
     | '/forbidden'
     | '/login'
@@ -1009,6 +1021,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   authRouteRoute: typeof authRouteRouteWithChildren
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ApiDocsRoute: typeof ApiDocsRoute
   DesignLabRoute: typeof DesignLabRoute
   ForbiddenRoute: typeof ForbiddenRoute
   LoginRoute: typeof LoginRoute
@@ -1082,6 +1095,13 @@ declare module '@tanstack/react-router' {
       path: '/design-lab'
       fullPath: '/design-lab'
       preLoaderRoute: typeof DesignLabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-docs': {
+      id: '/api-docs'
+      path: '/api-docs'
+      fullPath: '/api-docs'
+      preLoaderRoute: typeof ApiDocsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -1746,6 +1766,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   authRouteRoute: authRouteRouteWithChildren,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ApiDocsRoute: ApiDocsRoute,
   DesignLabRoute: DesignLabRoute,
   ForbiddenRoute: ForbiddenRoute,
   LoginRoute: LoginRoute,
