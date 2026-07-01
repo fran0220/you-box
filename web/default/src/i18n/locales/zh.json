@@ -5091,6 +5091,22 @@
     "Zero retention": "零数据保留",
     "Zhipu": "智谱",
     "Zhipu V4": "智谱 V4",
-    "Zoom": "缩放"
+    "Zoom": "缩放",
+    "YouBox Agent": "YouBox Agent",
+    "Authorize desktop app": "授权桌面应用",
+    "Allow YouBox Agent to access your account on this device.": "允许 YouBox Agent 在此设备上访问你的账号。",
+    "Device authorization": "设备授权",
+    "You are signing in to YouBox Agent on {{device}}.": "你正在 {{device}} 上登录 YouBox Agent。",
+    "This authorization link is invalid or expired. Return to the desktop app and try again.": "授权链接无效或已过期。请返回桌面应用重试。",
+    "Authorizing...": "授权中...",
+    "Authorize": "授权",
+    "Authorization failed": "授权失败",
+    "Unknown device": "未知设备",
+    "Connected devices": "已连接设备",
+    "Manage desktop devices authorized to use your YouBox account.": "管理已授权使用 YouBox 账号的桌面设备。",
+    "Last used": "上次使用",
+    "Revoked": "已撤销",
+    "No connected devices yet.": "暂无已连接设备。",
+    "Unknown platform": "未知平台"
   }
 }

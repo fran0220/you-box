@@ -181,6 +181,17 @@ func seedToken(t *testing.T, db *gorm.DB, userID int, name string, rawKey string
 	return token
 }
 
+func seedAgentSystemToken(t *testing.T, db *gorm.DB, userID int, name string, rawKey string, grantID int) *model.Token {
+	t.Helper()
+	token := seedToken(t, db, userID, name, rawKey)
+	token.Source = model.TokenSourceAgentDesktop
+	token.AgentGrantId = grantID
+	if err := db.Save(token).Error; err != nil {
+		t.Fatalf("failed to mark system token: %v", err)
+	}
+	return token
+}
+
 func newAuthenticatedContext(t *testing.T, method string, target string, body any, userID int) (*gin.Context, *httptest.ResponseRecorder) {
 	t.Helper()
 
@@ -414,6 +425,45 @@ func TestGetAllTokensMasksKeyInResponse(t *testing.T) {
 	}
 	if strings.Contains(recorder.Body.String(), token.Key) {
 		t.Fatalf("list response leaked raw token key: %s", recorder.Body.String())
+	}
+}
+
+func TestUserTokenAPIsHideAgentSystemTokens(t *testing.T) {
+	db := setupTokenControllerTestDB(t)
+	visible := seedToken(t, db, 1, "visible-token", "visible1234token")
+	systemToken := seedAgentSystemToken(t, db, 1, "agent-system-token", "system1234token", 42)
+
+	ctx, recorder := newAuthenticatedContext(t, http.MethodGet, "/api/token/?p=1&size=10", nil, 1)
+	GetAllTokens(ctx)
+
+	response := decodeAPIResponse(t, recorder)
+	if !response.Success {
+		t.Fatalf("expected success response, got message: %s", response.Message)
+	}
+	var page tokenPageResponse
+	if err := common.Unmarshal(response.Data, &page); err != nil {
+		t.Fatalf("failed to decode token page response: %v", err)
+	}
+	if len(page.Items) != 1 || page.Items[0].ID != visible.Id {
+		t.Fatalf("expected only visible user token, got %+v", page.Items)
+	}
+	count, err := model.CountUserTokens(1)
+	if err != nil {
+		t.Fatalf("count tokens: %v", err)
+	}
+	if count != 1 {
+		t.Fatalf("expected count 1 excluding system token, got %d", count)
+	}
+
+	keyCtx, keyRecorder := newAuthenticatedContext(t, http.MethodPost, "/api/token/"+strconv.Itoa(systemToken.Id)+"/key", nil, 1)
+	keyCtx.Params = gin.Params{{Key: "id", Value: strconv.Itoa(systemToken.Id)}}
+	GetTokenKey(keyCtx)
+	keyResponse := decodeAPIResponse(t, keyRecorder)
+	if keyResponse.Success {
+		t.Fatal("expected system-managed token key fetch to fail")
+	}
+	if strings.Contains(keyRecorder.Body.String(), systemToken.Key) {
+		t.Fatalf("system token key leaked: %s", keyRecorder.Body.String())
 	}
 }
 

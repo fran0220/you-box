@@ -4,6 +4,7 @@ func youBoxMigrationModels() []interface{} {
 	return []interface{}{
 		&Preset{},
 		&AppUsage{},
+		&UserAgentGrant{},
 	}
 }
 
@@ -17,5 +18,6 @@ func youBoxMigrationSpecs() []struct {
 	}{
 		{&Preset{}, "Preset"},
 		{&AppUsage{}, "AppUsage"},
+		{&UserAgentGrant{}, "UserAgentGrant"},
 	}
 }

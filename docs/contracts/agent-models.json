@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api.you-box.com/contracts/agent-models.json",
+  "title": "YouBox Agent Models API",
+  "type": "object",
+  "required": ["models", "default_model", "policy_version"],
+  "properties": {
+    "models": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "capabilities", "available"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "capabilities": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["chat", "tools", "vision", "reasoning"] }
+          },
+          "available": { "type": "boolean" },
+          "reason": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "default_model": { "type": "string" },
+    "policy_version": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+  }
+}

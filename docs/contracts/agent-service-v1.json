@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent.you-box.com/contracts/agent-service-v1.json",
+  "title": "YouBox Agent Service API v1",
+  "description": "Agent business data API — devices, workspaces, sessions, policy, audit, sync. The caller identity, grant_id, and device_id are derived from the Bearer YouBox Agent token; request body/query device_id values are not trusted.",
+  "definitions": {
+    "Policy": {
+      "type": "object",
+      "required": [
+        "allow_shell",
+        "allow_mcp",
+        "allow_browser_tool",
+        "allow_external_provider",
+        "max_permission_mode",
+        "audit_privileged_actions"
+      ],
+      "properties": {
+        "allow_shell": { "type": "boolean" },
+        "allow_mcp": { "type": "boolean" },
+        "allow_browser_tool": { "type": "boolean" },
+        "allow_external_provider": { "type": "boolean" },
+        "max_permission_mode": { "type": "string", "enum": ["deny", "ask", "allow"] },
+        "audit_privileged_actions": { "type": "boolean" }
+      }
+    },
+    "Device": {
+      "type": "object",
+      "required": ["device_id", "device_name", "platform"],
+      "properties": {
+        "device_id": { "type": "string", "description": "Server-assigned from the authenticated token device_id claim." },
+        "device_name": { "type": "string" },
+        "platform": { "type": "string" },
+        "app_version": { "type": "string" },
+        "last_seen_at": { "type": "integer" },
+        "revoked_at": { "type": ["integer", "null"] }
+      }
+    },
+    "Workspace": {
+      "type": "object",
+      "required": ["id", "name", "sync_enabled"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "device_id": { "type": "string", "description": "Server-assigned from the authenticated token device_id claim." },
+        "local_path_hash": { "type": "string" },
+        "sync_enabled": { "type": "boolean" },
+        "metadata_json": { "type": "object" }
+      }
+    },
+    "Session": {
+      "type": "object",
+      "required": ["id", "title", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "workspace_id": { "type": "string" },
+        "title": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "archived", "deleted"] },
+        "model": { "type": "string" },
+        "last_message_at": { "type": "integer" },
+        "local_session_ref": { "type": "string" },
+        "cloud_sync_state": { "type": "string" }
+      }
+    },
+    "AuditEvent": {
+      "type": "object",
+      "required": ["action", "risk_level", "created_at"],
+      "properties": {
+        "id": { "type": "integer" },
+        "device_id": {
+          "type": "string",
+          "description": "Server-assigned from the authenticated token device_id claim."
+        },
+        "workspace_id": { "type": "string" },
+        "session_id": { "type": "string" },
+        "action": { "type": "string" },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "payload_json": { "type": "object" },
+        "created_at": { "type": "integer" }
+      }
+    },
+    "HeartbeatRequest": {
+      "type": "object",
+      "properties": {
+        "device_name": { "type": "string" },
+        "platform": { "type": "string" },
+        "app_version": { "type": "string" }
+      }
+    },
+    "AuditRequest": {
+      "type": "object",
+      "required": ["action", "risk_level"],
+      "properties": {
+        "action": { "type": "string" },
+        "risk_level": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "workspace_id": { "type": "string" },
+        "session_id": { "type": "string" },
+        "payload_json": { "type": "object" }
+      }
+    },
+    "SyncPullResponse": {
+      "type": "object",
+      "required": ["cursor", "resources"],
+      "properties": {
+        "cursor": { "type": "string" },
+        "resources": { "type": "array" }
+      }
+    },
+    "SyncPushRequest": {
+      "type": "object",
+      "required": ["resource_type", "events"],
+      "properties": {
+        "resource_type": { "type": "string", "enum": ["workspace", "session", "session_event"] },
+        "cursor": { "type": "string" },
+        "events": { "type": "array" }
+      }
+    }
+  }
+}

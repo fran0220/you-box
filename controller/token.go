@@ -93,7 +93,7 @@ func GetToken(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
-	token, err := model.GetTokenByIds(id, userId)
+	token, err := model.GetUserVisibleTokenByIds(id, userId)
 	if err != nil {
 		common.ApiError(c, err)
 		return
@@ -108,7 +108,7 @@ func GetTokenKey(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
-	token, err := model.GetTokenByIds(id, userId)
+	token, err := model.GetUserVisibleTokenByIds(id, userId)
 	if err != nil {
 		common.ApiError(c, err)
 		return
@@ -303,7 +303,7 @@ func UpdateToken(c *gin.Context) {
 			return
 		}
 	}
-	cleanToken, err := model.GetTokenByIds(token.Id, userId)
+	cleanToken, err := model.GetUserVisibleTokenByIds(token.Id, userId)
 	if err != nil {
 		common.ApiError(c, err)
 		return

@@ -8,6 +8,8 @@ import (
 )
 
 func registerYouBoxRoutes(apiRouter *gin.RouterGroup) {
+	registerAgentRoutes(apiRouter)
+
 	apiRouter.GET("/apps", middleware.HeaderNavModuleAuth("rankings"), controller.GetAppRankings)
 
 	// Playground presets (saved model + parameter configurations), scoped

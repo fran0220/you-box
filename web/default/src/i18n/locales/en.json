@@ -5091,6 +5091,22 @@
     "Zero retention": "Zero retention",
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
+    "Zoom": "Zoom",
+    "YouBox Agent": "YouBox Agent",
+    "Authorize desktop app": "Authorize desktop app",
+    "Allow YouBox Agent to access your account on this device.": "Allow YouBox Agent to access your account on this device.",
+    "Device authorization": "Device authorization",
+    "You are signing in to YouBox Agent on {{device}}.": "You are signing in to YouBox Agent on {{device}}.",
+    "This authorization link is invalid or expired. Return to the desktop app and try again.": "This authorization link is invalid or expired. Return to the desktop app and try again.",
+    "Authorizing...": "Authorizing...",
+    "Authorize": "Authorize",
+    "Authorization failed": "Authorization failed",
+    "Unknown device": "Unknown device",
+    "Connected devices": "Connected devices",
+    "Manage desktop devices authorized to use your YouBox account.": "Manage desktop devices authorized to use your YouBox account.",
+    "Last used": "Last used",
+    "Revoked": "Revoked",
+    "No connected devices yet.": "No connected devices yet.",
+    "Unknown platform": "Unknown platform"
   }
 }
