@@ -61,6 +61,19 @@ web/             — Frontend themes container
 - Usage: `useTranslation()` hook, call `t('English key')` in components
 - CLI tools: `bun run i18n:sync` (from `web/default/`)
 
+## Frontend Design Language — "Paper" (Amp-style)
+
+The default web theme (`web/default/`) follows a restrained, editorial design language inspired by Amp's paper aesthetic. All new or reworked UI must follow it:
+
+- **One shell**: marketing site, docs, user console, and admin share a single `AppShell` (document-level scroll, sticky header, footer). Public pages render without a sidebar; authenticated console pages mount the sidebar slot; admin is a drill-in view inside the same shell. Never build a page that feels like a second site.
+- **Paper surface**: a light, warm "paper" background is the default. Content sits directly on the page; avoid heavy cards, drop shadows, and gradients. Use hairline borders and dividers (`border-border/70`) to delimit content.
+- **Typography carries hierarchy**: serif display face (`font-display`, normal weight) for headings; mono uppercase micro-labels (`yb-eyebrow`) for eyebrows, section labels, and metadata; sans for body. Numeric data uses `tabular-nums`.
+- **Restraint over decoration**: color is reserved for brand accents and state. Animation is CSS-only, slow, and subtle (drifting washes, fade-up in view) — never attention-grabbing motion.
+- **Editorial layout**: generous whitespace, left-aligned content, constrained prose measures, hairline-grid lists (provider wall, modality rows) over card walls where possible.
+- **Catalog pattern**: list/grid pages (e.g., Model Plaza) use a search input plus one facet dropdown per major dimension, URL-driven filters, and window-virtualized results — no pagination.
+- **Auth pages**: a single centered narrow column on paper with the brand top-left — no split/two-column brand panels.
+- **Reusable primitives first**: prefer `web/default/src/components/youbox/` (PageHeader, Panel, Metric, SettingRow, EmptyState, Eyebrow) over bespoke markup.
+
 ## Local validation (CI parity)
 
 From repo root:
