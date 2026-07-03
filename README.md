@@ -162,8 +162,10 @@ Local development:
 cd web/default && bun install && bun run dev
 ```
 
-Proxy the Go API with `VITE_REACT_APP_SERVER_URL=http://localhost:3000` (see
-`web/default/README.md` for layout, Model Plaza, i18n, and `bun run knip`).
+The frontend dev server proxies API requests to `https://api.you-box.com` by
+default. Use `VITE_REACT_APP_SERVER_URL=http://localhost:3000 bun run dev` when
+you want to test against a local backend (see `web/default/README.md` for
+layout, Model Plaza, i18n, and `bun run knip`).
 
 > [!WARNING]
 > When operating this project as a public generative AI service or API resale service, users should first complete all required filing, licensing, content safety, real-name verification, log retention, tax, payment, and upstream authorization obligations.

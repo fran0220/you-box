@@ -1,9 +1,9 @@
-# Frontend Development - Backend built from local source
+# Optional local backend stack for frontend/backend integration testing
 #
 # Usage:
 #   1. docker compose -f docker-compose.dev.yml up -d
-#   2. cd web && bun install && bun run dev
-#   3. Open http://localhost:3001 (Rsbuild dev server, API auto-proxied to :3000)
+#   2. cd web/default && VITE_REACT_APP_SERVER_URL=http://localhost:3000 bun run dev
+#   3. Open the Rsbuild dev server URL printed by bun
 #
 # Rebuild backend after Go code changes:
 #   docker compose -f docker-compose.dev.yml up -d --build new-api
