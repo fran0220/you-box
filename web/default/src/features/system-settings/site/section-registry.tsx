@@ -38,6 +38,12 @@ const SITE_SECTIONS = [
         defaultValues={{
           SystemName: settings.SystemName,
           Logo: settings.Logo,
+          LogoLight: settings.LogoLight,
+          LogoDark: settings.LogoDark,
+          Favicon: settings.Favicon,
+          MetaTitle: settings.MetaTitle,
+          MetaDescription: settings.MetaDescription,
+          BrandColor: settings.BrandColor,
           Footer: settings.Footer,
           About: settings.About,
           HomePageContent: settings.HomePageContent,

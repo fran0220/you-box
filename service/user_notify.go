@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -215,7 +214,7 @@ func sendGotifyNotify(gotifyUrl string, gotifyToken string, priority int, data d
 	}
 
 	// 序列化为 JSON
-	payloadBytes, err := json.Marshal(payload)
+	payloadBytes, err := common.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("failed to marshal gotify payload: %v", err)
 	}
@@ -261,7 +260,7 @@ func sendGotifyNotify(gotifyUrl string, gotifyToken string, priority int, data d
 
 		// 设置请求头
 		req.Header.Set("Content-Type", "application/json; charset=utf-8")
-		req.Header.Set("User-Agent", "BoxAI-Gotify-Notify/1.0")
+		req.Header.Set("User-Agent", strings.ReplaceAll(common.SystemName, " ", "-")+"-Gotify-Notify/1.0")
 
 		// 发送请求
 		client := GetHttpClient()

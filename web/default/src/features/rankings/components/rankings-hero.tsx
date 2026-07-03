@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PageHeader } from '@/components/youbox'
 import type { RankingPeriod } from '../types'
@@ -36,12 +37,15 @@ type RankingsHeroProps = {
 
 export function RankingsHero(props: RankingsHeroProps) {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
 
   return (
     <section className='space-y-6'>
       <PageHeader
         eyebrow={t('Rankings')}
-        title={t('Most used models on YouBox')}
+        title={t('Most used models on {{brandName}}', {
+          brandName: systemName,
+        })}
         subtitle={t(
           'Ranked by tokens routed across all customers. Updated from live usage data.'
         )}

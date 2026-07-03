@@ -31,8 +31,12 @@ import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { getStatus } from '@/lib/api'
 import { installBuildMetadata } from '@/lib/build-metadata'
+import { DEFAULT_SYSTEM_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 import '@/lib/dayjs'
-import { applyFaviconToDom } from '@/lib/dom-utils'
+import {
+  applyBrandColorToDom,
+  applyDocumentBrandingToDom,
+} from '@/lib/dom-utils'
 import { initializeFrontendCache } from '@/lib/frontend-cache'
 import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
@@ -130,20 +134,35 @@ const rootElement = document.getElementById('root')!
 ;(function initSystemBranding() {
   try {
     if (typeof window === 'undefined' || typeof document === 'undefined') return
-    const apply = (name: string) => {
-      document.title = name
-      const metaTitle = document.querySelector(
-        'meta[name="title"]'
-      ) as HTMLMetaElement | null
-      if (metaTitle) metaTitle.setAttribute('content', name)
+    const apply = (status: Record<string, unknown>) => {
+      const systemName = String(status.system_name || DEFAULT_SYSTEM_NAME)
+      const title = String(status.meta_title || systemName)
+      const logo = String(status.logo || '')
+      const favicon = String(status.favicon || logo)
+      const description =
+        typeof status.meta_description === 'string' &&
+        status.meta_description.trim()
+          ? status.meta_description
+          : DEFAULT_META_DESCRIPTION
+      const brandColor =
+        typeof status.brand_color === 'string' && status.brand_color.trim()
+          ? status.brand_color
+          : undefined
+
+      applyDocumentBrandingToDom({
+        title,
+        description,
+        favicon,
+        themeColor: brandColor,
+      })
+      applyBrandColorToDom(brandColor)
     }
     // Cache-first
     try {
       const saved = localStorage.getItem('status')
       if (saved) {
         const s = JSON.parse(saved)
-        if (s?.system_name) apply(s.system_name)
-        if (s?.logo) applyFaviconToDom(s.logo)
+        if (s?.system_name) apply(s)
       }
     } catch {
       /* empty */
@@ -152,14 +171,13 @@ const rootElement = document.getElementById('root')!
     getStatus()
       .then((s) => {
         if (s?.system_name) {
-          apply(s.system_name as string)
+          apply(s)
           try {
             localStorage.setItem('status', JSON.stringify(s))
           } catch {
             /* empty */
           }
         }
-        if (s?.logo) applyFaviconToDom(s.logo as string)
       })
       .catch(() => {
         /* empty */

@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useQuery } from '@tanstack/react-query'
 import { Lock, Route, Shield, Zap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Card } from '@/components/ui/card'
 import { Eyebrow, StatCard, StatCardRow } from '@/components/youbox'
 import { getUptimeStatus } from '@/features/dashboard/api'
@@ -53,6 +54,7 @@ const PRINCIPLES = [
 
 export function AboutMarketingFallback() {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
 
   const pricingQuery = useQuery({
     queryKey: ['pricing'],
@@ -75,13 +77,16 @@ export function AboutMarketingFallback() {
   return (
     <div className='mx-auto w-full max-w-[1000px] px-7 py-12 md:py-16'>
       <section className='mb-14 text-center'>
-        <Eyebrow className='mb-4 text-center'>{t('About YouBox')}</Eyebrow>
+        <Eyebrow className='mb-4 text-center'>
+          {t('About {{brandName}}', { brandName: systemName })}
+        </Eyebrow>
         <h1 className='font-display text-text-strong mx-auto max-w-[14em] text-[clamp(2rem,5vw,3.25rem)] leading-[1.05] font-bold tracking-[-0.035em]'>
           {t("We're building the routing layer for every model.")}
         </h1>
         <p className='text-muted-foreground mx-auto mt-5 max-w-[34em] text-lg leading-relaxed'>
           {t(
-            'The model landscape changes weekly. YouBox exists so your code never has to. One integration, every provider, no lock-in — that is the whole idea.'
+            'The model landscape changes weekly. {{brandName}} exists so your code never has to. One integration, every provider, no lock-in — that is the whole idea.',
+            { brandName: systemName }
           )}
         </p>
       </section>
@@ -102,16 +107,16 @@ export function AboutMarketingFallback() {
             label={t('API formats')}
             value={
               pricingQuery.data?.supported_endpoint
-                ? String(Object.keys(pricingQuery.data.supported_endpoint).length)
+                ? String(
+                    Object.keys(pricingQuery.data.supported_endpoint).length
+                  )
                 : '—'
             }
             loading={pricingQuery.isLoading}
           />
           <StatCard
             label={t('Uptime')}
-            value={
-              Number.isFinite(avgUptime) ? avgUptime.toFixed(2) : '—'
-            }
+            value={Number.isFinite(avgUptime) ? avgUptime.toFixed(2) : '—'}
             unit={Number.isFinite(avgUptime) ? '%' : undefined}
             loading={uptimeQuery.isLoading}
           />
@@ -144,7 +149,9 @@ export function AboutMarketingFallback() {
       </section>
 
       <p className='text-muted-foreground text-center text-sm'>
-        {t('Backed by teams shipping production AI across every major provider.')}
+        {t(
+          'Backed by teams shipping production AI across every major provider.'
+        )}
       </p>
     </div>
   )

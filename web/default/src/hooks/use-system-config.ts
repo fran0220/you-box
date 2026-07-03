@@ -24,8 +24,16 @@ import {
   type SystemConfig,
   DEFAULT_CURRENCY_CONFIG,
 } from '@/stores/system-config-store'
-import { DEFAULT_SYSTEM_NAME, DEFAULT_LOGO } from '@/lib/constants'
-import { applyFaviconToDom } from '@/lib/dom-utils'
+import {
+  DEFAULT_SYSTEM_NAME,
+  DEFAULT_LOGO,
+  DEFAULT_META_DESCRIPTION,
+} from '@/lib/constants'
+import {
+  applyBrandColorToDom,
+  applyDocumentBrandingToDom,
+} from '@/lib/dom-utils'
+import { useTheme } from '@/context/theme-provider'
 
 interface UseSystemConfigOptions {
   /** Automatically fetch config from backend (use only in root component) */
@@ -37,6 +45,12 @@ interface StatusApiResponse {
   data: {
     system_name?: string
     logo?: string
+    logo_light?: string
+    logo_dark?: string
+    favicon?: string
+    meta_title?: string
+    meta_description?: string
+    brand_color?: string
     footer_html?: string
     demo_site_enabled?: boolean
     display_token_stat_enabled?: boolean
@@ -56,6 +70,10 @@ function toNumber(value: unknown, fallback: number): number {
     if (!Number.isNaN(parsed)) return parsed
   }
   return fallback
+}
+
+function toOptionalString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined
 }
 
 /**
@@ -94,6 +112,12 @@ export function mapStatusDataToConfig(
   return {
     systemName: data.system_name || DEFAULT_SYSTEM_NAME,
     logo: data.logo || DEFAULT_LOGO,
+    logoLight: toOptionalString(data.logo_light),
+    logoDark: toOptionalString(data.logo_dark),
+    favicon: toOptionalString(data.favicon),
+    metaTitle: toOptionalString(data.meta_title),
+    metaDescription: toOptionalString(data.meta_description),
+    brandColor: toOptionalString(data.brand_color),
     footerHtml: data.footer_html,
     demoSiteEnabled: data.demo_site_enabled,
     displayTokenStatEnabled: data.display_token_stat_enabled,
@@ -142,6 +166,7 @@ function preloadImage(
  */
 export function useSystemConfig(options: UseSystemConfigOptions = {}) {
   const { autoLoad = false } = options
+  const { resolvedTheme } = useTheme()
   const {
     config,
     loading,
@@ -169,10 +194,28 @@ export function useSystemConfig(options: UseSystemConfigOptions = {}) {
     if (autoLoad) loadConfig()
   }, [autoLoad, loadConfig])
 
+  const logo =
+    resolvedTheme === 'dark'
+      ? config.logoDark || config.logo
+      : config.logoLight || config.logo
+  const favicon = config.favicon || logo
+  const title = config.metaTitle || config.systemName
+
+  useEffect(() => {
+    applyDocumentBrandingToDom({
+      title,
+      description: config.metaDescription || DEFAULT_META_DESCRIPTION,
+      favicon,
+      themeColor: config.brandColor,
+    })
+  }, [config.brandColor, config.metaDescription, favicon, title])
+
+  useEffect(() => {
+    applyBrandColorToDom(config.brandColor)
+  }, [config.brandColor])
+
   // Preload logo image when URL changes
   useEffect(() => {
-    const { logo } = config
-
     // Skip if logo is already loaded
     if (!logo || logo === loadedLogoUrl) return
 
@@ -181,7 +224,6 @@ export function useSystemConfig(options: UseSystemConfigOptions = {}) {
       logo,
       () => {
         setLoadedLogoUrl(logo)
-        applyFaviconToDom(logo)
       },
       () => {
         if (logo !== DEFAULT_LOGO) {
@@ -192,12 +234,13 @@ export function useSystemConfig(options: UseSystemConfigOptions = {}) {
         setLoadedLogoUrl(logo)
       }
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config.logo, loadedLogoUrl, setLoadedLogoUrl])
+  }, [logo, loadedLogoUrl, setLoadedLogoUrl])
 
   return {
     ...config,
+    logo,
+    favicon,
     loading,
-    logoLoaded: config.logo === loadedLogoUrl && !!loadedLogoUrl,
+    logoLoaded: logo === loadedLogoUrl && !!loadedLogoUrl,
   }
 }

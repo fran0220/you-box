@@ -60,7 +60,7 @@ export const CHAT_COMPLETION_PARAMS: DocsParamRow[] = [
   {
     field: 'route',
     type: 'string',
-    description: 'YouBox routing strategy: cost, latency, or quality.',
+    description: '{{brandName}} routing strategy: cost, latency, or quality.',
   },
   {
     field: 'fallbacks',

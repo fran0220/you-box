@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { SectionPageLayout } from '@/components/layout'
@@ -13,7 +14,9 @@ function formatTime(ts: number) {
 
 export function AgentDevices() {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
   const queryClient = useQueryClient()
+  const agentName = t('{{brandName}} Agent', { brandName: systemName })
   const failedToLoadDevicesMessage = t('Failed to load devices')
   const { data, isLoading, error } = useQuery({
     queryKey: ['agent-devices', failedToLoadDevicesMessage],
@@ -36,10 +39,11 @@ export function AgentDevices() {
       <SectionPageLayout.Content>
         <div className='mx-auto w-full max-w-[960px] space-y-5'>
           <PageHeader
-            eyebrow={t('YouBox Agent')}
+            eyebrow={agentName}
             title={t('Connected devices')}
             subtitle={t(
-              'Manage desktop devices authorized to use your YouBox account.'
+              'Manage desktop devices authorized to use your {{brandName}} account.',
+              { brandName: systemName }
             )}
           />
           {isLoading && (

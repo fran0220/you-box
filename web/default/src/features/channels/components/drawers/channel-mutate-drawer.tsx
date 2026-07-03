@@ -53,6 +53,7 @@ import { toast } from 'sonner'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { useHiddenClickUnlock } from '@/hooks/use-hidden-click-unlock'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -257,6 +258,7 @@ export function ChannelMutateDrawer({
   currentRow,
 }: ChannelMutateDrawerProps) {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
   const queryClient = useQueryClient()
   const { setOpen } = useChannels()
   const [fetchModelsDialogOpen, setFetchModelsDialogOpen] = useState(false)
@@ -611,7 +613,8 @@ export function ChannelMutateDrawer({
     const timer = setTimeout(() => {
       toast.warning(
         t(
-          'Warning: Base URL should not end with /v1. BoxAI will handle it automatically. This may cause request failures.'
+          'Warning: Base URL should not end with /v1. {{brandName}} will handle it automatically. This may cause request failures.',
+          { brandName: systemName }
         ),
         { duration: 5000 }
       )
@@ -1236,7 +1239,9 @@ export function ChannelMutateDrawer({
     renderVertexJsonFileUpload,
   })
   if (!TYPES_WITHOUT_GENERIC_BASE_URL.has(currentType)) {
-    apiAccessFields.push(genericBaseUrlField(t, FIELD_PLACEHOLDERS.BASE_URL))
+    apiAccessFields.push(
+      genericBaseUrlField(t, FIELD_PLACEHOLDERS.BASE_URL, systemName)
+    )
   }
 
   const headerTitle = (
@@ -1379,7 +1384,9 @@ export function ChannelMutateDrawer({
                   {CHANNEL_TYPE_WARNINGS[currentType] && (
                     <Alert>
                       <AlertDescription>
-                        {t(CHANNEL_TYPE_WARNINGS[currentType])}
+                        {t(CHANNEL_TYPE_WARNINGS[currentType], {
+                          brandName: systemName,
+                        })}
                       </AlertDescription>
                     </Alert>
                   )}
@@ -1478,7 +1485,9 @@ export function ChannelMutateDrawer({
                               'Enter one key per line for batch creation'
                             )
                           }
-                          return t(getKeyPromptForType(currentType))
+                          return t(getKeyPromptForType(currentType), {
+                            brandName: systemName,
+                          })
                         })()
                         return (
                           <FormItem>

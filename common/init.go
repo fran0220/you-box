@@ -22,7 +22,7 @@ var (
 )
 
 func printHelp() {
-	fmt.Println("BoxAI " + Version + " - Unified AI API gateway and admin dashboard.")
+	fmt.Println(SystemName + " " + Version + " - Unified AI API gateway and admin dashboard.")
 	fmt.Println("Usage: newapi [--port <port>] [--log-dir <log directory>] [--version] [--help]")
 }
 

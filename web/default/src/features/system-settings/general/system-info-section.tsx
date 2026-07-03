@@ -48,7 +48,13 @@ import { useUpdateOption } from '../hooks/use-update-option'
 const _systemInfoSchema = z.object({
   SystemName: z.string().min(1),
   ServerAddress: z.string().optional(),
-  Logo: z.string().url().optional().or(z.literal('')),
+  Logo: z.string().optional(),
+  LogoLight: z.string().optional(),
+  LogoDark: z.string().optional(),
+  Favicon: z.string().optional(),
+  MetaTitle: z.string().optional(),
+  MetaDescription: z.string().optional(),
+  BrandColor: z.string().optional(),
   Footer: z.string().optional(),
   About: z.string().optional(),
   HomePageContent: z.string().optional(),
@@ -69,29 +75,82 @@ function normalizeValue(value: unknown): string {
   return typeof value === 'string' ? value : String(value)
 }
 
-export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
+function isOptionalAssetPath(value: string): boolean {
+  const trimmed = value.trim()
+  if (!trimmed) return true
+  if (trimmed.startsWith('/') && !trimmed.startsWith('//')) return true
+  try {
+    const parsed = new URL(trimmed)
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+  } catch {
+    return false
+  }
+}
+
+function isOptionalHexColor(value: string): boolean {
+  const trimmed = value.trim()
+  return !trimmed || /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(trimmed)
+}
+
+const trimBeforeSaveKeys = new Set([
+  'Logo',
+  'LogoLight',
+  'LogoDark',
+  'Favicon',
+  'MetaTitle',
+  'MetaDescription',
+  'BrandColor',
+])
+
+export function SystemInfoSection(props: SystemInfoSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
 
   const normalizedDefaults: SystemInfoFormValues = {
-    SystemName: normalizeValue(defaultValues.SystemName),
-    ServerAddress: normalizeValue(defaultValues.ServerAddress),
-    Logo: normalizeValue(defaultValues.Logo),
-    Footer: normalizeValue(defaultValues.Footer),
-    About: normalizeValue(defaultValues.About),
-    HomePageContent: normalizeValue(defaultValues.HomePageContent),
+    SystemName: normalizeValue(props.defaultValues.SystemName),
+    ServerAddress: normalizeValue(props.defaultValues.ServerAddress),
+    Logo: normalizeValue(props.defaultValues.Logo),
+    LogoLight: normalizeValue(props.defaultValues.LogoLight),
+    LogoDark: normalizeValue(props.defaultValues.LogoDark),
+    Favicon: normalizeValue(props.defaultValues.Favicon),
+    MetaTitle: normalizeValue(props.defaultValues.MetaTitle),
+    MetaDescription: normalizeValue(props.defaultValues.MetaDescription),
+    BrandColor: normalizeValue(props.defaultValues.BrandColor),
+    Footer: normalizeValue(props.defaultValues.Footer),
+    About: normalizeValue(props.defaultValues.About),
+    HomePageContent: normalizeValue(props.defaultValues.HomePageContent),
     legal: {
-      user_agreement: normalizeValue(defaultValues.legal?.user_agreement),
-      privacy_policy: normalizeValue(defaultValues.legal?.privacy_policy),
+      user_agreement: normalizeValue(props.defaultValues.legal?.user_agreement),
+      privacy_policy: normalizeValue(props.defaultValues.legal?.privacy_policy),
     },
   }
+
+  const assetPathSchema = z.string().superRefine((value, ctx) => {
+    if (isOptionalAssetPath(value)) return
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: t('Enter a valid URL or root-relative path'),
+    })
+  })
 
   const systemInfoSchemaWithI18n = z.object({
     SystemName: z.string().min(1, {
       error: () => t('System name is required'),
     }),
     ServerAddress: z.string().optional(),
-    Logo: z.string().url().optional().or(z.literal('')),
+    Logo: assetPathSchema,
+    LogoLight: assetPathSchema,
+    LogoDark: assetPathSchema,
+    Favicon: assetPathSchema,
+    MetaTitle: z.string().optional(),
+    MetaDescription: z.string().optional(),
+    BrandColor: z.string().superRefine((value, ctx) => {
+      if (isOptionalHexColor(value)) return
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: t('Enter a valid hex color, such as #0f172a'),
+      })
+    }),
     Footer: z.string().optional(),
     About: z.string().optional(),
     HomePageContent: z.string().optional(),
@@ -112,6 +171,9 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
       onSubmit: async (_data, changedFields) => {
         for (const [key, value] of Object.entries(changedFields)) {
           let v = normalizeValue(value)
+          if (trimBeforeSaveKeys.has(key)) {
+            v = v.trim()
+          }
           if (key === 'ServerAddress') {
             v = v.replace(/\/+$/, '')
           }
@@ -122,6 +184,8 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
         }
       },
     })
+  const currentSystemName =
+    form.watch('SystemName') || normalizedDefaults.SystemName
 
   return (
     <>
@@ -149,7 +213,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                       <FormControl>
                         <Input
                           className='w-60'
-                          placeholder={t('BoxAI')}
+                          placeholder={t('Your brand name')}
                           {...field}
                         />
                       </FormControl>
@@ -199,9 +263,144 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                   />
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name='LogoLight'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Logo light URL')}
+                    description={t(
+                      'Optional logo for light theme; falls back to Logo URL'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          placeholder='/brand/logo-light.svg'
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='LogoDark'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Logo dark URL')}
+                    description={t(
+                      'Optional logo for dark theme; falls back to Logo URL'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          placeholder='/brand/logo-dark.svg'
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='Favicon'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Favicon URL')}
+                    description={t('Browser tab icon. Falls back to Logo URL.')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          placeholder='/favicon.ico'
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='BrandColor'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Brand color')}
+                    description={t(
+                      'Hex color used for primary buttons, focus rings, and brand accents.'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-40'
+                          placeholder='#0f172a'
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
             </SettingRowGroup>
 
             <SettingsFormGrid>
+              <FormField
+                control={form.control}
+                name='MetaTitle'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('SEO title')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t(
+                          'Optional browser/metadata title. Falls back to System Name.'
+                        )}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        'Optional browser/metadata title. Falls back to System Name.'
+                      )}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='MetaDescription'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('SEO description')}</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder={t(
+                          'Optional description used for HTML meta tags and link previews.'
+                        )}
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        'Optional description used for HTML meta tags and link previews.'
+                      )}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name='Footer'
@@ -259,7 +458,9 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                       <FormLabel>{t('Home Page Content')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={t('Welcome to BoxAI...')}
+                          placeholder={t('Welcome to {{brandName}}...', {
+                            brandName: currentSystemName,
+                          })}
                           rows={6}
                           {...field}
                         />

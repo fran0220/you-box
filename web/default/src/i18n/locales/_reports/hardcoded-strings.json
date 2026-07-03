@@ -12,14 +12,8 @@
     "value": "Lab switch"
   },
   {
-    "file": "features/home/components/sections/hero-code-block.tsx",
-    "line": 49,
-    "type": "title-prop",
-    "value": "route.ts"
-  },
-  {
     "file": "features/home/components/sections/how-it-works.tsx",
-    "line": 115,
+    "line": 113,
     "type": "title-prop",
     "value": "quickstart.sh"
   },

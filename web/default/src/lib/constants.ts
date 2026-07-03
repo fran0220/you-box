@@ -21,7 +21,9 @@ For commercial licensing, please contact support@quantumnous.com
  */
 
 // System Configuration Defaults
-export const DEFAULT_SYSTEM_NAME = 'BoxAI'
+export const DEFAULT_SYSTEM_NAME = 'AI Gateway'
+export const DEFAULT_META_DESCRIPTION =
+  'Unified AI API gateway and admin dashboard.'
 export const DEFAULT_LOGO = '/logo.png'
 
 // LocalStorage Keys

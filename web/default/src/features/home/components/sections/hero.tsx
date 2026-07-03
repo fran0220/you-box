@@ -20,8 +20,9 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, CircleCheckBig } from 'lucide-react'
 import { m, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useStatus } from '@/hooks/use-status'
 import { cn } from '@/lib/utils'
+import { useStatus } from '@/hooks/use-status'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import { useHeroStatusPill } from '../../hooks/use-hero-status-pill'
 
@@ -33,6 +34,7 @@ interface HeroProps {
 export function Hero(props: HeroProps) {
   const { t } = useTranslation()
   const { status } = useStatus()
+  const { systemName } = useSystemConfig()
   const shouldReduce = useReducedMotion()
   const { scrollY } = useScroll()
   const glowY = useTransform(scrollY, [0, 600], [0, 120])
@@ -118,10 +120,7 @@ export function Hero(props: HeroProps) {
           className='font-display landing-animate-fade-up text-[clamp(2.75rem,7vw,4.875rem)] leading-[1.02] font-bold tracking-[-0.04em] opacity-0'
           style={{ animationDelay: '60ms' }}
         >
-          <Trans
-            i18nKey='Hero headline'
-            components={{ br: <br /> }}
-          />
+          <Trans i18nKey='Hero headline' components={{ br: <br /> }} />
         </h1>
 
         <p
@@ -129,7 +128,8 @@ export function Hero(props: HeroProps) {
           style={{ animationDelay: '120ms' }}
         >
           {t(
-            'YouBox is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.'
+            '{{brandName}} is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.',
+            { brandName: systemName }
           )}
         </p>
 
@@ -166,7 +166,10 @@ export function Hero(props: HeroProps) {
           className='landing-animate-fade-up text-muted-foreground mt-5 flex items-center justify-center gap-2 text-[13px] opacity-0'
           style={{ animationDelay: '220ms' }}
         >
-          <CircleCheckBig className='text-success size-[15px]' aria-hidden='true' />
+          <CircleCheckBig
+            className='text-success size-[15px]'
+            aria-hidden='true'
+          />
           {t('Drop-in OpenAI, Claude, and Gemini APIs.')}
         </p>
       </div>

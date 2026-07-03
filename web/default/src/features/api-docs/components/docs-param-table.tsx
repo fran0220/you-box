@@ -23,6 +23,7 @@ import type { DocsErrorRow, DocsParamRow } from '../lib/docs-reference'
 
 type DocsParamTableProps = {
   rows: DocsParamRow[]
+  brandName?: string
   className?: string
 }
 
@@ -52,7 +53,7 @@ export function DocsParamTable(props: DocsParamTableProps) {
           </span>
           <span className='text-muted-foreground font-mono'>{row.type}</span>
           <span className='text-muted-foreground leading-relaxed'>
-            {t(row.description)}
+            {t(row.description, { brandName: props.brandName })}
           </span>
         </div>
       ))}

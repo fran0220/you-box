@@ -2,10 +2,11 @@ package common
 
 const (
 	defaultOpenRouterReferer = "https://api.you-box.com"
-	defaultOpenRouterTitle   = "BoxAI"
+	defaultOpenRouterTitle   = "AI Gateway"
+	DefaultMetaDescription   = "Unified AI API gateway and admin dashboard."
 )
 
-var SystemName = "BoxAI"
+var SystemName = "AI Gateway"
 
 func OpenRouterReferer() string {
 	return defaultOpenRouterReferer

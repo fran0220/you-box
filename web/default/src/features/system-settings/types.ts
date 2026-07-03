@@ -60,6 +60,12 @@ export type SiteSettings = {
   Notice: string
   SystemName: string
   Logo: string
+  LogoLight: string
+  LogoDark: string
+  Favicon: string
+  MetaTitle: string
+  MetaDescription: string
+  BrandColor: string
   Footer: string
   About: string
   HomePageContent: string

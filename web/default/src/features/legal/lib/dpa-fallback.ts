@@ -16,14 +16,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-export const DPA_FALLBACK_MARKDOWN = `## Overview
+export function getDpaFallbackMarkdown(brandName: string) {
+  const safeBrandName = brandName.replace(/[\\`*_[\]{}()#+.!|-]/g, '\\$&')
+  return `## Overview
 
-This Data Processing Agreement ("DPA") describes how YouBox processes personal data on behalf of customers when they use the API gateway and console.
+This Data Processing Agreement ("DPA") describes how ${safeBrandName} processes personal data on behalf of customers when they use the API gateway and console.
 
 ## Roles
 
 - **Customer** is the data controller for end-user content sent through the API.
-- **YouBox** acts as a data processor, routing requests to upstream model providers under the customer's instructions.
+- **${safeBrandName}** acts as a data processor, routing requests to upstream model providers under the customer's instructions.
 
 ## Processing scope
 
@@ -36,3 +38,4 @@ We apply access controls, encryption in transit, and retention limits aligned wi
 ## Contact
 
 For a signed enterprise DPA, contact your account administrator or support.`
+}

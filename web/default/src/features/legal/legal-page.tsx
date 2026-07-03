@@ -18,13 +18,13 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { useStatus } from '@/hooks/use-status'
 import { cn } from '@/lib/utils'
-
+import { useStatus } from '@/hooks/use-status'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Markdown } from '@/components/ui/markdown'
-import { LegalDocumentBody } from './legal-document-body'
 import { getPrivacyPolicy, getUserAgreement } from './api'
-import { DPA_FALLBACK_MARKDOWN } from './lib/dpa-fallback'
+import { LegalDocumentBody } from './legal-document-body'
+import { getDpaFallbackMarkdown } from './lib/dpa-fallback'
 
 export type LegalDocId = 'privacy' | 'terms' | 'dpa'
 
@@ -60,6 +60,7 @@ const DOC_META: Record<
 export function LegalPage(props: LegalPageProps) {
   const { t } = useTranslation()
   const { status } = useStatus()
+  const { systemName } = useSystemConfig()
   const privacyEnabled = status?.privacy_policy_enabled ?? false
   const termsEnabled = status?.user_agreement_enabled ?? false
 
@@ -84,7 +85,7 @@ export function LegalPage(props: LegalPageProps) {
           {activeMeta ? t(activeMeta.titleKey) : t('Data Processing Agreement')}
         </h1>
         <div className='bg-surface-inset border-border inline-flex rounded-full border p-1'>
-          {visibleTabs.map((tab) =>
+          {visibleTabs.map((tab) => (
             <Link
               key={tab.id}
               to='/legal/$doc'
@@ -98,18 +99,23 @@ export function LegalPage(props: LegalPageProps) {
             >
               {tab.label}
             </Link>
-          )}
+          ))}
         </div>
       </div>
 
       <p className='text-muted-foreground font-mono text-xs'>
-        {t('Last updated from administrator configuration · effective when published')}
+        {t(
+          'Last updated from administrator configuration · effective when published'
+        )}
       </p>
 
       {props.doc === 'dpa' ? (
         <div className='bg-card border-border rounded-lg border px-6 py-8 md:px-10 md:py-10'>
-          <Markdown withHeadingIds className='prose-neutral dark:prose-invert max-w-none font-sans'>
-            {DPA_FALLBACK_MARKDOWN}
+          <Markdown
+            withHeadingIds
+            className='prose-neutral dark:prose-invert max-w-none font-sans'
+          >
+            {getDpaFallbackMarkdown(systemName)}
           </Markdown>
         </div>
       ) : activeMeta ? (

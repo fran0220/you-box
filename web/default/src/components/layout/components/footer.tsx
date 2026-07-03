@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { Fragment, useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { DEFAULT_LOGO, DEFAULT_SYSTEM_NAME } from '@/lib/constants'
 import { sanitizeHtml } from '@/lib/sanitize'
 import { cn } from '@/lib/utils'
 import { useStatus } from '@/hooks/use-status'
@@ -117,12 +118,15 @@ function LegalLinks(props: { leadingSeparator?: boolean }) {
 
 // inline=true returns just the inner span for composition in a parent flex
 // row. inline=false wraps in a centered/right-aligned div (default).
-function ProjectAttribution(props: { currentYear: number; inline?: boolean }) {
-  const { t } = useTranslation()
+function ProjectAttribution(props: {
+  currentYear: number
+  name: string
+  inline?: boolean
+}) {
   const content = (
     <span className='text-muted-foreground/45'>
       &copy; {props.currentYear}{' '}
-      <span className='text-foreground/70 font-medium'>{t('BoxAI')}</span>
+      <span className='text-foreground/70 font-medium'>{props.name}</span>
     </span>
   )
   if (props.inline) {
@@ -139,8 +143,8 @@ export function Footer(props: FooterProps) {
   const { t } = useTranslation()
   const { systemName, logo: systemLogo, footerHtml } = useSystemConfig()
 
-  const displayLogo = systemLogo || props.logo || '/logo.png'
-  const displayName = systemName || props.name || 'BoxAI'
+  const displayLogo = systemLogo || props.logo || DEFAULT_LOGO
+  const displayName = systemName || props.name || DEFAULT_SYSTEM_NAME
   const currentYear = new Date().getFullYear()
 
   const fallbackColumns = useMemo<FooterColumnProps[]>(
@@ -190,7 +194,11 @@ export function Footer(props: FooterProps) {
             />
             <div className='border-border/60 text-muted-foreground/45 flex w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t pt-4 text-xs sm:w-auto sm:justify-end sm:border-t-0 sm:border-l sm:pt-0 sm:pl-5'>
               <LegalLinks />
-              <ProjectAttribution currentYear={currentYear} inline />
+              <ProjectAttribution
+                currentYear={currentYear}
+                name={displayName}
+                inline
+              />
             </div>
           </div>
         </div>
@@ -252,7 +260,7 @@ export function Footer(props: FooterProps) {
             </span>
             <LegalLinks leadingSeparator />
           </div>
-          <ProjectAttribution currentYear={currentYear} />
+          <ProjectAttribution currentYear={currentYear} name={displayName} />
         </div>
       </div>
     </footer>

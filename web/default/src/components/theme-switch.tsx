@@ -36,10 +36,13 @@ export function ThemeSwitch() {
 
   /* Sync theme-color meta with the ink canvas token (--background), not legacy azure-tinted values. */
   useEffect(() => {
-    const canvas = getComputedStyle(document.documentElement)
-      .getPropertyValue('--background')
+    const rootStyle = getComputedStyle(document.documentElement)
+    const configuredThemeColor = rootStyle
+      .getPropertyValue('--meta-theme-color')
       .trim()
+    const canvas = rootStyle.getPropertyValue('--background').trim()
     const themeColor =
+      configuredThemeColor ||
       canvas ||
       (resolvedTheme === 'dark' ? 'rgb(11, 11, 15)' : 'rgb(249, 249, 248)')
     const metaThemeColor = document.querySelector("meta[name='theme-color']")

@@ -21,32 +21,25 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2, Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { api } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
-import { useScrollSpy } from '@/hooks/use-scroll-spy'
+import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { useScrollSpy } from '@/hooks/use-scroll-spy'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { CodeBlock, PageHeader } from '@/components/youbox'
-import { DocsLayout } from './components/docs-layout'
-import {
-  DocsErrorTable,
-  DocsParamTable,
-} from './components/docs-param-table'
 import { getUserModels } from '@/features/playground/api'
+import { DocsLayout } from './components/docs-layout'
+import { DocsErrorTable, DocsParamTable } from './components/docs-param-table'
 import {
   buildCurl,
   buildJs,
@@ -113,6 +106,7 @@ function DocsSectionHeading(props: { children: React.ReactNode }) {
 
 export function ApiDocs() {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
   const user = useAuthStore((s) => s.auth.user)
   const base =
     typeof window !== 'undefined' ? window.location.origin : 'https://your-host'
@@ -205,7 +199,8 @@ export function ApiDocs() {
                 eyebrow='API'
                 title={t('Quickstart')}
                 subtitle={t(
-                  'YouBox exposes a single OpenAI-compatible endpoint that routes to 300+ models. If you already use the OpenAI SDK, change the base URL, add your key, and pass a provider-prefixed model slug.'
+                  '{{brandName}} exposes a single OpenAI-compatible endpoint that routes to 300+ models. If you already use the OpenAI SDK, change the base URL, add your key, and pass a provider-prefixed model slug.',
+                  { brandName: systemName }
                 )}
               />
             </section>
@@ -231,7 +226,9 @@ export function ApiDocs() {
             <section id='base-url' className='scroll-mt-24 space-y-3'>
               <DocsSectionHeading>{t('Base URL')}</DocsSectionHeading>
               <p className='text-muted-foreground text-[15px] leading-relaxed'>
-                {t('All requests go to one host. Point any OpenAI-compatible client at it:')}
+                {t(
+                  'All requests go to one host. Point any OpenAI-compatible client at it:'
+                )}
               </p>
               <CodeBlock
                 code={`${base}/v1`}
@@ -258,7 +255,11 @@ export function ApiDocs() {
                   <CodeBlock code={curl} language='bash' langLabel='bash' />
                 </TabsContent>
                 <TabsContent value='python' className='min-w-0'>
-                  <CodeBlock code={python} language='python' langLabel='python' />
+                  <CodeBlock
+                    code={python}
+                    language='python'
+                    langLabel='python'
+                  />
                 </TabsContent>
                 <TabsContent value='js' className='min-w-0'>
                   <CodeBlock
@@ -274,10 +275,14 @@ export function ApiDocs() {
               <DocsSectionHeading>{t('Request parameters')}</DocsSectionHeading>
               <p className='text-muted-foreground text-[15px] leading-relaxed'>
                 {t(
-                  'The body follows the OpenAI Chat Completions schema, with a few YouBox extensions for routing.'
+                  'The body follows the OpenAI Chat Completions schema, with a few {{brandName}} extensions for routing.',
+                  { brandName: systemName }
                 )}
               </p>
-              <DocsParamTable rows={CHAT_COMPLETION_PARAMS} />
+              <DocsParamTable
+                rows={CHAT_COMPLETION_PARAMS}
+                brandName={systemName}
+              />
             </section>
 
             <section id='response' className='scroll-mt-24 space-y-3'>
@@ -318,7 +323,9 @@ export function ApiDocs() {
                   </div>
 
                   <div className='flex flex-col gap-1.5'>
-                    <Label htmlFor='api-docs-system'>{t('System prompt')}</Label>
+                    <Label htmlFor='api-docs-system'>
+                      {t('System prompt')}
+                    </Label>
                     <Textarea
                       id='api-docs-system'
                       value={state.systemPrompt}
@@ -335,7 +342,9 @@ export function ApiDocs() {
                     <Textarea
                       id='api-docs-user'
                       value={state.userMessage}
-                      onChange={(event) => set('userMessage', event.target.value)}
+                      onChange={(event) =>
+                        set('userMessage', event.target.value)
+                      }
                       rows={3}
                     />
                   </div>
@@ -370,7 +379,9 @@ export function ApiDocs() {
                   </div>
 
                   <div className='flex items-center justify-between gap-4'>
-                    <Label htmlFor='api-docs-stream'>{t('Stream response')}</Label>
+                    <Label htmlFor='api-docs-stream'>
+                      {t('Stream response')}
+                    </Label>
                     <Switch
                       id='api-docs-stream'
                       checked={state.stream}

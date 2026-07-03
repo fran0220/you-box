@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
@@ -63,6 +64,7 @@ export function EmailSettingsSection({
   defaultValues,
 }: EmailSettingsSectionProps) {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
   const updateOption = useUpdateOption()
   const emailSchema = createEmailSchema(t)
 
@@ -113,163 +115,175 @@ export function EmailSettingsSection({
               saveLabel='Save SMTP settings'
             />
             <FormDirtyIndicator isDirty={isDirty} />
-          <SettingRowGroup>
-            <FormField
-              control={form.control}
-              name='SMTPServer'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('SMTP Host')}
-                  description={t('Hostname or IP of your SMTP provider')}
-                  control={
-                    <FormControl>
-                      <Input
-                        className='w-72 max-w-full'
-                        autoComplete='off'
-                        placeholder={t('smtp.example.com')}
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
+            <SettingRowGroup>
+              <FormField
+                control={form.control}
+                name='SMTPServer'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('SMTP Host')}
+                    description={t('Hostname or IP of your SMTP provider')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          autoComplete='off'
+                          placeholder={t('smtp.example.com')}
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='SMTPPort'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Port')}
-                  description={t('Common ports include 25, 465, and 587')}
-                  control={
-                    <FormControl>
-                      <Input
-                        className='w-32'
-                        autoComplete='off'
-                        type='number'
-                        placeholder='587'
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='SMTPPort'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Port')}
+                    description={t('Common ports include 25, 465, and 587')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-32'
+                          autoComplete='off'
+                          type='number'
+                          placeholder='587'
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='SMTPSSLEnabled'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Enable SSL/TLS')}
-                  description={t('Use secure connection when sending emails')}
-                  control={
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='SMTPSSLEnabled'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Enable SSL/TLS')}
+                    description={t('Use secure connection when sending emails')}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='SMTPForceAuthLogin'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Force AUTH LOGIN')}
-                  description={t(
-                    'Force SMTP authentication using AUTH LOGIN method'
-                  )}
-                  control={
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='SMTPForceAuthLogin'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Force AUTH LOGIN')}
+                    description={t(
+                      'Force SMTP authentication using AUTH LOGIN method'
+                    )}
+                    control={
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='SMTPAccount'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Username')}
-                  description={t(
-                    'Account used when authenticating with the SMTP server'
-                  )}
-                  control={
-                    <FormControl>
-                      <Input
-                        className='w-72 max-w-full'
-                        autoComplete='off'
-                        placeholder={t('noreply@example.com')}
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='SMTPAccount'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Username')}
+                    description={t(
+                      'Account used when authenticating with the SMTP server'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          autoComplete='off'
+                          placeholder={t('noreply@example.com')}
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='SMTPFrom'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('From Address')}
-                  description={t(
-                    'Display name and email used in outgoing messages'
-                  )}
-                  control={
-                    <FormControl>
-                      <Input
-                        className='w-72 max-w-full'
-                        autoComplete='off'
-                        placeholder={t('BoxAI <noreply@example.com>')}
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='SMTPFrom'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('From Address')}
+                    description={t(
+                      'Display name and email used in outgoing messages'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          autoComplete='off'
+                          placeholder={`${systemName} <noreply@example.com>`}
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='SMTPToken'
-              render={({ field }) => (
-                <SettingRowFormItem
-                  label={t('Password / Access Token')}
-                  description={t('Leave blank to keep the existing credential')}
-                  control={
-                    <FormControl>
-                      <Input
-                        className='w-72 max-w-full'
-                        autoComplete='off'
-                        type='password'
-                        placeholder={t('Enter new token to update')}
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                  }
-                />
-              )}
-            />
-          </SettingRowGroup>
+              <FormField
+                control={form.control}
+                name='SMTPToken'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Password / Access Token')}
+                    description={t(
+                      'Leave blank to keep the existing credential'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-72 max-w-full'
+                          autoComplete='off'
+                          type='password'
+                          placeholder={t('Enter new token to update')}
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+            </SettingRowGroup>
           </SettingsForm>
         </Form>
       </SettingsSection>

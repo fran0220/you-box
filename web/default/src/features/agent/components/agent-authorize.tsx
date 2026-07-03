@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -17,6 +18,7 @@ const CLIENT_ID = 'youbox-agent'
 
 export function AgentAuthorize() {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
   const search = useSearch({ from: '/_authenticated/agent/authorize' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,6 +29,7 @@ export function AgentAuthorize() {
   const clientId = search.client_id?.trim() || CLIENT_ID
   const codeChallenge = search.code_challenge?.trim() || ''
   const codeChallengeMethod = search.code_challenge_method?.trim() || 'S256'
+  const agentName = t('{{brandName}} Agent', { brandName: systemName })
 
   const canAuthorize = useMemo(() => {
     if (clientId !== CLIENT_ID) return false
@@ -66,17 +69,21 @@ export function AgentAuthorize() {
       <SectionPageLayout.Content>
         <div className='mx-auto w-full max-w-[640px] space-y-5'>
           <PageHeader
-            eyebrow={t('YouBox Agent')}
+            eyebrow={agentName}
             title={t('Authorize desktop app')}
             subtitle={t(
-              'Allow YouBox Agent to access your account on this device.'
+              'Allow {{agentName}} to access your account on this device.',
+              {
+                agentName,
+              }
             )}
           />
           <Card>
             <CardHeader>
               <CardTitle>{t('Device authorization')}</CardTitle>
               <CardDescription>
-                {t('You are signing in to YouBox Agent on {{device}}.', {
+                {t('You are signing in to {{agentName}} on {{device}}.', {
+                  agentName,
                   device: deviceLabel,
                 })}
               </CardDescription>

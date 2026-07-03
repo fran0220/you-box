@@ -92,6 +92,12 @@ export interface SystemStatus {
     version?: string
     system_name?: string
     logo?: string
+    logo_light?: string
+    logo_dark?: string
+    favicon?: string
+    meta_title?: string
+    meta_description?: string
+    brand_color?: string
     github_oauth?: boolean
     github_client_id?: string
     discord_oauth?: boolean
@@ -136,6 +142,12 @@ export interface SystemStatus {
   version?: string
   system_name?: string
   logo?: string
+  logo_light?: string
+  logo_dark?: string
+  favicon?: string
+  meta_title?: string
+  meta_description?: string
+  brand_color?: string
   github_oauth?: boolean
   github_client_id?: string
   discord_oauth?: boolean

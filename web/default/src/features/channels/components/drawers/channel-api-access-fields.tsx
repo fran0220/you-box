@@ -395,7 +395,8 @@ export const TYPES_WITHOUT_GENERIC_BASE_URL = new Set([3, 8, 22, 36, 45])
  */
 export function genericBaseUrlField(
   t: TFunction,
-  placeholderKey: string
+  placeholderKey: string,
+  brandName: string
 ): ApiAccessFieldDescriptor {
   return {
     kind: 'input',
@@ -403,7 +404,8 @@ export function genericBaseUrlField(
     label: t('Base URL'),
     placeholder: t(placeholderKey),
     description: t(
-      'Custom API base URL. For official channels, BoxAI has built-in addresses. Only fill this for third-party proxy sites or special endpoints. Do not add /v1 or trailing slash.'
+      'Custom API base URL. For official channels, {{brandName}} has built-in addresses. Only fill this for third-party proxy sites or special endpoints. Do not add /v1 or trailing slash.',
+      { brandName }
     ),
   }
 }

@@ -40,6 +40,12 @@ export interface CurrencyConfig {
 export interface SystemConfig {
   systemName: string
   logo: string
+  logoLight?: string
+  logoDark?: string
+  favicon?: string
+  metaTitle?: string
+  metaDescription?: string
+  brandColor?: string
   footerHtml?: string
   demoSiteEnabled?: boolean
   displayTokenStatEnabled?: boolean

@@ -51,7 +51,7 @@ func main() {
 		return
 	}
 
-	common.SysLog("BoxAI " + common.Version + " started")
+	common.SysLog(common.SystemName + " " + common.Version + " started")
 	if os.Getenv("GIN_MODE") != "debug" {
 		gin.SetMode(gin.ReleaseMode)
 	}

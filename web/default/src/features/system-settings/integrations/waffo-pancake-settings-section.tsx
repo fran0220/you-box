@@ -20,6 +20,7 @@ import * as React from 'react'
 import type { SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -64,9 +65,15 @@ interface Props {
 }
 
 const PANCAKE_DASHBOARD_URL = 'https://pancake.waffo.ai/merchant/dashboard'
-const DEFAULT_NEW_STORE_NAME = 'boxai-store'
-const DEFAULT_NEW_PRODUCT_NAME = 'boxai-charge-product'
-const DEFAULT_NEW_PAIR_NAME = `${DEFAULT_NEW_STORE_NAME} + ${DEFAULT_NEW_PRODUCT_NAME}`
+function toBrandSlug(value: string): string {
+  return (
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'gateway'
+  )
+}
 
 export function WaffoPancakeSettingsSection({
   defaultValues,
@@ -77,6 +84,10 @@ export function WaffoPancakeSettingsSection({
   onSelectedBindingChange,
 }: Props) {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
+  const defaultNewPairName = `${toBrandSlug(systemName)}-store + ${toBrandSlug(
+    systemName
+  )}-charge-product`
 
   const [phase, setPhase] = React.useState<'idle' | 'verifying'>('idle')
   const [catalog, setCatalog] = React.useState<CatalogStore[]>([])
@@ -479,12 +490,14 @@ export function WaffoPancakeSettingsSection({
             <ul className='list-inside list-disc space-y-1'>
               <li>
                 {t(
-                  'The bound Store is the parent container for every Pancake product new-api creates from this admin — both the wallet top-up product and any subscription-plan products. One store is enough; pin a different one only if you genuinely run separate Pancake catalogs.'
+                  'The bound Store is the parent container for every Pancake product {{brandName}} creates from this admin — both the wallet top-up product and any subscription-plan products. One store is enough; pin a different one only if you genuinely run separate Pancake catalogs.',
+                  { brandName: systemName }
                 )}
               </li>
               <li>
                 {t(
-                  'The bound Product powers wallet top-ups: when a user enters any amount, new-api runs the checkout against this single Pancake product and overrides the price per session — no need to pre-create $1 / $5 / $10 SKUs.'
+                  'The bound Product powers wallet top-ups: when a user enters any amount, {{brandName}} runs the checkout against this single Pancake product and overrides the price per session — no need to pre-create $1 / $5 / $10 SKUs.',
+                  { brandName: systemName }
                 )}
               </li>
               <li>
@@ -516,7 +529,7 @@ export function WaffoPancakeSettingsSection({
               >
                 {creatingPair
                   ? t('Creating...')
-                  : `+ ${t('Create')} ${DEFAULT_NEW_PAIR_NAME}`}
+                  : `+ ${t('Create')} ${defaultNewPairName}`}
               </Button>
             </div>
             <p className='text-muted-foreground text-xs'>

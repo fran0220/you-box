@@ -505,7 +505,7 @@ export const STATIC_I18N_KEYS = [
   // Home hero (design-system gap closure)
   'Hero headline',
   'One API · 300+ models',
-  'YouBox is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.',
+  '{{brandName}} is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.',
   'Get your API key',
   'Read the docs',
   'Drop-in OpenAI, Claude, and Gemini APIs.',
@@ -528,12 +528,29 @@ export const STATIC_I18N_KEYS = [
   'Type',
   'Meaning',
   'Code',
+  '{{brandName}} exposes a single OpenAI-compatible endpoint that routes to 300+ models. If you already use the OpenAI SDK, change the base URL, add your key, and pass a provider-prefixed model slug.',
+  'The body follows the OpenAI Chat Completions schema, with a few {{brandName}} extensions for routing.',
+  '{{brandName}} routing strategy: cost, latency, or quality.',
 
   // About fallback
-  'About YouBox',
+  'About {{brandName}}',
   "We're building the routing layer for every model.",
+  'The model landscape changes weekly. {{brandName}} exists so your code never has to. One integration, every provider, no lock-in — that is the whole idea.',
   'Principles',
   'What we optimize for',
+
+  // Runtime brand interpolation
+  '{{brandName}} Agent',
+  'Allow {{agentName}} to access your account on this device.',
+  'You are signing in to {{agentName}} on {{device}}.',
+  'Manage desktop devices authorized to use your {{brandName}} account.',
+  'Most used models on {{brandName}}',
+  'Custom API base URL. For official channels, {{brandName}} has built-in addresses. Only fill this for third-party proxy sites or special endpoints. Do not add /v1 or trailing slash.',
+  'Warning: Base URL should not end with /v1. {{brandName}} will handle it automatically. This may cause request failures.',
+  'Format: AccessKey|SecretKey (or just ApiKey if upstream is {{brandName}})',
+  'If connecting to upstream {{brandName}}-compatible relay projects, use OpenAI type instead unless you know what you are doing',
+  'e.g. {{brandName}} Console',
+  'Welcome to {{brandName}}...',
 
   // Misc
   'Cancel',

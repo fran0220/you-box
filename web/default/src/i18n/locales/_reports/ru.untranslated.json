@@ -1,8 +1,6 @@
 {
-  "BoxAI <noreply@example.com>": "BoxAI <noreply@example.com>",
   "example.com\nblocked-site.com": "example.com\nblocked-site.com",
   "example.com\ncompany.com": "example.com\ncompany.com",
   "example.com\\nblocked-site.com": "example.com\\nblocked-site.com",
-  "example.com\\ncompany.com": "example.com\\ncompany.com",
-  "YouBox Agent": "YouBox Agent"
+  "example.com\\ncompany.com": "example.com\\ncompany.com"
 }

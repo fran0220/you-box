@@ -6,10 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary Meta Tags -->
-    <title>BoxAI</title>
-    <meta name="title" content="BoxAI" />
+    <title>AI Gateway</title>
+    <meta name="title" content="AI Gateway" />
     <meta
       name="description"
+      content="Unified AI API gateway and admin dashboard."
+    />
+    <meta property="og:title" content="AI Gateway" />
+    <meta
+      property="og:description"
+      content="Unified AI API gateway and admin dashboard."
+    />
+    <meta name="twitter:title" content="AI Gateway" />
+    <meta
+      name="twitter:description"
       content="Unified AI API gateway and admin dashboard."
     />
 
@@ -20,19 +30,19 @@
 
   <body>
     <script>
-      (function () {
-        var m = document.cookie.match(/(?:^|; )vite-ui-theme=([^;]*)/);
-        var t = m ? decodeURIComponent(m[1]) : 'dark';
-        var resolved = 'dark';
+      ;(function () {
+        var m = document.cookie.match(/(?:^|; )vite-ui-theme=([^;]*)/)
+        var t = m ? decodeURIComponent(m[1]) : 'dark'
+        var resolved = 'dark'
         if (t === 'light') {
-          resolved = 'light';
+          resolved = 'light'
         } else if (t === 'system') {
           resolved = window.matchMedia('(prefers-color-scheme: dark)').matches
             ? 'dark'
-            : 'light';
+            : 'light'
         }
-        document.documentElement.classList.add(resolved);
-      })();
+        document.documentElement.classList.add(resolved)
+      })()
     </script>
     <div id="root"></div>
   </body>
