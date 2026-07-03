@@ -5149,7 +5149,17 @@
     "Zero retention": "零数据保留",
     "Zhipu": "智谱",
     "Zhipu V4": "智谱 V4",
-    "Zoom": "缩放"
-  },
-  "Link to this section": "链接到此小节"
+    "Zoom": "缩放",
+    "Link to this section": "链接到此小节",
+    "Usage (last 30 days)": "用量(近 30 天)",
+    "View Usage": "查看用量",
+    "View Settings": "查看设置",
+    "Manage keys": "管理密钥",
+    "Used {{amount}} in total": "累计消耗 {{amount}}",
+    "Create your first API key": "创建你的第一个 API 密钥",
+    "Copy the key — it is shown only once": "复制密钥(仅显示一次)",
+    "Make your first request": "发起第一次调用",
+    "API endpoint": "API 端点",
+    "Create key": "创建密钥"
+  }
 }

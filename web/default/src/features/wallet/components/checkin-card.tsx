@@ -42,8 +42,8 @@ import {
 import { Dialog } from '@/components/dialog'
 import { Panel } from '@/components/patterns'
 import { Turnstile } from '@/components/turnstile'
-import { getCheckinStatus, performCheckin } from '../api'
-import type { CheckinRecord } from '../types'
+import { getCheckinStatus, performCheckin } from '@/features/profile/api'
+import type { CheckinRecord } from '@/features/profile/types'
 
 interface CheckinCalendarCardProps {
   checkinEnabled: boolean
@@ -64,8 +64,7 @@ export function CheckinCalendarCard({
   const [checkinLoading, setCheckinLoading] = useState(false)
   const [turnstileModalVisible, setTurnstileModalVisible] = useState(false)
   const [turnstileWidgetKey, setTurnstileWidgetKey] = useState(0)
-  const [initialLoaded, setInitialLoaded] = useState(false)
-  const [collapsed, setCollapsed] = useState<boolean>(false)
+  const [collapsed, setCollapsed] = useState<boolean>(true)
 
   const currentMonthStr = useMemo(() => {
     const y = currentMonth.getFullYear()
@@ -117,13 +116,6 @@ export function CheckinCalendarCard({
 
   const checkedToday = checkinData?.stats?.checked_in_today === true
   const todayAward = checkinRecordsMap[todayString]
-
-  // One-shot: once the first load completes, collapse the card if today's
-  // check-in is already done (render adjust; converges after a single pass)
-  if (!initialLoaded && !isLoading && checkinData) {
-    setCollapsed(checkedToday)
-    setInitialLoaded(true)
-  }
 
   const shouldTriggerTurnstile = useCallback(
     (message?: string) => {

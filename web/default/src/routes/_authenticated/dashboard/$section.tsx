@@ -20,13 +20,19 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 
 const DASHBOARD_DEFAULT_SECTION = 'overview'
-const DASHBOARD_SECTION_IDS = ['overview', 'models', 'users'] as const
+const DASHBOARD_SECTION_IDS = ['overview', 'users'] as const
 const Dashboard = createLazyRouteComponent(async () => ({
   default: (await import('@/features/dashboard')).Dashboard,
 }))
 
 export const Route = createFileRoute('/_authenticated/dashboard/$section')({
   beforeLoad: ({ params }) => {
+    if (params.section === 'models') {
+      throw redirect({
+        to: '/usage-logs/$section',
+        params: { section: 'common' },
+      })
+    }
     if (
       !(DASHBOARD_SECTION_IDS as readonly string[]).includes(params.section)
     ) {

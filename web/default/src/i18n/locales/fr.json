@@ -5149,7 +5149,17 @@
     "Zero retention": "Aucune rétention",
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
-  },
-  "Link to this section": "Lien vers cette section"
+    "Zoom": "Zoom",
+    "Link to this section": "Lien vers cette section",
+    "Usage (last 30 days)": "Utilisation (30 derniers jours)",
+    "View Usage": "Voir l'utilisation",
+    "View Settings": "Voir les paramètres",
+    "Manage keys": "Gérer les clés",
+    "Used {{amount}} in total": "{{amount}} utilisés au total",
+    "Create your first API key": "Créez votre première clé API",
+    "Copy the key — it is shown only once": "Copiez la clé — elle ne s'affiche qu'une seule fois",
+    "Make your first request": "Effectuez votre première requête",
+    "API endpoint": "Point de terminaison API",
+    "Create key": "Créer une clé"
+  }
 }

@@ -5149,7 +5149,17 @@
     "Zero retention": "Không lưu dữ liệu",
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
-  },
-  "Link to this section": "Liên kết đến phần này"
+    "Zoom": "Zoom",
+    "Link to this section": "Liên kết đến phần này",
+    "Usage (last 30 days)": "Mức sử dụng (30 ngày qua)",
+    "View Usage": "Xem mức sử dụng",
+    "View Settings": "Xem cài đặt",
+    "Manage keys": "Quản lý khóa",
+    "Used {{amount}} in total": "Đã dùng tổng cộng {{amount}}",
+    "Create your first API key": "Tạo khóa API đầu tiên của bạn",
+    "Copy the key — it is shown only once": "Sao chép khóa — chỉ hiển thị một lần",
+    "Make your first request": "Thực hiện yêu cầu đầu tiên",
+    "API endpoint": "Điểm cuối API",
+    "Create key": "Tạo khóa"
+  }
 }

@@ -5149,7 +5149,17 @@
     "Zero retention": "Без хранения данных",
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
-  },
-  "Link to this section": "Ссылка на этот раздел"
+    "Zoom": "Zoom",
+    "Link to this section": "Ссылка на этот раздел",
+    "Usage (last 30 days)": "Использование (за 30 дней)",
+    "View Usage": "Просмотр использования",
+    "View Settings": "Открыть настройки",
+    "Manage keys": "Управление ключами",
+    "Used {{amount}} in total": "Всего использовано {{amount}}",
+    "Create your first API key": "Создайте свой первый API-ключ",
+    "Copy the key — it is shown only once": "Скопируйте ключ — он показывается только один раз",
+    "Make your first request": "Выполните первый запрос",
+    "API endpoint": "Конечная точка API",
+    "Create key": "Создать ключ"
+  }
 }

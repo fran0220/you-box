@@ -38,6 +38,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { ModelGroupSelector } from '@/components/model-group-selector'
 import { getUserModels, getUserGroups, getModelPricingMap } from './api'
+import { ChatLinksMenu } from './components/chat-links-menu'
 import { CompareModelsSelector } from './components/compare-models-selector'
 import { PlaygroundChat } from './components/playground-chat'
 import { PlaygroundInput } from './components/playground-input'
@@ -381,6 +382,7 @@ export function Playground(props: PlaygroundProps) {
         }
         actions={
           <>
+            <ChatLinksMenu />
             <PresetsMenu
               config={config}
               parameterEnabled={parameterEnabled}
@@ -408,7 +410,6 @@ export function Playground(props: PlaygroundProps) {
             <Button
               variant='ghost'
               size='icon-sm'
-              className='lg:hidden'
               aria-label={t('Parameters')}
               title={t('Parameters')}
               onClick={() => setParametersSheetOpen(true)}
@@ -419,8 +420,8 @@ export function Playground(props: PlaygroundProps) {
         }
       />
 
-      {/* Body: conversation column + 320px parameter rail (rail collapses below lg) */}
-      <div className='grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_320px]'>
+      {/* Body: single conversation column; parameters live in the sheet */}
+      <div className='grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)]'>
         <div className='flex min-h-0 min-w-0 flex-col overflow-hidden'>
           {/* Full-width scroll container: scrolling works even over side whitespace */}
           <div className='flex flex-1 flex-col overflow-hidden'>
@@ -450,14 +451,9 @@ export function Playground(props: PlaygroundProps) {
             />
           </div>
         </div>
-
-        {/* Desktop parameter rail */}
-        <aside className='bg-surface-inset border-border hidden min-h-0 flex-col overflow-y-auto border-l lg:flex'>
-          {parametersPanel}
-        </aside>
       </div>
 
-      {/* Mobile (<lg) parameter sheet — same panel component as the rail */}
+      {/* Parameter sheet (all breakpoints) */}
       <Sheet open={parametersSheetOpen} onOpenChange={setParametersSheetOpen}>
         <SheetContent side='right' className='gap-0'>
           <SheetHeader className='border-b'>

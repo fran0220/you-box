@@ -29,11 +29,6 @@ const DASHBOARD_SECTIONS = [
     build: () => null,
   },
   {
-    id: 'models',
-    titleKey: 'Model Call Analytics',
-    build: () => null,
-  },
-  {
     id: 'users',
     titleKey: 'User Analytics',
     adminOnly: true,

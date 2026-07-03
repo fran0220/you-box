@@ -64,9 +64,11 @@ export function NavGroup({ title, items }: NavGroupProps) {
 
   return (
     <SidebarGroup className='px-2.5 py-1'>
-      <SidebarGroupLabel className='mt-5 mb-1.5 first:mt-2.5'>
-        {title}
-      </SidebarGroupLabel>
+      {title ? (
+        <SidebarGroupLabel className='mt-5 mb-1.5 first:mt-2.5'>
+          {title}
+        </SidebarGroupLabel>
+      ) : null}
       <SidebarMenu>
         {items.map((item) => {
           const key = `${item.title}-${item.url || item.type}`

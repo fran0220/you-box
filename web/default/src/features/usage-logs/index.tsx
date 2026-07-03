@@ -121,7 +121,6 @@ function UsageLogsContent() {
     [navigate]
   )
 
-  const pageMeta = SECTION_META[activeCategory]
   const showTaskSwitcher =
     activeCategory !== 'common' && visibleSections.length > 1
 
@@ -137,17 +136,35 @@ function UsageLogsContent() {
     </Tabs>
   ) : undefined
 
+  // Top-level tab: API logs vs task logs (drawing lives under the
+  // task tab via the secondary switcher).
+  const activeTopTab = activeCategory === 'common' ? 'common' : 'task'
+  const showTopTabs = visibleSections.length > 0
+  const handleTopTabChange = useCallback(
+    (tab: string) => {
+      handleSectionChange(tab === 'common' ? 'common' : 'task')
+    },
+    [handleSectionChange]
+  )
+
   return (
     <>
       <SectionPageLayout>
         <SectionPageLayout.Content>
           <div className='space-y-4'>
             <PageHeader
-              eyebrow={t('Usage Logs')}
-              title={t(pageMeta.titleKey)}
+              title={t('Usage')}
               subtitle={usageLogsSubtitle(t, activeCategory)}
               actions={headerActions}
             />
+            {showTopTabs && (
+              <Tabs value={activeTopTab} onValueChange={handleTopTabChange}>
+                <TabsList>
+                  <TabsTrigger value='common'>{t('API Logs')}</TabsTrigger>
+                  <TabsTrigger value='task'>{t('Task Logs')}</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            )}
             <UsageLogsTable logCategory={activeCategory} />
           </div>
         </SectionPageLayout.Content>

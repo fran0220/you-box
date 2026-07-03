@@ -20,6 +20,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getSelf } from '@/lib/api'
 import { useStatus } from '@/hooks/use-status'
+import { CheckinCalendarCard } from './components/checkin-card'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import { SectionPageLayout } from '@/components/layout'
@@ -318,10 +319,9 @@ export function Wallet(props: WalletProps) {
     <>
       <SectionPageLayout>
         <SectionPageLayout.Content>
-          <div className='mx-auto w-full max-w-[1120px] space-y-5'>
+          <div className='mx-auto w-full max-w-3xl space-y-5'>
             <PageHeader
-              eyebrow={t('Wallet')}
-              title={t('Wallet')}
+              title={t('Billing')}
               subtitle={t(
                 'Top up your balance, redeem codes, and review billing history.'
               )}
@@ -352,9 +352,18 @@ export function Wallet(props: WalletProps) {
               </InlineAlert>
             </div>
           )}
-          <div className='grid w-full gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] xl:items-start'>
-            <div className='flex flex-col gap-4'>
+          <div className='flex w-full flex-col gap-4'>
               <BalanceHeroCard user={user} loading={userLoading} />
+
+              <CheckinCalendarCard
+                checkinEnabled={status?.checkin_enabled === true}
+                turnstileEnabled={
+                  !!(status?.turnstile_check && status?.turnstile_site_key)
+                }
+                turnstileSiteKey={
+                  (status?.turnstile_site_key as string) || ''
+                }
+              />
 
               <div id='wallet-add-funds' className='scroll-mt-4'>
                 <RechargeFormCard
@@ -389,16 +398,14 @@ export function Wallet(props: WalletProps) {
                   }
                 />
               </div>
-            </div>
-
-            <div className='flex flex-col gap-4'>
-              <TransactionsCard onViewAll={() => setBillingDialogOpen(true)} />
 
               <SubscriptionPlansCard
                 topupInfo={topupInfo}
                 userQuota={user?.quota}
                 onPurchaseSuccess={fetchUser}
               />
+
+              <TransactionsCard onViewAll={() => setBillingDialogOpen(true)} />
 
               <AffiliateRewardsCard
                 user={user}
@@ -409,7 +416,6 @@ export function Wallet(props: WalletProps) {
                 }
                 loading={affiliateLoading}
               />
-            </div>
           </div>
           </div>
         </SectionPageLayout.Content>

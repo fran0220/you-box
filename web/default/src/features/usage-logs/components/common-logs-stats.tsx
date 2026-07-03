@@ -20,38 +20,15 @@ import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { formatLogQuota } from '@/lib/format'
-import { cn } from '@/lib/utils'
 import { useIsAdmin } from '@/hooks/use-admin'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Metric } from '@/components/patterns'
 import { getLogStats, getUserLogStats } from '../api'
 import { DEFAULT_LOG_STATS } from '../constants'
 import { buildApiParams } from '../lib/utils'
 import { useUsageLogsContext } from './usage-logs-provider'
 
 const route = getRouteApi('/_authenticated/usage-logs/$section')
-
-function StatBadge(props: {
-  label: string
-  value: string | number
-  accentOpacity: string
-}) {
-  return (
-    <span className='border-border bg-surface-2/80 inline-flex h-7 items-center gap-2 rounded-md border px-2.5 text-xs shadow-xs'>
-      <span
-        className={cn(
-          'bg-brand h-3.5 w-0.5 shrink-0 rounded-full',
-          props.accentOpacity
-        )}
-      />
-      <span className='text-muted-foreground font-mono text-[11px] uppercase tracking-[0.06em]'>
-        {props.label}
-      </span>
-      <span className='text-foreground font-mono text-xs font-semibold tabular-nums'>
-        {props.value}
-      </span>
-    </span>
-  )
-}
 
 export function CommonLogsStats() {
   const { t } = useTranslation()
@@ -83,31 +60,22 @@ export function CommonLogsStats() {
 
   if (isLoading) {
     return (
-      <div className='flex items-center gap-2'>
-        <Skeleton className='h-7 w-[150px] rounded-md' />
-        <Skeleton className='h-7 w-[100px] rounded-md' />
-        <Skeleton className='h-7 w-[120px] rounded-md' />
+      <div className='flex items-center gap-6'>
+        <Skeleton className='h-9 w-[110px]' />
+        <Skeleton className='h-9 w-[80px]' />
+        <Skeleton className='h-9 w-[80px]' />
       </div>
     )
   }
 
   return (
-    <div className='flex flex-wrap items-center gap-2'>
-      <StatBadge
-        label={t('Usage')}
-        value={sensitiveVisible ? formatLogQuota(stats?.quota || 0) : '••••'}
-        accentOpacity='opacity-100'
+    <div className='flex flex-wrap items-center gap-x-6 gap-y-2'>
+      <Metric
+        k={t('Usage')}
+        v={sensitiveVisible ? formatLogQuota(stats?.quota || 0) : '••••'}
       />
-      <StatBadge
-        label={t('RPM')}
-        value={stats?.rpm || 0}
-        accentOpacity='opacity-70'
-      />
-      <StatBadge
-        label={t('TPM')}
-        value={stats?.tpm || 0}
-        accentOpacity='opacity-45'
-      />
+      <Metric k={t('RPM')} v={stats?.rpm || 0} />
+      <Metric k={t('TPM')} v={stats?.tpm || 0} />
     </div>
   )
 }

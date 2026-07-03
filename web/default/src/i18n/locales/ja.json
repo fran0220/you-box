@@ -5149,7 +5149,17 @@
     "Zero retention": "データ保持なし",
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V 4",
-    "Zoom": "ズーム"
-  },
-  "Link to this section": "このセクションへのリンク"
+    "Zoom": "ズーム",
+    "Link to this section": "このセクションへのリンク",
+    "Usage (last 30 days)": "使用量(過去 30 日)",
+    "View Usage": "使用量を見る",
+    "View Settings": "設定を見る",
+    "Manage keys": "キーを管理",
+    "Used {{amount}} in total": "累計 {{amount}} 使用",
+    "Create your first API key": "最初の API キーを作成",
+    "Copy the key — it is shown only once": "キーをコピー(表示は一度だけ)",
+    "Make your first request": "最初のリクエストを送信",
+    "API endpoint": "API エンドポイント",
+    "Create key": "キーを作成"
+  }
 }

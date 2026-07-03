@@ -18,28 +18,28 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import {
   Activity,
-  BookText,
-  Box,
   CreditCard,
   FileText,
   FlaskConical,
   Key,
-  LayoutGrid,
   ListTodo,
-  MessageSquare,
   Radio,
   Settings,
+  SlidersHorizontal,
   Ticket,
-  User,
   Users,
   Wallet,
-  Wrench,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { type SidebarData } from '@/components/layout/types'
 
 /**
  * Root navigation groups for the application sidebar.
+ *
+ * Converged user console: a single flat group of six high-frequency
+ * entries (Amp-style restraint). Public resources (docs, pricing,
+ * apps) live in the header, not here. Admin entries stay in a
+ * role-gated group until the admin drill-in workspace lands.
  *
  * These are shown when the URL does not match any nested sidebar view
  * registered in `layout/lib/sidebar-view-registry.ts`.
@@ -50,8 +50,8 @@ export function useSidebarData(): SidebarData {
   return {
     navGroups: [
       {
-        id: 'chat',
-        title: t('Get started'),
+        id: 'console',
+        title: '',
         items: [
           {
             title: t('Overview'),
@@ -64,71 +64,26 @@ export function useSidebarData(): SidebarData {
             icon: Key,
           },
           {
+            title: t('Usage'),
+            url: '/usage-logs/common',
+            activeUrls: ['/usage-logs/task', '/usage-logs/drawing'],
+            configUrls: ['/usage-logs/common', '/usage-logs/task'],
+            icon: FileText,
+          },
+          {
+            title: t('Billing'),
+            url: '/wallet',
+            icon: Wallet,
+          },
+          {
             title: t('Playground'),
             url: '/playground',
             icon: FlaskConical,
           },
           {
-            title: t('Chat'),
-            icon: MessageSquare,
-            type: 'chat-presets',
-          },
-        ],
-      },
-      {
-        id: 'developer',
-        title: t('Resources'),
-        items: [
-          {
-            title: t('Usage Logs'),
-            icon: FileText,
-            items: [
-              {
-                title: t('API Logs'),
-                url: '/usage-logs/common',
-              },
-              {
-                title: t('Task Logs'),
-                url: '/usage-logs/task',
-                activeUrls: ['/usage-logs/drawing'],
-              },
-            ],
-          },
-          {
-            title: t('Models & Pricing'),
-            url: '/pricing',
-            icon: Box,
-          },
-          {
-            title: t('API reference'),
-            url: '/docs',
-            icon: BookText,
-          },
-          {
-            title: t('API tools'),
-            url: '/api-tools',
-            icon: Wrench,
-          },
-          {
-            title: t('Apps'),
-            url: '/apps',
-            icon: LayoutGrid,
-          },
-        ],
-      },
-      {
-        id: 'personal',
-        title: t('Account'),
-        items: [
-          {
-            title: t('Wallet'),
-            url: '/wallet',
-            icon: Wallet,
-          },
-          {
-            title: t('Profile'),
+            title: t('Settings'),
             url: '/profile',
-            icon: User,
+            icon: SlidersHorizontal,
           },
         ],
       },
