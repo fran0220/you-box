@@ -41,14 +41,19 @@ export function HeaderFrame({
       )}
       {...props}
     >
+      {/* Full-bleed inner row: identical header geometry on public and
+          console pages so navigating between them never shifts the chrome. */}
       <div
         className={cn(
-          'mx-auto flex h-full w-full max-w-[var(--container-xl,1280px)] items-center gap-4 px-[var(--gutter,24px)]',
+          'flex h-full w-full items-center gap-4 px-[var(--gutter,24px)]',
           innerClassName
         )}
       >
         {showSidebarTrigger ? (
-          <SidebarTrigger variant='ghost' className='size-8 shrink-0' />
+          <SidebarTrigger
+            variant='ghost'
+            className='size-8 shrink-0 md:hidden'
+          />
         ) : null}
         {children}
       </div>

@@ -47,6 +47,9 @@ For commercial licensing, please contact support@quantumnous.com
   }
   html {
     @apply overflow-x-hidden font-sans;
+    /* Classic (non-overlay) scrollbars reserve their gutter so pages with
+       and without overflow keep identical layout width. */
+    scrollbar-gutter: stable;
   }
   body {
     @apply bg-background text-foreground has-[div[data-variant='inset']]:bg-sidebar min-h-svh w-full;
@@ -540,45 +543,45 @@ For commercial licensing, please contact support@quantumnous.com
     var(--border) 0,
     var(--border) 1px,
     transparent 1px,
-    transparent 112px
+    transparent 96px
   );
-  opacity: 0.45;
+  opacity: 0.7;
   mask-image: radial-gradient(
-    120% 90% at 50% 0%,
-    black 30%,
-    transparent 78%
+    130% 100% at 50% 0%,
+    black 42%,
+    transparent 85%
   );
 }
 
 .hero-wash {
   position: absolute;
-  width: 52rem;
-  height: 52rem;
+  width: 64rem;
+  height: 64rem;
   border-radius: 9999px;
-  filter: blur(90px);
+  filter: blur(80px);
   will-change: transform;
 }
 
 .hero-wash--brand {
-  top: -26rem;
-  right: -16rem;
+  top: -28rem;
+  right: -14rem;
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--brand) 13%, transparent),
-    transparent 72%
+    color-mix(in srgb, var(--brand) 26%, transparent),
+    transparent 74%
   );
-  animation: hero-drift-a 48s var(--ease-out, ease-in-out) infinite alternate;
+  animation: hero-drift-a 32s ease-in-out infinite alternate;
 }
 
 .hero-wash--warm {
-  bottom: -30rem;
-  left: -18rem;
+  bottom: -32rem;
+  left: -16rem;
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--paper-cream, #dfdfc1) 55%, transparent),
-    transparent 72%
+    color-mix(in srgb, var(--paper-cream, #dfdfc1) 92%, transparent),
+    transparent 74%
   );
-  animation: hero-drift-b 62s var(--ease-out, ease-in-out) infinite alternate;
+  animation: hero-drift-b 40s ease-in-out infinite alternate;
 }
 
 @keyframes hero-drift-a {
@@ -586,7 +589,7 @@ For commercial licensing, please contact support@quantumnous.com
     transform: translate3d(0, 0, 0) scale(1);
   }
   to {
-    transform: translate3d(-5rem, 3.5rem, 0) scale(1.07);
+    transform: translate3d(-9rem, 6rem, 0) scale(1.12);
   }
 }
 
@@ -595,7 +598,7 @@ For commercial licensing, please contact support@quantumnous.com
     transform: translate3d(0, 0, 0) scale(1);
   }
   to {
-    transform: translate3d(4rem, -3rem, 0) scale(1.05);
+    transform: translate3d(7rem, -5rem, 0) scale(1.1);
   }
 }
 
