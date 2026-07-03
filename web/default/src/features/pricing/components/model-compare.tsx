@@ -247,7 +247,7 @@ export function ModelCompare() {
     return (
       <>
         <div className='pb-8'>
-          <LoadingSkeleton viewMode='table' />
+          <LoadingSkeleton />
         </div>
       </>
     )

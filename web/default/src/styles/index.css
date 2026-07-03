@@ -588,48 +588,6 @@ For commercial licensing, please contact support@quantumnous.com
   }
 }
 
-/* Pricing card grid — one-shot stagger on mount / view-switch. The
- * `data-grid-stagger` attribute is present only during a short mount window
- * (set in model-card-grid.tsx), so cards added later by filtering/search do
- * not re-animate. */
-@media (prefers-reduced-motion: no-preference) {
-  [data-grid-stagger] > * {
-    animation: cardGridEnter var(--dur-base) var(--ease-out) both;
-  }
-  [data-grid-stagger] > *:nth-child(2) {
-    animation-delay: 30ms;
-  }
-  [data-grid-stagger] > *:nth-child(3) {
-    animation-delay: 60ms;
-  }
-  [data-grid-stagger] > *:nth-child(4) {
-    animation-delay: 90ms;
-  }
-  [data-grid-stagger] > *:nth-child(5) {
-    animation-delay: 120ms;
-  }
-  [data-grid-stagger] > *:nth-child(6) {
-    animation-delay: 150ms;
-  }
-  [data-grid-stagger] > *:nth-child(7) {
-    animation-delay: 180ms;
-  }
-  [data-grid-stagger] > *:nth-child(n + 8) {
-    animation-delay: 210ms;
-  }
-}
-
-@keyframes cardGridEnter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Typing indicator dots (ai-elements/typing-dots) — shown before the first
  * streamed token. Gated by motion-safe at the utility level. */
 @keyframes yb-typing {

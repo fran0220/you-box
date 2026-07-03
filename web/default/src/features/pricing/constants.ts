@@ -196,22 +196,6 @@ export const TOKEN_UNIT_DIVISORS = {
 export const DEFAULT_TOKEN_UNIT: TokenUnit = 'M'
 
 /**
- * View mode options. `LIST` is the OpenRouter-style dense, full-width row
- * catalog and is the DEFAULT surface; `CARD` (grid) and `TABLE` are optional
- * comparison layouts toggled from the toolbar.
- */
-export const VIEW_MODES = {
-  LIST: 'list',
-  CARD: 'card',
-  TABLE: 'table',
-} as const
-
-export type ViewMode = (typeof VIEW_MODES)[keyof typeof VIEW_MODES]
-
-/** Default catalog view: the dense list. */
-export const DEFAULT_VIEW_MODE: ViewMode = VIEW_MODES.LIST
-
-/**
  * @deprecated Pagination was removed in favour of a continuous/virtualized
  * list. Kept exported only so any lingering importer still compiles; do not
  * use in new code.

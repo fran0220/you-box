@@ -19,9 +19,9 @@ For commercial licensing, please contact support@quantumnous.com
 import { useCallback, useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Scale, Star } from 'lucide-react'
-import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
-import { MOTION_TRANSITION } from '@/lib/motion'
+import { cn } from '@/lib/utils'
+import { getLobeIcon } from '@/lib/lobe-icon'
 import { Button } from '@/components/ui/button'
 import { PageTransition } from '@/components/page-transition'
 import { EmptyState as YouboxEmptyState } from '@/components/youbox/empty-state'
@@ -29,22 +29,22 @@ import { PageHeader } from '@/components/youbox'
 import {
   EmptyState,
   LoadingSkeleton,
-  ModelCardGrid,
   ModelList,
   PricingFilterPills,
-  PricingSidebar,
-  PricingTable,
   PricingToolbar,
   SearchBar,
 } from './components'
-import { VIEW_MODES, computePromptPriceCeiling } from './constants'
+import { FILTER_SECTIONS, computePromptPriceCeiling } from './constants'
 import { useFavorites } from './hooks/use-favorites'
 import { useFilters } from './hooks/use-filters'
 import { usePricingData } from './hooks/use-pricing-data'
+import { extractProviders } from './lib/filters'
+
+/** Providers surfaced as quick-toggle chips under the search row. */
+const PROVIDER_CHIP_LIMIT = 8
 
 export function Pricing() {
   const { t } = useTranslation()
-  const reduceMotion = useReducedMotion()
   // Favorites filter: local-only star set; narrows whatever the regular
   // filters produced.
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
@@ -63,7 +63,6 @@ export function Pricing() {
     searchInput,
     sortBy,
     tokenUnit,
-    viewMode,
     showRechargePrice,
     facetState,
     toggleFacetValue,
@@ -72,7 +71,6 @@ export function Pricing() {
     setSortBy,
     setPromptPriceRange,
     setTokenUnit,
-    setViewMode,
     setShowRechargePrice,
     filteredModels,
     activeFilters,
@@ -83,12 +81,19 @@ export function Pricing() {
     clearSearch,
   } = useFilters(models)
 
-  // Vendor name -> icon key, for the sidebar provider checkboxes.
+  // Vendor name -> icon key, for provider chips and drawer checkboxes.
   const vendorIcons = useMemo(() => {
     const map: Record<string, string | undefined> = {}
     for (const v of vendors) map[v.name] = v.icon
     return map
   }, [vendors])
+
+  // Top providers by model count, quick-toggle chips.
+  const providerChips = useMemo(
+    () => extractProviders(models, vendors).slice(0, PROVIDER_CHIP_LIMIT),
+    [models, vendors]
+  )
+  const selectedProviders = facetState[FILTER_SECTIONS.PROVIDER]
 
   // Prompt-price slider ceiling adapts to the live catalog.
   const priceCeiling = useMemo(
@@ -108,21 +113,6 @@ export function Pricing() {
     clearAll()
     setShowFavoritesOnly(false)
   }, [clearAll])
-
-  // The toolbar and sidebar share the same facet contract.
-  const sidebarProps = {
-    models,
-    vendors,
-    facetState,
-    toggleFacetValue,
-    vendorIcons,
-    groupRatios: groupRatio,
-    promptPriceRange,
-    priceCeiling,
-    onPromptPriceRangeChange: setPromptPriceRange,
-    hasActiveFilters,
-    onClearFilters: clearFilters,
-  }
 
   const renderPricingContent = () => {
     if (showFavoritesOnly && displayedModels.length === 0) {
@@ -159,33 +149,6 @@ export function Pricing() {
       )
     }
 
-    if (viewMode === VIEW_MODES.CARD) {
-      return (
-        <ModelCardGrid
-          models={displayedModels}
-          priceRate={priceRate}
-          usdExchangeRate={usdExchangeRate}
-          tokenUnit={tokenUnit}
-          showRechargePrice={showRechargePrice}
-        />
-      )
-    }
-
-    if (viewMode === VIEW_MODES.TABLE) {
-      return (
-        <PricingTable
-          models={displayedModels}
-          priceRate={priceRate}
-          usdExchangeRate={usdExchangeRate}
-          tokenUnit={tokenUnit}
-          showRechargePrice={showRechargePrice}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-        />
-      )
-    }
-
-    // Default: the dense, OpenRouter-style virtualized list.
     return (
       <ModelList
         models={displayedModels}
@@ -200,104 +163,125 @@ export function Pricing() {
   if (isLoading) {
     return (
       <PageTransition className='pb-10'>
-        <LoadingSkeleton viewMode={viewMode} />
+        <LoadingSkeleton />
       </PageTransition>
     )
   }
 
   return (
     <PageTransition className='pb-10'>
-        <PageHeader
-          className='mb-5'
-          eyebrow={t('Model Plaza')}
-          title={t('Models')}
-          subtitle={t('{{count}} models from {{vendors}} providers', {
-            count: models.length,
-            vendors: vendors.length,
-          })}
-          actions={
-            <Button
-              render={
-                <Link to='/pricing/compare' search={{ models: undefined }} />
-              }
-              variant='outline'
-              size='sm'
-              className='gap-1.5'
-            >
-              <Scale className='size-4' aria-hidden='true' />
-              {t('Compare models')}
-            </Button>
-          }
-        />
+      <PageHeader
+        className='mb-5'
+        eyebrow={t('Model Plaza')}
+        title={t('Models')}
+        subtitle={t('{{count}} models from {{vendors}} providers', {
+          count: models.length,
+          vendors: vendors.length,
+        })}
+        actions={
+          <Button
+            render={
+              <Link to='/pricing/compare' search={{ models: undefined }} />
+            }
+            variant='outline'
+            size='sm'
+            className='gap-1.5'
+          >
+            <Scale className='size-4' aria-hidden='true' />
+            {t('Compare models')}
+          </Button>
+        }
+      />
 
-        {/* Sticky control strip: search + toolbar + pills */}
-        <div
-          data-pricing-control-strip
-          className='bg-background/80 supports-[backdrop-filter]:bg-background/60 border-border/60 sticky top-[var(--app-header-height,3rem)] z-10 -mx-4 mb-4 space-y-2.5 border-b px-4 py-2.5 backdrop-blur md:-mx-6 md:px-6'
-        >
-          <div className='flex flex-col gap-2.5 lg:flex-row lg:items-center'>
-            <SearchBar
-              value={searchInput}
-              onChange={setSearchInput}
-              onClear={clearSearch}
-              placeholder={t('Search models by name, provider, or capability…')}
-              className='lg:flex-1'
-            />
-            <PricingToolbar
-              showFavoritesOnly={showFavoritesOnly}
-              onShowFavoritesOnlyChange={setShowFavoritesOnly}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-              tokenUnit={tokenUnit}
-              onTokenUnitChange={setTokenUnit}
-              showRechargePrice={showRechargePrice}
-              onRechargePriceChange={setShowRechargePrice}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-              activeFilterCount={activeFilterCount}
-              {...sidebarProps}
-            />
-          </div>
-          <PricingFilterPills
-            activeFilters={activeFilters}
-            searchInput={searchInput}
-            onClearSearch={clearSearch}
-            onClearAll={handleClearAll}
+      {/* Control strip: search + toolbar + provider chips + pills */}
+      <div
+        data-pricing-control-strip
+        className='border-border/60 mb-4 space-y-2.5 border-b pb-3'
+      >
+        <div className='flex flex-col gap-2.5 lg:flex-row lg:items-center'>
+          <SearchBar
+            value={searchInput}
+            onChange={setSearchInput}
+            onClear={clearSearch}
+            placeholder={t('Search models by name, provider, or capability…')}
+            className='lg:flex-1'
+          />
+          <PricingToolbar
+            showFavoritesOnly={showFavoritesOnly}
+            onShowFavoritesOnlyChange={setShowFavoritesOnly}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            tokenUnit={tokenUnit}
+            onTokenUnitChange={setTokenUnit}
+            showRechargePrice={showRechargePrice}
+            onRechargePriceChange={setShowRechargePrice}
+            activeFilterCount={activeFilterCount}
+            models={models}
+            vendors={vendors}
+            facetState={facetState}
+            toggleFacetValue={toggleFacetValue}
+            vendorIcons={vendorIcons}
+            groupRatios={groupRatio}
+            promptPriceRange={promptPriceRange}
+            priceCeiling={priceCeiling}
+            onPromptPriceRangeChange={setPromptPriceRange}
+            hasActiveFilters={hasActiveFilters}
+            onClearFilters={clearFilters}
           />
         </div>
-
-        <div className='grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]'>
-          <PricingSidebar
-            {...sidebarProps}
-            className='hover-scrollbar sticky top-[var(--app-header-height,3rem)] hidden max-h-[calc(100dvh-var(--app-header-height,3rem)-1rem)] self-start overflow-y-auto pr-1 xl:flex'
-          />
-
-          <main className='min-w-0'>
-            <div className='text-muted-foreground mb-2.5 text-sm'>
-              <span className='text-foreground font-semibold tabular-nums'>
-                {displayedModels.length.toLocaleString()}
-              </span>{' '}
-              {displayedModels.length === 1 ? t('model') : t('models')}
-              {(hasActiveFilters || showFavoritesOnly) &&
-                models.length > 0 && (
-                  <span className='text-muted-foreground/60'>
-                    {' / '}
-                    {models.length.toLocaleString()}
-                  </span>
-                )}
-            </div>
-            {/* Crossfade on view switch (keyed on viewMode so it fires on
-                switch, not on every search/filter change). */}
-            <m.div
-              key={viewMode}
-              initial={reduceMotion ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={reduceMotion ? { duration: 0 } : MOTION_TRANSITION.fast}
-            >
-              {renderPricingContent()}
-            </m.div>
-          </main>
+        {providerChips.length > 1 && (
+          <div className='flex flex-wrap items-center gap-1.5'>
+            {providerChips.map((chip) => {
+              const active = selectedProviders.includes(chip.value)
+              return (
+                <button
+                  key={chip.value}
+                  type='button'
+                  onClick={() =>
+                    toggleFacetValue(FILTER_SECTIONS.PROVIDER, chip.value)
+                  }
+                  aria-pressed={active}
+                  className={cn(
+                    'inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-xs transition-colors',
+                    active
+                      ? 'border-brand-border/50 bg-brand-subtle text-brand font-medium'
+                      : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted'
+                  )}
+                >
+                  {vendorIcons[chip.value] && (
+                    <span className='shrink-0' aria-hidden='true'>
+                      {getLobeIcon(vendorIcons[chip.value]!, 13)}
+                    </span>
+                  )}
+                  {chip.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
+        <PricingFilterPills
+          activeFilters={activeFilters}
+          searchInput={searchInput}
+          onClearSearch={clearSearch}
+          onClearAll={handleClearAll}
+        />
       </div>
+
+      <main className='min-w-0'>
+        <div className='text-muted-foreground mb-2.5 text-sm'>
+          <span className='text-foreground font-semibold tabular-nums'>
+            {displayedModels.length.toLocaleString()}
+          </span>{' '}
+          {displayedModels.length === 1 ? t('model') : t('models')}
+          {(hasActiveFilters || showFavoritesOnly) && models.length > 0 && (
+            <span className='text-muted-foreground/60'>
+              {' / '}
+              {models.length.toLocaleString()}
+            </span>
+          )}
+        </div>
+        {renderPricingContent()}
+      </main>
     </PageTransition>
   )
 }

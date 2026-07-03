@@ -17,15 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useState } from 'react'
-import {
-  ArrowUpDown,
-  Check,
-  Filter,
-  Grid2X2,
-  List,
-  Star,
-  Table2,
-} from 'lucide-react'
+import { ArrowUpDown, Check, Filter, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -51,11 +43,9 @@ import {
 import { SegmentedControl } from '@/components/patterns'
 import {
   SORT_OPTION_ORDER,
-  VIEW_MODES,
   getSortLabels,
   type FilterSection,
   type SortOption,
-  type ViewMode,
 } from '../constants'
 import type { EnrichedPricingModel, PricingVendor, TokenUnit } from '../types'
 import { PricingSidebar } from './pricing-sidebar'
@@ -70,10 +60,8 @@ export interface PricingToolbarProps {
   onTokenUnitChange: (value: TokenUnit) => void
   showRechargePrice: boolean
   onRechargePriceChange: (value: boolean) => void
-  viewMode: ViewMode
-  onViewModeChange: (value: ViewMode) => void
   activeFilterCount: number
-  // Mobile filter Sheet hosts the same sidebar — pass the facet contract through.
+  // The filter Sheet hosts the full facet sidebar — pass the contract through.
   models: EnrichedPricingModel[]
   facetState: Record<FilterSection, string[]>
   toggleFacetValue: (facet: FilterSection, value: string) => void
@@ -89,16 +77,11 @@ export interface PricingToolbarProps {
 
 export function PricingToolbar(props: PricingToolbarProps) {
   const { t } = useTranslation()
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const sortLabels = getSortLabels(t)
 
   const handleTokenUnitChange = useCallback(
     (value: string) => props.onTokenUnitChange(value as TokenUnit),
-    [props]
-  )
-
-  const handleViewModeChange = useCallback(
-    (value: string) => props.onViewModeChange(value as ViewMode),
     [props]
   )
 
@@ -109,13 +92,12 @@ export function PricingToolbar(props: PricingToolbarProps) {
 
   return (
     <div className='flex flex-wrap items-center gap-2'>
-      {/* Mobile filter trigger */}
       <Button
         type='button'
         variant='outline'
         size='sm'
-        onClick={() => setMobileFiltersOpen(true)}
-        className='h-8 gap-1.5 px-3 text-xs xl:hidden'
+        onClick={() => setFiltersOpen(true)}
+        className='h-8 gap-1.5 px-3 text-xs'
       >
         <Filter className='size-3.5' />
         {t('Filters')}
@@ -143,27 +125,6 @@ export function PricingToolbar(props: PricingToolbarProps) {
         />
         {t('Favorites')}
       </button>
-
-      <div className='hidden items-center gap-2 sm:flex'>
-        <SegmentedControl
-          options={[
-            { value: 'standard', label: t('Standard') },
-            { value: 'recharge', label: t('Recharge') },
-          ]}
-          value={props.showRechargePrice ? 'recharge' : 'standard'}
-          onChange={handleRechargePriceChange}
-          ariaLabel={t('Price display mode')}
-        />
-        <SegmentedControl
-          options={[
-            { value: 'M', label: '/1M' },
-            { value: 'K', label: '/1K' },
-          ]}
-          value={props.tokenUnit}
-          onChange={handleTokenUnitChange}
-          ariaLabel={t('Token unit')}
-        />
-      </div>
 
       <DropdownMenu>
         <DropdownMenuTrigger
@@ -198,19 +159,8 @@ export function PricingToolbar(props: PricingToolbarProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <SegmentedControl
-        options={[
-          { value: VIEW_MODES.LIST, icon: List, tooltip: t('List view') },
-          { value: VIEW_MODES.CARD, icon: Grid2X2, tooltip: t('Card view') },
-          { value: VIEW_MODES.TABLE, icon: Table2, tooltip: t('Table view') },
-        ]}
-        value={props.viewMode}
-        onChange={handleViewModeChange}
-        ariaLabel={t('View mode')}
-      />
-
-      {/* Mobile / tablet filter Sheet hosts the full sidebar */}
-      <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+      {/* Filter Sheet: full facet sidebar + display options (all breakpoints) */}
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent
           side='right'
           className={sideDrawerContentClassName('sm:max-w-md')}
@@ -222,6 +172,36 @@ export function PricingToolbar(props: PricingToolbarProps) {
             </SheetDescription>
           </SheetHeader>
           <div className={sideDrawerFormClassName('gap-0')}>
+            <div className='border-border/60 mb-4 flex flex-col gap-3 border-b pb-4'>
+              <div className='flex items-center justify-between gap-3'>
+                <span className='text-muted-foreground text-xs font-medium'>
+                  {t('Price display mode')}
+                </span>
+                <SegmentedControl
+                  options={[
+                    { value: 'standard', label: t('Standard') },
+                    { value: 'recharge', label: t('Recharge') },
+                  ]}
+                  value={props.showRechargePrice ? 'recharge' : 'standard'}
+                  onChange={handleRechargePriceChange}
+                  ariaLabel={t('Price display mode')}
+                />
+              </div>
+              <div className='flex items-center justify-between gap-3'>
+                <span className='text-muted-foreground text-xs font-medium'>
+                  {t('Token unit')}
+                </span>
+                <SegmentedControl
+                  options={[
+                    { value: 'M', label: '/1M' },
+                    { value: 'K', label: '/1K' },
+                  ]}
+                  value={props.tokenUnit}
+                  onChange={handleTokenUnitChange}
+                  ariaLabel={t('Token unit')}
+                />
+              </div>
+            </div>
             <PricingSidebar
               models={props.models}
               vendors={props.vendors}

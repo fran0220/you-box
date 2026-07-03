@@ -24,9 +24,7 @@ import {
   FILTER_SECTIONS,
   PROMPT_PRICE_MAX_USD_PER_M,
   SORT_OPTIONS,
-  VIEW_MODES,
   type FilterSection,
-  type ViewMode,
 } from '../constants'
 import {
   filterAndSortModels,
@@ -48,12 +46,6 @@ function parseList(value: unknown): string[] {
 function serializeList(values: string[]): string | undefined {
   const cleaned = values.map((s) => s.trim()).filter(Boolean)
   return cleaned.length > 0 ? cleaned.join(ARRAY_SEPARATOR) : undefined
-}
-
-function normalizeViewMode(value: unknown): ViewMode {
-  if (value === VIEW_MODES.TABLE) return VIEW_MODES.TABLE
-  if (value === VIEW_MODES.CARD) return VIEW_MODES.CARD
-  return VIEW_MODES.LIST
 }
 
 function toNumberOr(value: unknown, fallback: number): number {
@@ -102,7 +94,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
   )
 
   const tokenUnit: TokenUnit = search.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
-  const viewMode = normalizeViewMode(search.view)
   const showRechargePrice = search.rechargePrice === true
 
   const updateFilters = useCallback(
@@ -174,11 +165,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
   const setTokenUnit = useCallback(
     (v: TokenUnit) =>
       updateFilters({ tokenUnit: v === DEFAULT_TOKEN_UNIT ? undefined : v }),
-    [updateFilters]
-  )
-  const setViewMode = useCallback(
-    (v: ViewMode) =>
-      updateFilters({ view: v === VIEW_MODES.LIST ? undefined : v }),
     [updateFilters]
   )
   const setShowRechargePrice = useCallback(
@@ -284,7 +270,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
     searchInput,
     sortBy,
     tokenUnit,
-    viewMode,
     showRechargePrice,
     providers,
     modelTypes,
@@ -300,7 +285,6 @@ export function useFilters(models: EnrichedPricingModel[]) {
     setSortBy,
     setPromptPriceRange,
     setTokenUnit,
-    setViewMode,
     setShowRechargePrice,
     filteredModels,
     activeFilters,
