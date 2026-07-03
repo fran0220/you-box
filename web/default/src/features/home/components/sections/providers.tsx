@@ -1,0 +1,94 @@
+/*
+Copyright (C) 2023-2026 QuantumNous
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+For commercial licensing, please contact support@quantumnous.com
+*/
+import { Link } from '@tanstack/react-router'
+import { ArrowRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { getLobeIcon } from '@/lib/lobe-icon'
+
+/** Model providers routed through the gateway. Names stay untranslated
+ * (lab names); icons come from @lobehub/icons. */
+const PROVIDERS: Array<{ name: string; icon: string }> = [
+  { name: 'Anthropic', icon: 'Anthropic' },
+  { name: 'OpenAI', icon: 'OpenAI' },
+  { name: 'Google', icon: 'Google.Color' },
+  { name: 'xAI', icon: 'XAI' },
+  { name: 'Meta', icon: 'Meta.Color' },
+  { name: 'Mistral', icon: 'Mistral.Color' },
+  { name: 'DeepSeek', icon: 'DeepSeek.Color' },
+  { name: 'Qwen', icon: 'Qwen.Color' },
+  { name: 'Moonshot AI', icon: 'Moonshot' },
+  { name: 'Zhipu AI', icon: 'Zhipu.Color' },
+  { name: 'MiniMax', icon: 'Minimax.Color' },
+  { name: 'ByteDance', icon: 'ByteDance.Color' },
+  { name: 'Tencent', icon: 'Tencent.Color' },
+  { name: 'Baidu', icon: 'Baidu.Color' },
+  { name: 'Cohere', icon: 'Cohere.Color' },
+  { name: '01.AI', icon: 'Yi.Color' },
+  { name: 'StepFun', icon: 'Stepfun.Color' },
+  { name: 'InternLM', icon: 'InternLM.Color' },
+]
+
+/**
+ * Provider wall: every frontier lab behind the one endpoint. Editorial
+ * hairline grid, no cards — restraint over decoration.
+ */
+export function Providers() {
+  const { t } = useTranslation()
+
+  return (
+    <section className='border-border/70 border-t py-14 md:py-20'>
+      <div className='mx-auto w-full max-w-6xl px-4 md:px-6'>
+        <p className='yb-eyebrow mb-4'>{t('Model providers')}</p>
+        <h2 className='font-display max-w-[16em] text-3xl leading-[1.1] font-normal md:text-4xl'>
+          {t('Every frontier lab, one endpoint')}
+        </h2>
+        <p className='text-muted-foreground mt-4 max-w-[36em] text-base leading-relaxed'>
+          {t(
+            'From Anthropic to xAI — switch providers and models without changing a line of code.'
+          )}
+        </p>
+
+        <ul className='border-border/70 mt-10 grid grid-cols-2 border-t border-l sm:grid-cols-3 lg:grid-cols-6'>
+          {PROVIDERS.map((provider) => (
+            <li
+              key={provider.name}
+              className='border-border/70 text-muted-foreground hover:text-foreground flex items-center gap-2.5 border-r border-b px-4 py-4 text-[13px] font-medium transition-colors'
+            >
+              <span className='shrink-0' aria-hidden='true'>
+                {getLobeIcon(provider.icon, 18)}
+              </span>
+              <span className='truncate'>{provider.name}</span>
+            </li>
+          ))}
+        </ul>
+
+        <Link
+          to='/pricing'
+          className='text-muted-foreground hover:text-foreground group mt-6 inline-flex items-center gap-1.5 text-sm transition-colors'
+        >
+          {t('Browse all models in the Model Plaza')}
+          <ArrowRight
+            className='size-4 transition-transform group-hover:translate-x-0.5'
+            aria-hidden='true'
+          />
+        </Link>
+      </div>
+    </section>
+  )
+}

@@ -5165,6 +5165,10 @@
     "Back to Console": "Quay lại bảng điều khiển",
     "Back to Admin": "Quay lại quản trị",
     "Plug into the AI apps you already use": "Kết nối các ứng dụng AI bạn đang dùng",
-    "and any OpenAI-compatible client": "và mọi ứng dụng tương thích OpenAI"
+    "and any OpenAI-compatible client": "và mọi ứng dụng tương thích OpenAI",
+    "Model providers": "Nhà cung cấp mô hình",
+    "Every frontier lab, one endpoint": "Mọi phòng lab hàng đầu, một điểm truy cập",
+    "From Anthropic to xAI — switch providers and models without changing a line of code.": "Từ Anthropic đến xAI — đổi nhà cung cấp và mô hình mà không cần sửa một dòng mã.",
+    "Browse all models in the Model Plaza": "Xem tất cả mô hình tại Quảng trường mô hình"
   }
 }

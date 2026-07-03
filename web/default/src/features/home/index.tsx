@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { Markdown } from '@/components/ui/markdown'
 import { Skeleton } from '@/components/ui/skeleton'
-import { CTA, Hero, HowItWorks } from './components'
+import { CTA, Hero, HowItWorks, Providers } from './components'
 import { useHomePageContent } from './hooks'
 
 export function Home() {
@@ -67,6 +67,7 @@ export function Home() {
   return (
     <>
       <Hero isAuthenticated={isAuthenticated} />
+      <Providers />
       <HowItWorks />
       <CTA isAuthenticated={isAuthenticated} />
     </>

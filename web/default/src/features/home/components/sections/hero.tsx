@@ -29,6 +29,9 @@ import { useHeroStatusPill } from '../../hooks/use-hero-status-pill'
 /** Client apps and coding agents shown in the hero integrations strip.
  * Names stay untranslated (product names); icons come from @lobehub/icons. */
 const INTEGRATION_APPS: Array<{ name: string; icon: string }> = [
+  { name: 'Claude Code', icon: 'ClaudeCode.Color' },
+  { name: 'Codex', icon: 'Codex' },
+  { name: 'OpenCode', icon: 'OpenCode' },
   { name: 'Cherry Studio', icon: 'CherryStudio.Color' },
   { name: 'LobeChat', icon: 'LobeHub.Color' },
   { name: 'Open WebUI', icon: 'OpenWebUI' },

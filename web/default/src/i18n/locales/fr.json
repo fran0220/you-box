@@ -5165,6 +5165,10 @@
     "Back to Console": "Retour à la console",
     "Back to Admin": "Retour à l'administration",
     "Plug into the AI apps you already use": "Branchez les applications IA que vous utilisez déjà",
-    "and any OpenAI-compatible client": "et tout client compatible OpenAI"
+    "and any OpenAI-compatible client": "et tout client compatible OpenAI",
+    "Model providers": "Fournisseurs de modèles",
+    "Every frontier lab, one endpoint": "Tous les laboratoires de pointe, un seul point d'accès",
+    "From Anthropic to xAI — switch providers and models without changing a line of code.": "D'Anthropic à xAI — changez de fournisseur et de modèle sans modifier une ligne de code.",
+    "Browse all models in the Model Plaza": "Parcourir tous les modèles dans la place des modèles"
   }
 }

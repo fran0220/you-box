@@ -5165,6 +5165,10 @@
     "Back to Console": "Назад в консоль",
     "Back to Admin": "Назад в админку",
     "Plug into the AI apps you already use": "Подключайте привычные AI-приложения",
-    "and any OpenAI-compatible client": "и любой OpenAI-совместимый клиент"
+    "and any OpenAI-compatible client": "и любой OpenAI-совместимый клиент",
+    "Model providers": "Поставщики моделей",
+    "Every frontier lab, one endpoint": "Все передовые лаборатории, одна точка доступа",
+    "From Anthropic to xAI — switch providers and models without changing a line of code.": "От Anthropic до xAI — меняйте провайдеров и модели, не меняя ни строчки кода.",
+    "Browse all models in the Model Plaza": "Смотреть все модели в каталоге"
   }
 }

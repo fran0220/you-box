@@ -5165,6 +5165,10 @@
     "Back to Console": "コンソールに戻る",
     "Back to Admin": "管理に戻る",
     "Plug into the AI apps you already use": "使い慣れた AI アプリにそのまま接続",
-    "and any OpenAI-compatible client": "その他 OpenAI 互換クライアント"
+    "and any OpenAI-compatible client": "その他 OpenAI 互換クライアント",
+    "Model providers": "モデルプロバイダー",
+    "Every frontier lab, one endpoint": "あらゆるフロンティアラボを一つのエンドポイントで",
+    "From Anthropic to xAI — switch providers and models without changing a line of code.": "Anthropic から xAI まで、コードを 1 行も変えずにプロバイダーとモデルを切り替え。",
+    "Browse all models in the Model Plaza": "モデル広場ですべてのモデルを見る"
   }
 }

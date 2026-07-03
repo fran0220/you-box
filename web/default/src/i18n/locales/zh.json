@@ -5165,6 +5165,10 @@
     "Back to Console": "返回控制台",
     "Back to Admin": "返回管理",
     "Plug into the AI apps you already use": "即插即用,接入你常用的 AI 应用",
-    "and any OpenAI-compatible client": "以及任何 OpenAI 兼容客户端"
+    "and any OpenAI-compatible client": "以及任何 OpenAI 兼容客户端",
+    "Model providers": "模型厂商",
+    "Every frontier lab, one endpoint": "前沿厂商,一个端点",
+    "From Anthropic to xAI — switch providers and models without changing a line of code.": "从 Anthropic 到 xAI,切换厂商和模型无需改动一行代码。",
+    "Browse all models in the Model Plaza": "在模型广场浏览全部模型"
   }
 }
