@@ -508,7 +508,7 @@ export const STATIC_I18N_KEYS = [
   'YouBox is the unified gateway to every frontier LLM. Write one integration and route to any provider — with automatic failover, smart cost routing, and pass-through pricing.',
   'Get your API key',
   'Read the docs',
-  'No markup on tokens. Drop-in OpenAI-compatible SDK.',
+  'Drop-in OpenAI, Claude, and Gemini APIs.',
   'Models',
   'Providers',
 

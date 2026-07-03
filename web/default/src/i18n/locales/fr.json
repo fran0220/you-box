@@ -2906,7 +2906,7 @@
     "No Logs Found": "Aucun journal trouvé",
     "No logs to export": "Aucun journal à exporter",
     "No mappings configured. Click \"Add Row\" to get started.": "Aucun mappage configuré. Cliquez sur « Ajouter une ligne » pour commencer.",
-    "No markup on tokens. Drop-in OpenAI-compatible SDK.": "Aucune majoration sur les tokens. SDK compatible OpenAI prêt à l'emploi.",
+    "Drop-in OpenAI, Claude, and Gemini APIs.": "APIs OpenAI, Claude et Gemini prêtes à l'emploi.",
     "No matches found": "Aucune correspondance trouvée",
     "No matching items": "Aucun élément correspondant",
     "No matching presets": "Aucun préréglage correspondant",

@@ -2906,7 +2906,7 @@
     "No Logs Found": "Логи не найдены",
     "No logs to export": "Нет журналов для экспорта",
     "No mappings configured. Click \"Add Row\" to get started.": "Нет настроенных сопоставлений. Нажмите \"Добавить строку\", чтобы начать.",
-    "No markup on tokens. Drop-in OpenAI-compatible SDK.": "Без наценки на токены. Совместимый с OpenAI SDK без доработок.",
+    "Drop-in OpenAI, Claude, and Gemini APIs.": "API OpenAI, Claude и Gemini без доработок.",
     "No matches found": "Совпадений не найдено",
     "No matching items": "Нет подходящих элементов",
     "No matching presets": "Нет подходящих пресетов",

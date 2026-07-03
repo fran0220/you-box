@@ -2906,7 +2906,7 @@
     "No Logs Found": "No Logs Found",
     "No logs to export": "No logs to export",
     "No mappings configured. Click \"Add Row\" to get started.": "No mappings configured. Click \"Add Row\" to get started.",
-    "No markup on tokens. Drop-in OpenAI-compatible SDK.": "No markup on tokens. Drop-in OpenAI-compatible SDK.",
+    "Drop-in OpenAI, Claude, and Gemini APIs.": "Drop-in OpenAI, Claude, and Gemini APIs.",
     "No matches found": "No matches found",
     "No matching items": "No matching items",
     "No matching presets": "No matching presets",

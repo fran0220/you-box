@@ -2906,7 +2906,7 @@
     "No Logs Found": "Không tìm thấy nhật ký",
     "No logs to export": "Không có nhật ký để xuất",
     "No mappings configured. Click \"Add Row\" to get started.": "Chưa có ánh xạ nào được cấu hình. Nhấp vào \"Thêm hàng\" để bắt đầu.",
-    "No markup on tokens. Drop-in OpenAI-compatible SDK.": "Không markup token. SDK tương thích OpenAI dùng ngay.",
+    "Drop-in OpenAI, Claude, and Gemini APIs.": "API OpenAI, Claude và Gemini dùng ngay.",
     "No matches found": "Không tìm thấy kết quả nào",
     "No matching items": "Không có mục phù hợp",
     "No matching presets": "Không có cài đặt sẵn phù hợp",

@@ -2906,7 +2906,7 @@
     "No Logs Found": "ログが見つかりません",
     "No logs to export": "エクスポートするログがありません",
     "No mappings configured. Click \"Add Row\" to get started.": "マッピングが設定されていません。「行を追加」をクリックして開始してください。",
-    "No markup on tokens. Drop-in OpenAI-compatible SDK.": "トークンに上乗せなし。OpenAI互換SDKをそのまま利用。",
+    "Drop-in OpenAI, Claude, and Gemini APIs.": "OpenAI・Claude・Gemini APIをそのまま利用。",
     "No matches found": "一致するものが見つかりません",
     "No matching items": "一致する項目がありません",
     "No matching presets": "一致するプリセットがありません",

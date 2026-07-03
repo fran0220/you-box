@@ -181,10 +181,11 @@ For commercial licensing, please contact support@quantumnous.com
   --dur-slow: 400ms;
 
   --z-overlay: 50;
-  --z-dropdown: 70;
-  --z-popover: 70;
-  --z-tooltip: 80;
-  --z-toast: 90;
+  --z-sticky: 200;
+  --z-dropdown: 210;
+  --z-popover: 210;
+  --z-tooltip: 220;
+  --z-toast: 230;
 
   --radius: 14px;
   --app-header-height: 3.75rem;
@@ -195,7 +196,6 @@ For commercial licensing, please contact support@quantumnous.com
   --container-lg: 1100px;
   --container-xl: 1280px;
   --blur-md: blur(18px);
-  --z-sticky: 200;
   --app-rev: '2k6e8r7p';
   --font-body: var(--font-sans);
 

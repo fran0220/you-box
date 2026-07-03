@@ -2906,7 +2906,7 @@
     "No Logs Found": "未找到日志",
     "No logs to export": "没有可导出的日志",
     "No mappings configured. Click \"Add Row\" to get started.": "未配置映射。点击 \"添加行\" 开始。",
-    "No markup on tokens. Drop-in OpenAI-compatible SDK.": "令牌零加价。即插即用的 OpenAI 兼容 SDK。",
+    "Drop-in OpenAI, Claude, and Gemini APIs.": "即插即用 OpenAI、Claude、Gemini API。",
     "No matches found": "未找到匹配项",
     "No matching items": "没有匹配项",
     "No matching presets": "没有匹配的预设",

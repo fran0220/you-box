@@ -24,8 +24,6 @@ import { useStatus } from '@/hooks/use-status'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useHeroStatusPill } from '../../hooks/use-hero-status-pill'
-import { HeroCodeBlock } from './hero-code-block'
-import { HeroStatsStrip } from './hero-stats-strip'
 
 interface HeroProps {
   className?: string
@@ -169,22 +167,8 @@ export function Hero(props: HeroProps) {
           style={{ animationDelay: '220ms' }}
         >
           <CircleCheckBig className='text-success size-[15px]' aria-hidden='true' />
-          {t('No markup on tokens. Drop-in OpenAI-compatible SDK.')}
+          {t('Drop-in OpenAI, Claude, and Gemini APIs.')}
         </p>
-
-        <div
-          className='landing-animate-fade-up mt-12 w-full opacity-0'
-          style={{ animationDelay: '280ms' }}
-        >
-          <HeroCodeBlock />
-        </div>
-
-        <div
-          className='landing-animate-fade-up w-full opacity-0'
-          style={{ animationDelay: '340ms' }}
-        >
-          <HeroStatsStrip />
-        </div>
       </div>
     </section>
   )
