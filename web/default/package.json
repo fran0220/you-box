@@ -7,6 +7,7 @@
     "dev": "rsbuild dev",
     "build": "rsbuild build",
     "build:check": "tsc -b && rsbuild build",
+    "bundle:audit": "node scripts/bundle-audit.mjs",
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "preview": "rsbuild preview",

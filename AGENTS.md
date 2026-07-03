@@ -61,6 +61,16 @@ web/             — Frontend themes container
 - Usage: `useTranslation()` hook, call `t('English key')` in components
 - CLI tools: `bun run i18n:sync` (from `web/default/`)
 
+## Local validation (CI parity)
+
+From repo root:
+
+- **Backend:** `go test ./... -count=1`
+- **Frontend:** `cd web && bun install --frozen-lockfile` then `cd default && bun run typecheck && bun run lint && bun run test`
+- **Pre-commit:** `bun install` at repo root (enables Husky + lint-staged for staged `*.go` and `web/default/**` files)
+
+GitHub Actions workflow `.github/workflows/ci.yml` runs the same checks on pull requests to `main`.
+
 ## Rules
 
 ### Rule 1: JSON Package — Use `common/json.go`

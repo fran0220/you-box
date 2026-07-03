@@ -17,12 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo } from 'react'
-import { VChart } from '@visactor/react-vchart'
 import { PieChart } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useChartTheme } from '@/lib/use-chart-theme'
 import { VCHART_OPTION } from '@/lib/vchart'
 import { useVChartThemeColors } from '@/lib/vchart-theme'
+import { LazyVChart } from '@/components/lazy-vchart'
 import { buildMonochromeSeriesColorMap } from '../lib/chart-colors'
 import { formatShare, formatTokens } from '../lib/format'
 import type { RankingPeriod, VendorRanking, VendorShareSeries } from '../types'
@@ -160,7 +160,7 @@ export function MarketShareSection(props: MarketShareSectionProps) {
   const right = visible.slice(half)
 
   return (
-    <section className='bg-surface-card overflow-hidden rounded-lg border border-border'>
+    <section className='bg-surface-card border-border overflow-hidden rounded-lg border'>
       {/* Chart block ----------------------------------------------------- */}
       <div className='px-5 py-4'>
         <h2 className='text-foreground inline-flex items-center gap-2 text-base font-semibold'>
@@ -175,7 +175,7 @@ export function MarketShareSection(props: MarketShareSectionProps) {
       <div className='px-5 pb-5'>
         <div className='h-60 sm:h-72'>
           {themeReady && spec ? (
-            <VChart
+            <LazyVChart
               key={`vendor-share-${resolvedTheme}-${props.period}`}
               spec={{
                 ...spec,

@@ -16,7 +16,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useCallback, useMemo, lazy, Suspense, useEffect } from 'react'
+import {
+  useState,
+  useCallback,
+  useMemo,
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+} from 'react'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
@@ -33,7 +41,7 @@ import {
   buildDefaultDashboardFilters,
   getSavedChartPreferences,
   saveChartPreferences,
-} from './lib'
+} from './lib/filters'
 import {
   type DashboardSectionId,
   DASHBOARD_DEFAULT_SECTION,
@@ -132,6 +140,40 @@ function PerformanceOverviewFallback() {
   )
 }
 
+function RenderWhenVisible(props: {
+  children: React.ReactNode
+  fallback: React.ReactNode
+  rootMargin?: string
+}) {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    if (visible) return
+
+    const node = ref.current
+    if (!node || !('IntersectionObserver' in window)) {
+      setVisible(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (!entry?.isIntersecting) return
+        setVisible(true)
+        observer.disconnect()
+      },
+      { rootMargin: props.rootMargin ?? '240px' }
+    )
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [props.rootMargin, visible])
+
+  return <div ref={ref}>{visible ? props.children : props.fallback}</div>
+}
+
 const SECTION_META: Record<DashboardSectionId, { titleKey: string }> = {
   overview: {
     titleKey: 'Overview',
@@ -189,9 +231,7 @@ export function Dashboard() {
   const isAdmin = Boolean(userRole && userRole >= ROLE.ADMIN)
   const sectionTabIds = useMemo(
     () =>
-      DASHBOARD_SECTION_IDS.filter(
-        (section) => section !== 'users' || isAdmin
-      ),
+      DASHBOARD_SECTION_IDS.filter((section) => section !== 'users' || isAdmin),
     [isAdmin]
   )
   const handleSectionChange = useCallback(
@@ -275,38 +315,46 @@ export function Dashboard() {
                 </FadeIn>
               )}
               <FadeIn delay={0.1}>
-                <Suspense fallback={<ModelChartsFallback />}>
-                  <LazyConsumptionDistributionChart
-                    data={modelData}
-                    loading={dataLoading}
-                    defaultChartType={
-                      chartPreferences.consumptionDistributionChart
-                    }
-                    timeGranularity={
-                      modelFilters.time_granularity || DEFAULT_TIME_GRANULARITY
-                    }
-                  />
-                </Suspense>
+                <RenderWhenVisible fallback={<ModelChartsFallback />}>
+                  <Suspense fallback={<ModelChartsFallback />}>
+                    <LazyConsumptionDistributionChart
+                      data={modelData}
+                      loading={dataLoading}
+                      defaultChartType={
+                        chartPreferences.consumptionDistributionChart
+                      }
+                      timeGranularity={
+                        modelFilters.time_granularity ||
+                        DEFAULT_TIME_GRANULARITY
+                      }
+                    />
+                  </Suspense>
+                </RenderWhenVisible>
               </FadeIn>
               <FadeIn delay={0.15}>
-                <Suspense fallback={<ModelChartsFallback />}>
-                  <LazyModelCharts
-                    data={modelData}
-                    loading={dataLoading}
-                    defaultChartTab={chartPreferences.modelAnalyticsChart}
-                    timeGranularity={
-                      modelFilters.time_granularity || DEFAULT_TIME_GRANULARITY
-                    }
-                  />
-                </Suspense>
+                <RenderWhenVisible fallback={<ModelChartsFallback />}>
+                  <Suspense fallback={<ModelChartsFallback />}>
+                    <LazyModelCharts
+                      data={modelData}
+                      loading={dataLoading}
+                      defaultChartTab={chartPreferences.modelAnalyticsChart}
+                      timeGranularity={
+                        modelFilters.time_granularity ||
+                        DEFAULT_TIME_GRANULARITY
+                      }
+                    />
+                  </Suspense>
+                </RenderWhenVisible>
               </FadeIn>
             </>
           )}
           {activeSection === 'users' && isAdmin && (
             <FadeIn>
-              <Suspense fallback={<ModelChartsFallback />}>
-                <LazyUserCharts />
-              </Suspense>
+              <RenderWhenVisible fallback={<ModelChartsFallback />}>
+                <Suspense fallback={<ModelChartsFallback />}>
+                  <LazyUserCharts />
+                </Suspense>
+              </RenderWhenVisible>
             </FadeIn>
           )}
         </div>

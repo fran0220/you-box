@@ -18,7 +18,6 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo, useState, useRef, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { VChart } from '@visactor/react-vchart'
 import { Users, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getRollingDateRange, type TimeGranularity } from '@/lib/time'
@@ -27,6 +26,7 @@ import { useThemeCustomization } from '@/context/theme-customization-provider'
 import { useTheme } from '@/context/theme-provider'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { LazyVChart } from '@/components/lazy-vchart'
 import { getUserQuotaDataByUsers } from '@/features/dashboard/api'
 import {
   TIME_GRANULARITY_OPTIONS,
@@ -238,7 +238,7 @@ export function UserCharts() {
                 ) : (
                   themeReady &&
                   spec && (
-                    <VChart
+                    <LazyVChart
                       key={`user-${chart.value}-${topUserLimit}-${resolvedTheme}-${customization.preset}`}
                       spec={{
                         ...spec,

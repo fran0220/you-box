@@ -1,0 +1,25 @@
+{
+  "name": "YouBox",
+  "image": "mcr.microsoft.com/devcontainers/go:1-1.25-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "postCreateCommand": "curl -fsSL https://bun.sh/install | bash && export BUN_INSTALL=\"$HOME/.bun\" && export PATH=\"$BUN_INSTALL/bin:$PATH\" && go mod download && cd web && bun install --frozen-lockfile",
+  "forwardPorts": [3000, 5173],
+  "portsAttributes": {
+    "3000": { "label": "API (make dev-api or docker compose)" },
+    "5173": { "label": "Frontend (make dev-web)" }
+  },
+  "postAttachCommand": "echo 'Start stack: make dev-api && make dev-web'"
+}

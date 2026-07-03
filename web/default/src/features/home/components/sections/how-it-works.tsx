@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { Settings, Zap, BarChart3 } from 'lucide-react'
+import { BarChart3, KeyRound, Zap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { CodeBlock } from '@/components/ai-elements/code-block'
 import { AnimateInView } from '@/components/animate-in-view'
@@ -45,32 +45,30 @@ export function HowItWorks() {
   const steps = [
     {
       num: '1',
-      title: t('Configure'),
-      desc: t(
-        'Add your API keys, set up channels and configure access permissions'
-      ),
-      icon: <Settings className='size-6' strokeWidth={1.5} />,
+      title: t('Create a key'),
+      desc: t('Generate one API key from the console and keep it in your app.'),
+      icon: <KeyRound className='size-6' strokeWidth={1.5} />,
     },
     {
       num: '2',
-      title: t('Connect'),
+      title: t('Send a request'),
       desc: t(
-        'Connect through OpenAI, Claude, Gemini, and other compatible API routes'
+        'Use the OpenAI-compatible endpoint with any supported model string.'
       ),
       icon: <Zap className='size-6' strokeWidth={1.5} />,
     },
     {
       num: '3',
-      title: t('Monitor'),
-      desc: t('Track usage, costs and performance with real-time analytics'),
+      title: t('Monitor usage'),
+      desc: t('Review spend, tokens, and errors from the focused console.'),
       icon: <BarChart3 className='size-6' strokeWidth={1.5} />,
     },
   ]
 
   return (
-    <section className='border-border/40 relative z-10 border-t py-24 md:py-32'>
+    <section className='border-border/40 relative z-10 border-t py-16 md:py-20'>
       <div>
-        <AnimateInView className='mb-16 text-center md:mb-20'>
+        <AnimateInView className='mb-10 text-center md:mb-12'>
           <p className='yb-eyebrow mb-3'>
             {'// '}
             {t('How It Works')}
@@ -107,7 +105,7 @@ export function HowItWorks() {
         <AnimateInView
           delay={450}
           animation='fade-up'
-          className='mx-auto mt-16 max-w-2xl'
+          className='mx-auto mt-12 max-w-2xl'
         >
           <CodeBlock
             code={buildQuickstartCode()}

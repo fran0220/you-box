@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useStatus } from '@/hooks/use-status'
-import type { AnnouncementItem, ApiInfoItem, FAQItem } from '../types'
+import type { AnnouncementItem, ApiInfoItem } from '../types'
 
 /**
  * Get specific list from status data
@@ -51,13 +51,6 @@ export function useAnnouncements() {
 }
 
 /**
- * Get FAQ list
- */
-export function useFAQ() {
-  return useStatusData<FAQItem>('faq_enabled', 'faq')
-}
-
-/**
  * Get dashboard content panel visibility
  */
 export function useDashboardContentVisibility() {
@@ -67,7 +60,6 @@ export function useDashboardContentVisibility() {
   return {
     apiInfo: hasStatus && status?.api_info_enabled !== false,
     announcements: hasStatus && status?.announcements_enabled !== false,
-    faq: hasStatus && status?.faq_enabled !== false,
     uptimeKuma: hasStatus && status?.uptime_kuma_enabled !== false,
   }
 }

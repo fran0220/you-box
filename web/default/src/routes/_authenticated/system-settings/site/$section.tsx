@@ -17,21 +17,25 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { SiteSettings } from '@/features/system-settings/site'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import {
-  SITE_DEFAULT_SECTION,
-  SITE_SECTION_IDS,
-} from '@/features/system-settings/site/section-registry.tsx'
+  SETTINGS_SECTION_ROUTES,
+  isSettingsSectionId,
+} from '@/features/system-settings/section-route-config'
+
+const routeConfig = SETTINGS_SECTION_ROUTES.site
+const SiteSettings = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/system-settings/site')).SiteSettings,
+}))
 
 export const Route = createFileRoute(
   '/_authenticated/system-settings/site/$section'
 )({
   beforeLoad: ({ params }) => {
-    const validSections = SITE_SECTION_IDS as unknown as string[]
-    if (!validSections.includes(params.section)) {
+    if (!isSettingsSectionId('site', params.section)) {
       throw redirect({
         to: '/system-settings/site/$section',
-        params: { section: SITE_DEFAULT_SECTION },
+        params: { section: routeConfig.defaultSection },
       })
     }
   },

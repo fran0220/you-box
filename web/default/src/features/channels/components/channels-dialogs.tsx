@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { lazy, Suspense } from 'react'
 import { useChannels } from './channels-provider'
 import { BalanceQueryDialog } from './dialogs/balance-query-dialog'
 import { ChannelTestDialog } from './dialogs/channel-test-dialog'
@@ -26,19 +27,30 @@ import { MultiKeyManageDialog } from './dialogs/multi-key-manage-dialog'
 import { OllamaModelsDialog } from './dialogs/ollama-models-dialog'
 import { TagBatchEditDialog } from './dialogs/tag-batch-edit-dialog'
 import { UpstreamUpdateDialog } from './dialogs/upstream-update-dialog'
-import { ChannelMutateDrawer } from './drawers/channel-mutate-drawer'
+
+const ChannelMutateDrawer = lazy(() =>
+  import('./drawers/channel-mutate-drawer').then((mod) => ({
+    default: mod.ChannelMutateDrawer,
+  }))
+)
 
 export function ChannelsDialogs() {
   const { open, setOpen, currentRow, upstream } = useChannels()
+  const mutateDrawerOpen =
+    open === 'create-channel' || open === 'update-channel'
 
   return (
     <>
       {/* Channel Create/Update Drawer */}
-      <ChannelMutateDrawer
-        open={open === 'create-channel' || open === 'update-channel'}
-        onOpenChange={(v) => !v && setOpen(null)}
-        currentRow={open === 'update-channel' ? currentRow : null}
-      />
+      {mutateDrawerOpen && (
+        <Suspense fallback={null}>
+          <ChannelMutateDrawer
+            open={mutateDrawerOpen}
+            onOpenChange={(v) => !v && setOpen(null)}
+            currentRow={open === 'update-channel' ? currentRow : null}
+          />
+        </Suspense>
+      )}
 
       {/* Test Channel Dialog */}
       <ChannelTestDialog

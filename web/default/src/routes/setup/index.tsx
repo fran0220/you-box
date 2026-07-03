@@ -17,8 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { SetupWizard } from '@/features/setup'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { getSetupStatus } from '@/features/setup/api'
+
+const SetupWizard = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/setup')).SetupWizard,
+}))
 
 export const Route = createFileRoute('/setup/')({
   beforeLoad: async () => {

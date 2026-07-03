@@ -17,16 +17,19 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Dashboard } from '@/features/dashboard'
-import {
-  DASHBOARD_SECTION_IDS,
-  DASHBOARD_DEFAULT_SECTION,
-} from '@/features/dashboard/section-registry'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
+
+const DASHBOARD_DEFAULT_SECTION = 'overview'
+const DASHBOARD_SECTION_IDS = ['overview', 'models', 'users'] as const
+const Dashboard = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/dashboard')).Dashboard,
+}))
 
 export const Route = createFileRoute('/_authenticated/dashboard/$section')({
   beforeLoad: ({ params }) => {
-    const validSections = DASHBOARD_SECTION_IDS as unknown as string[]
-    if (!validSections.includes(params.section)) {
+    if (
+      !(DASHBOARD_SECTION_IDS as readonly string[]).includes(params.section)
+    ) {
       throw redirect({
         to: '/dashboard/$section',
         params: { section: DASHBOARD_DEFAULT_SECTION },

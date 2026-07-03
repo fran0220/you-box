@@ -149,8 +149,8 @@ export function Footer(props: FooterProps) {
         title: t('Product'),
         links: [
           { text: t('Model Square'), href: '/pricing' },
-          { text: t('Rankings'), href: '/rankings' },
-          { text: t('Playground'), href: '/playground' },
+          { text: t('Console'), href: '/dashboard' },
+          { text: t('Status'), href: '/status' },
         ],
       },
       {
@@ -158,13 +158,12 @@ export function Footer(props: FooterProps) {
         links: [
           { text: t('Documentation'), href: '/docs' },
           { text: t('API reference'), href: '/docs' },
-          { text: t('Status'), href: '/status' },
+          { text: t('Playground'), href: '/playground' },
         ],
       },
       {
-        title: t('Company'),
+        title: t('Legal'),
         links: [
-          { text: t('About'), href: '/about' },
           { text: t('Privacy Policy'), href: '/legal/privacy' },
           { text: t('User Agreement'), href: '/legal/terms' },
         ],
@@ -218,27 +217,29 @@ export function Footer(props: FooterProps) {
               </span>
             </Link>
             <p className='text-muted-foreground/60 mt-3 max-w-[240px] text-xs leading-relaxed'>
-              {t('Every model, one box. The unified gateway and marketplace for large language models.')}
+              {t(
+                'Every model, one box. The unified gateway and marketplace for large language models.'
+              )}
             </p>
           </div>
 
           {/* Links columns */}
           <div className='grid grid-cols-2 gap-8 sm:grid-cols-3 md:gap-16'>
-              {displayColumns.map((column, index) => (
-                <div key={index}>
-                  <p className='text-muted-foreground/60 mb-3 font-mono text-[11px] font-medium tracking-[0.08em] uppercase'>
-                    {t(column.title)}
-                  </p>
-                  <ul className='space-y-2.5'>
-                    {column.links.map((link, linkIndex) => (
-                      <li key={linkIndex}>
-                        <FooterLinkItem link={link} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
+            {displayColumns.map((column, index) => (
+              <div key={index}>
+                <p className='text-muted-foreground/60 mb-3 font-mono text-[11px] font-medium tracking-[0.08em] uppercase'>
+                  {t(column.title)}
+                </p>
+                <ul className='space-y-2.5'>
+                  {column.links.map((link, linkIndex) => (
+                    <li key={linkIndex}>
+                      <FooterLinkItem link={link} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Copyright + optional legal links inline on the left, project

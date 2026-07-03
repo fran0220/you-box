@@ -24,7 +24,6 @@ import {
   FileText,
   FlaskConical,
   Key,
-  LayoutDashboard,
   LayoutGrid,
   ListTodo,
   MessageSquare,
@@ -52,8 +51,18 @@ export function useSidebarData(): SidebarData {
     navGroups: [
       {
         id: 'chat',
-        title: t('Chat'),
+        title: t('Get started'),
         items: [
+          {
+            title: t('Overview'),
+            url: '/dashboard/overview',
+            icon: Activity,
+          },
+          {
+            title: t('API Keys'),
+            url: '/keys',
+            icon: Key,
+          },
           {
             title: t('Playground'),
             url: '/playground',
@@ -68,12 +77,27 @@ export function useSidebarData(): SidebarData {
       },
       {
         id: 'developer',
-        title: t('Developer'),
+        title: t('Resources'),
         items: [
           {
-            title: t('API tools'),
-            url: '/api-tools',
-            icon: Wrench,
+            title: t('Usage Logs'),
+            icon: FileText,
+            items: [
+              {
+                title: t('API Logs'),
+                url: '/usage-logs/common',
+              },
+              {
+                title: t('Task Logs'),
+                url: '/usage-logs/task',
+                activeUrls: ['/usage-logs/drawing'],
+              },
+            ],
+          },
+          {
+            title: t('Models & Pricing'),
+            url: '/pricing',
+            icon: Box,
           },
           {
             title: t('API reference'),
@@ -81,48 +105,20 @@ export function useSidebarData(): SidebarData {
             icon: BookText,
           },
           {
-            title: t('App rankings'),
+            title: t('API tools'),
+            url: '/api-tools',
+            icon: Wrench,
+          },
+          {
+            title: t('Apps'),
             url: '/apps',
             icon: LayoutGrid,
           },
         ],
       },
       {
-        id: 'general',
-        title: t('General'),
-        items: [
-          {
-            title: t('Overview'),
-            url: '/dashboard/overview',
-            icon: Activity,
-          },
-          {
-            title: t('Dashboard'),
-            url: '/dashboard/models',
-            icon: LayoutDashboard,
-          },
-          {
-            title: t('API Keys'),
-            url: '/keys',
-            icon: Key,
-          },
-          {
-            title: t('Usage Logs'),
-            url: '/usage-logs/common',
-            icon: FileText,
-          },
-          {
-            title: t('Task Logs'),
-            url: '/usage-logs/task',
-            activeUrls: ['/usage-logs/drawing'],
-            configUrls: ['/usage-logs/drawing', '/usage-logs/task'],
-            icon: ListTodo,
-          },
-        ],
-      },
-      {
         id: 'personal',
-        title: t('Personal'),
+        title: t('Account'),
         items: [
           {
             title: t('Wallet'),
@@ -148,7 +144,7 @@ export function useSidebarData(): SidebarData {
           {
             title: t('Models'),
             url: '/models/metadata',
-            icon: Box,
+            icon: ListTodo,
           },
           {
             title: t('Users'),

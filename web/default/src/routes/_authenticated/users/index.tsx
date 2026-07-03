@@ -19,8 +19,12 @@ For commercial licensing, please contact support@quantumnous.com
 import z from 'zod'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { ROLE } from '@/lib/roles'
-import { Users } from '@/features/users'
+
+const Users = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/users')).Users,
+}))
 
 const usersSearchSchema = z.object({
   page: z.number().optional().catch(1),

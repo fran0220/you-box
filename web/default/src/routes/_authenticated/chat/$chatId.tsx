@@ -20,19 +20,23 @@ import { useMemo, useState } from 'react'
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { Loader2, MessageCircleWarning } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { createLazyComponent } from '@/lib/lazy-route-component'
+import { isSidebarModuleEnabled } from '@/lib/nav-modules'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Main } from '@/components/layout'
 import { EmptyState } from '@/components/youbox'
-import { isSidebarModuleEnabled } from '@/lib/nav-modules'
-import { ChatShell } from '@/features/chat/components/chat-shell'
 import { useActiveChatKey } from '@/features/chat/hooks/use-active-chat-key'
 import { useChatPresets } from '@/features/chat/hooks/use-chat-presets'
 import {
   chatLinkRequiresApiKey,
   resolveChatUrl,
 } from '@/features/chat/lib/chat-links'
+
+const ChatShell = createLazyComponent(async () => ({
+  default: (await import('@/features/chat/components/chat-shell')).ChatShell,
+}))
 
 export const Route = createFileRoute('/_authenticated/chat/$chatId')({
   beforeLoad: () => {
@@ -130,7 +134,7 @@ function ChatRouteComponent() {
           title={t('Use sidebar shortcut')}
           description={
             <>
-              <span className='font-medium text-foreground'>{preset.name}</span>{' '}
+              <span className='text-foreground font-medium'>{preset.name}</span>{' '}
               {t(
                 'opens in an external client. Trigger it from the sidebar or API key actions to launch the configured application.'
               )}
@@ -163,9 +167,7 @@ function ChatRouteComponent() {
       const message =
         error instanceof Error
           ? error.message
-          : t(
-              'Unable to generate chat link. Please check your API keys.'
-            )
+          : t('Unable to generate chat link. Please check your API keys.')
       return (
         <div className='flex h-full flex-col items-center justify-center p-6'>
           <Alert variant='destructive' className='max-w-xl'>

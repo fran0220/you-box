@@ -27,8 +27,6 @@ import {
   Hero,
   HowItWorks,
   MarketplacePreview,
-  PricingTiers,
-  Providers,
 } from './components'
 import { useHomePageContent } from './hooks'
 
@@ -47,7 +45,9 @@ export function Home() {
           aria-live='polite'
         >
           <Skeleton className='h-4 w-32' />
-          <p className='text-muted-foreground font-mono text-sm'>{t('Loading...')}</p>
+          <p className='text-muted-foreground font-mono text-sm'>
+            {t('Loading...')}
+          </p>
         </div>
       </AppShell>
     )
@@ -78,11 +78,9 @@ export function Home() {
   return (
     <AppShell variant='public'>
       <Hero isAuthenticated={isAuthenticated} />
-      <Providers />
-      <MarketplacePreview />
       <Features />
       <HowItWorks />
-      <PricingTiers />
+      <MarketplacePreview />
       <CTA isAuthenticated={isAuthenticated} />
     </AppShell>
   )

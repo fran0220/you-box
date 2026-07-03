@@ -21,12 +21,12 @@ import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatQuota } from '@/lib/format'
 import { useNotifications } from '@/hooks/use-notifications'
+import { Button } from '@/components/ui/button'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { NotificationPopover } from '@/components/notification-popover'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
-import { Button } from '@/components/ui/button'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { HeaderFrame } from './header-frame'
 import { SystemBrand } from './system-brand'
@@ -51,7 +51,7 @@ export function Header(props: HeaderProps) {
   const variant = props.variant
   const showTopNav = props.showTopNav ?? true
   const showSearch = props.showSearch ?? variant === 'app'
-  const showNotifications = props.showNotifications ?? true
+  const showNotifications = props.showNotifications ?? variant === 'app'
   const showConfigDrawer = props.showConfigDrawer ?? variant === 'app'
   const showProfileDropdown = props.showProfileDropdown ?? variant === 'app'
   const showThemeSwitch = props.showThemeSwitch ?? true

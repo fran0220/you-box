@@ -17,8 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createLazyComponent } from '@/lib/lazy-route-component'
 import { AppShell } from '@/components/layout'
-import { LegalPage, type LegalDocId } from '@/features/legal/legal-page'
+import type { LegalDocId } from '@/features/legal/legal-page'
+
+const LegalPage = createLazyComponent(async () => ({
+  default: (await import('@/features/legal/legal-page')).LegalPage,
+}))
 
 const VALID_DOCS = new Set<LegalDocId>(['privacy', 'terms', 'dpa'])
 

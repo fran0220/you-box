@@ -19,8 +19,13 @@ For commercial licensing, please contact support@quantumnous.com
 import z from 'zod'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { getFreshModuleAccess } from '@/lib/nav-modules'
-import { ModelDetails } from '@/features/pricing/components/model-details'
+
+const ModelDetails = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/pricing/components/model-details'))
+    .ModelDetails,
+}))
 
 // Mirrors the catalog index route's search schema so the detail page can carry
 // the active filters/sort/view back to `/pricing` ("Back to Models"). All array

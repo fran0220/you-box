@@ -1,6 +1,10 @@
 import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
-import { AgentAuthorize } from '@/features/agent'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
+
+const AgentAuthorize = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/agent')).AgentAuthorize,
+}))
 
 const searchSchema = z.object({
   client_id: z.string().optional().catch('youbox-agent'),

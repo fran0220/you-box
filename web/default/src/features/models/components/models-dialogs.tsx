@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { lazy, Suspense } from 'react'
 import { DescriptionDialog } from './dialogs/description-dialog'
 import { MissingModelsDialog } from './dialogs/missing-models-dialog'
 import { PrefillGroupManagement } from './dialogs/prefill-group-management'
@@ -23,8 +24,13 @@ import { SyncWizardDialog } from './dialogs/sync-wizard-dialog'
 import { UpstreamConflictDialog } from './dialogs/upstream-conflict-dialog'
 import { VendorManagementDialog } from './dialogs/vendor-management-dialog'
 import { VendorMutateDialog } from './dialogs/vendor-mutate-dialog'
-import { ModelMutateDrawer } from './drawers/model-mutate-drawer'
 import { useModels } from './models-provider'
+
+const ModelMutateDrawer = lazy(() =>
+  import('./drawers/model-mutate-drawer').then((mod) => ({
+    default: mod.ModelMutateDrawer,
+  }))
+)
 
 export function ModelsDialogs() {
   const {
@@ -35,15 +41,20 @@ export function ModelsDialogs() {
     descriptionData,
     setDescriptionData,
   } = useModels()
+  const mutateDrawerOpen = open === 'create-model' || open === 'update-model'
 
   return (
     <>
       {/* Model Create/Update Drawer */}
-      <ModelMutateDrawer
-        open={open === 'create-model' || open === 'update-model'}
-        onOpenChange={(v) => !v && setOpen(null)}
-        currentRow={currentRow}
-      />
+      {mutateDrawerOpen && (
+        <Suspense fallback={null}>
+          <ModelMutateDrawer
+            open={mutateDrawerOpen}
+            onOpenChange={(v) => !v && setOpen(null)}
+            currentRow={currentRow}
+          />
+        </Suspense>
+      )}
 
       <VendorManagementDialog
         open={open === 'vendor-management'}

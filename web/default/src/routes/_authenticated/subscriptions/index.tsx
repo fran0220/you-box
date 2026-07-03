@@ -18,8 +18,12 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { ROLE } from '@/lib/roles'
-import { Subscriptions } from '@/features/subscriptions'
+
+const Subscriptions = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/subscriptions')).Subscriptions,
+}))
 
 export const Route = createFileRoute('/_authenticated/subscriptions/')({
   beforeLoad: () => {

@@ -28,20 +28,20 @@ import { usePricingData } from '@/features/pricing/hooks/use-pricing-data'
 export function MarketplacePreview() {
   const { t } = useTranslation()
   const { models, isLoading } = usePricingData()
-  const previewModels = models.slice(0, 4)
+  const previewModels = models.slice(0, 3)
 
   return (
     <section className='px-4 py-16 md:px-6'>
       <div className='mx-auto max-w-6xl'>
         <div className='mb-8 flex flex-wrap items-end justify-between gap-6'>
           <div className='max-w-xl'>
-            <Eyebrow className='mb-3'>{t('Marketplace')}</Eyebrow>
+            <Eyebrow className='mb-3'>{t('Models and pricing')}</Eyebrow>
             <h2 className='font-display text-text-strong text-[clamp(1.75rem,3vw,2.375rem)] leading-[1.08] font-bold tracking-[-0.025em]'>
-              {t('One catalog. Every model.')}
+              {t('Pick a model when the job changes.')}
             </h2>
             <p className='text-muted-foreground mt-3 text-base leading-relaxed md:text-[17px]'>
               {t(
-                'Compare price, context, and throughput across providers. Switch models with a single string — no new integration.'
+                'Compare price, context, and provider options without turning the homepage into a full marketplace.'
               )}
             </p>
           </div>
@@ -51,7 +51,7 @@ export function MarketplacePreview() {
             render={<Link to='/pricing' />}
           >
             <span>
-              {t('Browse all {{count}}', {
+              {t('See all {{count}} models', {
                 count: models.length > 0 ? models.length : '…',
               })}
             </span>
@@ -59,9 +59,9 @@ export function MarketplacePreview() {
           </Button>
         </div>
 
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-3'>
           {isLoading
-            ? Array.from({ length: 4 }).map((_, index) => (
+            ? Array.from({ length: 3 }).map((_, index) => (
                 <Skeleton key={index} className='h-56 w-full rounded-[14px]' />
               ))
             : previewModels.map((model) => (

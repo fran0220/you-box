@@ -23,7 +23,6 @@ import { ApiInfoSection } from './api-info-section'
 import { ChatSettingsSection } from './chat-settings-section'
 import { DashboardSection } from './dashboard-section'
 import { DrawingSettingsSection } from './drawing-settings-section'
-import { FAQSection } from './faq-section'
 import { UptimeKumaSection } from './uptime-kuma-section'
 
 /**
@@ -70,16 +69,6 @@ const CONTENT_SECTIONS = [
       <ApiInfoSection
         enabled={settings['console_setting.api_info_enabled']}
         data={settings['console_setting.api_info']}
-      />
-    ),
-  },
-  {
-    id: 'faq',
-    titleKey: 'FAQ',
-    build: (settings: ContentSettings) => (
-      <FAQSection
-        enabled={settings['console_setting.faq_enabled']}
-        data={settings['console_setting.faq']}
       />
     ),
   },

@@ -17,9 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createLazyComponent } from '@/lib/lazy-route-component'
 import { isSidebarModuleEnabled } from '@/lib/nav-modules'
 import { Main } from '@/components/layout'
-import { Playground } from '@/features/playground'
+
+const Playground = createLazyComponent(async () => ({
+  default: (await import('@/features/playground')).Playground,
+}))
 
 type PlaygroundSearch = {
   model?: string

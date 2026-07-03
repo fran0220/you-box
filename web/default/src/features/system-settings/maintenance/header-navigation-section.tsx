@@ -56,8 +56,10 @@ const headerNavSchema = z.object({
   pricingRequireAuth: z.boolean(),
   rankingsEnabled: z.boolean(),
   rankingsRequireAuth: z.boolean(),
+  apps: z.boolean(),
   docs: z.boolean(),
   about: z.boolean(),
+  status: z.boolean(),
 })
 
 type HeaderNavFormValues = z.infer<typeof headerNavSchema>
@@ -90,12 +92,18 @@ const toFormValues = (config: HeaderNavModulesConfig): HeaderNavFormValues => ({
     config.rankings?.requireAuth === undefined
       ? HEADER_NAV_DEFAULT.rankings.requireAuth
       : Boolean(config.rankings.requireAuth),
+  apps:
+    config.apps === undefined ? HEADER_NAV_DEFAULT.apps : Boolean(config.apps),
   docs:
     config.docs === undefined ? HEADER_NAV_DEFAULT.docs : Boolean(config.docs),
   about:
     config.about === undefined
       ? HEADER_NAV_DEFAULT.about
       : Boolean(config.about),
+  status:
+    config.status === undefined
+      ? HEADER_NAV_DEFAULT.status
+      : Boolean(config.status),
 })
 
 export function HeaderNavigationSection({
@@ -120,8 +128,10 @@ export function HeaderNavigationSection({
       ...config,
       home: values.home,
       console: values.console,
+      apps: values.apps,
       docs: values.docs,
       about: values.about,
+      status: values.status,
       pricing: {
         ...(config.pricing ?? HEADER_NAV_DEFAULT.pricing),
         enabled: values.pricingEnabled,
@@ -168,6 +178,16 @@ export function HeaderNavigationSection({
       key: 'docs',
       title: t('Docs'),
       description: t('Documentation or external knowledge base.'),
+    },
+    {
+      key: 'status',
+      title: t('Status'),
+      description: t('Public health and uptime page.'),
+    },
+    {
+      key: 'apps',
+      title: t('Apps'),
+      description: t('Public app usage leaderboard.'),
     },
     {
       key: 'about',
@@ -225,28 +245,28 @@ export function HeaderNavigationSection({
           <FormDirtyIndicator isDirty={isDirty} />
           <SettingRowGroup>
             <div className='grid gap-0 md:grid-cols-2 md:divide-x md:divide-[var(--divider)]'>
-            {simpleModules.map((module) => (
-              <FormField
-                key={module.key}
-                control={form.control}
-                name={module.key}
-                render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{module.title}</FormLabel>
-                      <FormDescription>{module.description}</FormDescription>
-                    </SettingsSwitchContent>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </SettingsSwitchItem>
-                )}
-              />
-            ))}
+              {simpleModules.map((module) => (
+                <FormField
+                  key={module.key}
+                  control={form.control}
+                  name={module.key}
+                  render={({ field }) => (
+                    <SettingsSwitchItem>
+                      <SettingsSwitchContent>
+                        <FormLabel>{module.title}</FormLabel>
+                        <FormDescription>{module.description}</FormDescription>
+                      </SettingsSwitchContent>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </SettingsSwitchItem>
+                  )}
+                />
+              ))}
             </div>
           </SettingRowGroup>
 

@@ -18,7 +18,11 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { z } from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
-import { Wallet } from '@/features/wallet'
+import { createLazyComponent } from '@/lib/lazy-route-component'
+
+const Wallet = createLazyComponent(async () => ({
+  default: (await import('@/features/wallet')).Wallet,
+}))
 
 const walletSearchSchema = z.object({
   show_history: z.boolean().optional(),

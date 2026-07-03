@@ -17,21 +17,25 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { BillingSettings } from '@/features/system-settings/billing'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import {
-  BILLING_DEFAULT_SECTION,
-  BILLING_SECTION_IDS,
-} from '@/features/system-settings/billing/section-registry.tsx'
+  SETTINGS_SECTION_ROUTES,
+  isSettingsSectionId,
+} from '@/features/system-settings/section-route-config'
+
+const routeConfig = SETTINGS_SECTION_ROUTES.billing
+const BillingSettings = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/system-settings/billing')).BillingSettings,
+}))
 
 export const Route = createFileRoute(
   '/_authenticated/system-settings/billing/$section'
 )({
   beforeLoad: ({ params }) => {
-    const validSections = BILLING_SECTION_IDS as unknown as string[]
-    if (!validSections.includes(params.section)) {
+    if (!isSettingsSectionId('billing', params.section)) {
       throw redirect({
         to: '/system-settings/billing/$section',
-        params: { section: BILLING_DEFAULT_SECTION },
+        params: { section: routeConfig.defaultSection },
       })
     }
   },

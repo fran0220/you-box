@@ -19,12 +19,14 @@ For commercial licensing, please contact support@quantumnous.com
 import z from 'zod'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { ROLE } from '@/lib/roles'
-import { Models } from '@/features/models'
-import {
-  MODELS_SECTION_IDS,
-  MODELS_DEFAULT_SECTION,
-} from '@/features/models/section-registry'
+
+const MODELS_DEFAULT_SECTION = 'metadata'
+const MODELS_SECTION_IDS = ['metadata', 'deployments'] as const
+const Models = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/models')).Models,
+}))
 
 const modelsSearchSchema = z.object({
   page: z.number().optional().catch(1),
@@ -49,8 +51,7 @@ export const Route = createFileRoute('/_authenticated/models/$section')({
       })
     }
 
-    const validSections = MODELS_SECTION_IDS as unknown as string[]
-    if (!validSections.includes(params.section)) {
+    if (!(MODELS_SECTION_IDS as readonly string[]).includes(params.section)) {
       throw redirect({
         to: '/models/$section',
         params: { section: MODELS_DEFAULT_SECTION },

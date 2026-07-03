@@ -152,7 +152,8 @@ export const SIDEBAR_ITEM_VARIANTS: Variants = {
  * token for stacking).
  *
  * Layering pairs with the `--z-*` scale in styles/theme.css: the backdrop sits
- * at `--z-overlay`; anchored popups add their own `z-[var(--z-popover|...)]`.
+ * at `--z-overlay`; anchored popups add their own z-index token such as
+ * `--z-popover` or `--z-dropdown`.
  * Callers append their own transform recipe (scale/translate) on top of
  * {@link overlayPopupMotionClassName}.
  */

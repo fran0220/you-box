@@ -18,11 +18,13 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import z from 'zod'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { UsageLogs } from '@/features/usage-logs'
-import {
-  isUsageLogsSectionId,
-  USAGE_LOGS_DEFAULT_SECTION,
-} from '@/features/usage-logs/section-registry'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
+
+const USAGE_LOGS_DEFAULT_SECTION = 'common'
+const USAGE_LOGS_SECTION_IDS = ['common', 'drawing', 'task'] as const
+const UsageLogs = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/usage-logs')).UsageLogs,
+}))
 
 const logTypeValues = ['0', '1', '2', '3', '4', '5', '6'] as const
 const logTypeSearchSchema = z
@@ -53,7 +55,9 @@ const usageLogsSearchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/usage-logs/$section')({
   beforeLoad: ({ params, search }) => {
-    if (!isUsageLogsSectionId(params.section)) {
+    if (
+      !(USAGE_LOGS_SECTION_IDS as readonly string[]).includes(params.section)
+    ) {
       throw redirect({
         to: '/usage-logs/$section',
         params: { section: USAGE_LOGS_DEFAULT_SECTION },

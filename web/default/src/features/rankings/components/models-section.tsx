@@ -17,12 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo } from 'react'
-import { VChart } from '@visactor/react-vchart'
 import { BarChart3, Trophy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useChartTheme } from '@/lib/use-chart-theme'
 import { VCHART_OPTION } from '@/lib/vchart'
 import { useVChartThemeColors } from '@/lib/vchart-theme'
+import { LazyVChart } from '@/components/lazy-vchart'
 import { formatTokens } from '../lib/format'
 import type { ModelHistorySeries, ModelRanking, RankingPeriod } from '../types'
 import { ModelLeaderboard } from './model-leaderboard'
@@ -159,7 +159,7 @@ export function ModelsSection(props: ModelsSectionProps) {
   }, [chartGridColor, chartTextColor, orderedPoints, t])
 
   return (
-    <section className='bg-surface-card overflow-hidden rounded-lg border border-border'>
+    <section className='bg-surface-card border-border overflow-hidden rounded-lg border'>
       {/* Chart block ----------------------------------------------------- */}
       <div className='flex items-start justify-between gap-4 px-5 py-4'>
         <div className='min-w-0 flex-1'>
@@ -184,7 +184,7 @@ export function ModelsSection(props: ModelsSectionProps) {
       <div className='px-5 pb-5'>
         <div className='h-60 sm:h-72'>
           {themeReady && spec ? (
-            <VChart
+            <LazyVChart
               key={`models-history-${resolvedTheme}-${props.period}`}
               spec={{
                 ...spec,

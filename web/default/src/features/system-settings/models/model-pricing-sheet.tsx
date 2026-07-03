@@ -18,6 +18,8 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import {
   forwardRef,
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -79,7 +81,12 @@ import {
 } from './model-pricing-core'
 import { PriceInput, PriceLane } from './model-pricing-inputs'
 import { formatPricingNumber } from './pricing-format'
-import { TieredPricingEditor } from './tiered-pricing-editor'
+
+const TieredPricingEditor = lazy(() =>
+  import('./tiered-pricing-editor').then((mod) => ({
+    default: mod.TieredPricingEditor,
+  }))
+)
 
 export type { ModelRatioData } from './model-pricing-core'
 
@@ -637,13 +644,15 @@ export const ModelPricingEditorPanel = forwardRef<
 
                   <TabsContent value='tiered_expr' className='pt-0'>
                     <FieldGroup className='gap-5'>
-                      <TieredPricingEditor
-                        modelName={watchedValues.name}
-                        billingExpr={billingExpr}
-                        requestRuleExpr={requestRuleExpr}
-                        onBillingExprChange={setBillingExpr}
-                        onRequestRuleExprChange={setRequestRuleExpr}
-                      />
+                      <Suspense fallback={null}>
+                        <TieredPricingEditor
+                          modelName={watchedValues.name}
+                          billingExpr={billingExpr}
+                          requestRuleExpr={requestRuleExpr}
+                          onBillingExprChange={setBillingExpr}
+                          onRequestRuleExprChange={setRequestRuleExpr}
+                        />
+                      </Suspense>
                     </FieldGroup>
                   </TabsContent>
                 </Tabs>

@@ -19,9 +19,13 @@ For commercial licensing, please contact support@quantumnous.com
 import z from 'zod'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { ROLE } from '@/lib/roles'
-import { Redemptions } from '@/features/redemption-codes'
 import { REDEMPTION_STATUS_VALUES } from '@/features/redemption-codes/constants'
+
+const Redemptions = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/redemption-codes')).Redemptions,
+}))
 
 const redemptionsSearchSchema = z.object({
   page: z.number().optional().catch(1),

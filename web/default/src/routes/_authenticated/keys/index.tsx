@@ -18,8 +18,12 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
-import { ApiKeys } from '@/features/keys'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { API_KEY_STATUS_OPTIONS } from '@/features/keys/constants'
+
+const ApiKeys = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/keys')).ApiKeys,
+}))
 
 const apiKeySearchSchema = z.object({
   page: z.number().optional().catch(1),

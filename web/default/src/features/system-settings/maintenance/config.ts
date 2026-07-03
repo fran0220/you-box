@@ -26,8 +26,10 @@ export type HeaderNavModulesConfig = {
   console: boolean
   pricing: HeaderNavAccessConfig
   rankings: HeaderNavAccessConfig
+  apps: boolean
   docs: boolean
   about: boolean
+  status: boolean
   [key: string]: boolean | HeaderNavAccessConfig
 }
 
@@ -46,11 +48,13 @@ export const HEADER_NAV_DEFAULT: HeaderNavModulesConfig = {
     requireAuth: false,
   },
   rankings: {
-    enabled: true,
+    enabled: false,
     requireAuth: false,
   },
+  apps: false,
   docs: true,
-  about: true,
+  about: false,
+  status: true,
 }
 
 export const SIDEBAR_MODULES_DEFAULT: SidebarModulesAdminConfig = {

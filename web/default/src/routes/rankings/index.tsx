@@ -19,8 +19,12 @@ For commercial licensing, please contact support@quantumnous.com
 import z from 'zod'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { getFreshModuleAccess } from '@/lib/nav-modules'
-import { Rankings } from '@/features/rankings'
+
+const Rankings = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/rankings')).Rankings,
+}))
 
 const rankingsSearchSchema = z.object({
   period: z

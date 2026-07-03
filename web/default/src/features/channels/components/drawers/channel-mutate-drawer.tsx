@@ -18,6 +18,8 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import {
   Fragment,
+  lazy,
+  Suspense,
   useEffect,
   useState,
   useMemo,
@@ -147,7 +149,6 @@ import {
   MissingModelsConfirmationDialog,
   type MissingModelsAction,
 } from '../dialogs/missing-models-confirmation-dialog'
-import { ParamOverrideEditorDialog } from '../dialogs/param-override-editor-dialog'
 import { StatusCodeRiskDialog } from '../dialogs/status-code-risk-dialog'
 import { ModelMappingEditor } from '../model-mapping-editor'
 import {
@@ -163,6 +164,12 @@ import {
   ChannelBasicSection,
   ChannelModelsSection,
 } from './sections'
+
+const ParamOverrideEditorDialog = lazy(() =>
+  import('../dialogs/param-override-editor-dialog').then((mod) => ({
+    default: mod.ParamOverrideEditorDialog,
+  }))
+)
 
 type ChannelMutateDrawerProps = {
   open: boolean
@@ -2982,17 +2989,19 @@ export function ChannelMutateDrawer({
       </DrawerShell>
 
       {paramOverrideEditorOpen && (
-        <ParamOverrideEditorDialog
-          open={paramOverrideEditorOpen}
-          value={form.watch('param_override') || ''}
-          onOpenChange={setParamOverrideEditorOpen}
-          onSave={(nextValue) => {
-            form.setValue('param_override', nextValue, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }}
-        />
+        <Suspense fallback={null}>
+          <ParamOverrideEditorDialog
+            open={paramOverrideEditorOpen}
+            value={form.watch('param_override') || ''}
+            onOpenChange={setParamOverrideEditorOpen}
+            onSave={(nextValue) => {
+              form.setValue('param_override', nextValue, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Fetch Models Dialog */}

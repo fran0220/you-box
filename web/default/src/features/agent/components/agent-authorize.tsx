@@ -1,8 +1,14 @@
 import { useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useSearch } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { SectionPageLayout } from '@/components/layout'
 import { PageHeader } from '@/components/youbox'
 import { authorizeAgentDevice } from '../api'
@@ -47,7 +53,7 @@ export function AgentAuthorize() {
         setError(res.message || t('Authorization failed'))
         return
       }
-      window.location.href = res.data.redirect_uri
+      window.location.assign(res.data.redirect_uri)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('Authorization failed'))
     } finally {
@@ -62,24 +68,33 @@ export function AgentAuthorize() {
           <PageHeader
             eyebrow={t('YouBox Agent')}
             title={t('Authorize desktop app')}
-            subtitle={t('Allow YouBox Agent to access your account on this device.')}
+            subtitle={t(
+              'Allow YouBox Agent to access your account on this device.'
+            )}
           />
           <Card>
             <CardHeader>
               <CardTitle>{t('Device authorization')}</CardTitle>
               <CardDescription>
-                {t('You are signing in to YouBox Agent on {{device}}.', { device: deviceLabel })}
+                {t('You are signing in to YouBox Agent on {{device}}.', {
+                  device: deviceLabel,
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent className='space-y-4'>
               {!canAuthorize && (
-                <p className='text-sm text-muted-foreground'>
-                  {t('This authorization link is invalid or expired. Return to the desktop app and try again.')}
+                <p className='text-muted-foreground text-sm'>
+                  {t(
+                    'This authorization link is invalid or expired. Return to the desktop app and try again.'
+                  )}
                 </p>
               )}
-              {error && <p className='text-sm text-destructive'>{error}</p>}
+              {error && <p className='text-destructive text-sm'>{error}</p>}
               <div className='flex gap-3'>
-                <Button disabled={!canAuthorize || loading} onClick={() => void handleAuthorize()}>
+                <Button
+                  disabled={!canAuthorize || loading}
+                  onClick={() => void handleAuthorize()}
+                >
                   {loading ? t('Authorizing...') : t('Authorize')}
                 </Button>
               </div>

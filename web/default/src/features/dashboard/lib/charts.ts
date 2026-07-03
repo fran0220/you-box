@@ -16,7 +16,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { dataScheme as vchartDefaultDataScheme } from '@visactor/vchart/esm/theme/color-scheme/builtin/default'
 import { getCurrencyDisplay } from '@/lib/currency'
 import { formatChartTime, type TimeGranularity } from '@/lib/time'
 import {
@@ -29,6 +28,48 @@ import type {
   ProcessedChartData,
   ProcessedUserChartData,
 } from '@/features/dashboard/types'
+
+const DEFAULT_CHART_COLOR_SCHEMES = [
+  {
+    maxDomainLength: 10,
+    scheme: [
+      '#1664FF',
+      '#1AC6FF',
+      '#FF8A00',
+      '#3CC780',
+      '#7442D4',
+      '#FFC400',
+      '#304D77',
+      '#B48DEB',
+      '#009488',
+      '#FF7DDA',
+    ],
+  },
+  {
+    scheme: [
+      '#1664FF',
+      '#B2CFFF',
+      '#1AC6FF',
+      '#94EFFF',
+      '#FF8A00',
+      '#FFCE7A',
+      '#3CC780',
+      '#B9EDCD',
+      '#7442D4',
+      '#DDC5FA',
+      '#FFC400',
+      '#FAE878',
+      '#304D77',
+      '#8B959E',
+      '#B48DEB',
+      '#EFE3FF',
+      '#009488',
+      '#59BAA8',
+      '#FF7DDA',
+      '#FFCFEE',
+    ],
+  },
+]
 
 type TFunction = (key: string) => string
 type TooltipLineItem = {
@@ -52,9 +93,9 @@ function getVChartDefaultColors(domainLength: number, themeKey?: string) {
   }
 
   const scheme =
-    vchartDefaultDataScheme.find(
+    DEFAULT_CHART_COLOR_SCHEMES.find(
       (item) => !item.maxDomainLength || domainLength <= item.maxDomainLength
-    ) ?? vchartDefaultDataScheme[vchartDefaultDataScheme.length - 1]
+    ) ?? DEFAULT_CHART_COLOR_SCHEMES[DEFAULT_CHART_COLOR_SCHEMES.length - 1]
 
   return scheme.scheme
 }

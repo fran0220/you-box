@@ -17,7 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { SECURITY_DEFAULT_SECTION } from '@/features/system-settings/security/section-registry.tsx'
+import { SETTINGS_SECTION_ROUTES } from '@/features/system-settings/section-route-config'
+
+const routeConfig = SETTINGS_SECTION_ROUTES.security
 
 export const Route = createFileRoute(
   '/_authenticated/system-settings/security/'
@@ -25,7 +27,7 @@ export const Route = createFileRoute(
   beforeLoad: () => {
     throw redirect({
       to: '/system-settings/security/$section',
-      params: { section: SECURITY_DEFAULT_SECTION },
+      params: { section: routeConfig.defaultSection },
     })
   },
 })

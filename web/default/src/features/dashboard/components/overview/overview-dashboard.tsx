@@ -59,7 +59,6 @@ import {
 } from '../../hooks/use-status-data'
 import { AnnouncementsPanel } from './announcements-panel'
 import { ApiInfoPanel } from './api-info-panel'
-import { FAQPanel } from './faq-panel'
 import { OverviewInsights } from './overview-insights'
 import { UptimePanel } from './uptime-panel'
 
@@ -458,7 +457,6 @@ export function OverviewDashboard() {
   const {
     apiInfo: showApiInfoPanel,
     announcements: showAnnouncementsPanel,
-    faq: showFAQPanel,
     uptimeKuma: showUptimePanel,
   } = useDashboardContentVisibility()
   const [manualSetupGuideExpanded, setManualSetupGuideExpanded] = useState<
@@ -598,8 +596,7 @@ export function OverviewDashboard() {
   const completedStepCount = startSteps.filter((step) => step.completed).length
   const setupComplete = completedStepCount === startSteps.length
   const setupGuideExpanded = manualSetupGuideExpanded ?? !setupComplete
-  const showLeftContentPanels =
-    isAdmin || showApiInfoPanel || showAnnouncementsPanel || showFAQPanel
+  const showLeftContentPanels = showApiInfoPanel || showAnnouncementsPanel
   const showContentPanels = showLeftContentPanels || showUptimePanel
 
   const handleSetupGuideToggle = () => {
@@ -610,7 +607,6 @@ export function OverviewDashboard() {
 
   return (
     <div className='flex flex-col gap-4'>
-      <OverviewInsights />
       {setupGuideExpanded ? (
         <CardStaggerContainer className='grid items-stretch gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]'>
           <CardStaggerItem className='bg-card h-full overflow-hidden rounded-2xl border shadow-xs'>
@@ -741,6 +737,8 @@ export function OverviewDashboard() {
         </CardStaggerContainer>
       )}
 
+      <OverviewInsights />
+
       {showContentPanels && (
         <CardStaggerContainer
           className={cn(
@@ -754,8 +752,7 @@ export function OverviewDashboard() {
             <div
               className={cn(
                 'grid min-w-0 grid-cols-1 gap-4',
-                (showApiInfoPanel || showAnnouncementsPanel || showFAQPanel) &&
-                  'lg:grid-cols-2'
+                showApiInfoPanel && showAnnouncementsPanel && 'lg:grid-cols-2'
               )}
             >
               {showApiInfoPanel && (
@@ -766,11 +763,6 @@ export function OverviewDashboard() {
               {showAnnouncementsPanel && (
                 <CardStaggerItem>
                   <AnnouncementsPanel />
-                </CardStaggerItem>
-              )}
-              {showFAQPanel && (
-                <CardStaggerItem>
-                  <FAQPanel />
                 </CardStaggerItem>
               )}
             </div>

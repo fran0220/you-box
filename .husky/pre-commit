@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+if command -v bunx >/dev/null 2>&1; then
+  bunx lint-staged
+elif command -v npx >/dev/null 2>&1; then
+  npx lint-staged
+else
+  echo "lint-staged: install deps with 'bun install' at repo root" >&2
+  exit 1
+fi

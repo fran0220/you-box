@@ -24,9 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatNumber, formatQuota } from '@/lib/format'
 import { computeTimeRange } from '@/lib/time'
-import { cn } from '@/lib/utils'
 import { AnimatedNumber } from '@/components/ui/animated-number'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -35,39 +33,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { FilterTabs } from '@/components/data-table'
-import { PageHeader } from '@/components/youbox'
 import {
-  Eyebrow,
   Panel,
   PanelBody,
   PanelHeader,
   ProgressBar,
-  Sparkline,
   StatCard,
   StatCardRow,
   type StatCardDelta,
 } from '@/components/patterns'
 import { StatusBadge, type StatusVariant } from '@/components/status-badge'
+import { PageHeader } from '@/components/youbox'
 import { getUserQuotaDates } from '@/features/dashboard/api'
 import type { QuotaDataItem } from '@/features/dashboard/types'
 import { getUserLogs } from '@/features/usage-logs/api'
 import { LOG_TYPE_ENUM } from '@/features/usage-logs/constants'
 import type { UsageLog } from '@/features/usage-logs/data/schema'
 
-/**
- * R2-B1 overview insights — the SCREENS.dashboard structure:
- * header (greeting + range + new key) → 4 StatCards → requests-over-time
- * panel (metric tabs) → spend-by-model → recent activity + credit balance.
- * Replaces the legacy SummaryCards block.
- */
-
 const RANGE_OPTIONS = [1, 7, 14, 30] as const
 type RangeDays = (typeof RANGE_OPTIONS)[number]
-
 type MetricKey = 'requests' | 'tokens' | 'spend'
 
-const CHART_BUCKETS = 28
+const LOG_STATUS: Record<number, { label: string; variant: StatusVariant }> = {
+  [LOG_TYPE_ENUM.CONSUME]: { label: 'Consume', variant: 'success' },
+  [LOG_TYPE_ENUM.ERROR]: { label: 'Error', variant: 'danger' },
+  [LOG_TYPE_ENUM.TOPUP]: { label: 'Top-up', variant: 'info' },
+  [LOG_TYPE_ENUM.REFUND]: { label: 'Refund', variant: 'info' },
+  [LOG_TYPE_ENUM.MANAGE]: { label: 'Manage', variant: 'warning' },
+  [LOG_TYPE_ENUM.SYSTEM]: { label: 'System', variant: 'neutral' },
+}
 
 function sumSeries(items: QuotaDataItem[], key: MetricKey): number {
   return items.reduce((total, item) => {
@@ -75,28 +69,6 @@ function sumSeries(items: QuotaDataItem[], key: MetricKey): number {
     if (key === 'tokens') return total + (Number(item.token_used) || 0)
     return total + (Number(item.quota) || 0)
   }, 0)
-}
-
-function bucketize(
-  items: QuotaDataItem[],
-  key: MetricKey,
-  start: number,
-  end: number,
-  buckets: number
-): number[] {
-  const series = Array.from({ length: buckets }, () => 0)
-  if (end <= start) return series
-  for (const item of items) {
-    const ts = Number(item.created_at) || start
-    const index = Math.min(
-      buckets - 1,
-      Math.max(0, Math.floor(((ts - start) / (end - start)) * buckets))
-    )
-    if (key === 'requests') series[index] += Number(item.count) || 0
-    else if (key === 'tokens') series[index] += Number(item.token_used) || 0
-    else series[index] += Number(item.quota) || 0
-  }
-  return series
 }
 
 function deltaFor(
@@ -113,34 +85,18 @@ function deltaFor(
   }
 }
 
-function modelInitials(name: string): string {
-  return (
-    name
-      .replace(/[^a-zA-Z0-9]/g, '')
-      .slice(0, 2)
-      .toUpperCase() || '?'
-  )
-}
-
-const LOG_STATUS: Record<number, { label: string; variant: StatusVariant }> = {
-  [LOG_TYPE_ENUM.CONSUME]: { label: 'Consume', variant: 'success' },
-  [LOG_TYPE_ENUM.ERROR]: { label: 'Error', variant: 'danger' },
-  [LOG_TYPE_ENUM.TOPUP]: { label: 'Top-up', variant: 'info' },
-  [LOG_TYPE_ENUM.REFUND]: { label: 'Refund', variant: 'info' },
-  [LOG_TYPE_ENUM.MANAGE]: { label: 'Manage', variant: 'warning' },
-  [LOG_TYPE_ENUM.SYSTEM]: { label: 'System', variant: 'neutral' },
-}
-
 function relativeTime(
   ts: number,
   t: (key: string, opts?: Record<string, unknown>) => string
-) {
+): string {
   const seconds = Math.max(0, Math.floor(Date.now() / 1000) - ts)
   if (seconds < 60) return t('{{count}}s ago', { count: seconds })
-  if (seconds < 3600)
+  if (seconds < 3600) {
     return t('{{count}}m ago', { count: Math.floor(seconds / 60) })
-  if (seconds < 86400)
+  }
+  if (seconds < 86400) {
     return t('{{count}}h ago', { count: Math.floor(seconds / 3600) })
+  }
   return t('{{count}}d ago', { count: Math.floor(seconds / 86400) })
 }
 
@@ -156,12 +112,11 @@ export function OverviewInsights() {
   const { t } = useTranslation()
   const user = useAuthStore((state) => state.auth.user)
   const [rangeDays, setRangeDays] = useState<RangeDays>(7)
-  const [metric, setMetric] = useState<MetricKey>('requests')
 
   const remainQuota = Number(user?.quota ?? 0)
   const usedQuota = Number(user?.used_quota ?? 0)
+  const totalQuota = usedQuota + remainQuota
 
-  // Double window: the first half feeds period-over-period deltas.
   const window = useMemo(() => {
     const full = computeTimeRange(rangeDays * 2)
     const mid = Math.floor((full.start_timestamp + full.end_timestamp) / 2)
@@ -172,7 +127,7 @@ export function OverviewInsights() {
     queryKey: [
       'dashboard',
       'overview',
-      'insights',
+      'summary',
       rangeDays,
       window.start_timestamp,
       window.end_timestamp,
@@ -189,7 +144,7 @@ export function OverviewInsights() {
   const logsQuery = useQuery({
     queryKey: ['dashboard', 'overview', 'recent-logs'],
     queryFn: async () => {
-      const result = await getUserLogs({ p: 1, page_size: 6 })
+      const result = await getUserLogs({ p: 1, page_size: 5 })
       return result.success ? ((result.data?.items ?? []) as UsageLog[]) : []
     },
     staleTime: 60 * 1000,
@@ -218,47 +173,6 @@ export function OverviewInsights() {
     [split]
   )
 
-  const chartSeries = useMemo(
-    () =>
-      bucketize(
-        split.currentPeriod,
-        metric,
-        window.mid,
-        window.end_timestamp,
-        CHART_BUCKETS
-      ),
-    [split.currentPeriod, metric, window.mid, window.end_timestamp]
-  )
-
-  const spendByModel = useMemo(() => {
-    const byModel = new Map<string, number>()
-    for (const item of split.currentPeriod) {
-      const name = item.model_name || t('Unknown')
-      byModel.set(name, (byModel.get(name) ?? 0) + (Number(item.quota) || 0))
-    }
-    const rows = Array.from(byModel.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-    const max = rows[0]?.[1] ?? 0
-    return { rows, max }
-  }, [split.currentPeriod, t])
-
-  const dailySpend = useMemo(() => {
-    const buckets = rangeDays === 1 ? 12 : Math.min(rangeDays, 14)
-    return bucketize(
-      split.currentPeriod,
-      'spend',
-      window.mid,
-      window.end_timestamp,
-      buckets
-    )
-  }, [split.currentPeriod, rangeDays, window.mid, window.end_timestamp])
-
-  const totalQuota = usedQuota + remainQuota
-  const burnPerDay = totals.spend / rangeDays
-  const runwayDays =
-    remainQuota > 0 && burnPerDay > 0 ? remainQuota / burnPerDay : null
-
   const rangeLabel: Record<RangeDays, string> = {
     1: t('Today'),
     7: t('Last 7 days'),
@@ -266,27 +180,11 @@ export function OverviewInsights() {
     30: t('Last 30 days'),
   }
 
-  const dateLabels = useMemo(() => {
-    const start = new Date(window.mid * 1000)
-    const end = new Date(window.end_timestamp * 1000)
-    const middle = new Date((window.mid + window.end_timestamp) * 500)
-    const fmt = (d: Date) =>
-      rangeDays === 1
-        ? `${String(d.getHours()).padStart(2, '0')}:00`
-        : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-    return [fmt(start), fmt(middle), fmt(end)]
-  }, [window.mid, window.end_timestamp, rangeDays])
-
   const loading = trendQuery.isLoading
-  const trendError = trendQuery.isError
   const logsError = logsQuery.isError
-  const maxDailySpend = Math.max(...dailySpend, 1)
-
-  const metricTitle: Record<MetricKey, string> = {
-    requests: t('{{value}} requests', { value: formatNumber(totals.requests) }),
-    tokens: t('{{value}} tokens', { value: formatNumber(totals.tokens) }),
-    spend: t('{{value}} spend', { value: formatQuota(totals.spend) }),
-  }
+  const burnPerDay = totals.spend / rangeDays
+  const runwayDays =
+    remainQuota > 0 && burnPerDay > 0 ? remainQuota / burnPerDay : null
 
   return (
     <div className='flex flex-col gap-4'>
@@ -298,14 +196,16 @@ export function OverviewInsights() {
             {user?.username ? `, ${user.username}` : ''}
           </>
         }
-        subtitle={t("Here's your activity for {{range}}.", {
-          range: rangeLabel[rangeDays].toLowerCase(),
-        })}
+        subtitle={t(
+          'Use this workspace to create keys, watch usage, and fix issues quickly.'
+        )}
         actions={
           <>
             <Select
               value={String(rangeDays)}
-              onValueChange={(v) => setRangeDays(Number(v) as RangeDays)}
+              onValueChange={(value) =>
+                setRangeDays(Number(value) as RangeDays)
+              }
             >
               <SelectTrigger
                 size='sm'
@@ -330,7 +230,6 @@ export function OverviewInsights() {
         }
       />
 
-      {/* 2. stat row */}
       <StatCardRow columns={4}>
         <StatCard
           icon={<Activity />}
@@ -377,115 +276,7 @@ export function OverviewInsights() {
         />
       </StatCardRow>
 
-      {/* 3+4. requests-over-time + spend by model */}
-      <div className='grid gap-4 xl:grid-cols-[1.7fr_1fr]'>
-        <Panel>
-          <PanelHeader
-            eyebrow={t('usage over time')}
-            title={metricTitle[metric]}
-            actions={
-              <FilterTabs<MetricKey>
-                label={t('Chart metric')}
-                value={metric}
-                onValueChange={setMetric}
-                items={[
-                  { value: 'requests', label: t('Requests') },
-                  { value: 'tokens', label: t('Tokens') },
-                  { value: 'spend', label: t('Spend') },
-                ]}
-              />
-            }
-          />
-          <PanelBody>
-            {loading ? (
-              <div className='bg-surface-2 h-[170px] rounded-md motion-safe:animate-pulse' />
-            ) : trendError ? (
-              <div className='flex h-[170px] flex-col items-center justify-center gap-2 text-center'>
-                <p className='text-muted-foreground text-sm'>
-                  {t('Failed to load')}
-                </p>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => {
-                    void trendQuery.refetch()
-                  }}
-                >
-                  {t('Try again')}
-                </Button>
-              </div>
-            ) : (
-              <Sparkline data={chartSeries} height={170} />
-            )}
-            {!trendError && (
-              <div className='text-muted-foreground mt-3 flex justify-between font-mono text-[11px]'>
-                {dateLabels.map((label, index) => (
-                  <span key={index}>{label}</span>
-                ))}
-              </div>
-            )}
-          </PanelBody>
-        </Panel>
-
-        <Panel>
-          <PanelHeader
-            title={t('Spend by model')}
-            actions={
-              <span className='text-muted-foreground font-mono text-[11px]'>
-                {rangeLabel[rangeDays]}
-              </span>
-            }
-          />
-          <PanelBody className='flex flex-col gap-4'>
-            {trendError ? (
-              <div className='flex flex-col items-center gap-2 py-6 text-center'>
-                <p className='text-muted-foreground text-sm'>
-                  {t('Failed to load')}
-                </p>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => {
-                    void trendQuery.refetch()
-                  }}
-                >
-                  {t('Try again')}
-                </Button>
-              </div>
-            ) : spendByModel.rows.length === 0 ? (
-              <p className='text-muted-foreground py-6 text-center text-sm'>
-                {t('No usage in this period')}
-              </p>
-            ) : (
-              spendByModel.rows.map(([name, amount]) => (
-                <div key={name}>
-                  <div className='mb-1.5 flex items-center gap-2.5'>
-                    <Avatar className='size-6'>
-                      <AvatarFallback className='font-display text-[10px] font-semibold'>
-                        {modelInitials(name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>
-                      {name}
-                    </span>
-                    <span className='text-muted-foreground font-mono text-[13px]'>
-                      {formatQuota(amount)}
-                    </span>
-                  </div>
-                  <ProgressBar
-                    value={amount}
-                    max={spendByModel.max || 1}
-                    label={name}
-                  />
-                </div>
-              ))
-            )}
-          </PanelBody>
-        </Panel>
-      </div>
-
-      {/* 5+6. recent activity + credit balance */}
-      <div className='grid gap-4 xl:grid-cols-2'>
+      <div className='grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]'>
         <Panel>
           <PanelHeader
             title={t('Recent activity')}
@@ -525,6 +316,7 @@ export function OverviewInsights() {
                   label: 'Unknown',
                   variant: 'neutral' as StatusVariant,
                 }
+
                 return (
                   <div
                     key={log.id ?? index}
@@ -588,11 +380,11 @@ export function OverviewInsights() {
               label={t('Used quota')}
               className='mt-4 mb-2 h-2'
             />
-            <div className='text-muted-foreground flex justify-between font-mono text-xs'>
+            <div className='text-muted-foreground flex justify-between gap-3 font-mono text-xs'>
               <span>
                 {t('Used')} {formatQuota(usedQuota)}
               </span>
-              <span>
+              <span className='text-right'>
                 {runwayDays !== null
                   ? t('~{{count}} days left at current rate', {
                       count: Math.min(999, Math.floor(runwayDays)),
@@ -601,28 +393,25 @@ export function OverviewInsights() {
               </span>
             </div>
             <div className='bg-divider my-5 h-px' />
-            <Eyebrow className='mb-3'>{t('daily spend')}</Eyebrow>
-            <div
-              className='flex h-20 items-end gap-1.5'
-              role='img'
-              aria-label={t('Daily spend chart')}
-            >
-              {dailySpend.map((value, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    'bg-brand min-h-0.5 flex-1 rounded-[2px]',
-                    index !== dailySpend.length - 1 && 'opacity-50'
-                  )}
-                  style={{
-                    height: `${Math.max(3, (value / maxDailySpend) * 100)}%`,
-                  }}
-                />
-              ))}
-            </div>
-            <div className='text-muted-foreground mt-2 flex justify-between font-mono text-[11px]'>
-              <span>{dateLabels[0]}</span>
-              <span>{dateLabels[2]}</span>
+            <div className='grid gap-2 text-sm'>
+              <div className='flex items-center justify-between gap-3'>
+                <span className='text-muted-foreground'>
+                  {t('Current range')}
+                </span>
+                <span className='font-mono'>{rangeLabel[rangeDays]}</span>
+              </div>
+              <div className='flex items-center justify-between gap-3'>
+                <span className='text-muted-foreground'>
+                  {t('Period spend')}
+                </span>
+                <span className='font-mono'>{formatQuota(totals.spend)}</span>
+              </div>
+              <div className='flex items-center justify-between gap-3'>
+                <span className='text-muted-foreground'>
+                  {t('Average daily spend')}
+                </span>
+                <span className='font-mono'>{formatQuota(burnPerDay)}</span>
+              </div>
             </div>
           </PanelBody>
         </Panel>

@@ -17,27 +17,170 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 /**
- * Lazy renderer for @lobehub/icons.
+ * Lazy renderer for curated @lobehub/icons modules.
  *
- * The icon set is several megabytes of SVG components, so the module is
- * imported on demand and cached; a sized placeholder is rendered until the
- * chunk arrives. Use via getLobeIcon() from '@/lib/lobe-icon'.
+ * The package barrel pulls every provider icon into one multi-megabyte async
+ * chunk. Keep this file on explicit per-provider imports so channel/model
+ * lists only fetch icons that are actually visible. Use via getLobeIcon() from
+ * '@/lib/lobe-icon'.
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-type LobeIconsModule = typeof import('@lobehub/icons')
+type IconComponent = React.ElementType<Record<string, unknown>>
+type IconModuleDefault = unknown
+type IconModule = { default: IconModuleDefault }
+type IconLoader = () => Promise<IconModule>
 
-let cachedIcons: LobeIconsModule | null = null
-let iconsPromise: Promise<LobeIconsModule> | null = null
+const LOBE_ICON_LOADERS = {
+  Ai360: () => import('@lobehub/icons/es/Ai360'),
+  Alibaba: () => import('@lobehub/icons/es/Alibaba'),
+  AlibabaCloud: () => import('@lobehub/icons/es/AlibabaCloud'),
+  Anthropic: () => import('@lobehub/icons/es/Anthropic'),
+  Aws: () => import('@lobehub/icons/es/Aws'),
+  Azure: () => import('@lobehub/icons/es/Azure'),
+  AzureAI: () => import('@lobehub/icons/es/AzureAI'),
+  Baidu: () => import('@lobehub/icons/es/Baidu'),
+  Bedrock: () => import('@lobehub/icons/es/Bedrock'),
+  ByteDance: () => import('@lobehub/icons/es/ByteDance'),
+  Claude: () => import('@lobehub/icons/es/Claude'),
+  Cloudflare: () => import('@lobehub/icons/es/Cloudflare'),
+  Codex: () => import('@lobehub/icons/es/Codex'),
+  Cohere: () => import('@lobehub/icons/es/Cohere'),
+  Coze: () => import('@lobehub/icons/es/Coze'),
+  DeepSeek: () => import('@lobehub/icons/es/DeepSeek'),
+  Dify: () => import('@lobehub/icons/es/Dify'),
+  Doubao: () => import('@lobehub/icons/es/Doubao'),
+  FastGPT: () => import('@lobehub/icons/es/FastGPT'),
+  Fireworks: () => import('@lobehub/icons/es/Fireworks'),
+  Gemini: () => import('@lobehub/icons/es/Gemini'),
+  Github: () => import('@lobehub/icons/es/Github'),
+  Google: () => import('@lobehub/icons/es/Google'),
+  GoogleCloud: () => import('@lobehub/icons/es/GoogleCloud'),
+  Grok: () => import('@lobehub/icons/es/Grok'),
+  Groq: () => import('@lobehub/icons/es/Groq'),
+  HuggingFace: () => import('@lobehub/icons/es/HuggingFace'),
+  Hunyuan: () => import('@lobehub/icons/es/Hunyuan'),
+  Jina: () => import('@lobehub/icons/es/Jina'),
+  Jimeng: () => import('@lobehub/icons/es/Jimeng'),
+  Kling: () => import('@lobehub/icons/es/Kling'),
+  Kimi: () => import('@lobehub/icons/es/Kimi'),
+  Meta: () => import('@lobehub/icons/es/Meta'),
+  Microsoft: () => import('@lobehub/icons/es/Microsoft'),
+  Midjourney: () => import('@lobehub/icons/es/Midjourney'),
+  Minimax: () => import('@lobehub/icons/es/Minimax'),
+  Mistral: () => import('@lobehub/icons/es/Mistral'),
+  Moonshot: () => import('@lobehub/icons/es/Moonshot'),
+  Nvidia: () => import('@lobehub/icons/es/Nvidia'),
+  Ollama: () => import('@lobehub/icons/es/Ollama'),
+  OpenAI: () => import('@lobehub/icons/es/OpenAI'),
+  OpenRouter: () => import('@lobehub/icons/es/OpenRouter'),
+  Perplexity: () => import('@lobehub/icons/es/Perplexity'),
+  Qwen: () => import('@lobehub/icons/es/Qwen'),
+  Replicate: () => import('@lobehub/icons/es/Replicate'),
+  SiliconCloud: () => import('@lobehub/icons/es/SiliconCloud'),
+  Spark: () => import('@lobehub/icons/es/Spark'),
+  Suno: () => import('@lobehub/icons/es/Suno'),
+  Tencent: () => import('@lobehub/icons/es/Tencent'),
+  Together: () => import('@lobehub/icons/es/Together'),
+  Vidu: () => import('@lobehub/icons/es/Vidu'),
+  Volcengine: () => import('@lobehub/icons/es/Volcengine'),
+  Wenxin: () => import('@lobehub/icons/es/Wenxin'),
+  XAI: () => import('@lobehub/icons/es/XAI'),
+  Xinference: () => import('@lobehub/icons/es/Xinference'),
+  Yi: () => import('@lobehub/icons/es/Yi'),
+  Zhipu: () => import('@lobehub/icons/es/Zhipu'),
+} satisfies Record<string, IconLoader>
 
-function loadIcons(): Promise<LobeIconsModule> {
-  if (!iconsPromise) {
-    iconsPromise = import('@lobehub/icons').then((mod) => {
-      cachedIcons = mod
-      return mod
+type LobeIconKey = keyof typeof LOBE_ICON_LOADERS
+type LoadedIconState = {
+  key: LobeIconKey
+  icon: IconModuleDefault | null
+}
+
+const LOBE_ICON_ALIASES: Record<string, LobeIconKey> = {
+  anthropic: 'Claude',
+  aws: 'Aws',
+  bedrock: 'Bedrock',
+  bytedance: 'ByteDance',
+  github: 'Github',
+  googlecloud: 'GoogleCloud',
+  huggingface: 'HuggingFace',
+  minimax: 'Minimax',
+  openai: 'OpenAI',
+  siliconflow: 'SiliconCloud',
+  tencentcloud: 'Tencent',
+  volcengine: 'Volcengine',
+  wenxin: 'Wenxin',
+  xai: 'XAI',
+}
+
+const LOBE_ICON_KEYS_BY_LOWERCASE = Object.fromEntries(
+  Object.keys(LOBE_ICON_LOADERS).map((key) => [key.toLowerCase(), key])
+) as Record<string, LobeIconKey>
+
+const cachedIcons = new Map<LobeIconKey, IconModuleDefault | null>()
+const iconPromises = new Map<LobeIconKey, Promise<IconModuleDefault | null>>()
+
+function resolveIconKey(baseName: string): LobeIconKey | null {
+  const normalized = baseName
+    .trim()
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toLowerCase()
+  return (
+    LOBE_ICON_KEYS_BY_LOWERCASE[normalized] ?? LOBE_ICON_ALIASES[normalized]
+  )
+}
+
+function loadIcon(key: LobeIconKey): Promise<IconModuleDefault | null> {
+  const cached = cachedIcons.get(key)
+  if (cached !== undefined) return Promise.resolve(cached)
+
+  const pending = iconPromises.get(key)
+  if (pending) return pending
+
+  const promise = LOBE_ICON_LOADERS[key]()
+    .then((mod) => mod.default)
+    .catch(() => null)
+    .then((icon) => {
+      cachedIcons.set(key, icon)
+      iconPromises.delete(key)
+      return icon
     })
+
+  iconPromises.set(key, promise)
+  return promise
+}
+
+function fallbackIcon(name: string, size: number): React.ReactNode {
+  const firstLetter = name.trim().charAt(0).toUpperCase() || '?'
+  return (
+    <div
+      className='bg-muted text-muted-foreground flex items-center justify-center rounded-full text-xs font-medium'
+      style={{ width: size, height: size }}
+    >
+      {firstLetter}
+    </div>
+  )
+}
+
+function getIconRequest(trimmedName: string): {
+  key: LobeIconKey
+  segments: string[]
+} | null {
+  const segments = trimmedName.split('.')
+  const key = resolveIconKey(segments[0] ?? '')
+  if (!key) return null
+
+  return {
+    key,
+    segments: [key, ...segments.slice(1)],
   }
-  return iconsPromise
+}
+
+function isIconComponent(value: unknown): value is IconComponent {
+  return (
+    typeof value === 'function' || (typeof value === 'object' && value !== null)
+  )
 }
 
 /**
@@ -75,46 +218,28 @@ function parseValue(raw: string | undefined | null): string | number | boolean {
 }
 
 function renderLobeIcon(
-  LobeIcons: LobeIconsModule,
+  baseIcon: IconModuleDefault,
   trimmedName: string,
+  segments: string[],
   size: number
 ): React.ReactNode {
   // Parse component path and chained properties
-  const segments = trimmedName.split('.')
-  const baseKey = segments[0]
-  const BaseIcon = (LobeIcons as Record<string, unknown>)[baseKey] as
-    | Record<string, unknown>
-    | undefined
-
-  let IconComponent: React.ComponentType<Record<string, unknown>> | undefined
+  let IconComponent: IconComponent | undefined
   let propStartIndex: number
+  const compoundIcon = baseIcon as Record<string, unknown>
+  const nestedIcon = segments.length > 1 ? compoundIcon[segments[1]] : undefined
 
-  if (BaseIcon && segments.length > 1 && BaseIcon[segments[1]]) {
-    IconComponent = BaseIcon[segments[1]] as React.ComponentType<
-      Record<string, unknown>
-    >
+  if (isIconComponent(nestedIcon)) {
+    IconComponent = nestedIcon
     propStartIndex = 2
   } else {
-    IconComponent = (LobeIcons as Record<string, unknown>)[baseKey] as
-      | React.ComponentType<Record<string, unknown>>
-      | undefined
+    IconComponent = isIconComponent(baseIcon) ? baseIcon : undefined
     propStartIndex = segments.length > 1 && /^[A-Z]/.test(segments[1]) ? 2 : 1
   }
 
   // Fallback if icon not found
-  if (
-    !IconComponent ||
-    (typeof IconComponent !== 'function' && typeof IconComponent !== 'object')
-  ) {
-    const firstLetter = trimmedName.charAt(0).toUpperCase()
-    return (
-      <div
-        className='bg-muted text-muted-foreground flex items-center justify-center rounded-full text-xs font-medium'
-        style={{ width: size, height: size }}
-      >
-        {firstLetter}
-      </div>
-    )
+  if (!IconComponent) {
+    return fallbackIcon(trimmedName, size)
   }
 
   // Parse chained properties (e.g., "type={'platform'}", "shape='square'")
@@ -144,20 +269,40 @@ function renderLobeIcon(
 }
 
 export function LazyLobeIcon(props: { name: string; size: number }) {
-  const [icons, setIcons] = useState<LobeIconsModule | null>(cachedIcons)
+  const request = useMemo(() => getIconRequest(props.name), [props.name])
+  const [loadedIcon, setLoadedIcon] = useState<LoadedIconState | null>(null)
+
+  const requestKey = request?.key
 
   useEffect(() => {
-    if (icons) return
+    if (!requestKey) {
+      return
+    }
+
+    if (cachedIcons.get(requestKey) !== undefined) return
+
     let active = true
-    loadIcons().then((mod) => {
-      if (active) setIcons(mod)
+    loadIcon(requestKey).then((icon) => {
+      if (active) setLoadedIcon({ key: requestKey, icon })
     })
     return () => {
       active = false
     }
-  }, [icons])
+  }, [requestKey])
 
-  if (!icons) {
+  if (!request) {
+    return fallbackIcon(props.name, props.size)
+  }
+
+  const cached = cachedIcons.get(request.key)
+  let iconState: LoadedIconState | null = null
+  if (cached !== undefined) {
+    iconState = { key: request.key, icon: cached }
+  } else if (loadedIcon?.key === request.key) {
+    iconState = loadedIcon
+  }
+
+  if (!iconState) {
     return (
       <span
         className='inline-block shrink-0'
@@ -167,5 +312,9 @@ export function LazyLobeIcon(props: { name: string; size: number }) {
     )
   }
 
-  return renderLobeIcon(icons, props.name, props.size)
+  if (!iconState.icon) {
+    return fallbackIcon(props.name, props.size)
+  }
+
+  return renderLobeIcon(iconState.icon, props.name, request.segments, props.size)
 }
