@@ -28,6 +28,9 @@ func elevenLabsEndpointTypes(modelName string) []constant.EndpointType {
 // 其他音频模型继续归入 audio，避免模型广场把 TTS/STT/语音处理模型显示为 Chat。
 func GetEndpointTypesByChannelType(channelType int, modelName string) []constant.EndpointType {
 	var endpointTypes []constant.EndpointType
+	if IsImageGenerationModel(modelName) {
+		return []constant.EndpointType{constant.EndpointTypeImageGeneration}
+	}
 	if elevenLabsTypes := elevenLabsEndpointTypes(modelName); len(elevenLabsTypes) > 0 {
 		endpointTypes = elevenLabsTypes
 	} else if IsAudioModel(modelName) {
@@ -65,10 +68,6 @@ func GetEndpointTypesByChannelType(channelType int, modelName string) []constant
 				endpointTypes = []constant.EndpointType{constant.EndpointTypeOpenAI}
 			}
 		}
-	}
-	if IsImageGenerationModel(modelName) {
-		// add to first
-		endpointTypes = append([]constant.EndpointType{constant.EndpointTypeImageGeneration}, endpointTypes...)
 	}
 	return endpointTypes
 }

@@ -279,6 +279,11 @@ func SyncUpstreamModels(c *gin.Context) {
 
 	// 若既无缺失模型需要创建，也未指定覆盖更新字段，则无需请求上游数据，直接返回
 	if len(missing) == 0 && len(req.Overwrite) == 0 {
+		if err := model.EnsureModelMetadataForEnabledModels(); err != nil {
+			common.SysError("failed to complete default model metadata: " + err.Error())
+		} else {
+			model.RefreshPricing()
+		}
 		modelsURL, vendorsURL := getUpstreamURLs(req.Locale)
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
@@ -355,6 +360,16 @@ func SyncUpstreamModels(c *gin.Context) {
 	for _, name := range missing {
 		up, ok := modelByName[name]
 		if !ok {
+			if err := model.EnsureModelMetadataForNames([]string{name}, nil); err == nil {
+				var created model.Model
+				if err := model.DB.Where("model_name = ?", name).First(&created).Error; err == nil {
+					createdModels++
+					createdList = append(createdList, name)
+					continue
+				}
+			} else {
+				common.SysError("failed to create default model metadata for " + name + ": " + err.Error())
+			}
 			skipped = append(skipped, name)
 			continue
 		}
@@ -448,6 +463,16 @@ func SyncUpstreamModels(c *gin.Context) {
 				return nil
 			})
 		}
+	}
+
+	if err := model.EnsureModelMetadataForEnabledModels(); err != nil {
+		common.SysError("failed to complete default model metadata: " + err.Error())
+	} else {
+		model.RefreshPricing()
+	}
+
+	if createdModels > 0 || updatedModels > 0 {
+		model.RefreshPricing()
 	}
 
 	c.JSON(http.StatusOK, gin.H{

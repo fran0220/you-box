@@ -1,7 +1,13 @@
 package model
 
 import (
+	"errors"
 	"strings"
+
+	"github.com/QuantumNous/new-api/common"
+
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type defaultModelCatalogMetadata struct {
@@ -187,6 +193,200 @@ func applyDefaultModelMetadata(model *Model) {
 	}
 }
 
+func normalizeModelMetadataNames(modelNames []string) []string {
+	seen := make(map[string]struct{}, len(modelNames))
+	names := make([]string, 0, len(modelNames))
+	for _, modelName := range modelNames {
+		modelName = strings.TrimSpace(modelName)
+		if modelName == "" {
+			continue
+		}
+		if _, exists := seen[modelName]; exists {
+			continue
+		}
+		seen[modelName] = struct{}{}
+		names = append(names, modelName)
+	}
+	return names
+}
+
+func getOrCreateVendorWithDB(db *gorm.DB, vendorName string, vendorMap map[int]*Vendor) (int, error) {
+	vendorName = strings.TrimSpace(vendorName)
+	if vendorName == "" {
+		return 0, nil
+	}
+
+	for id, vendor := range vendorMap {
+		if vendor.Name == vendorName {
+			updates := make(map[string]interface{})
+			if strings.TrimSpace(vendor.Description) == "" && defaultVendorDescriptions[vendor.Name] != "" {
+				vendor.Description = defaultVendorDescriptions[vendor.Name]
+				updates["description"] = vendor.Description
+			}
+			if strings.TrimSpace(vendor.Icon) == "" && getDefaultVendorIcon(vendor.Name) != "" {
+				vendor.Icon = getDefaultVendorIcon(vendor.Name)
+				updates["icon"] = vendor.Icon
+			}
+			if len(updates) > 0 {
+				if err := db.Model(&Vendor{}).Where("id = ?", id).Updates(updates).Error; err != nil {
+					return 0, err
+				}
+			}
+			return id, nil
+		}
+	}
+
+	var existing Vendor
+	if err := db.Where("name = ?", vendorName).First(&existing).Error; err == nil {
+		vendorMap[existing.Id] = &existing
+		return getOrCreateVendorWithDB(db, vendorName, vendorMap)
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+
+	vendor := &Vendor{
+		Name:        vendorName,
+		Description: defaultVendorDescriptions[vendorName],
+		Status:      1,
+		Icon:        getDefaultVendorIcon(vendorName),
+	}
+	if err := db.Create(vendor).Error; err != nil {
+		return 0, err
+	}
+	vendorMap[vendor.Id] = vendor
+	return vendor.Id, nil
+}
+
+func fillExistingDefaultModelMetadataWithDB(db *gorm.DB, modelName string, vendorMap map[int]*Vendor) error {
+	metadata, exists := defaultModelCatalogMetadataByName[modelName]
+	if !exists {
+		return nil
+	}
+
+	var existing Model
+	if err := db.Where("model_name = ?", modelName).First(&existing).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		return err
+	}
+
+	updates := make(map[string]interface{})
+	if strings.TrimSpace(existing.Description) == "" && metadata.Description != "" {
+		updates["description"] = metadata.Description
+	}
+	if strings.TrimSpace(existing.Tags) == "" && metadata.Tags != "" {
+		updates["tags"] = metadata.Tags
+	}
+	if strings.TrimSpace(existing.Icon) == "" && metadata.Icon != "" {
+		updates["icon"] = metadata.Icon
+	}
+	if existing.VendorID == 0 && strings.TrimSpace(metadata.Vendor) != "" {
+		vendorID, err := getOrCreateVendorWithDB(db, metadata.Vendor, vendorMap)
+		if err != nil {
+			return err
+		}
+		updates["vendor_id"] = vendorID
+	}
+	if len(updates) == 0 {
+		return nil
+	}
+	updates["updated_time"] = common.GetTimestamp()
+	return db.Model(&Model{}).Where("id = ?", existing.Id).Updates(updates).Error
+}
+
+// EnsureModelMetadataForNames creates editable model metadata rows for channel
+// models that are missing from the admin catalog. Model prices still live in
+// system option maps (ModelRatio, ModelPrice, CompletionRatio, ...); these rows
+// are the admin-facing catalog entries needed to edit those prices and decide
+// whether a model is listed in the model plaza.
+func EnsureModelMetadataForNames(modelNames []string, tx *gorm.DB) error {
+	names := normalizeModelMetadataNames(modelNames)
+	if len(names) == 0 {
+		return nil
+	}
+
+	db := DB
+	if tx != nil {
+		db = tx
+	}
+
+	var existingNames []string
+	if err := db.Model(&Model{}).Where("model_name IN ?", names).Pluck("model_name", &existingNames).Error; err != nil {
+		return err
+	}
+	existingSet := make(map[string]struct{}, len(existingNames))
+	for _, modelName := range existingNames {
+		existingSet[modelName] = struct{}{}
+	}
+
+	var vendors []Vendor
+	if err := db.Find(&vendors).Error; err != nil {
+		return err
+	}
+	vendorMap := make(map[int]*Vendor, len(vendors))
+	for i := range vendors {
+		vendorMap[vendors[i].Id] = &vendors[i]
+	}
+	for _, modelName := range names {
+		if _, exists := existingSet[modelName]; exists {
+			if err := fillExistingDefaultModelMetadataWithDB(db, modelName, vendorMap); err != nil {
+				return err
+			}
+		}
+	}
+
+	now := common.GetTimestamp()
+	modelsToCreate := make([]Model, 0)
+	disabledModelNames := make([]string, 0)
+	for _, modelName := range names {
+		if _, exists := existingSet[modelName]; exists {
+			continue
+		}
+
+		status := 0
+		if _, hasDefaultCatalog := defaultModelCatalogMetadataByName[modelName]; hasDefaultCatalog {
+			status = 1
+		}
+
+		metadata := Model{
+			ModelName:    modelName,
+			Status:       status,
+			SyncOfficial: 1,
+			NameRule:     NameRuleExact,
+			CreatedTime:  now,
+			UpdatedTime:  now,
+		}
+		if vendorName := defaultVendorNameForModel(modelName); vendorName != "" {
+			vendorID, err := getOrCreateVendorWithDB(db, vendorName, vendorMap)
+			if err != nil {
+				return err
+			}
+			metadata.VendorID = vendorID
+		}
+		applyDefaultModelMetadata(&metadata)
+		modelsToCreate = append(modelsToCreate, metadata)
+		if status == 0 {
+			disabledModelNames = append(disabledModelNames, modelName)
+		}
+	}
+
+	if len(modelsToCreate) == 0 {
+		return nil
+	}
+	if err := db.Clauses(clause.OnConflict{DoNothing: true}).Create(&modelsToCreate).Error; err != nil {
+		return err
+	}
+	if len(disabledModelNames) > 0 {
+		return db.Model(&Model{}).Where("model_name IN ?", disabledModelNames).Update("status", 0).Error
+	}
+	return nil
+}
+
+func EnsureModelMetadataForEnabledModels() error {
+	return EnsureModelMetadataForNames(GetEnabledModels(), nil)
+}
+
 func defaultModelDescriptionKey(modelName string, description string) string {
 	metadata, exists := defaultModelCatalogMetadataByName[modelName]
 	if !exists {
@@ -222,22 +422,6 @@ func initDefaultVendorMapping(metaMap map[string]*Model, vendorMap map[int]*Vend
 			applyDefaultModelMetadata(existing)
 			continue
 		}
-
-		// 匹配供应商
-		vendorID := 0
-		if vendorName := defaultVendorNameForModel(modelName); vendorName != "" {
-			vendorID = getOrCreateVendor(vendorName, vendorMap)
-		}
-
-		// 创建模型元数据
-		metadata := &Model{
-			ModelName: modelName,
-			VendorID:  vendorID,
-			Status:    1,
-			NameRule:  NameRuleExact,
-		}
-		applyDefaultModelMetadata(metadata)
-		metaMap[modelName] = metadata
 	}
 }
 

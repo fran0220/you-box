@@ -57,6 +57,7 @@ var defaultModelRatio = map[string]float64{
 	"gpt-4.1-nano":                              0.05, // $0.1 / 1M tokens
 	"gpt-4.1-nano-2025-04-14":                   0.05, // $0.1 / 1M tokens
 	"gpt-image-1":                               2.5,  // $5 / 1M tokens
+	"gpt-image-2":                               2.5,  // image generation default; tune from metadata pricing page as needed
 	"o1":                                        7.5,  // $15 / 1M tokens
 	"o1-2024-12-17":                             7.5,  // $15 / 1M tokens
 	"o1-preview":                                7.5,  // $15 / 1M tokens
@@ -92,6 +93,8 @@ var defaultModelRatio = map[string]float64{
 	"gpt-5":                                     0.625,
 	"gpt-5-2025-08-07":                          0.625,
 	"gpt-5-chat-latest":                         0.625,
+	"gpt-5.4-mini":                              0.375,
+	"gpt-5.5":                                   2.5,
 	"gpt-5-mini":                                0.125,
 	"gpt-5-mini-2025-08-07":                     0.125,
 	"gpt-5-nano":                                0.025,
@@ -170,6 +173,15 @@ var defaultModelRatio = map[string]float64{
 	"claude-3-opus-20240229":                    7.5, // $15 / 1M tokens
 	"claude-opus-4-20250514":                    7.5,
 	"claude-opus-4-1-20250805":                  7.5,
+	"deepseek-v4-flash":                         0.07,
+	"deepseek-v4-pro":                           0.87,
+	"glm-5.2":                                   0.5634,
+	"grok-4.3":                                  0.625,
+	"grok-composer-2.5-fast":                    1.5,
+	"kimi-k2.6":                                 0.475,
+	"kimi-k2.7-code":                            0.475,
+	"MiniMax-M2.7":                              0.15,
+	"MiniMax-M3":                                0.15,
 	"ERNIE-4.0-8K":                              0.120 * RMB,
 	"ERNIE-3.5-8K":                              0.012 * RMB,
 	"ERNIE-3.5-8K-0205":                         0.024 * RMB,
@@ -340,10 +352,22 @@ var modelRatioMap = types.NewRWMap[string, float64]()
 var completionRatioMap = types.NewRWMap[string, float64]()
 
 var defaultCompletionRatio = map[string]float64{
-	"gpt-4-gizmo-*":  2,
-	"gpt-4o-gizmo-*": 3,
-	"gpt-4-all":      2,
-	"gpt-image-1":    8,
+	"gpt-4-gizmo-*":          2,
+	"gpt-4o-gizmo-*":         3,
+	"gpt-4-all":              2,
+	"gpt-image-1":            8,
+	"gpt-image-2":            6,
+	"gpt-5.4-mini":           6,
+	"gpt-5.5":                6,
+	"deepseek-v4-flash":      2,
+	"deepseek-v4-pro":        2,
+	"glm-5.2":                3.5,
+	"grok-4.3":               2,
+	"grok-composer-2.5-fast": 5,
+	"kimi-k2.6":              4.2105263157894735,
+	"kimi-k2.7-code":         4.2105263157894735,
+	"MiniMax-M2.7":           4,
+	"MiniMax-M3":             4,
 }
 
 // InitRatioSettings initializes all model related settings maps
@@ -667,6 +691,7 @@ func ModelRatio2JSONString() string {
 
 var defaultImageRatio = map[string]float64{
 	"gpt-image-1": 2,
+	"gpt-image-2": 2,
 }
 var imageRatioMap = types.NewRWMap[string, float64]()
 var audioRatioMap = types.NewRWMap[string, float64]()
