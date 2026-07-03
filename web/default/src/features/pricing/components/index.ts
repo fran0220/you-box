@@ -16,11 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-export { PricingSidebar } from './pricing-sidebar'
 export { PricingToolbar } from './pricing-toolbar'
 export { PricingFilterPills } from './pricing-filter-pills'
-export { ModelRow } from './model-row'
-export { ModelList } from './model-list'
+export { FacetDropdown } from './facet-dropdown'
+export { ModelCard } from './model-card'
+export { ModelGrid } from './model-grid'
 export { PromptPriceSlider } from './pricing-range-filters'
 export { LoadingSkeleton } from './loading-skeleton'
 export { EmptyState } from './empty-state'

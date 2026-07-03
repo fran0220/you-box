@@ -20,28 +20,22 @@ import { useCallback, useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Scale, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { cn } from '@/lib/utils'
-import { getLobeIcon } from '@/lib/lobe-icon'
 import { Button } from '@/components/ui/button'
 import { PageTransition } from '@/components/page-transition'
-import { EmptyState as YouboxEmptyState } from '@/components/youbox/empty-state'
 import { PageHeader } from '@/components/youbox'
+import { EmptyState as YouboxEmptyState } from '@/components/youbox/empty-state'
 import {
   EmptyState,
   LoadingSkeleton,
-  ModelList,
+  ModelGrid,
   PricingFilterPills,
   PricingToolbar,
   SearchBar,
 } from './components'
-import { FILTER_SECTIONS, computePromptPriceCeiling } from './constants'
+import { computePromptPriceCeiling } from './constants'
 import { useFavorites } from './hooks/use-favorites'
 import { useFilters } from './hooks/use-filters'
 import { usePricingData } from './hooks/use-pricing-data'
-import { extractProviders } from './lib/filters'
-
-/** Providers surfaced as quick-toggle chips under the search row. */
-const PROVIDER_CHIP_LIMIT = 8
 
 export function Pricing() {
   const { t } = useTranslation()
@@ -50,14 +44,8 @@ export function Pricing() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
   const { favorites, isFavorite } = useFavorites()
 
-  const {
-    models,
-    vendors,
-    groupRatio,
-    isLoading,
-    priceRate,
-    usdExchangeRate,
-  } = usePricingData()
+  const { models, vendors, groupRatio, isLoading, priceRate, usdExchangeRate } =
+    usePricingData()
 
   const {
     searchInput,
@@ -74,26 +62,17 @@ export function Pricing() {
     setShowRechargePrice,
     filteredModels,
     activeFilters,
-    activeFilterCount,
     hasActiveFilters,
-    clearFilters,
     clearAll,
     clearSearch,
   } = useFilters(models)
 
-  // Vendor name -> icon key, for provider chips and drawer checkboxes.
+  // Vendor name -> icon key, for the provider facet dropdown.
   const vendorIcons = useMemo(() => {
     const map: Record<string, string | undefined> = {}
     for (const v of vendors) map[v.name] = v.icon
     return map
   }, [vendors])
-
-  // Top providers by model count, quick-toggle chips.
-  const providerChips = useMemo(
-    () => extractProviders(models, vendors).slice(0, PROVIDER_CHIP_LIMIT),
-    [models, vendors]
-  )
-  const selectedProviders = facetState[FILTER_SECTIONS.PROVIDER]
 
   // Prompt-price slider ceiling adapts to the live catalog.
   const priceCeiling = useMemo(
@@ -150,7 +129,7 @@ export function Pricing() {
     }
 
     return (
-      <ModelList
+      <ModelGrid
         models={displayedModels}
         priceRate={priceRate}
         usdExchangeRate={usdExchangeRate}
@@ -171,7 +150,7 @@ export function Pricing() {
   return (
     <PageTransition className='pb-10'>
       <PageHeader
-        className='mb-5'
+        className='mb-6'
         eyebrow={t('Model Plaza')}
         title={t('Models')}
         subtitle={t('{{count}} models from {{vendors}} providers', {
@@ -193,18 +172,16 @@ export function Pricing() {
         }
       />
 
-      {/* Control strip: search + toolbar + provider chips + pills */}
-      <div
-        data-pricing-control-strip
-        className='border-border/60 mb-4 space-y-2.5 border-b pb-3'
-      >
-        <div className='flex flex-col gap-2.5 lg:flex-row lg:items-center'>
+      {/* Filter bar: search + one dropdown per facet (Cloudflare catalog
+          pattern), active-filter pills below. */}
+      <div data-pricing-control-strip className='mb-4 space-y-2.5'>
+        <div className='flex flex-col gap-2.5 xl:flex-row xl:items-center'>
           <SearchBar
             value={searchInput}
             onChange={setSearchInput}
             onClear={clearSearch}
             placeholder={t('Search models by name, provider, or capability…')}
-            className='lg:flex-1'
+            className='xl:max-w-md xl:flex-1'
           />
           <PricingToolbar
             showFavoritesOnly={showFavoritesOnly}
@@ -215,7 +192,6 @@ export function Pricing() {
             onTokenUnitChange={setTokenUnit}
             showRechargePrice={showRechargePrice}
             onRechargePriceChange={setShowRechargePrice}
-            activeFilterCount={activeFilterCount}
             models={models}
             vendors={vendors}
             facetState={facetState}
@@ -225,40 +201,8 @@ export function Pricing() {
             promptPriceRange={promptPriceRange}
             priceCeiling={priceCeiling}
             onPromptPriceRangeChange={setPromptPriceRange}
-            hasActiveFilters={hasActiveFilters}
-            onClearFilters={clearFilters}
           />
         </div>
-        {providerChips.length > 1 && (
-          <div className='flex flex-wrap items-center gap-1.5'>
-            {providerChips.map((chip) => {
-              const active = selectedProviders.includes(chip.value)
-              return (
-                <button
-                  key={chip.value}
-                  type='button'
-                  onClick={() =>
-                    toggleFacetValue(FILTER_SECTIONS.PROVIDER, chip.value)
-                  }
-                  aria-pressed={active}
-                  className={cn(
-                    'inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-xs transition-colors',
-                    active
-                      ? 'border-brand-border/50 bg-brand-subtle text-brand font-medium'
-                      : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted'
-                  )}
-                >
-                  {vendorIcons[chip.value] && (
-                    <span className='shrink-0' aria-hidden='true'>
-                      {getLobeIcon(vendorIcons[chip.value]!, 13)}
-                    </span>
-                  )}
-                  {chip.label}
-                </button>
-              )
-            })}
-          </div>
-        )}
         <PricingFilterPills
           activeFilters={activeFilters}
           searchInput={searchInput}
@@ -268,11 +212,10 @@ export function Pricing() {
       </div>
 
       <main className='min-w-0'>
-        <div className='text-muted-foreground mb-2.5 text-sm'>
-          <span className='text-foreground font-semibold tabular-nums'>
-            {displayedModels.length.toLocaleString()}
-          </span>{' '}
-          {displayedModels.length === 1 ? t('model') : t('models')}
+        <div className='text-muted-foreground mb-3 text-sm'>
+          {t('We found {{count}} models', {
+            count: displayedModels.length,
+          })}
           {(hasActiveFilters || showFavoritesOnly) && models.length > 0 && (
             <span className='text-muted-foreground/60'>
               {' / '}
