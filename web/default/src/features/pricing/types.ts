@@ -25,17 +25,20 @@ export type PricingVendor = {
   name: string
   icon?: string
   description?: string
+  description_key?: string
 }
 
 export type PricingModel = {
   id: number
   model_name: string
   description?: string
+  description_key?: string
   icon?: string
   vendor_id?: number
   vendor_name?: string
   vendor_icon?: string
   vendor_description?: string
+  vendor_description_key?: string
   quota_type: number
   model_ratio: number
   completion_ratio: number
@@ -55,6 +58,11 @@ export type PricingModel = {
   pricing_version?: string
 }
 
+export type SupportedEndpointInfo = {
+  path?: string
+  method?: string
+}
+
 export type PricingData = {
   success: boolean
   message?: string
@@ -62,7 +70,7 @@ export type PricingData = {
   vendors: PricingVendor[]
   group_ratio: Record<string, number>
   usable_group: Record<string, { desc: string; ratio: number }>
-  supported_endpoint: Record<string, string>
+  supported_endpoint: Record<string, SupportedEndpointInfo>
   auto_groups: string[]
 }
 

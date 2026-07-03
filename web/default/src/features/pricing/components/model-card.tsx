@@ -23,7 +23,11 @@ import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
-import { DEFAULT_TOKEN_UNIT, getModelTypeLabels } from '../constants'
+import {
+  DEFAULT_TOKEN_UNIT,
+  getEndpointTypeLabels,
+  getModelTypeLabels,
+} from '../constants'
 import { useFavorites } from '../hooks/use-favorites'
 import { isTokenBasedModel } from '../lib/model-helpers'
 import { deriveModelTypes } from '../lib/model-type'
@@ -66,7 +70,19 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   const initial = model.model_name?.charAt(0).toUpperCase() || '?'
 
   const typeLabels = useMemo(() => getModelTypeLabels(t), [t])
+  const endpointTypeLabels = useMemo(() => getEndpointTypeLabels(t), [t])
   const modelTypes = useMemo(() => deriveModelTypes(model).slice(0, 2), [model])
+  const capabilityLabels = useMemo(() => {
+    const endpointLabels = endpointTypeLabels as Record<string, string>
+    const labels = (model.supported_endpoint_types ?? [])
+      .map((type) => endpointLabels[type])
+      .filter((label): label is string => Boolean(label))
+
+    const uniqueLabels = Array.from(new Set(labels))
+    if (uniqueLabels.length > 0) return uniqueLabels.slice(0, 2)
+
+    return modelTypes.map((type) => typeLabels[type] ?? type).slice(0, 2)
+  }, [endpointTypeLabels, model.supported_endpoint_types, modelTypes, typeLabels])
 
   const free =
     isTokenBased &&
@@ -145,12 +161,12 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
               {model.vendor_name}
             </span>
           )}
-          {modelTypes.map((type) => (
+          {capabilityLabels.map((label) => (
             <span
-              key={type}
+              key={label}
               className='border-border/70 text-muted-foreground rounded-full border px-2 py-0.5 text-[10px] font-medium'
             >
-              {typeLabels[type] ?? type}
+              {label}
             </span>
           ))}
           {free && (

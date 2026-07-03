@@ -18,6 +18,8 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import type { TFunction } from 'i18next'
+import { useTranslation } from 'react-i18next'
 import { useStatus } from '@/hooks/use-status'
 import { getPricing } from '../api'
 import {
@@ -26,7 +28,19 @@ import {
 } from '../lib/model-helpers'
 import type { EnrichedPricingModel } from '../types'
 
+function translateCatalogText(
+  t: TFunction,
+  key: string | undefined,
+  fallback: string | undefined
+): string | undefined {
+  const translationKey = key || fallback
+  if (!translationKey) return fallback
+
+  return t(translationKey, { defaultValue: fallback ?? translationKey })
+}
+
 export function usePricingData() {
+  const { t } = useTranslation()
   const { status } = useStatus()
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -53,12 +67,24 @@ export function usePricingData() {
       const vendor = model.vendor_id
         ? vendorMap.get(model.vendor_id)
         : undefined
+      const description = translateCatalogText(
+        t,
+        model.description_key,
+        model.description
+      )
+      const vendorDescription = translateCatalogText(
+        t,
+        vendor?.description_key,
+        vendor?.description
+      )
       const base = {
         ...model,
+        description,
         key: model.model_name,
         vendor_name: vendor?.name,
         vendor_icon: vendor?.icon,
-        vendor_description: vendor?.description,
+        vendor_description: vendorDescription,
+        vendor_description_key: vendor?.description_key,
         group_ratio: data.group_ratio,
       }
       return {
@@ -67,7 +93,7 @@ export function usePricingData() {
         completionPriceUsdPerM: getOutputPriceUsdPerM(base),
       }
     })
-  }, [data])
+  }, [data, t])
 
   return {
     models,

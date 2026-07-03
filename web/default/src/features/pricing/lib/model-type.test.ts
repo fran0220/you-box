@@ -89,6 +89,38 @@ describe('deriveModelTypes', () => {
     ).toEqual([MODEL_TYPE_VALUES.AUDIO])
   })
 
+  it('maps audio endpoint to Audio', () => {
+    expect(
+      deriveModelTypes(
+        model({
+          model_name: 'eleven_v3',
+          supported_endpoint_types: ['audio'],
+        })
+      )
+    ).toEqual([MODEL_TYPE_VALUES.AUDIO])
+  })
+
+  it('maps fine-grained audio endpoint types to Audio', () => {
+    for (const endpoint of [
+      'audio-tts',
+      'audio-stt',
+      'audio-speech-to-speech',
+      'audio-sfx',
+      'audio-music',
+      'audio-isolation',
+      'audio-alignment',
+    ]) {
+      expect(
+        deriveModelTypes(
+          model({
+            model_name: endpoint,
+            supported_endpoint_types: [endpoint],
+          })
+        )
+      ).toEqual([MODEL_TYPE_VALUES.AUDIO])
+    }
+  })
+
   it('maps chat endpoint types to Chat', () => {
     for (const endpoint of [
       'openai',

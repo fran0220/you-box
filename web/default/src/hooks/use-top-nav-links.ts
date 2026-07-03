@@ -93,12 +93,14 @@ export function useTopNavLinks(): TopNavLink[] {
     links.push({ title: t('Apps'), href: '/apps' })
   }
 
-  // Docs (supports external links)
+  // Docs: only http(s) URLs open in a new tab; internal paths stay in-app.
   if (modules?.docs !== false) {
-    if (docsLink) {
+    if (docsLink && /^https?:\/\//i.test(docsLink)) {
       links.push({ title: t('Docs'), href: docsLink, external: true })
     } else {
-      links.push({ title: t('Docs'), href: '/docs' })
+      const href =
+        !docsLink || docsLink === '/api-docs' ? '/docs' : docsLink
+      links.push({ title: t('Docs'), href })
     }
   }
 

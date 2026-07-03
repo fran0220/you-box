@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -18,6 +17,7 @@ import (
 type Pricing struct {
 	ModelName              string                  `json:"model_name"`
 	Description            string                  `json:"description,omitempty"`
+	DescriptionKey         string                  `json:"description_key,omitempty"`
 	Icon                   string                  `json:"icon,omitempty"`
 	Tags                   string                  `json:"tags,omitempty"`
 	VendorID               int                     `json:"vendor_id,omitempty"`
@@ -39,10 +39,11 @@ type Pricing struct {
 }
 
 type PricingVendor struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
-	Icon        string `json:"icon,omitempty"`
+	ID             int    `json:"id"`
+	Name           string `json:"name"`
+	Description    string `json:"description,omitempty"`
+	DescriptionKey string `json:"description_key,omitempty"`
+	Icon           string `json:"icon,omitempty"`
 }
 
 var (
@@ -62,6 +63,28 @@ var (
 	modelSupportEndpointTypes = make(map[string][]constant.EndpointType)
 	modelSupportEndpointsLock = sync.RWMutex{}
 )
+
+var pricingHiddenModels = map[string]struct{}{
+	// ElevenLabs internal routing aliases / legacy model IDs. They can remain
+	// callable in a channel's ability list, but the model plaza should expose the
+	// current public models instead of endpoint implementation details.
+	"elevenlabs":                  {},
+	"eleven_turbo_v2":             {},
+	"eleven_turbo_v2_5":           {},
+	"eleven_flash_v2":             {},
+	"eleven_multilingual_v1":      {},
+	"eleven_multilingual_v2":      {},
+	"scribe_v1":                   {},
+	"eleven_english_sts_v2":       {},
+	"elevenlabs-speech-to-speech": {},
+	"elevenlabs-sound-generation": {},
+	"elevenlabs-text-to-dialogue": {},
+}
+
+func isPricingHiddenModel(modelName string) bool {
+	_, ok := pricingHiddenModels[strings.ToLower(strings.TrimSpace(modelName))]
+	return ok
+}
 
 func GetPricing() []Pricing {
 	if time.Since(lastGetPricingTime) > time.Minute*1 || len(pricingMap) == 0 {
@@ -176,15 +199,19 @@ func updatePricing() {
 
 	// 初始化默认供应商映射
 	initDefaultVendorMapping(metaMap, vendorMap, enableAbilities)
+	for _, vendor := range vendorMap {
+		applyDefaultVendorMetadata(vendor)
+	}
 
 	// 构建对前端友好的供应商列表
 	vendorsList = make([]PricingVendor, 0, len(vendorMap))
 	for _, v := range vendorMap {
 		vendorsList = append(vendorsList, PricingVendor{
-			ID:          v.Id,
-			Name:        v.Name,
-			Description: v.Description,
-			Icon:        v.Icon,
+			ID:             v.Id,
+			Name:           v.Name,
+			Description:    v.Description,
+			DescriptionKey: defaultVendorDescriptionKey(v.Name, v.Description),
+			Icon:           v.Icon,
 		})
 	}
 
@@ -220,7 +247,7 @@ func updatePricing() {
 			continue
 		}
 		var raw map[string]interface{}
-		if err := json.Unmarshal([]byte(meta.Endpoints), &raw); err == nil {
+		if err := common.Unmarshal([]byte(meta.Endpoints), &raw); err == nil {
 			endpoints := make([]string, 0, len(raw))
 			for k, v := range raw {
 				switch v.(type) {
@@ -264,7 +291,7 @@ func updatePricing() {
 			continue
 		}
 		var raw map[string]interface{}
-		if err := json.Unmarshal([]byte(meta.Endpoints), &raw); err == nil {
+		if err := common.Unmarshal([]byte(meta.Endpoints), &raw); err == nil {
 			for k, v := range raw {
 				switch val := v.(type) {
 				case string:
@@ -287,6 +314,9 @@ func updatePricing() {
 
 	pricingMap = make([]Pricing, 0)
 	for model, groups := range modelGroupsMap {
+		if isPricingHiddenModel(model) {
+			continue
+		}
 		pricing := Pricing{
 			ModelName:              model,
 			EnableGroup:            groups.Items(),
@@ -300,6 +330,7 @@ func updatePricing() {
 				continue
 			}
 			pricing.Description = meta.Description
+			pricing.DescriptionKey = defaultModelDescriptionKey(model, meta.Description)
 			pricing.Icon = meta.Icon
 			pricing.Tags = meta.Tags
 			pricing.VendorID = meta.VendorID

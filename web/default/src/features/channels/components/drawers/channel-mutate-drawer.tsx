@@ -114,6 +114,7 @@ import {
   ADD_MODE_OPTIONS,
   CHANNEL_TYPE_OPTIONS,
   CHANNEL_TYPE_WARNINGS,
+  ELEVENLABS_DEFAULT_MODELS,
   ERROR_MESSAGES,
   FIELD_DESCRIPTIONS,
   FIELD_PLACEHOLDERS,
@@ -593,6 +594,18 @@ export function ChannelMutateDrawer({
       const currentBaseUrlValue = form.getValues('base_url')
       if (!currentBaseUrlValue || currentBaseUrlValue === '') {
         form.setValue('base_url', 'https://ark.cn-beijing.volces.com')
+      }
+    }
+
+    // Type 59 (ElevenLabs) - set official base URL and current public models
+    if (currentType === 59) {
+      const currentBaseUrlValue = form.getValues('base_url')
+      if (!currentBaseUrlValue || currentBaseUrlValue === '') {
+        form.setValue('base_url', 'https://api.elevenlabs.io')
+      }
+      const currentModelsValue = form.getValues('models')
+      if (!currentModelsValue || currentModelsValue === '') {
+        form.setValue('models', ELEVENLABS_DEFAULT_MODELS.join(','))
       }
     }
 

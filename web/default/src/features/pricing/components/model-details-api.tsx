@@ -23,8 +23,9 @@ import type { BundledLanguage } from 'shiki/bundle/web'
 import { useStatus } from '@/hooks/use-status'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CodeBlock } from '@/components/ai-elements/code-block'
+import { ENDPOINT_TYPES, getEndpointTypeLabels } from '../constants'
 import { replaceModelInPath } from '../lib/model-helpers'
-import type { PricingModel } from '../types'
+import type { PricingModel, SupportedEndpointInfo } from '../types'
 
 // ---------------------------------------------------------------------------
 // Code-sample registry
@@ -409,11 +410,218 @@ function buildImageSample(lang: Lang, ctx: SampleContext): string {
   ].join('\n')
 }
 
+function buildElevenLabsJsonAudioSample(
+  lang: Lang,
+  ctx: SampleContext,
+  body: Record<string, unknown>,
+  outputFile: string
+): string {
+  const url = `${ctx.baseUrl}${ctx.endpointPath}`
+  const bodyJson = JSON.stringify(body, null, 2)
+
+  if (lang === 'curl') {
+    return [
+      `curl ${url} \\`,
+      `  -H "Authorization: Bearer $${ctx.apiKeyEnv}" \\`,
+      `  -H "Content-Type: application/json" \\`,
+      `  -d '${bodyJson.replace(/\n/g, '\n     ')}' \\`,
+      `  --output ${outputFile}`,
+    ].join('\n')
+  }
+
+  if (lang === 'python') {
+    return [
+      'import requests',
+      '',
+      `response = requests.post(`,
+      `    "${url}",`,
+      `    headers={"Authorization": "Bearer <YOUR_API_KEY>"},`,
+      `    json=${bodyJson.replace(/\n/g, '\n         ')},`,
+      ')',
+      'response.raise_for_status()',
+      `open("${outputFile}", "wb").write(response.content)`,
+    ].join('\n')
+  }
+
+  return [
+    `const response = await fetch('${url}', {`,
+    `  method: 'POST',`,
+    `  headers: {`,
+    `    Authorization: \`Bearer \${process.env.${ctx.apiKeyEnv}}\`,`,
+    `    'Content-Type': 'application/json',`,
+    `  },`,
+    `  body: JSON.stringify(${bodyJson}),`,
+    `})`,
+    '',
+    `const audio = await response.arrayBuffer()`,
+    `console.log('Generated ${outputFile}', audio.byteLength)`,
+  ].join('\n')
+}
+
+function buildElevenLabsMultipartAudioSample(
+  lang: Lang,
+  ctx: SampleContext,
+  fields: Record<string, string>,
+  fileField: string,
+  fileName: string,
+  outputFile?: string
+): string {
+  const url = `${ctx.baseUrl}${ctx.endpointPath}`
+
+  if (lang === 'curl') {
+    const formArgs = [
+      `-F "${fileField}=@${fileName}"`,
+      ...Object.entries(fields).map(([key, value]) => `-F "${key}=${value}"`),
+    ]
+    const lines = [
+      `curl ${url} \\`,
+      `  -H "Authorization: Bearer $${ctx.apiKeyEnv}" \\`,
+    ]
+    formArgs.forEach((arg, index) => {
+      const isLast = index === formArgs.length - 1 && !outputFile
+      lines.push(`  ${arg}${isLast ? '' : ' \\'}`)
+    })
+    if (outputFile) lines.push(`  --output ${outputFile}`)
+    return lines.join('\n')
+  }
+
+  if (lang === 'python') {
+    const data = JSON.stringify(fields, null, 4)
+    const responseLine = outputFile
+      ? `open("${outputFile}", "wb").write(response.content)`
+      : 'print(response.json())'
+    return [
+      'import requests',
+      '',
+      `with open("${fileName}", "rb") as audio_file:`,
+      `    response = requests.post(`,
+      `        "${url}",`,
+      `        headers={"Authorization": "Bearer <YOUR_API_KEY>"},`,
+      `        files={"${fileField}": audio_file},`,
+      `        data=${data.replace(/\n/g, '\n             ')},`,
+      '    )',
+      'response.raise_for_status()',
+      responseLine,
+    ].join('\n')
+  }
+
+  const appendFields = Object.entries(fields).map(
+    ([key, value]) => `form.append('${key}', '${value}')`
+  )
+  const resultLine = outputFile
+    ? `console.log('Generated ${outputFile}', (await response.arrayBuffer()).byteLength)`
+    : `console.log(await response.json())`
+  return [
+    `const form = new FormData()`,
+    `form.append('${fileField}', fileInput.files[0]) // ${fileName}`,
+    ...appendFields,
+    '',
+    `const response = await fetch('${url}', {`,
+    `  method: 'POST',`,
+    `  headers: { Authorization: \`Bearer \${process.env.${ctx.apiKeyEnv}}\` },`,
+    `  body: form,`,
+    `})`,
+    '',
+    resultLine,
+  ].join('\n')
+}
+
+function buildAudioSample(lang: Lang, ctx: SampleContext): string {
+  const voicePath = ctx.endpointPath.replace(
+    '{voice_id}',
+    '21m00Tcm4TlvDq8ikWAM'
+  )
+  const audioCtx = { ...ctx, endpointPath: voicePath }
+
+  if (ctx.endpointType === ENDPOINT_TYPES.AUDIO_STT) {
+    return buildElevenLabsMultipartAudioSample(
+      lang,
+      ctx,
+      { model: ctx.modelName },
+      'file',
+      'speech.mp3'
+    )
+  }
+  if (ctx.endpointType === ENDPOINT_TYPES.AUDIO_SPEECH_TO_SPEECH) {
+    return buildElevenLabsMultipartAudioSample(
+      lang,
+      audioCtx,
+      { model_id: ctx.modelName },
+      'audio',
+      'speech.mp3',
+      'converted.mp3'
+    )
+  }
+  if (ctx.endpointType === ENDPOINT_TYPES.AUDIO_SFX) {
+    return buildElevenLabsJsonAudioSample(
+      lang,
+      ctx,
+      {
+        text: 'A short soft notification chime',
+        model_id: ctx.modelName,
+        duration_seconds: 1.5,
+        prompt_influence: 0.5,
+      },
+      'sfx.mp3'
+    )
+  }
+  if (ctx.endpointType === ENDPOINT_TYPES.AUDIO_MUSIC) {
+    return buildElevenLabsJsonAudioSample(
+      lang,
+      ctx,
+      {
+        prompt: 'Three second instrumental soft synth logo sting',
+        model_id: ctx.modelName,
+        music_length_ms: 3000,
+        force_instrumental: true,
+      },
+      'music.mp3'
+    )
+  }
+  if (ctx.endpointType === ENDPOINT_TYPES.AUDIO_ISOLATION) {
+    return buildElevenLabsMultipartAudioSample(
+      lang,
+      ctx,
+      {},
+      'audio',
+      'noisy-speech.mp3',
+      'isolated.mp3'
+    )
+  }
+  if (ctx.endpointType === ENDPOINT_TYPES.AUDIO_ALIGNMENT) {
+    return buildElevenLabsMultipartAudioSample(
+      lang,
+      ctx,
+      { text: 'Smoke test.' },
+      'file',
+      'speech.mp3'
+    )
+  }
+
+  return buildElevenLabsJsonAudioSample(
+    lang,
+    ctx,
+    {
+      model: ctx.modelName,
+      input: 'Hello from ElevenLabs.',
+      voice: '21m00Tcm4TlvDq8ikWAM',
+      response_format: 'mp3',
+    },
+    'speech.mp3'
+  )
+}
+
 function buildSample(
   lang: Lang,
   endpointType: string,
   ctx: SampleContext
 ): string {
+  if (
+    endpointType === ENDPOINT_TYPES.AUDIO ||
+    endpointType.startsWith('audio-')
+  ) {
+    return buildAudioSample(lang, ctx)
+  }
   if (endpointType === 'anthropic') return buildAnthropicSample(lang, ctx)
   if (endpointType === 'gemini') return buildGeminiSample(lang, ctx)
   if (endpointType === 'embeddings' || endpointType === 'jina-rerank')
@@ -428,10 +636,11 @@ function buildSample(
 
 function CodeSamplesSection(props: {
   model: PricingModel
-  endpointMap: Record<string, { path?: string; method?: string }>
+  endpointMap: Record<string, SupportedEndpointInfo>
 }) {
   const { t } = useTranslation()
   const { status } = useStatus()
+  const endpointLabels = useMemo(() => getEndpointTypeLabels(t), [t])
 
   const baseUrl = useMemo(() => {
     const candidate =
@@ -495,7 +704,8 @@ function CodeSamplesSection(props: {
                   value={ep.type}
                   className='h-7 px-2.5 text-xs'
                 >
-                  {ep.type}
+                  {(endpointLabels as Record<string, string>)[ep.type] ??
+                    ep.type}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -539,6 +749,10 @@ function CodeSamplesSection(props: {
 export function ModelDetailsProviderInfo(props: { model: PricingModel }) {
   const { t } = useTranslation()
   const endpoints = props.model.supported_endpoint_types ?? []
+  const endpointLabels = getEndpointTypeLabels(t) as Record<string, string>
+  const endpointText = endpoints
+    .map((endpoint) => endpointLabels[endpoint] ?? endpoint)
+    .join(', ')
 
   return (
     <section>
@@ -551,7 +765,7 @@ export function ModelDetailsProviderInfo(props: { model: PricingModel }) {
         </InfoCell>
         <InfoCell label={t('Endpoint types')}>
           <span className='text-sm'>
-            {endpoints.length > 0 ? endpoints.join(', ') : '—'}
+            {endpoints.length > 0 ? endpointText : '—'}
           </span>
         </InfoCell>
         {props.model.vendor_description ? (
@@ -617,7 +831,7 @@ function AuthSection() {
 
 export function ModelDetailsApi(props: {
   model: PricingModel
-  endpointMap: Record<string, { path?: string; method?: string }>
+  endpointMap: Record<string, SupportedEndpointInfo>
 }) {
   return (
     <div className='space-y-6'>

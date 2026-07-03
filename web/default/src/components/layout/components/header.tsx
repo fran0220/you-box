@@ -22,7 +22,6 @@ import { useAuthStore } from '@/stores/auth-store'
 import { formatQuota } from '@/lib/format'
 import { useNotifications } from '@/hooks/use-notifications'
 import { Button } from '@/components/ui/button'
-import { ConfigDrawer } from '@/components/config-drawer'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { NotificationPopover } from '@/components/notification-popover'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -32,18 +31,17 @@ import { SystemBrand } from './system-brand'
 import { TopNav } from './top-nav'
 
 export type HeaderProps = {
-  /** True when the console sidebar is mounted (shows the trigger + config drawer). */
+  /** True when the console sidebar is mounted (shows the mobile sidebar trigger). */
   withSidebar?: boolean
   showTopNav?: boolean
   showSearch?: boolean
   showNotifications?: boolean
-  showConfigDrawer?: boolean
   showLanguageSwitcher?: boolean
 }
 
 /**
  * One header for the whole site. `withSidebar` only controls structural
- * chrome (sidebar trigger, config drawer, mobile nav); everything else is
+ * chrome (sidebar trigger, mobile nav); everything else is
  * driven by the auth state so a signed-in user sees the same header on
  * /docs as on /keys, and visitors get the same header everywhere.
  */
@@ -59,7 +57,6 @@ export function Header(props: HeaderProps) {
   const showTopNav = props.showTopNav ?? true
   const showSearch = props.showSearch ?? isAuthenticated
   const showNotifications = props.showNotifications ?? isAuthenticated
-  const showConfigDrawer = (props.showConfigDrawer ?? true) && withSidebar
   const showLanguageSwitcher = props.showLanguageSwitcher ?? true
 
   return (
@@ -102,7 +99,6 @@ export function Header(props: HeaderProps) {
           />
         ) : null}
         {showLanguageSwitcher ? <LanguageSwitcher /> : null}
-        {showConfigDrawer ? <ConfigDrawer /> : null}
         {isAuthenticated ? (
           <ProfileDropdown />
         ) : (

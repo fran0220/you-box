@@ -36,7 +36,7 @@ import { DEFAULT_TOKEN_UNIT, QUOTA_TYPE_VALUES } from '../constants'
 import { usePricingData } from '../hooks/use-pricing-data'
 import { getDynamicPricingTiers } from '../lib/dynamic-price'
 import { parseTags } from '../lib/filters'
-import type { PricingModel, TokenUnit } from '../types'
+import type { PricingModel, SupportedEndpointInfo, TokenUnit } from '../types'
 import { DynamicPricingBreakdown } from './dynamic-pricing-breakdown'
 import { ModelDetailsApi, ModelDetailsProviderInfo } from './model-details-api'
 import { ModelDetailsApps } from './model-details-apps'
@@ -172,7 +172,7 @@ export interface ModelDetailsContentProps {
   model: PricingModel
   groupRatio: Record<string, number>
   usableGroup: Record<string, { desc: string; ratio: number }>
-  endpointMap: Record<string, { path?: string; method?: string }>
+  endpointMap: Record<string, SupportedEndpointInfo>
   autoGroups: string[]
   priceRate: number
   usdExchangeRate: number
@@ -320,9 +320,10 @@ export function ModelDetailsDrawer(props: ModelDetailsDrawerProps) {
 
 export function ModelDetails() {
   const { t } = useTranslation()
-  const { modelId } = useParams({ from: '/_public/pricing/$modelId/' })
-  const search = useSearch({ from: '/_public/pricing/$modelId/' })
+  const params = useParams({ strict: false })
+  const search = useSearch({ strict: false })
   const navigate = useNavigate()
+  const modelId = typeof params.modelId === 'string' ? params.modelId : ''
 
   const {
     models,
@@ -337,6 +338,7 @@ export function ModelDetails() {
 
   const tokenUnit: TokenUnit =
     search.tokenUnit === 'K' ? 'K' : DEFAULT_TOKEN_UNIT
+  const showRechargePrice = search.rechargePrice === true
 
   const model = useMemo(() => {
     if (!models || !modelId) return null
@@ -417,13 +419,8 @@ export function ModelDetails() {
           priceRate={priceRate ?? 1}
           usdExchangeRate={usdExchangeRate ?? 1}
           tokenUnit={tokenUnit}
-          showRechargePrice={search.rechargePrice ?? false}
-          endpointMap={
-            (endpointMap as Record<
-              string,
-              { path?: string; method?: string }
-            >) || {}
-          }
+          showRechargePrice={showRechargePrice}
+          endpointMap={endpointMap || {}}
         />
         </div>
       </PageTransition>

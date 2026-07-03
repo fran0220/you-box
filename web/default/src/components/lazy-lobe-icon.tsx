@@ -146,6 +146,29 @@ const LOBE_ICON_KEYS_BY_LOWERCASE = Object.fromEntries(
 const cachedIcons = new Map<LobeIconKey, IconModuleDefault | null>()
 const iconPromises = new Map<LobeIconKey, Promise<IconModuleDefault | null>>()
 
+function ElevenLabsFallbackIcon(props: { size: number }) {
+  return (
+    <svg
+      aria-label='ElevenLabs'
+      fill='currentColor'
+      height={props.size}
+      role='img'
+      viewBox='0 0 24 24'
+      width={props.size}
+      xmlns='http://www.w3.org/2000/svg'
+    >
+      <title>ElevenLabs</title>
+      <path d='M5 0h5v24H5V0zM14 0h5v24h-5V0z' />
+    </svg>
+  )
+}
+
+const LOCAL_ICON_FALLBACKS: Partial<
+  Record<LobeIconKey, (size: number) => React.ReactNode>
+> = {
+  ElevenLabs: (size) => <ElevenLabsFallbackIcon size={size} />,
+}
+
 function resolveIconKey(baseName: string): LobeIconKey | null {
   const normalized = baseName
     .trim()
@@ -328,6 +351,9 @@ export function LazyLobeIcon(props: { name: string; size: number }) {
   }
 
   if (!iconState) {
+    const localFallback = LOCAL_ICON_FALLBACKS[request.key]
+    if (localFallback) return localFallback(props.size)
+
     return (
       <span
         className='inline-block shrink-0'
@@ -338,6 +364,9 @@ export function LazyLobeIcon(props: { name: string; size: number }) {
   }
 
   if (!iconState.icon) {
+    const localFallback = LOCAL_ICON_FALLBACKS[request.key]
+    if (localFallback) return localFallback(props.size)
+
     return fallbackIcon(props.name, props.size)
   }
 

@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { FacetOption } from './filters'
+import { ENDPOINT_TYPES } from '../constants'
 import type { PricingModel, PricingVendor } from '../types'
 
 /** Canonical model-type facet values (English labels; i18n at UI layer). */
@@ -32,11 +33,22 @@ export const MODEL_TYPE_VALUES = {
 export type ModelTypeValue =
   (typeof MODEL_TYPE_VALUES)[keyof typeof MODEL_TYPE_VALUES]
 
-const CHAT_ENDPOINT_TYPES = new Set([
-  'openai',
-  'openai-response',
-  'anthropic',
-  'gemini',
+const CHAT_ENDPOINT_TYPES = new Set<string>([
+  ENDPOINT_TYPES.OPENAI,
+  ENDPOINT_TYPES.OPENAI_RESPONSE,
+  ENDPOINT_TYPES.ANTHROPIC,
+  ENDPOINT_TYPES.GEMINI,
+])
+
+const AUDIO_ENDPOINT_TYPES = new Set<string>([
+  ENDPOINT_TYPES.AUDIO,
+  ENDPOINT_TYPES.AUDIO_TTS,
+  ENDPOINT_TYPES.AUDIO_STT,
+  ENDPOINT_TYPES.AUDIO_SPEECH_TO_SPEECH,
+  ENDPOINT_TYPES.AUDIO_SFX,
+  ENDPOINT_TYPES.AUDIO_MUSIC,
+  ENDPOINT_TYPES.AUDIO_ISOLATION,
+  ENDPOINT_TYPES.AUDIO_ALIGNMENT,
 ])
 
 /**
@@ -48,7 +60,7 @@ const CHAT_ENDPOINT_TYPES = new Set([
  * 2. `embeddings` -> Embedding
  * 3. `jina-rerank` -> Rerank
  * 4. `openai-video` -> Video
- * 5. `audio_ratio` or `audio_completion_ratio` > 0 -> Audio
+ * 5. `audio*` endpoint, `audio_ratio`, or `audio_completion_ratio` > 0 -> Audio
  * 6. Any of openai / openai-response / anthropic / gemini in
  *    `supported_endpoint_types` -> Chat
  */
@@ -78,19 +90,22 @@ export function deriveModelTypes(model: PricingModel): ModelTypeValue[] {
   const endpointSet = new Set(endpoints)
   const matched = new Set<ModelTypeValue>()
 
-  if (endpointSet.has('image-generation')) {
+  if (endpointSet.has(ENDPOINT_TYPES.IMAGE_GENERATION)) {
     matched.add(MODEL_TYPE_VALUES.IMAGE)
   }
-  if (endpointSet.has('embeddings')) {
+  if (endpointSet.has(ENDPOINT_TYPES.EMBEDDINGS)) {
     matched.add(MODEL_TYPE_VALUES.EMBEDDING)
   }
-  if (endpointSet.has('jina-rerank')) {
+  if (endpointSet.has(ENDPOINT_TYPES.JINA_RERANK)) {
     matched.add(MODEL_TYPE_VALUES.RERANK)
   }
-  if (endpointSet.has('openai-video')) {
+  if (endpointSet.has(ENDPOINT_TYPES.OPENAI_VIDEO)) {
     matched.add(MODEL_TYPE_VALUES.VIDEO)
   }
-  if (hasPositiveAudioRatio(model)) {
+  if (
+    endpoints.some((e) => AUDIO_ENDPOINT_TYPES.has(e)) ||
+    hasPositiveAudioRatio(model)
+  ) {
     matched.add(MODEL_TYPE_VALUES.AUDIO)
   }
   if (endpoints.some((e) => CHAT_ENDPOINT_TYPES.has(e))) {

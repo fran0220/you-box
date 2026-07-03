@@ -113,6 +113,24 @@ var defaultModelRatio = map[string]float64{
 	"tts-1-1106":                                7.5, // 1k characters -> $0.015
 	"tts-1-hd":                                  15,  // 1k characters -> $0.03
 	"tts-1-hd-1106":                             15,  // 1k characters -> $0.03
+	"eleven_turbo_v2":                           25,  // ElevenLabs Flash/Turbo: $0.05 / 1K characters
+	"eleven_turbo_v2_5":                         25,
+	"eleven_flash_v2":                           25,
+	"eleven_flash_v2_5":                         25,
+	"eleven_multilingual_v1":                    50, // ElevenLabs multilingual/v3: $0.10 / 1K characters
+	"eleven_multilingual_v2":                    50,
+	"eleven_v3":                                 50,
+	"elevenlabs-text-to-dialogue":               50,
+	"eleven_text_to_sound_v2":                   25,
+	"elevenlabs-sound-generation":               25,
+	"music_v2":                                  50,
+	"scribe_v1":                                 1.833333, // ElevenLabs STT: $0.22 / hour, using 1000 audio units / minute
+	"scribe_v2":                                 1.833333,
+	"eleven_english_sts_v2":                     40, // ElevenLabs voice changer / speech-to-speech.
+	"eleven_multilingual_sts_v2":                40,
+	"elevenlabs-speech-to-speech":               40, // Speech engine: $0.08 / minute, using 1000 audio units / minute
+	"elevenlabs-audio-isolation":                40,
+	"elevenlabs-forced-alignment":               1.833333,
 	"davinci":                                   10,
 	"curie":                                     10,
 	"text-embedding-3-small":                    0.01,

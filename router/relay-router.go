@@ -190,6 +190,16 @@ func SetRelayRouter(router *gin.Engine) {
 		relaySunoRouter.GET("/fetch/:id", controller.RelayTaskFetch)
 	}
 
+	relayElevenLabsRouter := router.Group("/elevenlabs")
+	relayElevenLabsRouter.Use(middleware.RouteTag("relay"))
+	relayElevenLabsRouter.Use(middleware.SystemPerformanceCheck())
+	relayElevenLabsRouter.Use(middleware.TokenAuth())
+	relayElevenLabsRouter.Use(middleware.ModelRequestRateLimit())
+	relayElevenLabsRouter.Use(middleware.Distribute())
+	{
+		relayElevenLabsRouter.Any("/*path", controller.RelayElevenLabs)
+	}
+
 	relayGeminiRouter := router.Group("/v1beta")
 	relayGeminiRouter.Use(middleware.RouteTag("relay"))
 	relayGeminiRouter.Use(middleware.SystemPerformanceCheck())

@@ -48,6 +48,7 @@ const BRAND_AND_LITERAL_KEYS = new Set([
   'DeepSeek',
   'Discord',
   'DoubaoVideo',
+  'ElevenLabs',
   'FastGPT',
   'Gemini',
   'Gemini Image 4K',
@@ -316,5 +317,4 @@ main().catch((err) => {
   console.error(err)
   process.exitCode = 1
 })
-
 

@@ -15,6 +15,7 @@ import (
 	"github.com/QuantumNous/new-api/dto"
 	"github.com/QuantumNous/new-api/i18n"
 	"github.com/QuantumNous/new-api/model"
+	"github.com/QuantumNous/new-api/relay/channel/elevenlabs"
 	relayconstant "github.com/QuantumNous/new-api/relay/constant"
 	"github.com/QuantumNous/new-api/service"
 	"github.com/QuantumNous/new-api/setting/ratio_setting"
@@ -292,6 +293,18 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 		}
 		c.Set("platform", string(constant.TaskPlatformSuno))
 		c.Set("relay_mode", relayMode)
+	} else if elevenlabs.IsNativeProxyPath(c.Request.URL.Path) {
+		upstreamPath := elevenlabs.UpstreamPathFromProxyPath(c.Request.URL.Path)
+		endpoint, ok := elevenlabs.MatchNativeEndpoint(c.Request.Method, upstreamPath)
+		if !ok {
+			return nil, false, fmt.Errorf("unsupported ElevenLabs endpoint: %s %s", c.Request.Method, upstreamPath)
+		}
+		modelName, err := elevenlabs.NativeModelForRequest(c, endpoint)
+		if err != nil {
+			return nil, false, err
+		}
+		modelRequest.Model = modelName
+		c.Set("relay_mode", relayconstant.RelayModeUnknown)
 	} else if strings.Contains(c.Request.URL.Path, "/v1/videos/") && strings.HasSuffix(c.Request.URL.Path, "/remix") {
 		relayMode := relayconstant.RelayModeVideoSubmit
 		c.Set("relay_mode", relayMode)
