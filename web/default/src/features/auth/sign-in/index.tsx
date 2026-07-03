@@ -32,7 +32,7 @@ export function SignIn() {
     <AuthLayout>
       <div className='w-full space-y-8'>
         <div className='space-y-2'>
-          <h2 className='font-display text-center text-[28px] font-bold tracking-[-0.025em] sm:text-left'>
+          <h2 className='font-display text-3xl leading-[1.15] font-normal'>
             {t('Sign in')}
           </h2>
           {!status?.self_use_mode_enabled &&
@@ -41,7 +41,7 @@ export function SignIn() {
                 {t("Don't have an account?")}{' '}
                 <Link
                   to='/sign-up'
-                  className='font-medium text-foreground underline underline-offset-4 hover:opacity-80'
+                  className='text-foreground font-medium underline underline-offset-4 hover:opacity-80'
                 >
                   {t('Sign up')}
                 </Link>
@@ -52,11 +52,7 @@ export function SignIn() {
 
         <UserAuthForm redirectTo={redirect} />
 
-        <TermsFooter
-          variant='sign-in'
-          status={status}
-          className='text-center'
-        />
+        <TermsFooter variant='sign-in' status={status} className='text-left' />
       </div>
     </AuthLayout>
   )

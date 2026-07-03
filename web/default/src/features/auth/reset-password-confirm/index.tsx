@@ -107,7 +107,7 @@ export function ResetPasswordConfirm({
     <AuthLayout>
       <div className='w-full space-y-8'>
         <div className='space-y-2'>
-          <h2 className='font-display text-center text-[28px] font-bold tracking-[-0.025em] sm:text-left'>
+          <h2 className='font-display text-3xl leading-[1.15] font-normal'>
             {t('Reset password')}
           </h2>
           <p className='text-muted-foreground text-left text-sm sm:text-base'>

@@ -27,7 +27,7 @@ export function ForgotPassword() {
     <AuthLayout>
       <div className='w-full space-y-8'>
         <div className='space-y-3'>
-          <h2 className='font-display text-center text-[28px] font-bold tracking-[-0.025em] sm:text-left'>
+          <h2 className='font-display text-3xl leading-[1.15] font-normal'>
             {t('Forgot password')}
           </h2>
           <p className='text-muted-foreground text-left text-sm sm:text-base'>
@@ -39,7 +39,7 @@ export function ForgotPassword() {
             {t("Don't have an account?")}{' '}
             <Link
               to='/sign-up'
-              className='font-medium text-foreground underline underline-offset-4 hover:opacity-80'
+              className='text-foreground font-medium underline underline-offset-4 hover:opacity-80'
             >
               {t('Sign up')}
             </Link>
