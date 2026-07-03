@@ -16,11 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { CircleDashed, Ticket, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber, formatQuota } from '@/lib/format'
 import { AnimatedNumber } from '@/components/ui/animated-number'
-import { StatCard, StatCardRow } from '@/components/youbox'
+import { Metric, MetricsRow } from '@/components/patterns'
 import { REDEMPTION_STATUS } from '../constants'
 import type { Redemption } from '../types'
 
@@ -57,28 +56,19 @@ export function RedemptionsStatCards({
     .reduce((sum, r) => sum + (r.quota || 0), 0)
 
   return (
-    <StatCardRow columns={3}>
-      <StatCard
-        size='sm'
-        label={t('Codes issued')}
-        icon={<Ticket />}
-        value={<AnimatedNumber value={total} format={formatNumber} />}
-        loading={loading}
+    <MetricsRow loading={loading} count={3}>
+      <Metric
+        k={t('Codes issued')}
+        v={<AnimatedNumber value={total} format={formatNumber} />}
       />
-      <StatCard
-        size='sm'
-        label={t('Unused')}
-        icon={<CircleDashed />}
-        value={<AnimatedNumber value={unused} format={formatNumber} />}
-        loading={loading}
+      <Metric
+        k={t('Unused')}
+        v={<AnimatedNumber value={unused} format={formatNumber} />}
       />
-      <StatCard
-        size='sm'
-        label={t('Redeemed value')}
-        icon={<Wallet />}
-        value={<AnimatedNumber value={redeemedValue} format={formatQuota} />}
-        loading={loading}
+      <Metric
+        k={t('Redeemed value')}
+        v={<AnimatedNumber value={redeemedValue} format={formatQuota} />}
       />
-    </StatCardRow>
+    </MetricsRow>
   )
 }

@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 export { DeltaBadge } from './delta-badge'
 export { Eyebrow } from './eyebrow'
 export { Metric } from './metric'
+export { MetricsRow } from './metrics-row'
 export { Panel, PanelBody, PanelHeader } from './panel'
 export { ProgressBar } from './progress-bar'
 export { RankBadge } from './rank-badge'

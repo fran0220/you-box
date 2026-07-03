@@ -21,8 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { formatNumber, formatQuota } from '@/lib/format'
 import { computeTimeRange } from '@/lib/time'
 import { AnimatedNumber } from '@/components/ui/animated-number'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Metric } from '@/components/patterns'
+import { Metric, MetricsRow } from '@/components/patterns'
 import { getUserQuotaDates } from '@/features/dashboard/api'
 import { API_KEY_STATUS } from '../constants'
 import { type ApiKey } from '../types'
@@ -69,18 +68,8 @@ export function ApiKeysStatCards({ apiKeys, loading }: ApiKeysStatCardsProps) {
     (apiKey) => apiKey.status === API_KEY_STATUS.ENABLED
   ).length
 
-  if (loading && spend7d.isLoading) {
-    return (
-      <div className='flex items-center gap-6'>
-        <Skeleton className='h-9 w-24' />
-        <Skeleton className='h-9 w-24' />
-        <Skeleton className='h-9 w-28' />
-      </div>
-    )
-  }
-
   return (
-    <div className='border-border flex flex-wrap items-center gap-x-8 gap-y-2 border-b pb-3'>
+    <MetricsRow loading={loading && spend7d.isLoading} count={3}>
       <Metric
         k={t('Active keys')}
         v={<AnimatedNumber value={activeCount} format={formatNumber} />}
@@ -105,6 +94,6 @@ export function ApiKeysStatCards({ apiKeys, loading }: ApiKeysStatCardsProps) {
           )
         }
       />
-    </div>
+    </MetricsRow>
   )
 }

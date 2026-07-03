@@ -18,16 +18,11 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import {
   Activity,
-  CreditCard,
   FileText,
   FlaskConical,
   Key,
-  ListTodo,
-  Radio,
-  Settings,
+  ShieldCheck,
   SlidersHorizontal,
-  Ticket,
-  Users,
   Wallet,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -38,8 +33,8 @@ import { type SidebarData } from '@/components/layout/types'
  *
  * Converged user console: a single flat group of six high-frequency
  * entries (Amp-style restraint). Public resources (docs, pricing,
- * apps) live in the header, not here. Admin entries stay in a
- * role-gated group until the admin drill-in workspace lands.
+ * apps) live in the header, not here. Admins additionally get a
+ * single role-gated entry into the admin drill-in workspace.
  *
  * These are shown when the URL does not match any nested sidebar view
  * registered in `layout/lib/sidebar-view-registry.ts`.
@@ -89,38 +84,20 @@ export function useSidebarData(): SidebarData {
       },
       {
         id: 'admin',
-        title: t('Admin'),
+        title: '',
         items: [
           {
-            title: t('Channels'),
+            title: t('Admin console'),
             url: '/channels',
-            icon: Radio,
-          },
-          {
-            title: t('Models'),
-            url: '/models/metadata',
-            icon: ListTodo,
-          },
-          {
-            title: t('Users'),
-            url: '/users',
-            icon: Users,
-          },
-          {
-            title: t('Redemption Codes'),
-            url: '/redemption-codes',
-            icon: Ticket,
-          },
-          {
-            title: t('Subscription Management'),
-            url: '/subscriptions',
-            icon: CreditCard,
-          },
-          {
-            title: t('System Settings'),
-            url: '/system-settings/site',
-            activeUrls: ['/system-settings'],
-            icon: Settings,
+            configUrls: [
+              '/channels',
+              '/models',
+              '/users',
+              '/redemption-codes',
+              '/subscriptions',
+              '/system-settings',
+            ],
+            icon: ShieldCheck,
           },
         ],
       },

@@ -16,10 +16,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { CircleDollarSign, Layers, ToggleRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { AnimatedNumber } from '@/components/ui/animated-number'
-import { StatCard, StatCardRow } from '@/components/youbox'
+import { Metric, MetricsRow } from '@/components/patterns'
 import type { PlanRecord } from '../types'
 
 type SubscriptionsStatCardsProps = {
@@ -52,33 +51,21 @@ export function SubscriptionsStatCards({
   )
 
   return (
-    <StatCardRow columns={3}>
-      <StatCard
-        size='sm'
-        label={t('Total plans')}
-        icon={<Layers />}
-        value={<AnimatedNumber value={plans.length} />}
-        loading={loading}
+    <MetricsRow loading={loading} count={3}>
+      <Metric k={t('Total plans')} v={<AnimatedNumber value={plans.length} />} />
+      <Metric
+        k={t('Enabled')}
+        v={<AnimatedNumber value={enabledPlans.length} />}
       />
-      <StatCard
-        size='sm'
-        label={t('Enabled')}
-        icon={<ToggleRight />}
-        value={<AnimatedNumber value={enabledPlans.length} />}
-        loading={loading}
-      />
-      <StatCard
-        size='sm'
-        label={t('Enabled value')}
-        icon={<CircleDollarSign />}
-        value={
+      <Metric
+        k={t('Enabled value')}
+        v={
           <AnimatedNumber
             value={enabledValue}
             format={(n) => `$${n.toFixed(2)}`}
           />
         }
-        loading={loading}
       />
-    </StatCardRow>
+    </MetricsRow>
   )
 }

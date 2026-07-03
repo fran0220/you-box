@@ -16,11 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { Activity, AlertTriangle, PowerOff, Server } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber } from '@/lib/format'
 import { AnimatedNumber } from '@/components/ui/animated-number'
-import { StatCard, StatCardRow } from '@/components/patterns'
+import { Metric, MetricsRow } from '@/components/patterns'
 import { CHANNEL_STATUS } from '../constants'
 import type { Channel } from '../types'
 
@@ -63,35 +62,23 @@ export function ChannelsStatCards({
   const offline = channels.length - enabled.length
 
   return (
-    <StatCardRow columns={4}>
-      <StatCard
-        size='sm'
-        label={t('Total channels')}
-        icon={<Server />}
-        value={<AnimatedNumber value={total} format={formatNumber} />}
-        loading={loading}
+    <MetricsRow loading={loading} count={4}>
+      <Metric
+        k={t('Total channels')}
+        v={<AnimatedNumber value={total} format={formatNumber} />}
       />
-      <StatCard
-        size='sm'
-        label={t('Healthy')}
-        icon={<Activity />}
-        value={<AnimatedNumber value={healthy} format={formatNumber} />}
-        loading={loading}
+      <Metric
+        k={t('Healthy')}
+        v={<AnimatedNumber value={healthy} format={formatNumber} />}
       />
-      <StatCard
-        size='sm'
-        label={t('Degraded')}
-        icon={<AlertTriangle />}
-        value={<AnimatedNumber value={degraded} format={formatNumber} />}
-        loading={loading}
+      <Metric
+        k={t('Degraded')}
+        v={<AnimatedNumber value={degraded} format={formatNumber} />}
       />
-      <StatCard
-        size='sm'
-        label={t('Offline')}
-        icon={<PowerOff />}
-        value={<AnimatedNumber value={offline} format={formatNumber} />}
-        loading={loading}
+      <Metric
+        k={t('Offline')}
+        v={<AnimatedNumber value={offline} format={formatNumber} />}
       />
-    </StatCardRow>
+    </MetricsRow>
   )
 }
