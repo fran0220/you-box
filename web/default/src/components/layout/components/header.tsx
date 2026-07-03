@@ -31,10 +31,9 @@ import { HeaderFrame } from './header-frame'
 import { SystemBrand } from './system-brand'
 import { TopNav } from './top-nav'
 
-export type HeaderVariant = 'public' | 'app'
-
 export type HeaderProps = {
-  variant: HeaderVariant
+  /** True when the console sidebar is mounted (shows the trigger + config drawer). */
+  withSidebar?: boolean
   showTopNav?: boolean
   showSearch?: boolean
   showNotifications?: boolean
@@ -43,14 +42,14 @@ export type HeaderProps = {
 }
 
 /**
- * One header for the whole site. The `variant` only controls structural
+ * One header for the whole site. `withSidebar` only controls structural
  * chrome (sidebar trigger, config drawer, mobile nav); everything else is
  * driven by the auth state so a signed-in user sees the same header on
- * /docs as on /keys, and visitors get the marketing header everywhere.
+ * /docs as on /keys, and visitors get the same header everywhere.
  */
 export function Header(props: HeaderProps) {
   const { t } = useTranslation()
-  const variant = props.variant
+  const withSidebar = props.withSidebar ?? false
 
   const notifications = useNotifications()
   const user = useAuthStore((s) => s.auth.user)
@@ -60,21 +59,20 @@ export function Header(props: HeaderProps) {
   const showTopNav = props.showTopNav ?? true
   const showSearch = props.showSearch ?? isAuthenticated
   const showNotifications = props.showNotifications ?? isAuthenticated
-  const showConfigDrawer =
-    (props.showConfigDrawer ?? true) && variant === 'app'
+  const showConfigDrawer = (props.showConfigDrawer ?? true) && withSidebar
   const showLanguageSwitcher = props.showLanguageSwitcher ?? true
 
   return (
-    <HeaderFrame showSidebarTrigger={variant === 'app'}>
+    <HeaderFrame showSidebarTrigger={withSidebar}>
       <SystemBrand variant='inline' />
       <div className='ms-auto flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2'>
         {showTopNav ? (
-          variant === 'public' ? (
-            <TopNav className='me-1' showDesktopLinks showMobileMenu />
-          ) : (
+          withSidebar ? (
             <div className='me-1 hidden lg:block'>
               <TopNav showDesktopLinks showMobileMenu={false} />
             </div>
+          ) : (
+            <TopNav className='me-1' showDesktopLinks showMobileMenu />
           )
         ) : null}
         {showSearch ? <Search /> : null}

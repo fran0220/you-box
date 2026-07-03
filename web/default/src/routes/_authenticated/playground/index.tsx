@@ -19,7 +19,6 @@ For commercial licensing, please contact support@quantumnous.com
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createLazyComponent } from '@/lib/lazy-route-component'
 import { isSidebarModuleEnabled } from '@/lib/nav-modules'
-import { Main } from '@/components/layout'
 
 const Playground = createLazyComponent(async () => ({
   default: (await import('@/features/playground')).Playground,
@@ -47,8 +46,8 @@ export const Route = createFileRoute('/_authenticated/playground/')({
 function PlaygroundPage() {
   const { model } = Route.useSearch()
   return (
-    <Main className='h-full min-h-0 p-0'>
+    <div className='flex h-[calc(100svh-var(--app-header-height,0px))] min-h-0 flex-col overflow-hidden'>
       <Playground initialModel={model} />
-    </Main>
+    </div>
   )
 }

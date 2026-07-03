@@ -30,5 +30,5 @@ export const Route = createFileRoute('/_public')({
 })
 
 function PublicLayout() {
-  return <AppShell variant='public' />
+  return <AppShell />
 }

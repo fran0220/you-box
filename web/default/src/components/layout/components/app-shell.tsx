@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { getCookie } from '@/lib/cookies'
-import { cn } from '@/lib/utils'
 import { LayoutProvider } from '@/context/layout-provider'
 import { SearchProvider } from '@/context/search-provider'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
@@ -30,37 +29,44 @@ import {
 import { AppContentScrollRestoration } from './app-content-scroll-restoration'
 import { AppSidebar } from './app-sidebar'
 import { Footer } from './footer'
-import { Header, type HeaderVariant } from './header'
+import { Header } from './header'
 
 export type AppShellProps = {
-  variant: HeaderVariant
+  /** Mount the console sidebar (authenticated console routes only). */
+  withSidebar?: boolean
   children?: React.ReactNode
   contentMode?: AppShellContentMode
   showFooter?: boolean
 }
 
 /**
- * Single shell, two scroll models:
- * - `app` (console): viewport-locked inner scroll, sidebar, no footer.
- *   The sidebar is console chrome only; it never leaks onto public pages.
- * - `public` (marketing): document scroll, cream `.paper` canvas, footer,
- *   no sidebar regardless of auth. Signed-in visitors reach the console
- *   through the header (top nav, quota pill, profile menu).
+ * The single site shell: sticky header, document scroll, cream `.paper`
+ * canvas and footer everywhere. The console sidebar is an optional slot
+ * inside the same shell (never a second shell), so public pages, the
+ * user console and the admin drill-in workspace share one visual
+ * language and one scroll model. Viewport-locked surfaces (playground,
+ * chat) opt out via their own fixed-height wrappers and `showFooter`.
  */
 export function AppShell(props: AppShellProps) {
   const contentMode = props.contentMode ?? 'standard'
-  const showFooter = props.showFooter ?? props.variant === 'public'
+  const showFooter = props.showFooter ?? true
 
-  if (props.variant === 'public') {
+  const body = (
+    <>
+      <AppShellContent mode={contentMode}>
+        {props.children ?? <AnimatedOutlet />}
+      </AppShellContent>
+      {showFooter ? <Footer /> : null}
+    </>
+  )
+
+  if (!props.withSidebar) {
     return (
       <SearchProvider>
         <div className='paper bg-background text-foreground relative flex min-h-svh flex-col overflow-x-clip'>
           <SkipToMain />
-          <Header variant='public' />
-          <AppShellContent mode={contentMode}>
-            {props.children ?? <AnimatedOutlet />}
-          </AppShellContent>
-          {showFooter ? <Footer /> : null}
+          <Header />
+          {body}
         </div>
       </SearchProvider>
     )
@@ -71,21 +77,19 @@ export function AppShell(props: AppShellProps) {
   return (
     <LayoutProvider>
       <SearchProvider>
-        <SidebarProvider defaultOpen={defaultOpen} className='flex-col'>
+        <SidebarProvider
+          defaultOpen={defaultOpen}
+          className='paper bg-background text-foreground flex-col overflow-x-clip'
+        >
           <AppContentScrollRestoration />
           <SkipToMain />
-          <Header variant='app' />
-          <div className='flex min-h-0 w-full flex-1'>
+          <Header withSidebar />
+          <div className='flex w-full flex-1'>
             <AppSidebar />
-            <SidebarInset
-              className={cn(
-                '@container/content',
-                'h-[calc(100svh-var(--app-header-height,0px))]',
-                'min-h-0 overflow-hidden',
-                'peer-data-[variant=inset]:h-[calc(100svh-var(--app-header-height,0px)-(var(--spacing)*4))]'
-              )}
-            >
-              {props.children ?? <AnimatedOutlet />}
+            <SidebarInset className='@container/content min-w-0'>
+              <div className='flex min-h-[calc(100svh-var(--app-header-height,0px))] flex-1 flex-col'>
+                {body}
+              </div>
             </SidebarInset>
           </div>
         </SidebarProvider>

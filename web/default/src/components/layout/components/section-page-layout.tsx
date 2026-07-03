@@ -23,7 +23,6 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react'
-import { Main } from './main'
 import { PageFooterProvider } from './page-footer'
 
 type SlotProps = { children?: ReactNode }
@@ -76,7 +75,7 @@ export function SectionPageLayout(props: SectionPageLayoutProps) {
 
   return (
     <PageFooterProvider container={footerContainer}>
-      <Main>
+      <main className='flex min-w-0 flex-1 flex-col'>
         {(breadcrumb != null || title != null || actions != null) && (
           <div className='mx-auto w-full max-w-[var(--container-lg,1100px)] shrink-0 px-[var(--gutter,24px)] pt-7 pb-4'>
             {breadcrumb != null && (
@@ -105,18 +104,17 @@ export function SectionPageLayout(props: SectionPageLayoutProps) {
           </div>
         )}
 
-        <div
-          data-app-content-scroll
-          className='mx-auto min-h-0 w-full max-w-[var(--container-lg,1100px)] flex-1 overflow-auto px-[var(--gutter,24px)] pt-1 pb-16'
-        >
+        <div className='mx-auto w-full max-w-[var(--container-lg,1100px)] flex-1 px-[var(--gutter,24px)] pt-1 pb-16'>
           {content}
         </div>
 
+        {/* Sticky slot so action bars (save, pagination) stay visible
+            under document scroll. */}
         <div
           ref={setFooterContainer}
-          className='bg-background mx-auto w-full max-w-[var(--container-lg,1100px)] shrink-0 border-t px-[var(--gutter,24px)] py-3 empty:hidden'
+          className='bg-background sticky bottom-0 z-10 mx-auto w-full max-w-[var(--container-lg,1100px)] shrink-0 border-t px-[var(--gutter,24px)] py-3 empty:hidden'
         />
-      </Main>
+      </main>
     </PageFooterProvider>
   )
 }

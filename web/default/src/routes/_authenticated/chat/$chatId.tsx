@@ -25,7 +25,6 @@ import { isSidebarModuleEnabled } from '@/lib/nav-modules'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Main } from '@/components/layout'
 import { EmptyState } from '@/components/youbox'
 import { useActiveChatKey } from '@/features/chat/hooks/use-active-chat-key'
 import { useChatPresets } from '@/features/chat/hooks/use-chat-presets'
@@ -199,10 +198,10 @@ function ChatRouteComponent() {
   })()
 
   return (
-    <Main className='h-full min-h-0 p-0'>
+    <div className='flex h-[calc(100svh-var(--app-header-height,0px))] min-h-0 flex-col overflow-hidden'>
       <ChatShell activeChatId={chatId} preset={preset} resolvedUrl={iframeSrc}>
         {content}
       </ChatShell>
-    </Main>
+    </div>
   )
 }

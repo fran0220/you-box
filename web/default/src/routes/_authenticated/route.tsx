@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect, useRouterState } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { getSelf } from '@/lib/api'
 import { AppShell } from '@/components/layout'
@@ -60,5 +60,14 @@ export const Route = createFileRoute('/_authenticated')({
 })
 
 function AuthenticatedAppLayout() {
-  return <AppShell variant='app' />
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
+  // Viewport-locked surfaces manage their own scroll and skip the footer.
+  const fullscreen =
+    pathname.startsWith('/playground') || pathname.startsWith('/chat')
+
+  return (
+    <AppShell withSidebar contentMode='bare' showFooter={!fullscreen} />
+  )
 }
