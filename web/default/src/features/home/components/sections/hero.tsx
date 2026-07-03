@@ -66,11 +66,16 @@ export function Hero(props: HeroProps) {
   }
 
   return (
-    <section className='relative z-10 overflow-hidden pt-16 pb-14 md:pt-20 md:pb-16 lg:pt-24'>
-      <div className='mx-auto flex max-w-6xl flex-col items-center px-4 text-center md:px-6'>
+    <section className='relative z-10 overflow-hidden pt-16 pb-16 md:pt-24 md:pb-20 lg:pt-28'>
+      <div className='hero-backdrop' aria-hidden='true'>
+        <div className='hero-wash hero-wash--brand' />
+        <div className='hero-wash hero-wash--warm' />
+      </div>
+
+      <div className='relative mx-auto w-full max-w-6xl px-4 md:px-6'>
         <Link
           to='/status'
-          className='landing-animate-fade-up border-border bg-surface-2 text-muted-foreground hover:border-brand-border mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs opacity-0 transition-colors'
+          className='landing-animate-fade-up border-border bg-surface-2 text-muted-foreground hover:border-brand-border mb-7 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs opacity-0 transition-colors'
           style={{ animationDelay: '0ms' }}
         >
           <span
@@ -95,21 +100,21 @@ export function Hero(props: HeroProps) {
         </Link>
 
         <p
-          className='yb-eyebrow landing-animate-fade-up mb-4 opacity-0'
+          className='yb-eyebrow landing-animate-fade-up mb-5 opacity-0'
           style={{ animationDelay: '40ms' }}
         >
           {t('One API · 300+ models')}
         </p>
 
         <h1
-          className='font-display landing-animate-fade-up text-[clamp(2.75rem,7vw,4.875rem)] leading-[1.04] font-normal opacity-0'
+          className='font-display landing-animate-fade-up max-w-[13em] text-[clamp(2.875rem,7.5vw,5.25rem)] leading-[1.02] font-normal tracking-[-0.015em] opacity-0'
           style={{ animationDelay: '60ms' }}
         >
           <Trans i18nKey='Hero headline' components={{ br: <br /> }} />
         </h1>
 
         <p
-          className='landing-animate-fade-up text-muted-foreground mt-5 max-w-[32em] text-base leading-relaxed opacity-0 md:text-xl md:leading-[1.55]'
+          className='landing-animate-fade-up text-muted-foreground mt-6 max-w-[34em] text-base leading-relaxed opacity-0 md:text-xl md:leading-[1.55]'
           style={{ animationDelay: '120ms' }}
         >
           {t(
@@ -119,7 +124,7 @@ export function Hero(props: HeroProps) {
         </p>
 
         <div
-          className='landing-animate-fade-up mt-8 flex flex-wrap items-center justify-center gap-3 opacity-0'
+          className='landing-animate-fade-up mt-9 flex flex-wrap items-center gap-3 opacity-0'
           style={{ animationDelay: '180ms' }}
         >
           {props.isAuthenticated ? (
@@ -148,7 +153,7 @@ export function Hero(props: HeroProps) {
         </div>
 
         <p
-          className='landing-animate-fade-up text-muted-foreground mt-5 flex items-center justify-center gap-2 text-[13px] opacity-0'
+          className='landing-animate-fade-up text-muted-foreground mt-5 flex items-center gap-2 text-[13px] opacity-0'
           style={{ animationDelay: '220ms' }}
         >
           <CircleCheckBig

@@ -520,6 +520,91 @@ For commercial licensing, please contact support@quantumnous.com
   }
 }
 
+/* Home hero backdrop — restrained paper aurora.
+ * Two large blurred washes (brand indigo + deepened cream) drift very
+ * slowly behind a faint editorial column grid. Pure CSS, no JS; static
+ * under prefers-reduced-motion. */
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--border) 0,
+    var(--border) 1px,
+    transparent 1px,
+    transparent 112px
+  );
+  opacity: 0.45;
+  mask-image: radial-gradient(
+    120% 90% at 50% 0%,
+    black 30%,
+    transparent 78%
+  );
+}
+
+.hero-wash {
+  position: absolute;
+  width: 52rem;
+  height: 52rem;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+
+.hero-wash--brand {
+  top: -26rem;
+  right: -16rem;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--brand) 13%, transparent),
+    transparent 72%
+  );
+  animation: hero-drift-a 48s var(--ease-out, ease-in-out) infinite alternate;
+}
+
+.hero-wash--warm {
+  bottom: -30rem;
+  left: -18rem;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--paper-cream, #dfdfc1) 55%, transparent),
+    transparent 72%
+  );
+  animation: hero-drift-b 62s var(--ease-out, ease-in-out) infinite alternate;
+}
+
+@keyframes hero-drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-5rem, 3.5rem, 0) scale(1.07);
+  }
+}
+
+@keyframes hero-drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4rem, -3rem, 0) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-wash {
+    animation: none !important;
+  }
+}
+
 /* Micro-interactions — flat editorial feedback: borders sharpen, nothing lifts */
 @media (prefers-reduced-motion: no-preference) {
   [data-slot='card'] {
