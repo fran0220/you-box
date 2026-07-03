@@ -16,102 +16,141 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { BarChart3, KeyRound, Zap } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { Link } from '@tanstack/react-router'
+import { ArrowRight, Briefcase, Code2, MessagesSquare } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { CodeBlock } from '@/components/ai-elements/code-block'
+import { cn } from '@/lib/utils'
+import { useStatus } from '@/hooks/use-status'
 import { AnimateInView } from '@/components/animate-in-view'
 
-// Quickstart snippet rendered with the unified CodeBlock chrome
-// (three dots + mono filename + copy) — R2-B15 gap closure.
-function buildQuickstartCode() {
-  const origin =
-    typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'https://your-gateway.example.com'
-  return [
-    `curl -X POST "${origin}/v1/chat/completions" \\`,
-    '  -H "Authorization: Bearer $YOUR_API_KEY" \\',
-    '  -H "Content-Type: application/json" \\',
-    `  -d '{`,
-    '    "model": "gpt-4o",',
-    '    "messages": [{ "role": "user", "content": "Hello!" }]',
-    `  }'`,
-  ].join('\n')
+interface Guide {
+  eyebrow: string
+  title: string
+  desc: string
+  cta: string
+  to: string
+  icon: ReactNode
 }
 
+function GuideLink(props: {
+  guide: Guide
+  className?: string
+  children: ReactNode
+}) {
+  const className = cn(
+    'group flex h-full flex-col gap-4 py-8 transition-colors',
+    props.className
+  )
+  if (props.guide.to.startsWith('http')) {
+    return (
+      <a
+        href={props.guide.to}
+        target='_blank'
+        rel='noopener noreferrer'
+        className={className}
+      >
+        {props.children}
+      </a>
+    )
+  }
+  return (
+    <Link to={props.guide.to} className={className}>
+      {props.children}
+    </Link>
+  )
+}
+
+/**
+ * User-oriented entry points: chat goes straight to the playground,
+ * developers and office users go to the docs. Hairline-divided
+ * three-column grid — no cards.
+ */
 export function HowItWorks() {
   const { t } = useTranslation()
+  const { status } = useStatus()
+  const docsUrl = (status?.docs_link as string | undefined) || '/docs'
 
-  const steps = [
+  const guides: Guide[] = [
     {
-      num: '1',
-      title: t('Create a key'),
-      desc: t('Generate one API key from the console and keep it in your app.'),
-      icon: <KeyRound className='size-6' strokeWidth={1.5} />,
-    },
-    {
-      num: '2',
-      title: t('Send a request'),
+      eyebrow: t('For chatting'),
+      title: t('Chat'),
       desc: t(
-        'Use the OpenAI-compatible endpoint with any supported model string.'
+        'Talk with 300+ models right in the browser. No code, no setup, just pick a model and start.'
       ),
-      icon: <Zap className='size-6' strokeWidth={1.5} />,
+      cta: t('Open the playground'),
+      to: '/playground',
+      icon: <MessagesSquare className='size-5' strokeWidth={1.5} />,
     },
     {
-      num: '3',
-      title: t('Monitor usage'),
-      desc: t('Review spend, tokens, and errors from the focused console.'),
-      icon: <BarChart3 className='size-6' strokeWidth={1.5} />,
+      eyebrow: t('For developers'),
+      title: t('Developers'),
+      desc: t(
+        'Call every provider through one OpenAI-compatible API. One key, one balance, drop-in SDK support.'
+      ),
+      cta: t('Read the docs'),
+      to: docsUrl,
+      icon: <Code2 className='size-5' strokeWidth={1.5} />,
+    },
+    {
+      eyebrow: t('For everyday work'),
+      title: t('Office'),
+      desc: t(
+        'Bring AI into writing, translation, and analysis with the desktop and web apps you already use.'
+      ),
+      cta: t('Read the docs'),
+      to: docsUrl,
+      icon: <Briefcase className='size-5' strokeWidth={1.5} />,
     },
   ]
 
   return (
-    <section className='border-border/40 relative z-10 border-t py-16 md:py-20'>
-      <div>
-        <AnimateInView className='mb-10 text-center md:mb-12'>
-          <p className='yb-eyebrow mb-3'>
-            {t('How It Works')}
-          </p>
-          <h2 className='font-display text-2xl font-bold tracking-[-0.025em] md:text-3xl'>
-            {t('Three steps to get started')}
+    <section className='border-border/70 relative z-10 border-t py-14 md:py-20'>
+      <div className='mx-auto w-full max-w-6xl px-4 md:px-6'>
+        <AnimateInView className='mb-10 md:mb-12'>
+          <p className='yb-eyebrow mb-4'>{t('Get started')}</p>
+          <h2 className='font-display max-w-[16em] text-3xl leading-[1.1] font-normal md:text-4xl'>
+            {t('Start from what you want to do')}
           </h2>
         </AnimateInView>
 
-        <div className='grid gap-8 md:grid-cols-3 md:gap-12'>
-          {steps.map((step, i) => (
+        <div className='border-border/70 divide-border/70 grid divide-y border-y md:grid-cols-3 md:divide-x md:divide-y-0'>
+          {guides.map((guide, i) => (
             <AnimateInView
-              key={step.num}
-              delay={i * 150}
+              key={guide.title}
+              delay={i * 120}
               animation='fade-up'
-              className='relative flex flex-col items-center text-center'
+              className='h-full'
             >
-              <div className='relative mb-6'>
-                <div className='text-brand bg-brand-subtle flex size-16 items-center justify-center rounded-lg transition-colors'>
-                  {step.icon}
+              <GuideLink
+                guide={guide}
+                className={cn(
+                  i === 0 && 'md:pr-8',
+                  i === 1 && 'md:px-8',
+                  i === 2 && 'md:pl-8'
+                )}
+              >
+                <div className='text-muted-foreground group-hover:text-brand flex items-center gap-3 transition-colors'>
+                  <span aria-hidden='true'>{guide.icon}</span>
+                  <span className='yb-eyebrow'>{guide.eyebrow}</span>
                 </div>
-                <div className='bg-brand text-primary-foreground absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full font-mono text-xs font-semibold'>
-                  {step.num}
-                </div>
-              </div>
-              <h3 className='mb-2 text-base font-semibold'>{step.title}</h3>
-              <p className='text-muted-foreground max-w-[240px] text-sm leading-relaxed'>
-                {step.desc}
-              </p>
+                <h3 className='font-display text-xl font-normal md:text-2xl'>
+                  {guide.title}
+                </h3>
+                <p className='text-muted-foreground max-w-[30em] text-sm leading-relaxed'>
+                  {guide.desc}
+                </p>
+                <span className='text-foreground mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-medium'>
+                  {guide.cta}
+                  <ArrowRight
+                    className='size-4 transition-transform group-hover:translate-x-0.5'
+                    aria-hidden='true'
+                  />
+                </span>
+              </GuideLink>
             </AnimateInView>
           ))}
         </div>
-
-        <AnimateInView
-          delay={450}
-          animation='fade-up'
-          className='mx-auto mt-12 max-w-2xl'
-        >
-          <CodeBlock
-            code={buildQuickstartCode()}
-            language='bash'
-            title='quickstart.sh'
-          />
-        </AnimateInView>
       </div>
     </section>
   )
