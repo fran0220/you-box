@@ -2010,7 +2010,7 @@
     "footer.columns.related.links.oneApi": "Один API",
     "footer.columns.related.title": "Связанные проекты",
     "footer.defaultCopyright": "Все права защищены.",
-    "footer.new\u0061pi.projectAttributionSuffix": "Все права защищены. Разработано участниками проекта.",
+    "footer.newapi.projectAttributionSuffix": "Все права защищены. Разработано участниками проекта.",
     "For channels added after May 10, 2025, no need to remove \".\" from model names during deployment": "Для каналов, добавленных после 10 мая 2025 г., не нужно удалять \".\" из имён моделей при развёртывании",
     "For private deployments, format: https://fastgpt.run/api/openapi": "Для частных развертываний, формат: https://fastgpt.run/api/openapi",
     "Force a syntactically valid JSON response": "Принудительно возвращать синтаксически корректный JSON",
@@ -5163,6 +5163,8 @@
     "Create key": "Создать ключ",
     "Admin console": "Консоль администратора",
     "Back to Console": "Назад в консоль",
-    "Back to Admin": "Назад в админку"
+    "Back to Admin": "Назад в админку",
+    "Plug into the AI apps you already use": "Подключайте привычные AI-приложения",
+    "and any OpenAI-compatible client": "и любой OpenAI-совместимый клиент"
   }
 }

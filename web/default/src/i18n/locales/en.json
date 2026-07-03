@@ -2010,7 +2010,7 @@
     "footer.columns.related.links.oneApi": "One API",
     "footer.columns.related.title": "Related Projects",
     "footer.defaultCopyright": "All rights reserved.",
-    "footer.new\u0061pi.projectAttributionSuffix": "All rights reserved. Designed and developed by the project contributors.",
+    "footer.newapi.projectAttributionSuffix": "All rights reserved. Designed and developed by the project contributors.",
     "For channels added after May 10, 2025, no need to remove \".\" from model names during deployment": "For channels added after May 10, 2025, no need to remove \".\" from model names during deployment",
     "For private deployments, format: https://fastgpt.run/api/openapi": "For private deployments, format: https://fastgpt.run/api/openapi",
     "Force a syntactically valid JSON response": "Force a syntactically valid JSON response",
@@ -5163,6 +5163,8 @@
     "Create key": "Create key",
     "Admin console": "Admin console",
     "Back to Console": "Back to Console",
-    "Back to Admin": "Back to Admin"
+    "Back to Admin": "Back to Admin",
+    "Plug into the AI apps you already use": "Plug into the AI apps you already use",
+    "and any OpenAI-compatible client": "and any OpenAI-compatible client"
   }
 }

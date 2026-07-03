@@ -20,10 +20,26 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, CircleCheckBig } from 'lucide-react'
 import { Trans, useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { getLobeIcon } from '@/lib/lobe-icon'
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import { useHeroStatusPill } from '../../hooks/use-hero-status-pill'
+
+/** Client apps and coding agents shown in the hero integrations strip.
+ * Names stay untranslated (product names); icons come from @lobehub/icons. */
+const INTEGRATION_APPS: Array<{ name: string; icon: string }> = [
+  { name: 'Cherry Studio', icon: 'CherryStudio.Color' },
+  { name: 'LobeChat', icon: 'LobeHub.Color' },
+  { name: 'Open WebUI', icon: 'OpenWebUI' },
+  { name: 'LM Studio', icon: 'LmStudio' },
+  { name: 'Cline', icon: 'Cline' },
+  { name: 'Roo Code', icon: 'RooCode' },
+  { name: 'Cursor', icon: 'Cursor' },
+  { name: 'Dify', icon: 'Dify.Color' },
+  { name: 'FastGPT', icon: 'FastGPT.Color' },
+  { name: 'Coze', icon: 'Coze' },
+]
 
 interface HeroProps {
   className?: string
@@ -162,6 +178,38 @@ export function Hero(props: HeroProps) {
           />
           {t('Drop-in OpenAI, Claude, and Gemini APIs.')}
         </p>
+
+        {/* Client integrations strip: the gateway plugs into the AI apps
+            and coding agents people already use. */}
+        <div
+          className='landing-animate-fade-up border-border/70 mt-14 border-t pt-6 opacity-0'
+          style={{ animationDelay: '280ms' }}
+        >
+          <p className='yb-eyebrow text-muted-foreground/80'>
+            {t('Plug into the AI apps you already use')}
+          </p>
+          <ul className='mt-4 flex flex-wrap items-center gap-x-7 gap-y-3'>
+            {INTEGRATION_APPS.map((app) => (
+              <li
+                key={app.name}
+                className='text-muted-foreground hover:text-foreground flex items-center gap-2 text-[13px] font-medium transition-colors'
+              >
+                <span className='shrink-0 opacity-80' aria-hidden='true'>
+                  {getLobeIcon(app.icon, 17)}
+                </span>
+                {app.name}
+              </li>
+            ))}
+            <li>
+              <Link
+                to='/playground'
+                className='text-muted-foreground/70 hover:text-foreground text-[13px] underline decoration-dotted underline-offset-4 transition-colors'
+              >
+                {t('and any OpenAI-compatible client')}
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
   )

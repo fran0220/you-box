@@ -2010,7 +2010,7 @@
     "footer.columns.related.links.oneApi": "1つのAPI",
     "footer.columns.related.title": "関連プロジェクト",
     "footer.defaultCopyright": "すべての権利を留保します。",
-    "footer.new\u0061pi.projectAttributionSuffix": "すべての権利を留保します。プロジェクトコントリビューターにより設計・開発されています。",
+    "footer.newapi.projectAttributionSuffix": "すべての権利を留保します。プロジェクトコントリビューターにより設計・開発されています。",
     "For channels added after May 10, 2025, no need to remove \".\" from model names during deployment": "2025 年 5 月 10 日以降に追加されたチャネルの場合、デプロイ時にモデル名から「.」を削除する必要はありません",
     "For private deployments, format: https://fastgpt.run/api/openapi": "プライベートデプロイメントの場合、形式: https://fastgpt.run/api/openapi",
     "Force a syntactically valid JSON response": "構文的に有効な JSON 応答を強制",
@@ -5163,6 +5163,8 @@
     "Create key": "キーを作成",
     "Admin console": "管理コンソール",
     "Back to Console": "コンソールに戻る",
-    "Back to Admin": "管理に戻る"
+    "Back to Admin": "管理に戻る",
+    "Plug into the AI apps you already use": "使い慣れた AI アプリにそのまま接続",
+    "and any OpenAI-compatible client": "その他 OpenAI 互換クライアント"
   }
 }
