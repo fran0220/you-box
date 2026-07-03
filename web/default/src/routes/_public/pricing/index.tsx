@@ -22,15 +22,11 @@ import { useAuthStore } from '@/stores/auth-store'
 import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 import { getFreshModuleAccess } from '@/lib/nav-modules'
 
-const ModelDetails = createLazyRouteComponent(async () => ({
-  default: (await import('@/features/pricing/components/model-details'))
-    .ModelDetails,
+const Pricing = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/pricing')).Pricing,
 }))
 
-// Mirrors the catalog index route's search schema so the detail page can carry
-// the active filters/sort/view back to `/pricing` ("Back to Models"). All array
-// facets are comma-joined strings owned by the filter hook; ranges are numbers.
-const modelDetailsSearchSchema = z.preprocess(
+const pricingSearchSchema = z.preprocess(
   (raw) => {
     if (raw == null || typeof raw !== 'object') return raw
     const next = { ...(raw as Record<string, unknown>) }
@@ -65,8 +61,8 @@ const modelDetailsSearchSchema = z.preprocess(
   })
 )
 
-export const Route = createFileRoute('/pricing/$modelId/')({
-  validateSearch: modelDetailsSearchSchema,
+export const Route = createFileRoute('/_public/pricing/')({
+  validateSearch: pricingSearchSchema,
   beforeLoad: async ({ location }) => {
     const access = await getFreshModuleAccess('pricing')
     if (!access.enabled) {
@@ -82,5 +78,5 @@ export const Route = createFileRoute('/pricing/$modelId/')({
       }
     }
   },
-  component: ModelDetails,
+  component: Pricing,
 })

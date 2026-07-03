@@ -91,7 +91,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className='relative'>{brand}</div>
         <AnimateInView as='div' animation='fade-up' className='relative'>
           <p className='yb-eyebrow mb-4'>
-            {'// '}
             {t('AI Application Infrastructure Foundation')}
           </p>
           <p className='font-display max-w-[18em] text-3xl leading-[1.25] font-semibold tracking-[-0.02em]'>

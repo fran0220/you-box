@@ -16,10 +16,19 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { AppShell } from '@/components/layout'
 
-export const Route = createFileRoute('/legal/')({
-  beforeLoad: () => {
-    throw redirect({ to: '/legal/$doc', params: { doc: 'privacy' } })
-  },
+/**
+ * Pathless layout for all public/marketing pages. Mounting the shell here
+ * (instead of inside each feature) keeps the header and footer alive across
+ * public-page navigations, so switching between /docs, /pricing, /apps, ...
+ * no longer rebuilds the chrome.
+ */
+export const Route = createFileRoute('/_public')({
+  component: PublicLayout,
 })
+
+function PublicLayout() {
+  return <AppShell variant='public' />
+}

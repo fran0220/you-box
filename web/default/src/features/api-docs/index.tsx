@@ -34,7 +34,6 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { CodeBlock, PageHeader } from '@/components/youbox'
 import { getUserModels } from '@/features/playground/api'
@@ -96,11 +95,26 @@ function ModelQuickPicks(props: {
   )
 }
 
-function DocsSectionHeading(props: { children: React.ReactNode }) {
+function DocsSectionHeading(props: {
+  anchor?: string
+  children: React.ReactNode
+}) {
+  const { t } = useTranslation()
   return (
-    <h2 className='font-display text-text-strong scroll-mt-24 text-xl font-semibold tracking-[-0.01em]'>
-      {props.children}
-    </h2>
+    <div className='border-brand/60 border-t pt-5'>
+      <h2 className='font-display text-text-strong group scroll-mt-24 text-2xl font-normal'>
+        {props.children}
+        {props.anchor ? (
+          <a
+            href={`#${props.anchor}`}
+            aria-label={t('Link to this section')}
+            className='text-brand/60 hover:text-brand ml-2 font-mono text-base opacity-0 transition-opacity group-hover:opacity-100'
+          >
+            #
+          </a>
+        ) : null}
+      </h2>
+    </div>
   )
 }
 
@@ -182,8 +196,7 @@ export function ApiDocs() {
   }
 
   return (
-    <AppShell variant='public'>
-      <PageTransition className='pb-12'>
+    <PageTransition className='pb-12'>
         <DocsLayout
           activeSection={activeSection}
           activeTocId={activeSection}
@@ -192,7 +205,6 @@ export function ApiDocs() {
           <div className='space-y-10 pb-10'>
             <section id='overview' className='scroll-mt-24'>
               <p className='text-brand mb-3 font-mono text-[11px] tracking-[0.12em] uppercase'>
-                {'// '}
                 {t('Get started')}
               </p>
               <PageHeader
@@ -206,7 +218,7 @@ export function ApiDocs() {
             </section>
 
             <section id='quickstart' className='scroll-mt-24 space-y-3'>
-              <DocsSectionHeading>{t('Quickstart')}</DocsSectionHeading>
+              <DocsSectionHeading anchor='quickstart'>{t('Quickstart')}</DocsSectionHeading>
               <p className='text-muted-foreground text-[15px] leading-relaxed'>
                 {t(
                   'Create an API key, set the base URL to your gateway host, and call chat completions with any supported model slug.'
@@ -215,7 +227,7 @@ export function ApiDocs() {
             </section>
 
             <section id='authentication' className='scroll-mt-24 space-y-3'>
-              <DocsSectionHeading>{t('Authentication')}</DocsSectionHeading>
+              <DocsSectionHeading anchor='authentication'>{t('Authentication')}</DocsSectionHeading>
               <p className='text-muted-foreground text-[15px] leading-relaxed'>
                 {t(
                   'Authenticate with a bearer token. Create a key in API keys and pass it in the Authorization header. Keep it server-side — never ship it to a browser.'
@@ -224,7 +236,7 @@ export function ApiDocs() {
             </section>
 
             <section id='base-url' className='scroll-mt-24 space-y-3'>
-              <DocsSectionHeading>{t('Base URL')}</DocsSectionHeading>
+              <DocsSectionHeading anchor='base-url'>{t('Base URL')}</DocsSectionHeading>
               <p className='text-muted-foreground text-[15px] leading-relaxed'>
                 {t(
                   'All requests go to one host. Point any OpenAI-compatible client at it:'
@@ -239,7 +251,7 @@ export function ApiDocs() {
             </section>
 
             <section id='chat-completions' className='scroll-mt-24 space-y-4'>
-              <DocsSectionHeading>{t('Your first call')}</DocsSectionHeading>
+              <DocsSectionHeading anchor='chat-completions'>{t('Your first call')}</DocsSectionHeading>
               <p className='text-muted-foreground text-[15px] leading-relaxed'>
                 {t(
                   'Send a chat completion. Switch providers by changing only the model string.'
@@ -272,7 +284,7 @@ export function ApiDocs() {
             </section>
 
             <section id='request-parameters' className='scroll-mt-24 space-y-3'>
-              <DocsSectionHeading>{t('Request parameters')}</DocsSectionHeading>
+              <DocsSectionHeading anchor='request-parameters'>{t('Request parameters')}</DocsSectionHeading>
               <p className='text-muted-foreground text-[15px] leading-relaxed'>
                 {t(
                   'The body follows the OpenAI Chat Completions schema, with a few {{brandName}} extensions for routing.',
@@ -286,7 +298,7 @@ export function ApiDocs() {
             </section>
 
             <section id='response' className='scroll-mt-24 space-y-3'>
-              <DocsSectionHeading>{t('Response')}</DocsSectionHeading>
+              <DocsSectionHeading anchor='response'>{t('Response')}</DocsSectionHeading>
               <CodeBlock
                 code={SAMPLE_RESPONSE_JSON}
                 language='json'
@@ -295,12 +307,12 @@ export function ApiDocs() {
             </section>
 
             <section id='errors' className='scroll-mt-24 space-y-3'>
-              <DocsSectionHeading>{t('Error codes')}</DocsSectionHeading>
+              <DocsSectionHeading anchor='errors'>{t('Error codes')}</DocsSectionHeading>
               <DocsErrorTable rows={API_ERROR_CODES} />
             </section>
 
             <section id='request-builder' className='scroll-mt-24 space-y-4'>
-              <DocsSectionHeading>{t('Try it')}</DocsSectionHeading>
+              <DocsSectionHeading anchor='request-builder'>{t('Try it')}</DocsSectionHeading>
               <div className='grid items-start gap-6 lg:grid-cols-2'>
                 <Card className='flex flex-col gap-4 p-5'>
                   <h3 className='text-foreground text-sm font-semibold'>
@@ -432,8 +444,7 @@ export function ApiDocs() {
               </div>
             </section>
           </div>
-        </DocsLayout>
-      </PageTransition>
-    </AppShell>
+      </DocsLayout>
+    </PageTransition>
   )
 }

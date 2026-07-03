@@ -33,7 +33,7 @@ const rankingsSearchSchema = z.object({
     .catch(undefined),
 })
 
-export const Route = createFileRoute('/rankings/')({
+export const Route = createFileRoute('/_public/rankings/')({
   validateSearch: rankingsSearchSchema,
   beforeLoad: async ({ location }) => {
     const access = await getFreshModuleAccess('rankings')

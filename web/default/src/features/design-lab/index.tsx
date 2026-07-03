@@ -20,7 +20,6 @@ import { Suspense, useEffect, useState } from 'react'
 import { FlaskConical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Eyebrow } from '@/components/patterns'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { DESIGN_LAB_GROUPS } from './registry'
 
 /**
@@ -64,7 +63,6 @@ export default function DesignLab() {
             dev only
           </span>
           <div className='flex-1' />
-          <ThemeSwitch />
         </div>
       </header>
 

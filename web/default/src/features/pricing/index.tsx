@@ -23,7 +23,6 @@ import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 import { MOTION_TRANSITION } from '@/lib/motion'
 import { Button } from '@/components/ui/button'
-import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { EmptyState as YouboxEmptyState } from '@/components/youbox/empty-state'
 import { PageHeader } from '@/components/youbox'
@@ -200,17 +199,14 @@ export function Pricing() {
 
   if (isLoading) {
     return (
-      <AppShell variant='public'>
-        <PageTransition className='pb-10'>
-          <LoadingSkeleton viewMode={viewMode} />
-        </PageTransition>
-      </AppShell>
+      <PageTransition className='pb-10'>
+        <LoadingSkeleton viewMode={viewMode} />
+      </PageTransition>
     )
   }
 
   return (
-    <AppShell variant='public'>
-      <PageTransition className='pb-10'>
+    <PageTransition className='pb-10'>
         <PageHeader
           className='mb-5'
           eyebrow={t('Model Plaza')}
@@ -301,8 +297,7 @@ export function Pricing() {
               {renderPricingContent()}
             </m.div>
           </main>
-        </div>
-      </PageTransition>
-    </AppShell>
+      </div>
+    </PageTransition>
   )
 }

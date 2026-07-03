@@ -38,7 +38,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { StatusBadge } from '@/components/status-badge'
-import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { EmptyState as YouboxEmptyState } from '@/components/youbox/empty-state'
 import { MAX_COMPARE_MODELS, QUOTA_TYPE_VALUES } from '../constants'
@@ -206,7 +205,7 @@ function AddModelButton(props: {
 
 export function ModelCompare() {
   const { t } = useTranslation()
-  const search = useSearch({ from: '/pricing/compare' })
+  const search = useSearch({ from: '/_public/pricing/compare' })
   const navigate = useNavigate()
   const { models, isLoading, priceRate, usdExchangeRate } = usePricingData()
 
@@ -246,20 +245,19 @@ export function ModelCompare() {
 
   if (isLoading) {
     return (
-      <AppShell variant='public'>
+      <>
         <div className='pb-8'>
           <LoadingSkeleton viewMode='table' />
         </div>
-      </AppShell>
+      </>
     )
   }
 
   return (
-    <AppShell variant='public'>
+    <>
       <PageTransition className='mx-auto max-w-[1180px] px-4 pb-10 sm:px-7'>
         <div className='mb-6'>
           <p className='yb-eyebrow mb-3'>
-            {'// '}
             {t('Compare models')}
           </p>
           <h1 className='font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] font-bold tracking-[-0.03em]'>
@@ -390,7 +388,7 @@ export function ModelCompare() {
           </div>
         )}
       </PageTransition>
-    </AppShell>
+    </>
   )
 }
 

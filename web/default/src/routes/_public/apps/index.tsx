@@ -16,29 +16,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { type ComponentProps } from 'react'
-import { cn } from '@/lib/utils'
+import { createFileRoute } from '@tanstack/react-router'
+import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 
-export type EyebrowProps = ComponentProps<'p'> & {
-  /** Kept for compatibility; eyebrows no longer render a `//` prefix. */
-  plain?: boolean
-}
+const AppsRankings = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/apps')).AppsRankings,
+}))
 
-/**
- * Eyebrow — mono uppercase editorial section label (`yb-eyebrow` tokens).
- */
-export function Eyebrow(props: EyebrowProps) {
-  const { plain: _plain, className, children, ...rest } = props
-  return (
-    <p
-      data-slot='youbox-eyebrow'
-      className={cn(
-        'text-text-secondary m-0 font-mono text-[11px] font-semibold tracking-[0.14em] uppercase',
-        className
-      )}
-      {...rest}
-    >
-      {children}
-    </p>
-  )
-}
+export const Route = createFileRoute('/_public/apps/')({
+  component: AppsRankings,
+})

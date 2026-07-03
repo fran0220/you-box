@@ -31,7 +31,6 @@ import {
   DrawerHeader,
   DrawerShell,
 } from '@/components/drawer-layout'
-import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { DEFAULT_TOKEN_UNIT, QUOTA_TYPE_VALUES } from '../constants'
 import { usePricingData } from '../hooks/use-pricing-data'
@@ -321,8 +320,8 @@ export function ModelDetailsDrawer(props: ModelDetailsDrawerProps) {
 
 export function ModelDetails() {
   const { t } = useTranslation()
-  const { modelId } = useParams({ from: '/pricing/$modelId/' })
-  const search = useSearch({ from: '/pricing/$modelId/' })
+  const { modelId } = useParams({ from: '/_public/pricing/$modelId/' })
+  const search = useSearch({ from: '/_public/pricing/$modelId/' })
   const navigate = useNavigate()
 
   const {
@@ -350,7 +349,7 @@ export function ModelDetails() {
 
   if (isLoading) {
     return (
-      <AppShell variant='public'>
+      <>
         <PageTransition className='pb-10'>
           <div className='mx-auto max-w-[1180px] px-4 sm:px-7'>
             <Skeleton className='mb-6 h-4 w-48' />
@@ -372,13 +371,13 @@ export function ModelDetails() {
             </div>
           </div>
         </PageTransition>
-      </AppShell>
+      </>
     )
   }
 
   if (!model) {
     return (
-      <AppShell variant='public'>
+      <>
         <PageTransition className='pb-10'>
           <div className='mx-auto max-w-2xl px-4 text-center sm:px-7'>
             <h2 className='font-display mb-1 text-lg font-semibold tracking-tight'>
@@ -392,12 +391,12 @@ export function ModelDetails() {
             </Button>
           </div>
         </PageTransition>
-      </AppShell>
+      </>
     )
   }
 
   return (
-    <AppShell variant='public'>
+    <>
       <PageTransition className='pb-10'>
         <div className='mx-auto max-w-[1180px] px-4 sm:px-7'>
           <Button
@@ -428,6 +427,6 @@ export function ModelDetails() {
         />
         </div>
       </PageTransition>
-    </AppShell>
+    </>
   )
 }

@@ -18,7 +18,6 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, CircleCheckBig } from 'lucide-react'
-import { m, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { Trans, useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { useStatus } from '@/hooks/use-status'
@@ -35,9 +34,6 @@ export function Hero(props: HeroProps) {
   const { t } = useTranslation()
   const { status } = useStatus()
   const { systemName } = useSystemConfig()
-  const shouldReduce = useReducedMotion()
-  const { scrollY } = useScroll()
-  const glowY = useTransform(scrollY, [0, 600], [0, 120])
   const docsUrl = (status?.docs_link as string | undefined) || '/docs'
   const statusPill = useHeroStatusPill()
 
@@ -71,16 +67,6 @@ export function Hero(props: HeroProps) {
 
   return (
     <section className='relative z-10 overflow-hidden pt-16 pb-14 md:pt-20 md:pb-16 lg:pt-24'>
-      <m.div
-        aria-hidden
-        className='pointer-events-none absolute top-[-220px] left-1/2 -z-10 size-[620px] -translate-x-1/2 rounded-full blur-[10px]'
-        style={{
-          background:
-            'radial-gradient(circle, color-mix(in oklch, var(--foreground) 7%, transparent), transparent 64%)',
-          y: shouldReduce ? 0 : glowY,
-        }}
-      />
-
       <div className='mx-auto flex max-w-6xl flex-col items-center px-4 text-center md:px-6'>
         <Link
           to='/status'
@@ -112,12 +98,11 @@ export function Hero(props: HeroProps) {
           className='yb-eyebrow landing-animate-fade-up mb-4 opacity-0'
           style={{ animationDelay: '40ms' }}
         >
-          {'// '}
           {t('One API · 300+ models')}
         </p>
 
         <h1
-          className='font-display landing-animate-fade-up text-[clamp(2.75rem,7vw,4.875rem)] leading-[1.02] font-bold tracking-[-0.04em] opacity-0'
+          className='font-display landing-animate-fade-up text-[clamp(2.75rem,7vw,4.875rem)] leading-[1.04] font-normal opacity-0'
           style={{ animationDelay: '60ms' }}
         >
           <Trans i18nKey='Hero headline' components={{ br: <br /> }} />

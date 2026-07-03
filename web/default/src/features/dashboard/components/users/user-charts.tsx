@@ -119,7 +119,7 @@ export function UserCharts() {
       }
       const ThemeManager = await themeManagerPromise
       themeManagerRef.current = ThemeManager
-      ThemeManager.setCurrentTheme(resolvedTheme === 'dark' ? 'dark' : 'light')
+      ThemeManager.setCurrentTheme('light')
       setThemeReady(true)
     }
     updateTheme()
@@ -242,7 +242,7 @@ export function UserCharts() {
                       key={`user-${chart.value}-${topUserLimit}-${resolvedTheme}-${customization.preset}`}
                       spec={{
                         ...spec,
-                        theme: resolvedTheme === 'dark' ? 'dark' : 'light',
+                        theme: 'light',
                         background: 'transparent',
                       }}
                       option={VCHART_OPTION}

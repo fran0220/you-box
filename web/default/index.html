@@ -23,26 +23,14 @@
       content="Unified AI API gateway and admin dashboard."
     />
 
-    <meta name="theme-color" content="#fff" />
+    <meta name="theme-color" content="#fafaf8" />
     <!--umami-->
     <!--Google Analytics-->
   </head>
 
   <body>
     <script>
-      ;(function () {
-        var m = document.cookie.match(/(?:^|; )vite-ui-theme=([^;]*)/)
-        var t = m ? decodeURIComponent(m[1]) : 'dark'
-        var resolved = 'dark'
-        if (t === 'light') {
-          resolved = 'light'
-        } else if (t === 'system') {
-          resolved = window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light'
-        }
-        document.documentElement.classList.add(resolved)
-      })()
+      document.documentElement.classList.add('light')
     </script>
     <div id="root"></div>
   </body>

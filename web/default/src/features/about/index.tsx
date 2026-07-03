@@ -23,7 +23,6 @@ import { sanitizeHtml } from '@/lib/sanitize'
 import { cn } from '@/lib/utils'
 import { Markdown } from '@/components/ui/markdown'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AppShell } from '@/components/layout'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/youbox/empty-state'
 import { AboutMarketingFallback } from './components/about-marketing-fallback'
@@ -100,45 +99,45 @@ export function About() {
 
   if (isLoading) {
     return (
-      <AppShell variant='public'>
+      <>
         <AboutLoadingSkeleton />
-      </AppShell>
+      </>
     )
   }
 
   if (isError) {
     return (
-      <AppShell variant='public'>
+      <>
         <AboutErrorState onRetry={() => void refetch()} />
-      </AppShell>
+      </>
     )
   }
 
   if (mode === 'empty') {
     return (
-      <AppShell variant='public'>
+      <>
         <AboutMarketingFallback />
-      </AppShell>
+      </>
     )
   }
 
   if (mode === 'url') {
     return (
-      <AppShell variant='public'>
+      <>
         <iframe
           src={rawContent}
           className='min-h-[calc(100svh-var(--app-header-height,3rem))] w-full border-0'
           title={t('About')}
         />
-      </AppShell>
+      </>
     )
   }
 
   return (
-    <AppShell variant='public'>
+    <>
       <div className='px-7 py-10 md:py-12'>
         <AboutContentPanel mode={mode} rawContent={rawContent} />
       </div>
-    </AppShell>
+    </>
   )
 }

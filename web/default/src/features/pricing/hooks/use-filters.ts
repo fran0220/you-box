@@ -71,7 +71,7 @@ export type ActiveFilter = {
 export type UseFiltersResult = ReturnType<typeof useFilters>
 
 export function useFilters(models: EnrichedPricingModel[]) {
-  const search = useSearch({ from: '/pricing/' })
+  const search = useSearch({ from: '/_public/pricing/' })
   const navigate = useNavigate({ from: '/pricing/' })
 
   const searchInput = (search.search as string) || ''

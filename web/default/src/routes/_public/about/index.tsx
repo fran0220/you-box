@@ -19,10 +19,10 @@ For commercial licensing, please contact support@quantumnous.com
 import { createFileRoute } from '@tanstack/react-router'
 import { createLazyRouteComponent } from '@/lib/lazy-route-component'
 
-const ApiDocs = createLazyRouteComponent(async () => ({
-  default: (await import('@/features/api-docs')).ApiDocs,
+const About = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/about')).About,
 }))
 
-export const Route = createFileRoute('/docs/')({
-  component: ApiDocs,
+export const Route = createFileRoute('/_public/about/')({
+  component: About,
 })

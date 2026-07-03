@@ -33,7 +33,6 @@ import {
   applyBrandColorToDom,
   applyDocumentBrandingToDom,
 } from '@/lib/dom-utils'
-import { useTheme } from '@/context/theme-provider'
 
 interface UseSystemConfigOptions {
   /** Automatically fetch config from backend (use only in root component) */
@@ -166,7 +165,6 @@ function preloadImage(
  */
 export function useSystemConfig(options: UseSystemConfigOptions = {}) {
   const { autoLoad = false } = options
-  const { resolvedTheme } = useTheme()
   const {
     config,
     loading,
@@ -194,10 +192,7 @@ export function useSystemConfig(options: UseSystemConfigOptions = {}) {
     if (autoLoad) loadConfig()
   }, [autoLoad, loadConfig])
 
-  const logo =
-    resolvedTheme === 'dark'
-      ? config.logoDark || config.logo
-      : config.logoLight || config.logo
+  const logo = config.logoLight || config.logo
   const favicon = config.favicon || logo
   const title = config.metaTitle || config.systemName
 

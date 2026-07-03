@@ -21,7 +21,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { cn } from '@/lib/utils'
 import { EmptyState, PageHeader } from '@/components/youbox'
@@ -37,7 +36,7 @@ export function AppsRankings() {
   })
 
   return (
-    <AppShell variant='public'>
+    <>
       <PageTransition className='mx-auto max-w-[1000px] px-0 pb-12 pt-2 sm:pt-4'>
         <PageHeader
           eyebrow={t('App rankings')}
@@ -64,7 +63,7 @@ export function AppsRankings() {
           </Card>
         )}
       </PageTransition>
-    </AppShell>
+    </>
   )
 }
 

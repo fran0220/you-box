@@ -31,7 +31,7 @@ const compareSearchSchema = z.object({
   models: z.string().optional(),
 })
 
-export const Route = createFileRoute('/pricing/compare')({
+export const Route = createFileRoute('/_public/pricing/compare')({
   validateSearch: compareSearchSchema,
   beforeLoad: async ({ location }) => {
     const access = await getFreshModuleAccess('pricing')

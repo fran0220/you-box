@@ -16,13 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { createFileRoute } from '@tanstack/react-router'
-import { createLazyRouteComponent } from '@/lib/lazy-route-component'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-const About = createLazyRouteComponent(async () => ({
-  default: (await import('@/features/about')).About,
-}))
-
-export const Route = createFileRoute('/about/')({
-  component: About,
+export const Route = createFileRoute('/_public/legal/')({
+  beforeLoad: () => {
+    throw redirect({ to: '/legal/$doc', params: { doc: 'privacy' } })
+  },
 })

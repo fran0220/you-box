@@ -137,7 +137,7 @@ export function LatencyTrendChart(props: {
           key={`latency-${resolvedTheme}`}
           spec={{
             ...spec,
-            theme: resolvedTheme === 'dark' ? 'dark' : 'light',
+            theme: 'light',
             background: 'transparent',
           }}
           option={VCHART_OPTION}
@@ -258,7 +258,7 @@ export function UptimeTrendChart(props: {
           key={`uptime-trend-${resolvedTheme}`}
           spec={{
             ...spec,
-            theme: resolvedTheme === 'dark' ? 'dark' : 'light',
+            theme: 'light',
             background: 'transparent',
           }}
           option={VCHART_OPTION}
@@ -353,7 +353,7 @@ export function ThroughputBarChart(props: {
           key={`tput-${resolvedTheme}`}
           spec={{
             ...spec,
-            theme: resolvedTheme === 'dark' ? 'dark' : 'light',
+            theme: 'light',
             background: 'transparent',
           }}
           option={VCHART_OPTION}

@@ -179,7 +179,7 @@ export function MarketShareSection(props: MarketShareSectionProps) {
               key={`vendor-share-${resolvedTheme}-${props.period}`}
               spec={{
                 ...spec,
-                theme: resolvedTheme === 'dark' ? 'dark' : 'light',
+                theme: 'light',
                 background: 'transparent',
               }}
               option={VCHART_OPTION}

@@ -27,7 +27,6 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { NotificationPopover } from '@/components/notification-popover'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { HeaderFrame } from './header-frame'
 import { SystemBrand } from './system-brand'
 import { TopNav } from './top-nav'
@@ -40,84 +39,46 @@ export type HeaderProps = {
   showSearch?: boolean
   showNotifications?: boolean
   showConfigDrawer?: boolean
-  showProfileDropdown?: boolean
-  showThemeSwitch?: boolean
-  showAuthButtons?: boolean
   showLanguageSwitcher?: boolean
 }
 
+/**
+ * One header for the whole site. The `variant` only controls structural
+ * chrome (sidebar trigger, config drawer, mobile nav); everything else is
+ * driven by the auth state so a signed-in user sees the same header on
+ * /docs as on /keys, and visitors get the marketing header everywhere.
+ */
 export function Header(props: HeaderProps) {
   const { t } = useTranslation()
   const variant = props.variant
-  const showTopNav = props.showTopNav ?? true
-  const showSearch = props.showSearch ?? variant === 'app'
-  const showNotifications = props.showNotifications ?? variant === 'app'
-  const showConfigDrawer = props.showConfigDrawer ?? variant === 'app'
-  const showProfileDropdown = props.showProfileDropdown ?? variant === 'app'
-  const showThemeSwitch = props.showThemeSwitch ?? true
-  const showAuthButtons = props.showAuthButtons ?? variant === 'public'
-  const showLanguageSwitcher = props.showLanguageSwitcher ?? true
 
   const notifications = useNotifications()
   const user = useAuthStore((s) => s.auth.user)
   const quota = user?.quota
   const isAuthenticated = !!user
 
-  if (variant === 'public') {
-    return (
-      <HeaderFrame showSidebarTrigger={false}>
-        <SystemBrand variant='inline' />
-        <div className='ms-auto flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2'>
-          {showTopNav ? (
-            <TopNav className='me-1' showDesktopLinks showMobileMenu />
-          ) : null}
-          {showLanguageSwitcher ? <LanguageSwitcher /> : null}
-          {showThemeSwitch ? <ThemeSwitch /> : null}
-          {showNotifications ? (
-            <NotificationPopover
-              open={notifications.popoverOpen}
-              onOpenChange={notifications.setPopoverOpen}
-              unreadCount={notifications.unreadCount}
-              activeTab={notifications.activeTab}
-              onTabChange={notifications.setActiveTab}
-              notice={notifications.notice}
-              announcements={notifications.announcements}
-              loading={notifications.loading}
-              onMarkAllRead={notifications.markAllRead}
-            />
-          ) : null}
-          {showAuthButtons ? (
-            <>
-              <div className='bg-border/40 mx-1 hidden h-4 w-px sm:block' />
-              {isAuthenticated ? (
-                <ProfileDropdown />
-              ) : (
-                <Button
-                  size='sm'
-                  className='hidden h-8 rounded-lg px-3.5 text-xs font-medium sm:inline-flex'
-                  render={<Link to='/sign-in' />}
-                >
-                  {t('Sign in')}
-                </Button>
-              )}
-            </>
-          ) : null}
-        </div>
-      </HeaderFrame>
-    )
-  }
+  const showTopNav = props.showTopNav ?? true
+  const showSearch = props.showSearch ?? isAuthenticated
+  const showNotifications = props.showNotifications ?? isAuthenticated
+  const showConfigDrawer =
+    (props.showConfigDrawer ?? true) && variant === 'app'
+  const showLanguageSwitcher = props.showLanguageSwitcher ?? true
 
   return (
-    <HeaderFrame showSidebarTrigger>
+    <HeaderFrame showSidebarTrigger={variant === 'app'}>
       <SystemBrand variant='inline' />
-      <div className='ms-auto flex items-center gap-1 sm:gap-2'>
+      <div className='ms-auto flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2'>
         {showTopNav ? (
-          <div className='me-1 hidden lg:block'>
-            <TopNav showDesktopLinks showMobileMenu={false} />
-          </div>
+          variant === 'public' ? (
+            <TopNav className='me-1' showDesktopLinks showMobileMenu />
+          ) : (
+            <div className='me-1 hidden lg:block'>
+              <TopNav showDesktopLinks showMobileMenu={false} />
+            </div>
+          )
         ) : null}
         {showSearch ? <Search /> : null}
-        {typeof quota === 'number' ? (
+        {isAuthenticated && typeof quota === 'number' ? (
           <Link
             to='/wallet'
             className='border-border bg-surface-2 hover:bg-surface-3 duration-fast hidden h-7 items-center gap-1.5 rounded-full border px-3 font-mono text-xs font-medium transition-colors md:inline-flex'
@@ -143,9 +104,21 @@ export function Header(props: HeaderProps) {
           />
         ) : null}
         {showLanguageSwitcher ? <LanguageSwitcher /> : null}
-        {showThemeSwitch ? <ThemeSwitch /> : null}
         {showConfigDrawer ? <ConfigDrawer /> : null}
-        {showProfileDropdown ? <ProfileDropdown /> : null}
+        {isAuthenticated ? (
+          <ProfileDropdown />
+        ) : (
+          <>
+            <div className='bg-border/40 mx-1 hidden h-4 w-px sm:block' />
+            <Button
+              size='sm'
+              className='hidden h-8 rounded-md px-3.5 text-xs font-medium sm:inline-flex'
+              render={<Link to='/sign-in' />}
+            >
+              {t('Sign in')}
+            </Button>
+          </>
+        )}
       </div>
     </HeaderFrame>
   )

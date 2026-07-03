@@ -18,7 +18,6 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createLazyComponent } from '@/lib/lazy-route-component'
-import { AppShell } from '@/components/layout'
 import type { LegalDocId } from '@/features/legal/legal-page'
 
 const LegalPage = createLazyComponent(async () => ({
@@ -27,7 +26,7 @@ const LegalPage = createLazyComponent(async () => ({
 
 const VALID_DOCS = new Set<LegalDocId>(['privacy', 'terms', 'dpa'])
 
-export const Route = createFileRoute('/legal/$doc')({
+export const Route = createFileRoute('/_public/legal/$doc')({
   beforeLoad: ({ params }) => {
     if (!VALID_DOCS.has(params.doc as LegalDocId)) {
       throw redirect({ to: '/legal/$doc', params: { doc: 'privacy' } })
@@ -38,9 +37,6 @@ export const Route = createFileRoute('/legal/$doc')({
 
 function LegalRoute() {
   const { doc } = Route.useParams()
-  return (
-    <AppShell variant='public'>
-      <LegalPage doc={doc as LegalDocId} />
-    </AppShell>
-  )
+  return <LegalPage doc={doc as LegalDocId} />
+
 }

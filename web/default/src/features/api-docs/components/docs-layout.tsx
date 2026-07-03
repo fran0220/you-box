@@ -52,26 +52,38 @@ export function DocsLayout(props: DocsLayoutProps) {
           aria-label={t('Documentation')}
           className='sticky top-20 max-h-[calc(100dvh-5rem)] overflow-auto pb-10'
         >
-          {groups.map(([group, items]) => (
-            <div key={group} className='mb-4'>
-              <p className='text-muted-foreground/60 mb-1.5 px-2.5 font-mono text-[10px] tracking-[0.1em] uppercase'>
-                {t(group)}
-              </p>
-              {items.map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className={cn(
-                    'text-muted-foreground hover:bg-surface-hover hover:text-foreground mb-0.5 block rounded-[7px] px-2.5 py-1.5 text-[13.5px] transition-colors',
-                    props.activeSection === item.id &&
-                      'bg-surface-2 text-text-strong font-medium'
-                  )}
-                >
-                  {t(item.label)}
-                </a>
-              ))}
-            </div>
-          ))}
+          {(() => {
+            let chapter = 0
+            return groups.map(([group, items]) => (
+              <div key={group} className='mb-5'>
+                <p className='text-muted-foreground/70 mb-1.5 px-2.5 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase'>
+                  {t(group)}
+                </p>
+                {items.map((item) => {
+                  chapter += 1
+                  return (
+                    <a
+                      key={item.id}
+                      href={`#${item.id}`}
+                      className={cn(
+                        'text-muted-foreground hover:bg-surface-hover hover:text-foreground mb-0.5 flex items-baseline gap-2 rounded-[7px] px-2.5 py-1.5 text-[13.5px] transition-colors',
+                        props.activeSection === item.id &&
+                          'bg-surface-2 text-text-strong font-medium'
+                      )}
+                    >
+                      <span
+                        aria-hidden='true'
+                        className='text-brand/70 w-4 shrink-0 text-right font-mono text-[11px]'
+                      >
+                        {chapter}.
+                      </span>
+                      {t(item.label)}
+                    </a>
+                  )
+                })}
+              </div>
+            ))
+          })()}
         </nav>
       </aside>
 

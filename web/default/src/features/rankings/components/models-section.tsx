@@ -188,7 +188,7 @@ export function ModelsSection(props: ModelsSectionProps) {
               key={`models-history-${resolvedTheme}-${props.period}`}
               spec={{
                 ...spec,
-                theme: resolvedTheme === 'dark' ? 'dark' : 'light',
+                theme: 'light',
                 background: 'transparent',
               }}
               option={VCHART_OPTION}

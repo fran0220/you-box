@@ -94,7 +94,7 @@ export function ConsumptionDistributionChart(
 
       const ThemeManager = await themeManagerPromise
       themeManagerRef.current = ThemeManager
-      ThemeManager.setCurrentTheme(resolvedTheme === 'dark' ? 'dark' : 'light')
+      ThemeManager.setCurrentTheme('light')
       setThemeReady(true)
     }
 
@@ -169,7 +169,7 @@ export function ConsumptionDistributionChart(
             key={chartKey}
             spec={{
               ...spec,
-              theme: resolvedTheme === 'dark' ? 'dark' : 'light',
+              theme: 'light',
               background: 'transparent',
             }}
             option={VCHART_OPTION}

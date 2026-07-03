@@ -31,7 +31,6 @@ import { useStatus } from '@/hooks/use-status'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { Panel, PanelHeader } from '@/components/patterns'
 import { StatusBadge } from '@/components/status-badge'
@@ -157,7 +156,7 @@ export function StatusPage() {
   const loading = uptimeQuery.isLoading || perfQuery.isLoading
 
   return (
-    <AppShell variant='public'>
+    <>
       <PageTransition>
         <div className='mx-auto w-full max-w-[1000px] px-7 py-12 md:py-14'>
           <Eyebrow className='mb-3'>{t('System status')}</Eyebrow>
@@ -386,6 +385,6 @@ export function StatusPage() {
           ) : null}
         </div>
       </PageTransition>
-    </AppShell>
+    </>
   )
 }

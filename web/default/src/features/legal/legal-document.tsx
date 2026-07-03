@@ -26,7 +26,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Markdown } from '@/components/ui/markdown'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AppShell } from '@/components/layout'
 import {
   extractMarkdownToc,
   isLikelyLegalHtml,
@@ -70,19 +69,19 @@ export function LegalDocument({
 
   if (isLoading) {
     return (
-      <AppShell variant='public'>
+      <>
         <div className='mx-auto flex w-full max-w-4xl flex-col gap-4 px-7 py-12 md:py-14'>
           <Skeleton className='h-3 w-24' />
           <Skeleton className='h-10 w-[55%]' />
           <Skeleton className='bg-card border-border h-64 w-full rounded-lg border' />
         </div>
-      </AppShell>
+      </>
     )
   }
 
   if (!success || !hasContent) {
     return (
-      <AppShell variant='public'>
+      <>
         <div className='mx-auto w-full max-w-2xl px-7 py-12 md:py-14'>
           <Card className='border-border border-dashed'>
             <CardHeader className='flex flex-row items-start gap-4'>
@@ -100,17 +99,16 @@ export function LegalDocument({
             </CardHeader>
           </Card>
         </div>
-      </AppShell>
+      </>
     )
   }
 
   if (isUrl) {
     return (
-      <AppShell variant='public'>
+      <>
         <div className='mx-auto w-full max-w-2xl space-y-6 px-7 py-12 md:py-14'>
           <div className='space-y-2'>
             <p className='yb-eyebrow'>
-              {'// '}
               {t('Legal')}
             </p>
             <h1 className='font-display text-text-strong text-3xl font-bold tracking-[-0.03em] md:text-4xl'>
@@ -143,12 +141,12 @@ export function LegalDocument({
             </CardContent>
           </Card>
         </div>
-      </AppShell>
+      </>
     )
   }
 
   return (
-    <AppShell variant='public'>
+    <>
       <div
         className={cn(
           'mx-auto w-full space-y-8 px-7 py-12 md:py-14',
@@ -157,7 +155,6 @@ export function LegalDocument({
       >
         <div className='space-y-3'>
           <p className='yb-eyebrow'>
-            {'// '}
             {t('Legal')}
           </p>
           <h1 className='font-display text-text-strong text-3xl font-bold tracking-[-0.03em] md:text-4xl'>
@@ -221,6 +218,6 @@ export function LegalDocument({
         {/* "Last updated" mono footer intentionally omitted (R2-B15
             adaptation): LegalDocumentResponse exposes no timestamp. */}
       </div>
-    </AppShell>
+    </>
   )
 }

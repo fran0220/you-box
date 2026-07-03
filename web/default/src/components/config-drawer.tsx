@@ -28,9 +28,6 @@ import { IconLayoutFull } from '@/assets/custom/icon-layout-full'
 import { IconSidebarFloating } from '@/assets/custom/icon-sidebar-floating'
 import { IconSidebarInset } from '@/assets/custom/icon-sidebar-inset'
 import { IconSidebarSidebar } from '@/assets/custom/icon-sidebar-sidebar'
-import { IconThemeDark } from '@/assets/custom/icon-theme-dark'
-import { IconThemeLight } from '@/assets/custom/icon-theme-light'
-import { IconThemeSystem } from '@/assets/custom/icon-theme-system'
 import { type ContentLayout, type ThemeScale } from '@/lib/theme-customization'
 import { cn } from '@/lib/utils'
 import { useDirection } from '@/context/direction-provider'
@@ -96,7 +93,6 @@ export function ConfigDrawer() {
           </SheetDescription>
         </SheetHeader>
         <div className={sideDrawerFormClassName()}>
-          <ThemeConfig />
           <ScaleConfig />
           <SidebarConfig />
           <LayoutConfig />
@@ -197,38 +193,6 @@ function RadioGroupItem(props: {
         {props.item.label}
       </div>
     </Item>
-  )
-}
-
-function ThemeConfig() {
-  const { t } = useTranslation()
-  const { defaultTheme, theme, setTheme } = useTheme()
-  return (
-    <div>
-      <SectionTitle
-        title={t('Theme')}
-        showReset={theme !== defaultTheme}
-        onReset={() => setTheme(defaultTheme)}
-      />
-      <Radio
-        value={theme}
-        onValueChange={setTheme}
-        className='grid w-full max-w-md grid-cols-3 gap-4'
-        aria-label={t('Select theme preference')}
-        aria-describedby='theme-description'
-      >
-        {[
-          { value: 'system', label: t('System'), icon: IconThemeSystem },
-          { value: 'light', label: t('Light'), icon: IconThemeLight },
-          { value: 'dark', label: t('Dark'), icon: IconThemeDark },
-        ].map((item) => (
-          <RadioGroupItem key={item.value} item={item} isTheme />
-        ))}
-      </Radio>
-      <div id='theme-description' className='sr-only'>
-        {t('Choose between system preference, light mode, or dark mode')}
-      </div>
-    </div>
   )
 }
 

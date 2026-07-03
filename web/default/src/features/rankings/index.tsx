@@ -19,7 +19,6 @@ For commercial licensing, please contact support@quantumnous.com
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AppShell } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { EmptyState } from '@/components/youbox'
 import {
@@ -36,7 +35,7 @@ const VALID_PERIODS: RankingPeriod[] = ['today', 'week', 'month', 'year', 'all']
 
 export function Rankings() {
   const { t } = useTranslation()
-  const search = useSearch({ from: '/rankings/' })
+  const search = useSearch({ from: '/_public/rankings/' })
   const navigate = useNavigate()
 
   const period: RankingPeriod = VALID_PERIODS.includes(
@@ -56,7 +55,7 @@ export function Rankings() {
   }
 
   return (
-    <AppShell variant='public'>
+    <>
       <div className='relative'>
         <div
           aria-hidden
@@ -103,7 +102,7 @@ export function Rankings() {
           )}
         </PageTransition>
       </div>
-    </AppShell>
+    </>
   )
 }
 

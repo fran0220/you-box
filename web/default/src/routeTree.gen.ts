@@ -15,21 +15,13 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as DesignLabRouteImport } from './routes/design-lab'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
+import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as StatusIndexRouteImport } from './routes/status/index'
 import { Route as SetupIndexRouteImport } from './routes/setup/index'
-import { Route as RankingsIndexRouteImport } from './routes/rankings/index'
-import { Route as PricingIndexRouteImport } from './routes/pricing/index'
-import { Route as LegalIndexRouteImport } from './routes/legal/index'
-import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as ConsoleIndexRouteImport } from './routes/console/index'
-import { Route as AppsIndexRouteImport } from './routes/apps/index'
-import { Route as AboutIndexRouteImport } from './routes/about/index'
-import { Route as PricingCompareRouteImport } from './routes/pricing/compare'
+import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as OauthProviderRouteImport } from './routes/oauth/$provider'
-import { Route as LegalDocRouteImport } from './routes/legal/$doc'
 import { Route as ConsoleUserRouteImport } from './routes/console/user'
 import { Route as ConsoleTopupRouteImport } from './routes/console/topup'
 import { Route as ConsoleTokenRouteImport } from './routes/console/token'
@@ -56,8 +48,14 @@ import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as AuthenticatedSystemSettingsRouteRouteImport } from './routes/_authenticated/system-settings/route'
-import { Route as PricingModelIdIndexRouteImport } from './routes/pricing/$modelId/index'
 import { Route as ConsoleChatIndexRouteImport } from './routes/console/chat/index'
+import { Route as PublicStatusIndexRouteImport } from './routes/_public/status/index'
+import { Route as PublicRankingsIndexRouteImport } from './routes/_public/rankings/index'
+import { Route as PublicPricingIndexRouteImport } from './routes/_public/pricing/index'
+import { Route as PublicLegalIndexRouteImport } from './routes/_public/legal/index'
+import { Route as PublicDocsIndexRouteImport } from './routes/_public/docs/index'
+import { Route as PublicAppsIndexRouteImport } from './routes/_public/apps/index'
+import { Route as PublicAboutIndexRouteImport } from './routes/_public/about/index'
 import { Route as AuthenticatedWalletIndexRouteImport } from './routes/_authenticated/wallet/index'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedUsageLogsIndexRouteImport } from './routes/_authenticated/usage-logs/index'
@@ -72,6 +70,8 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedChannelsIndexRouteImport } from './routes/_authenticated/channels/index'
 import { Route as AuthenticatedApiToolsIndexRouteImport } from './routes/_authenticated/api-tools/index'
 import { Route as ConsoleChatIdRouteImport } from './routes/console/chat/$id'
+import { Route as PublicPricingCompareRouteImport } from './routes/_public/pricing/compare'
+import { Route as PublicLegalDocRouteImport } from './routes/_public/legal/$doc'
 import { Route as AuthenticatedUsageLogsSectionRouteImport } from './routes/_authenticated/usage-logs/$section'
 import { Route as AuthenticatedModelsSectionRouteImport } from './routes/_authenticated/models/$section'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
@@ -80,6 +80,7 @@ import { Route as AuthenticatedChatChatIdRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAgentDevicesRouteImport } from './routes/_authenticated/agent/devices'
 import { Route as AuthenticatedAgentAuthorizeRouteImport } from './routes/_authenticated/agent/authorize'
 import { Route as authUserResetRouteImport } from './routes/(auth)/user/reset'
+import { Route as PublicPricingModelIdIndexRouteImport } from './routes/_public/pricing/$modelId/index'
 import { Route as AuthenticatedSystemSettingsSiteIndexRouteImport } from './routes/_authenticated/system-settings/site/index'
 import { Route as AuthenticatedSystemSettingsSecurityIndexRouteImport } from './routes/_authenticated/system-settings/security/index'
 import { Route as AuthenticatedSystemSettingsOperationsIndexRouteImport } from './routes/_authenticated/system-settings/operations/index'
@@ -125,6 +126,10 @@ const ApiDocsRoute = ApiDocsRouteImport.update({
   path: '/api-docs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicRouteRoute = PublicRouteRouteImport.update({
+  id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -133,39 +138,9 @@ const authRouteRoute = authRouteRouteImport.update({
   id: '/(auth)',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StatusIndexRoute = StatusIndexRouteImport.update({
-  id: '/status/',
-  path: '/status/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SetupIndexRoute = SetupIndexRouteImport.update({
   id: '/setup/',
   path: '/setup/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RankingsIndexRoute = RankingsIndexRouteImport.update({
-  id: '/rankings/',
-  path: '/rankings/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingIndexRoute = PricingIndexRouteImport.update({
-  id: '/pricing/',
-  path: '/pricing/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalIndexRoute = LegalIndexRouteImport.update({
-  id: '/legal/',
-  path: '/legal/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsIndexRoute = DocsIndexRouteImport.update({
-  id: '/docs/',
-  path: '/docs/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
@@ -173,29 +148,14 @@ const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
   path: '/console/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppsIndexRoute = AppsIndexRouteImport.update({
-  id: '/apps/',
-  path: '/apps/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutIndexRoute = AboutIndexRouteImport.update({
-  id: '/about/',
-  path: '/about/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingCompareRoute = PricingCompareRouteImport.update({
-  id: '/pricing/compare',
-  path: '/pricing/compare',
-  getParentRoute: () => rootRouteImport,
+const PublicIndexRoute = PublicIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 const OauthProviderRoute = OauthProviderRouteImport.update({
   id: '/oauth/$provider',
   path: '/oauth/$provider',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalDocRoute = LegalDocRouteImport.update({
-  id: '/legal/$doc',
-  path: '/legal/$doc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleUserRoute = ConsoleUserRouteImport.update({
@@ -329,15 +289,45 @@ const AuthenticatedSystemSettingsRouteRoute =
     path: '/system-settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const PricingModelIdIndexRoute = PricingModelIdIndexRouteImport.update({
-  id: '/pricing/$modelId/',
-  path: '/pricing/$modelId/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConsoleChatIndexRoute = ConsoleChatIndexRouteImport.update({
   id: '/console/chat/',
   path: '/console/chat/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PublicStatusIndexRoute = PublicStatusIndexRouteImport.update({
+  id: '/status/',
+  path: '/status/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicRankingsIndexRoute = PublicRankingsIndexRouteImport.update({
+  id: '/rankings/',
+  path: '/rankings/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicPricingIndexRoute = PublicPricingIndexRouteImport.update({
+  id: '/pricing/',
+  path: '/pricing/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicLegalIndexRoute = PublicLegalIndexRouteImport.update({
+  id: '/legal/',
+  path: '/legal/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicDocsIndexRoute = PublicDocsIndexRouteImport.update({
+  id: '/docs/',
+  path: '/docs/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicAppsIndexRoute = PublicAppsIndexRouteImport.update({
+  id: '/apps/',
+  path: '/apps/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicAboutIndexRoute = PublicAboutIndexRouteImport.update({
+  id: '/about/',
+  path: '/about/',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 const AuthenticatedWalletIndexRoute =
   AuthenticatedWalletIndexRouteImport.update({
@@ -420,6 +410,16 @@ const ConsoleChatIdRoute = ConsoleChatIdRouteImport.update({
   path: '/console/chat/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicPricingCompareRoute = PublicPricingCompareRouteImport.update({
+  id: '/pricing/compare',
+  path: '/pricing/compare',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicLegalDocRoute = PublicLegalDocRouteImport.update({
+  id: '/legal/$doc',
+  path: '/legal/$doc',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const AuthenticatedUsageLogsSectionRoute =
   AuthenticatedUsageLogsSectionRouteImport.update({
     id: '/usage-logs/$section',
@@ -466,6 +466,12 @@ const authUserResetRoute = authUserResetRouteImport.update({
   path: '/user/reset',
   getParentRoute: () => authRouteRoute,
 } as any)
+const PublicPricingModelIdIndexRoute =
+  PublicPricingModelIdIndexRouteImport.update({
+    id: '/pricing/$modelId/',
+    path: '/pricing/$modelId/',
+    getParentRoute: () => PublicRouteRoute,
+  } as any)
 const AuthenticatedSystemSettingsSiteIndexRoute =
   AuthenticatedSystemSettingsSiteIndexRouteImport.update({
     id: '/site/',
@@ -552,7 +558,7 @@ const AuthenticatedSystemSettingsAuthSectionRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof PublicIndexRoute
   '/api-docs': typeof ApiDocsRoute
   '/design-lab': typeof DesignLabRoute
   '/forbidden': typeof ForbiddenRoute
@@ -585,18 +591,9 @@ export interface FileRoutesByFullPath {
   '/console/token': typeof ConsoleTokenRoute
   '/console/topup': typeof ConsoleTopupRoute
   '/console/user': typeof ConsoleUserRoute
-  '/legal/$doc': typeof LegalDocRoute
   '/oauth/$provider': typeof OauthProviderRoute
-  '/pricing/compare': typeof PricingCompareRoute
-  '/about/': typeof AboutIndexRoute
-  '/apps/': typeof AppsIndexRoute
   '/console/': typeof ConsoleIndexRoute
-  '/docs/': typeof DocsIndexRoute
-  '/legal/': typeof LegalIndexRoute
-  '/pricing/': typeof PricingIndexRoute
-  '/rankings/': typeof RankingsIndexRoute
   '/setup/': typeof SetupIndexRoute
-  '/status/': typeof StatusIndexRoute
   '/user/reset': typeof authUserResetRoute
   '/agent/authorize': typeof AuthenticatedAgentAuthorizeRoute
   '/agent/devices': typeof AuthenticatedAgentDevicesRoute
@@ -605,6 +602,8 @@ export interface FileRoutesByFullPath {
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/models/$section': typeof AuthenticatedModelsSectionRoute
   '/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
+  '/legal/$doc': typeof PublicLegalDocRoute
+  '/pricing/compare': typeof PublicPricingCompareRoute
   '/console/chat/$id': typeof ConsoleChatIdRoute
   '/api-tools/': typeof AuthenticatedApiToolsIndexRoute
   '/channels/': typeof AuthenticatedChannelsIndexRoute
@@ -619,8 +618,14 @@ export interface FileRoutesByFullPath {
   '/usage-logs/': typeof AuthenticatedUsageLogsIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/wallet/': typeof AuthenticatedWalletIndexRoute
+  '/about/': typeof PublicAboutIndexRoute
+  '/apps/': typeof PublicAppsIndexRoute
+  '/docs/': typeof PublicDocsIndexRoute
+  '/legal/': typeof PublicLegalIndexRoute
+  '/pricing/': typeof PublicPricingIndexRoute
+  '/rankings/': typeof PublicRankingsIndexRoute
+  '/status/': typeof PublicStatusIndexRoute
   '/console/chat/': typeof ConsoleChatIndexRoute
-  '/pricing/$modelId/': typeof PricingModelIdIndexRoute
   '/system-settings/auth/$section': typeof AuthenticatedSystemSettingsAuthSectionRoute
   '/system-settings/billing/$section': typeof AuthenticatedSystemSettingsBillingSectionRoute
   '/system-settings/content/$section': typeof AuthenticatedSystemSettingsContentSectionRoute
@@ -635,9 +640,10 @@ export interface FileRoutesByFullPath {
   '/system-settings/operations/': typeof AuthenticatedSystemSettingsOperationsIndexRoute
   '/system-settings/security/': typeof AuthenticatedSystemSettingsSecurityIndexRoute
   '/system-settings/site/': typeof AuthenticatedSystemSettingsSiteIndexRoute
+  '/pricing/$modelId/': typeof PublicPricingModelIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof PublicIndexRoute
   '/api-docs': typeof ApiDocsRoute
   '/design-lab': typeof DesignLabRoute
   '/forbidden': typeof ForbiddenRoute
@@ -669,18 +675,9 @@ export interface FileRoutesByTo {
   '/console/token': typeof ConsoleTokenRoute
   '/console/topup': typeof ConsoleTopupRoute
   '/console/user': typeof ConsoleUserRoute
-  '/legal/$doc': typeof LegalDocRoute
   '/oauth/$provider': typeof OauthProviderRoute
-  '/pricing/compare': typeof PricingCompareRoute
-  '/about': typeof AboutIndexRoute
-  '/apps': typeof AppsIndexRoute
   '/console': typeof ConsoleIndexRoute
-  '/docs': typeof DocsIndexRoute
-  '/legal': typeof LegalIndexRoute
-  '/pricing': typeof PricingIndexRoute
-  '/rankings': typeof RankingsIndexRoute
   '/setup': typeof SetupIndexRoute
-  '/status': typeof StatusIndexRoute
   '/user/reset': typeof authUserResetRoute
   '/agent/authorize': typeof AuthenticatedAgentAuthorizeRoute
   '/agent/devices': typeof AuthenticatedAgentDevicesRoute
@@ -689,6 +686,8 @@ export interface FileRoutesByTo {
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/models/$section': typeof AuthenticatedModelsSectionRoute
   '/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
+  '/legal/$doc': typeof PublicLegalDocRoute
+  '/pricing/compare': typeof PublicPricingCompareRoute
   '/console/chat/$id': typeof ConsoleChatIdRoute
   '/api-tools': typeof AuthenticatedApiToolsIndexRoute
   '/channels': typeof AuthenticatedChannelsIndexRoute
@@ -703,8 +702,14 @@ export interface FileRoutesByTo {
   '/usage-logs': typeof AuthenticatedUsageLogsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/wallet': typeof AuthenticatedWalletIndexRoute
+  '/about': typeof PublicAboutIndexRoute
+  '/apps': typeof PublicAppsIndexRoute
+  '/docs': typeof PublicDocsIndexRoute
+  '/legal': typeof PublicLegalIndexRoute
+  '/pricing': typeof PublicPricingIndexRoute
+  '/rankings': typeof PublicRankingsIndexRoute
+  '/status': typeof PublicStatusIndexRoute
   '/console/chat': typeof ConsoleChatIndexRoute
-  '/pricing/$modelId': typeof PricingModelIdIndexRoute
   '/system-settings/auth/$section': typeof AuthenticatedSystemSettingsAuthSectionRoute
   '/system-settings/billing/$section': typeof AuthenticatedSystemSettingsBillingSectionRoute
   '/system-settings/content/$section': typeof AuthenticatedSystemSettingsContentSectionRoute
@@ -719,12 +724,13 @@ export interface FileRoutesByTo {
   '/system-settings/operations': typeof AuthenticatedSystemSettingsOperationsIndexRoute
   '/system-settings/security': typeof AuthenticatedSystemSettingsSecurityIndexRoute
   '/system-settings/site': typeof AuthenticatedSystemSettingsSiteIndexRoute
+  '/pricing/$modelId': typeof PublicPricingModelIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/(auth)': typeof authRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_public': typeof PublicRouteRouteWithChildren
   '/api-docs': typeof ApiDocsRoute
   '/design-lab': typeof DesignLabRoute
   '/forbidden': typeof ForbiddenRoute
@@ -757,18 +763,10 @@ export interface FileRoutesById {
   '/console/token': typeof ConsoleTokenRoute
   '/console/topup': typeof ConsoleTopupRoute
   '/console/user': typeof ConsoleUserRoute
-  '/legal/$doc': typeof LegalDocRoute
   '/oauth/$provider': typeof OauthProviderRoute
-  '/pricing/compare': typeof PricingCompareRoute
-  '/about/': typeof AboutIndexRoute
-  '/apps/': typeof AppsIndexRoute
+  '/_public/': typeof PublicIndexRoute
   '/console/': typeof ConsoleIndexRoute
-  '/docs/': typeof DocsIndexRoute
-  '/legal/': typeof LegalIndexRoute
-  '/pricing/': typeof PricingIndexRoute
-  '/rankings/': typeof RankingsIndexRoute
   '/setup/': typeof SetupIndexRoute
-  '/status/': typeof StatusIndexRoute
   '/(auth)/user/reset': typeof authUserResetRoute
   '/_authenticated/agent/authorize': typeof AuthenticatedAgentAuthorizeRoute
   '/_authenticated/agent/devices': typeof AuthenticatedAgentDevicesRoute
@@ -777,6 +775,8 @@ export interface FileRoutesById {
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/models/$section': typeof AuthenticatedModelsSectionRoute
   '/_authenticated/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
+  '/_public/legal/$doc': typeof PublicLegalDocRoute
+  '/_public/pricing/compare': typeof PublicPricingCompareRoute
   '/console/chat/$id': typeof ConsoleChatIdRoute
   '/_authenticated/api-tools/': typeof AuthenticatedApiToolsIndexRoute
   '/_authenticated/channels/': typeof AuthenticatedChannelsIndexRoute
@@ -791,8 +791,14 @@ export interface FileRoutesById {
   '/_authenticated/usage-logs/': typeof AuthenticatedUsageLogsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/wallet/': typeof AuthenticatedWalletIndexRoute
+  '/_public/about/': typeof PublicAboutIndexRoute
+  '/_public/apps/': typeof PublicAppsIndexRoute
+  '/_public/docs/': typeof PublicDocsIndexRoute
+  '/_public/legal/': typeof PublicLegalIndexRoute
+  '/_public/pricing/': typeof PublicPricingIndexRoute
+  '/_public/rankings/': typeof PublicRankingsIndexRoute
+  '/_public/status/': typeof PublicStatusIndexRoute
   '/console/chat/': typeof ConsoleChatIndexRoute
-  '/pricing/$modelId/': typeof PricingModelIdIndexRoute
   '/_authenticated/system-settings/auth/$section': typeof AuthenticatedSystemSettingsAuthSectionRoute
   '/_authenticated/system-settings/billing/$section': typeof AuthenticatedSystemSettingsBillingSectionRoute
   '/_authenticated/system-settings/content/$section': typeof AuthenticatedSystemSettingsContentSectionRoute
@@ -807,6 +813,7 @@ export interface FileRoutesById {
   '/_authenticated/system-settings/operations/': typeof AuthenticatedSystemSettingsOperationsIndexRoute
   '/_authenticated/system-settings/security/': typeof AuthenticatedSystemSettingsSecurityIndexRoute
   '/_authenticated/system-settings/site/': typeof AuthenticatedSystemSettingsSiteIndexRoute
+  '/_public/pricing/$modelId/': typeof PublicPricingModelIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -844,18 +851,9 @@ export interface FileRouteTypes {
     | '/console/token'
     | '/console/topup'
     | '/console/user'
-    | '/legal/$doc'
     | '/oauth/$provider'
-    | '/pricing/compare'
-    | '/about/'
-    | '/apps/'
     | '/console/'
-    | '/docs/'
-    | '/legal/'
-    | '/pricing/'
-    | '/rankings/'
     | '/setup/'
-    | '/status/'
     | '/user/reset'
     | '/agent/authorize'
     | '/agent/devices'
@@ -864,6 +862,8 @@ export interface FileRouteTypes {
     | '/errors/$error'
     | '/models/$section'
     | '/usage-logs/$section'
+    | '/legal/$doc'
+    | '/pricing/compare'
     | '/console/chat/$id'
     | '/api-tools/'
     | '/channels/'
@@ -878,8 +878,14 @@ export interface FileRouteTypes {
     | '/usage-logs/'
     | '/users/'
     | '/wallet/'
+    | '/about/'
+    | '/apps/'
+    | '/docs/'
+    | '/legal/'
+    | '/pricing/'
+    | '/rankings/'
+    | '/status/'
     | '/console/chat/'
-    | '/pricing/$modelId/'
     | '/system-settings/auth/$section'
     | '/system-settings/billing/$section'
     | '/system-settings/content/$section'
@@ -894,6 +900,7 @@ export interface FileRouteTypes {
     | '/system-settings/operations/'
     | '/system-settings/security/'
     | '/system-settings/site/'
+    | '/pricing/$modelId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -928,18 +935,9 @@ export interface FileRouteTypes {
     | '/console/token'
     | '/console/topup'
     | '/console/user'
-    | '/legal/$doc'
     | '/oauth/$provider'
-    | '/pricing/compare'
-    | '/about'
-    | '/apps'
     | '/console'
-    | '/docs'
-    | '/legal'
-    | '/pricing'
-    | '/rankings'
     | '/setup'
-    | '/status'
     | '/user/reset'
     | '/agent/authorize'
     | '/agent/devices'
@@ -948,6 +946,8 @@ export interface FileRouteTypes {
     | '/errors/$error'
     | '/models/$section'
     | '/usage-logs/$section'
+    | '/legal/$doc'
+    | '/pricing/compare'
     | '/console/chat/$id'
     | '/api-tools'
     | '/channels'
@@ -962,8 +962,14 @@ export interface FileRouteTypes {
     | '/usage-logs'
     | '/users'
     | '/wallet'
+    | '/about'
+    | '/apps'
+    | '/docs'
+    | '/legal'
+    | '/pricing'
+    | '/rankings'
+    | '/status'
     | '/console/chat'
-    | '/pricing/$modelId'
     | '/system-settings/auth/$section'
     | '/system-settings/billing/$section'
     | '/system-settings/content/$section'
@@ -978,11 +984,12 @@ export interface FileRouteTypes {
     | '/system-settings/operations'
     | '/system-settings/security'
     | '/system-settings/site'
+    | '/pricing/$modelId'
   id:
     | '__root__'
-    | '/'
     | '/(auth)'
     | '/_authenticated'
+    | '/_public'
     | '/api-docs'
     | '/design-lab'
     | '/forbidden'
@@ -1015,18 +1022,10 @@ export interface FileRouteTypes {
     | '/console/token'
     | '/console/topup'
     | '/console/user'
-    | '/legal/$doc'
     | '/oauth/$provider'
-    | '/pricing/compare'
-    | '/about/'
-    | '/apps/'
+    | '/_public/'
     | '/console/'
-    | '/docs/'
-    | '/legal/'
-    | '/pricing/'
-    | '/rankings/'
     | '/setup/'
-    | '/status/'
     | '/(auth)/user/reset'
     | '/_authenticated/agent/authorize'
     | '/_authenticated/agent/devices'
@@ -1035,6 +1034,8 @@ export interface FileRouteTypes {
     | '/_authenticated/errors/$error'
     | '/_authenticated/models/$section'
     | '/_authenticated/usage-logs/$section'
+    | '/_public/legal/$doc'
+    | '/_public/pricing/compare'
     | '/console/chat/$id'
     | '/_authenticated/api-tools/'
     | '/_authenticated/channels/'
@@ -1049,8 +1050,14 @@ export interface FileRouteTypes {
     | '/_authenticated/usage-logs/'
     | '/_authenticated/users/'
     | '/_authenticated/wallet/'
+    | '/_public/about/'
+    | '/_public/apps/'
+    | '/_public/docs/'
+    | '/_public/legal/'
+    | '/_public/pricing/'
+    | '/_public/rankings/'
+    | '/_public/status/'
     | '/console/chat/'
-    | '/pricing/$modelId/'
     | '/_authenticated/system-settings/auth/$section'
     | '/_authenticated/system-settings/billing/$section'
     | '/_authenticated/system-settings/content/$section'
@@ -1065,12 +1072,13 @@ export interface FileRouteTypes {
     | '/_authenticated/system-settings/operations/'
     | '/_authenticated/system-settings/security/'
     | '/_authenticated/system-settings/site/'
+    | '/_public/pricing/$modelId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   authRouteRoute: typeof authRouteRouteWithChildren
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  PublicRouteRoute: typeof PublicRouteRouteWithChildren
   ApiDocsRoute: typeof ApiDocsRoute
   DesignLabRoute: typeof DesignLabRoute
   ForbiddenRoute: typeof ForbiddenRoute
@@ -1096,21 +1104,11 @@ export interface RootRouteChildren {
   ConsoleTokenRoute: typeof ConsoleTokenRoute
   ConsoleTopupRoute: typeof ConsoleTopupRoute
   ConsoleUserRoute: typeof ConsoleUserRoute
-  LegalDocRoute: typeof LegalDocRoute
   OauthProviderRoute: typeof OauthProviderRoute
-  PricingCompareRoute: typeof PricingCompareRoute
-  AboutIndexRoute: typeof AboutIndexRoute
-  AppsIndexRoute: typeof AppsIndexRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
-  DocsIndexRoute: typeof DocsIndexRoute
-  LegalIndexRoute: typeof LegalIndexRoute
-  PricingIndexRoute: typeof PricingIndexRoute
-  RankingsIndexRoute: typeof RankingsIndexRoute
   SetupIndexRoute: typeof SetupIndexRoute
-  StatusIndexRoute: typeof StatusIndexRoute
   ConsoleChatIdRoute: typeof ConsoleChatIdRoute
   ConsoleChatIndexRoute: typeof ConsoleChatIndexRoute
-  PricingModelIdIndexRoute: typeof PricingModelIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1157,6 +1155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDocsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public': {
+      id: '/_public'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof PublicRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -1171,53 +1176,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/status/': {
-      id: '/status/'
-      path: '/status'
-      fullPath: '/status/'
-      preLoaderRoute: typeof StatusIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/setup/': {
       id: '/setup/'
       path: '/setup'
       fullPath: '/setup/'
       preLoaderRoute: typeof SetupIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rankings/': {
-      id: '/rankings/'
-      path: '/rankings'
-      fullPath: '/rankings/'
-      preLoaderRoute: typeof RankingsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing/': {
-      id: '/pricing/'
-      path: '/pricing'
-      fullPath: '/pricing/'
-      preLoaderRoute: typeof PricingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/': {
-      id: '/legal/'
-      path: '/legal'
-      fullPath: '/legal/'
-      preLoaderRoute: typeof LegalIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs/': {
-      id: '/docs/'
-      path: '/docs'
-      fullPath: '/docs/'
-      preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console/': {
@@ -1227,39 +1190,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apps/': {
-      id: '/apps/'
-      path: '/apps'
-      fullPath: '/apps/'
-      preLoaderRoute: typeof AppsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about/': {
-      id: '/about/'
-      path: '/about'
-      fullPath: '/about/'
-      preLoaderRoute: typeof AboutIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing/compare': {
-      id: '/pricing/compare'
-      path: '/pricing/compare'
-      fullPath: '/pricing/compare'
-      preLoaderRoute: typeof PricingCompareRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_public/': {
+      id: '/_public/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/oauth/$provider': {
       id: '/oauth/$provider'
       path: '/oauth/$provider'
       fullPath: '/oauth/$provider'
       preLoaderRoute: typeof OauthProviderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/$doc': {
-      id: '/legal/$doc'
-      path: '/legal/$doc'
-      fullPath: '/legal/$doc'
-      preLoaderRoute: typeof LegalDocRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console/user': {
@@ -1444,19 +1386,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSystemSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/pricing/$modelId/': {
-      id: '/pricing/$modelId/'
-      path: '/pricing/$modelId'
-      fullPath: '/pricing/$modelId/'
-      preLoaderRoute: typeof PricingModelIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/console/chat/': {
       id: '/console/chat/'
       path: '/console/chat'
       fullPath: '/console/chat/'
       preLoaderRoute: typeof ConsoleChatIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_public/status/': {
+      id: '/_public/status/'
+      path: '/status'
+      fullPath: '/status/'
+      preLoaderRoute: typeof PublicStatusIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/rankings/': {
+      id: '/_public/rankings/'
+      path: '/rankings'
+      fullPath: '/rankings/'
+      preLoaderRoute: typeof PublicRankingsIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/pricing/': {
+      id: '/_public/pricing/'
+      path: '/pricing'
+      fullPath: '/pricing/'
+      preLoaderRoute: typeof PublicPricingIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/legal/': {
+      id: '/_public/legal/'
+      path: '/legal'
+      fullPath: '/legal/'
+      preLoaderRoute: typeof PublicLegalIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/docs/': {
+      id: '/_public/docs/'
+      path: '/docs'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof PublicDocsIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/apps/': {
+      id: '/_public/apps/'
+      path: '/apps'
+      fullPath: '/apps/'
+      preLoaderRoute: typeof PublicAppsIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/about/': {
+      id: '/_public/about/'
+      path: '/about'
+      fullPath: '/about/'
+      preLoaderRoute: typeof PublicAboutIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/_authenticated/wallet/': {
       id: '/_authenticated/wallet/'
@@ -1556,6 +1540,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleChatIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public/pricing/compare': {
+      id: '/_public/pricing/compare'
+      path: '/pricing/compare'
+      fullPath: '/pricing/compare'
+      preLoaderRoute: typeof PublicPricingCompareRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/legal/$doc': {
+      id: '/_public/legal/$doc'
+      path: '/legal/$doc'
+      fullPath: '/legal/$doc'
+      preLoaderRoute: typeof PublicLegalDocRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_authenticated/usage-logs/$section': {
       id: '/_authenticated/usage-logs/$section'
       path: '/usage-logs/$section'
@@ -1611,6 +1609,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/user/reset'
       preLoaderRoute: typeof authUserResetRouteImport
       parentRoute: typeof authRouteRoute
+    }
+    '/_public/pricing/$modelId/': {
+      id: '/_public/pricing/$modelId/'
+      path: '/pricing/$modelId'
+      fullPath: '/pricing/$modelId/'
+      preLoaderRoute: typeof PublicPricingModelIdIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/_authenticated/system-settings/site/': {
       id: '/_authenticated/system-settings/site/'
@@ -1845,10 +1850,42 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface PublicRouteRouteChildren {
+  PublicIndexRoute: typeof PublicIndexRoute
+  PublicLegalDocRoute: typeof PublicLegalDocRoute
+  PublicPricingCompareRoute: typeof PublicPricingCompareRoute
+  PublicAboutIndexRoute: typeof PublicAboutIndexRoute
+  PublicAppsIndexRoute: typeof PublicAppsIndexRoute
+  PublicDocsIndexRoute: typeof PublicDocsIndexRoute
+  PublicLegalIndexRoute: typeof PublicLegalIndexRoute
+  PublicPricingIndexRoute: typeof PublicPricingIndexRoute
+  PublicRankingsIndexRoute: typeof PublicRankingsIndexRoute
+  PublicStatusIndexRoute: typeof PublicStatusIndexRoute
+  PublicPricingModelIdIndexRoute: typeof PublicPricingModelIdIndexRoute
+}
+
+const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicIndexRoute: PublicIndexRoute,
+  PublicLegalDocRoute: PublicLegalDocRoute,
+  PublicPricingCompareRoute: PublicPricingCompareRoute,
+  PublicAboutIndexRoute: PublicAboutIndexRoute,
+  PublicAppsIndexRoute: PublicAppsIndexRoute,
+  PublicDocsIndexRoute: PublicDocsIndexRoute,
+  PublicLegalIndexRoute: PublicLegalIndexRoute,
+  PublicPricingIndexRoute: PublicPricingIndexRoute,
+  PublicRankingsIndexRoute: PublicRankingsIndexRoute,
+  PublicStatusIndexRoute: PublicStatusIndexRoute,
+  PublicPricingModelIdIndexRoute: PublicPricingModelIdIndexRoute,
+}
+
+const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
+  PublicRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   authRouteRoute: authRouteRouteWithChildren,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  PublicRouteRoute: PublicRouteRouteWithChildren,
   ApiDocsRoute: ApiDocsRoute,
   DesignLabRoute: DesignLabRoute,
   ForbiddenRoute: ForbiddenRoute,
@@ -1874,21 +1911,11 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleTokenRoute: ConsoleTokenRoute,
   ConsoleTopupRoute: ConsoleTopupRoute,
   ConsoleUserRoute: ConsoleUserRoute,
-  LegalDocRoute: LegalDocRoute,
   OauthProviderRoute: OauthProviderRoute,
-  PricingCompareRoute: PricingCompareRoute,
-  AboutIndexRoute: AboutIndexRoute,
-  AppsIndexRoute: AppsIndexRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
-  DocsIndexRoute: DocsIndexRoute,
-  LegalIndexRoute: LegalIndexRoute,
-  PricingIndexRoute: PricingIndexRoute,
-  RankingsIndexRoute: RankingsIndexRoute,
   SetupIndexRoute: SetupIndexRoute,
-  StatusIndexRoute: StatusIndexRoute,
   ConsoleChatIdRoute: ConsoleChatIdRoute,
   ConsoleChatIndexRoute: ConsoleChatIndexRoute,
-  PricingModelIdIndexRoute: PricingModelIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -70,7 +70,6 @@ export function HowItWorks() {
       <div>
         <AnimateInView className='mb-10 text-center md:mb-12'>
           <p className='yb-eyebrow mb-3'>
-            {'// '}
             {t('How It Works')}
           </p>
           <h2 className='font-display text-2xl font-bold tracking-[-0.025em] md:text-3xl'>
