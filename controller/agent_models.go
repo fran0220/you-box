@@ -13,10 +13,18 @@ import (
 
 func AgentModels(c *gin.Context) {
 	userId := c.GetInt("id")
-	user, err := model.GetUserCache(userId)
+	payload, err := buildAgentModelsPayload(userId)
 	if err != nil {
 		common.ApiError(c, err)
 		return
+	}
+	common.ApiSuccess(c, payload)
+}
+
+func buildAgentModelsPayload(userId int) (gin.H, error) {
+	user, err := model.GetUserCache(userId)
+	if err != nil {
+		return nil, err
 	}
 	enabled := model.GetEnabledModels()
 	groups := service.GetUserUsableGroups(user.Group)
@@ -47,11 +55,11 @@ func AgentModels(c *gin.Context) {
 		})
 	}
 
-	common.ApiSuccess(c, gin.H{
+	return gin.H{
 		"models":         items,
 		"default_model":  defaultModel,
 		"policy_version": time.Now().Format("2006-01-02"),
-	})
+	}, nil
 }
 
 func agentModelCapabilities(modelId string) []string {
