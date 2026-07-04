@@ -20,7 +20,7 @@ func AgentDesktopAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		userId, err := service.ValidateAgentAccessToken(auth)
+		claims, err := service.ValidateAgentAccessTokenClaims(auth)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
@@ -29,8 +29,11 @@ func AgentDesktopAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		userId := claims.UserId
 		c.Set("id", userId)
 		c.Set("agent_user_id", userId)
+		c.Set("agent_grant_id", claims.GrantId)
+		c.Set("agent_device_id", claims.DeviceId)
 		c.Next()
 	}
 }
@@ -39,10 +42,13 @@ func AgentDesktopAuthOrUserAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := strings.TrimSpace(c.GetHeader("Authorization"))
 		if strings.HasPrefix(auth, "Bearer ") {
-			userId, err := service.ValidateAgentAccessToken(auth)
+			claims, err := service.ValidateAgentAccessTokenClaims(auth)
 			if err == nil {
+				userId := claims.UserId
 				c.Set("id", userId)
 				c.Set("agent_user_id", userId)
+				c.Set("agent_grant_id", claims.GrantId)
+				c.Set("agent_device_id", claims.DeviceId)
 				c.Next()
 				return
 			}

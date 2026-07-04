@@ -23,6 +23,9 @@ func registerAgentRoutes(apiRouter *gin.RouterGroup) {
 
 		agentRoute.GET("/account", middleware.AgentDesktopAuth(), controller.AgentAccount)
 		agentRoute.GET("/models", middleware.AgentDesktopAuth(), controller.AgentModels)
+		agentRoute.GET("/desktop-config", middleware.AgentDesktopAuth(), controller.AgentDesktopConfig)
+		agentRoute.GET("/policy", middleware.AgentDesktopAuth(), controller.AgentDesktopPolicy)
+		agentRoute.POST("/audit", middleware.AgentDesktopAuth(), controller.AgentDesktopAudit)
 
 		devicesRoute := agentRoute.Group("/devices")
 		devicesRoute.Use(middleware.UserAuth())

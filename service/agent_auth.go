@@ -46,6 +46,12 @@ type AgentTokenPair struct {
 	GrantId      int    `json:"grant_id"`
 }
 
+type AgentAccessTokenClaims struct {
+	UserId   int
+	GrantId  int
+	DeviceId string
+}
+
 type agentAuthCodeStore struct {
 	mu    sync.Mutex
 	items map[string]agentAuthCodeEntry
@@ -474,8 +480,16 @@ func findGrantByRefreshToken(refreshToken, clientId, deviceId string, grantId in
 }
 
 func ValidateAgentAccessToken(tokenString string) (int, error) {
-	if err := InitAgentAuthKeys(); err != nil {
+	claims, err := ValidateAgentAccessTokenClaims(tokenString)
+	if err != nil {
 		return 0, err
+	}
+	return claims.UserId, nil
+}
+
+func ValidateAgentAccessTokenClaims(tokenString string) (*AgentAccessTokenClaims, error) {
+	if err := InitAgentAuthKeys(); err != nil {
+		return nil, err
 	}
 	tokenString = strings.TrimPrefix(strings.TrimSpace(tokenString), "Bearer ")
 	parsed, err := jwt.Parse(tokenString, func(t *jwt.Token) (any, error) {
@@ -485,45 +499,46 @@ func ValidateAgentAccessToken(tokenString string) (int, error) {
 		return agentJWTPublicKey, nil
 	}, jwt.WithAudience(constant.AgentAudience), jwt.WithIssuer(agentIssuer()))
 	if err != nil || !parsed.Valid {
-		return 0, errors.New("invalid access token")
+		return nil, errors.New("invalid access token")
 	}
 	claims, ok := parsed.Claims.(jwt.MapClaims)
 	if !ok {
-		return 0, errors.New("invalid token claims")
+		return nil, errors.New("invalid token claims")
 	}
 	sub, _ := claims["sub"].(string)
 	userId := 0
 	fmt.Sscanf(sub, "%d", &userId)
 	if userId <= 0 {
-		return 0, errors.New("invalid token subject")
+		return nil, errors.New("invalid token subject")
 	}
 	user, err := model.GetUserById(userId, false)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if user.Status != common.UserStatusEnabled {
-		return 0, errors.New("user is disabled")
+		return nil, errors.New("user is disabled")
 	}
 	grantId := intClaim(claims["grant_id"])
 	deviceId, _ := claims["device_id"].(string)
 	if grantId > 0 {
 		grant, err := model.GetUserAgentGrantById(grantId, userId)
 		if err != nil {
-			return 0, errors.New("device authorization revoked")
+			return nil, errors.New("device authorization revoked")
 		}
 		if err := validateAgentGrantUsable(grant); err != nil {
-			return 0, err
+			return nil, err
 		}
 	} else if deviceId != "" {
 		grant, err := model.GetUserAgentGrantByDevice(userId, constant.AgentClientID, deviceId)
 		if err != nil {
-			return 0, errors.New("device authorization revoked")
+			return nil, errors.New("device authorization revoked")
 		}
 		if err := validateAgentGrantUsable(grant); err != nil {
-			return 0, err
+			return nil, err
 		}
+		grantId = grant.Id
 	}
-	return userId, nil
+	return &AgentAccessTokenClaims{UserId: userId, GrantId: grantId, DeviceId: deviceId}, nil
 }
 
 func validateAgentGrantUsable(grant *model.UserAgentGrant) error {
