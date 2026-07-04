@@ -27,6 +27,13 @@ var defaultVendorDescriptionKeys = map[string]string{
 }
 
 var defaultModelCatalogMetadataByName = map[string]defaultModelCatalogMetadata{
+	"gpt-image-2": {
+		Vendor:         "OpenAI",
+		Description:    "Image generation model for creating and editing high-quality images from text and visual prompts.",
+		DescriptionKey: "Image generation model for creating and editing high-quality images from text and visual prompts.",
+		Tags:           "image,generation,vision",
+		Icon:           "OpenAI",
+	},
 	"eleven_v3": {
 		Vendor:         "ElevenLabs",
 		Description:    "ElevenLabs' latest expressive text-to-speech model for high-quality voice generation.",
@@ -75,6 +82,13 @@ var defaultModelCatalogMetadataByName = map[string]defaultModelCatalogMetadata{
 		DescriptionKey: "Forced alignment capability that aligns transcript text to audio and returns word and character timestamps.",
 		Tags:           "alignment,timestamps,audio",
 		Icon:           "ElevenLabs.Avatar",
+	},
+	"grok-composer-2.5-fast": {
+		Vendor:         "xAI",
+		Description:    "Fast Grok Composer model for code generation, agentic editing, and text workflows.",
+		DescriptionKey: "Fast Grok Composer model for code generation, agentic editing, and text workflows.",
+		Tags:           "chat,code,agent",
+		Icon:           "XAI.Color",
 	},
 }
 
