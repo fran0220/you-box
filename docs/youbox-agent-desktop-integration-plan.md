@@ -11,7 +11,7 @@
 - `you-box` 仅承载 YouBox Core 侧能力：Agent 桌面授权、授权设备管理、模型目录与网关凭证，不保存 Agent workspace/session/audit/sync 业务数据。
 - `youbox-agent-service` 已作为独立仓库和独立 DB 初始化，服务通过 Core JWT/JWKS/introspection 绑定 `youbox_user_id`、`grant_id`、`device_id`。
 - `youbox-agent-desktop` 已是真实的 `craft-ai-agents/craft-agents-oss` fork，`origin=fran0220/youbox-agent-desktop`，`upstream=craft-ai-agents/craft-agents-oss`，集成分支为 `youbox-integration`。
-- 旧的 Core `electron/` 小壳子不再作为 Agent Desktop 基础；桌面端改造都发生在 Craft fork 内。
+- 旧的 Core `electron/` 小壳子已从当前仓库移除；桌面端改造都发生在 Craft fork 内。
 - 产品路径已收敛为 YouBox 登录 + YouBox Gateway：外部 provider、BYOK、自定义 endpoint、Craft/Claude/ChatGPT/Copilot 登录入口在 UI/RPC/runtime 层被隐藏或拒绝；Pi-compatible 代码只作为隐藏 runtime adapter 保留，不作为产品 provider 暴露。
 
 YouBox Agent 应作为一个独立桌面端产品建设：
@@ -26,12 +26,12 @@ YouBox Agent 应作为一个独立桌面端产品建设：
 2. **桌面端只登录 YouBox，不保留 Craft 自有账号或外部 provider 登录体验**。
 3. **模型调用只走 YouBox Gateway，不保留 Anthropic/BYOK/自定义 endpoint 作为产品能力；Pi 仅是隐藏 runtime adapter**。
 4. **Agent workspace/session/设备/审计/同步数据归 Agent 独立数据域**。
-5. **当前仓库的 `electron/` 只是本地 Web 控制台壳，不承载 Craft Agent runtime**。
+5. **当前仓库不再保留旧 `electron/` 壳子；桌面端入口由独立桌面仓库承载**。
 6. **YouBox Core 同步 `Calcium-Ion/new-api` 上游；YouBox Agent Desktop 独立同步 `craft-agents-oss` 上游**。
 
-## 2. 当前 `electron/` 壳子定位
+## 2. 已移除的旧 `electron/` 壳子
 
-当前 `electron/` 是轻量桌面包装壳：
+旧 `electron/` 曾经只是轻量桌面包装壳：
 
 - 启动本地 Go `new-api`/`new-api.exe` 二进制。
 - 打开 `http://127.0.0.1:3000` 或开发端口。
@@ -55,7 +55,7 @@ YouBox Agent 应作为一个独立桌面端产品建设：
 ╰────────────────────────────╯
 ```
 
-它不是 Agent 桌面端，不具备 Craft 的 Electron main/preload RPC、Agent runtime、workspace/session、MCP、shell/file tools 等能力。后续可保留为“本地控制台壳”，也可以在桌面 Agent 成熟后废弃，但不应作为 Craft 改造基础。
+它不是 Agent 桌面端，不具备 Craft 的 Electron main/preload RPC、Agent runtime、workspace/session、MCP、shell/file tools 等能力。当前仓库已移除该壳子；如需桌面端能力，应在独立桌面仓库中集成 YouBox Core 的授权与模型网关 API，而不是恢复这个本地 Web 控制台壳。
 
 ## 3. 总体架构
 
@@ -701,4 +701,4 @@ packages/server-core/src/youbox/
 3. 本地敏感凭证：优先 OS keychain，还是先沿用 Craft encrypted credential store。
 4. Agent session 云同步粒度：只同步索引/标题/状态，还是同步完整消息与附件。
 5. 高风险工具默认策略：普通用户是否允许 shell，MCP 是否默认关闭。
-6. 当前 `electron/` 壳子的生命周期：保留为本地控制台壳，还是在 YouBox Agent 成熟后废弃。
+6. 已决策：当前仓库旧 `electron/` 壳子废弃并移除；后续桌面端以独立桌面仓库为准。
