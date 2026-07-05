@@ -116,6 +116,18 @@ export const ENDPOINT_TYPES = {
   AUDIO_MUSIC: 'audio-music',
   AUDIO_ISOLATION: 'audio-isolation',
   AUDIO_ALIGNMENT: 'audio-alignment',
+  MODEL_3D: 'model-3d',
+  MODEL_3D_TEXT: 'model-3d-text',
+  MODEL_3D_IMAGE: 'model-3d-image',
+  MODEL_3D_MULTI_IMAGE: 'model-3d-multi-image',
+  MODEL_3D_POST_PROCESS: 'model-3d-post-process',
+  MODEL_3D_ANIMATION: 'model-3d-animation',
+  MODEL_3D_REMESH: 'model-3d-remesh',
+  MODEL_3D_CONVERT: 'model-3d-convert',
+  MODEL_3D_RESIZE: 'model-3d-resize',
+  MODEL_3D_RETEXTURE: 'model-3d-retexture',
+  MODEL_3D_RIGGING: 'model-3d-rigging',
+  MODEL_3D_CHARACTER_ANIMATION: 'model-3d-character-animation',
 } as const
 
 export type EndpointTypeOption =
@@ -143,6 +155,18 @@ export function getEndpointTypeLabels(
     [ENDPOINT_TYPES.AUDIO_MUSIC]: t('Music'),
     [ENDPOINT_TYPES.AUDIO_ISOLATION]: t('Audio isolation'),
     [ENDPOINT_TYPES.AUDIO_ALIGNMENT]: t('Forced alignment'),
+    [ENDPOINT_TYPES.MODEL_3D]: t('3D Model'),
+    [ENDPOINT_TYPES.MODEL_3D_TEXT]: t('Text to 3D'),
+    [ENDPOINT_TYPES.MODEL_3D_IMAGE]: t('Image to 3D'),
+    [ENDPOINT_TYPES.MODEL_3D_MULTI_IMAGE]: t('Multi-image to 3D'),
+    [ENDPOINT_TYPES.MODEL_3D_POST_PROCESS]: t('3D post-processing'),
+    [ENDPOINT_TYPES.MODEL_3D_ANIMATION]: t('3D rigging & animation'),
+    [ENDPOINT_TYPES.MODEL_3D_REMESH]: t('Remesh'),
+    [ENDPOINT_TYPES.MODEL_3D_CONVERT]: t('3D convert'),
+    [ENDPOINT_TYPES.MODEL_3D_RESIZE]: t('3D resize'),
+    [ENDPOINT_TYPES.MODEL_3D_RETEXTURE]: t('Retexture'),
+    [ENDPOINT_TYPES.MODEL_3D_RIGGING]: t('Rigging'),
+    [ENDPOINT_TYPES.MODEL_3D_CHARACTER_ANIMATION]: t('3D character animation'),
   }
 }
 
@@ -181,6 +205,7 @@ export function getModelTypeLabels(t: TFunction): Record<string, string> {
     Rerank: t('Rerank'),
     Video: t('Video'),
     Audio: t('Audio'),
+    '3D': t('3D'),
   }
 }
 

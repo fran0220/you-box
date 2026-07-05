@@ -16,6 +16,7 @@ import (
 	"github.com/QuantumNous/new-api/i18n"
 	"github.com/QuantumNous/new-api/model"
 	"github.com/QuantumNous/new-api/relay/channel/elevenlabs"
+	"github.com/QuantumNous/new-api/relay/channel/meshy"
 	relayconstant "github.com/QuantumNous/new-api/relay/constant"
 	"github.com/QuantumNous/new-api/service"
 	"github.com/QuantumNous/new-api/setting/ratio_setting"
@@ -300,6 +301,18 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 			return nil, false, fmt.Errorf("unsupported ElevenLabs endpoint: %s %s", c.Request.Method, upstreamPath)
 		}
 		modelName, err := elevenlabs.NativeModelForRequest(c, endpoint)
+		if err != nil {
+			return nil, false, err
+		}
+		modelRequest.Model = modelName
+		c.Set("relay_mode", relayconstant.RelayModeUnknown)
+	} else if meshy.IsNativeProxyPath(c.Request.URL.Path) {
+		upstreamPath := meshy.UpstreamPathFromProxyPath(c.Request.URL.Path)
+		endpoint, ok := meshy.MatchNativeEndpoint(c.Request.Method, upstreamPath)
+		if !ok {
+			return nil, false, fmt.Errorf("unsupported Meshy endpoint: %s %s", c.Request.Method, upstreamPath)
+		}
+		modelName, err := meshy.NativeModelForRequest(c, endpoint)
 		if err != nil {
 			return nil, false, err
 		}

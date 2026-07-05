@@ -23,6 +23,31 @@ func elevenLabsEndpointTypes(modelName string) []constant.EndpointType {
 	}
 }
 
+func meshyEndpointTypes(modelName string) []constant.EndpointType {
+	switch modelName {
+	case "meshy-text-to-3d":
+		return []constant.EndpointType{constant.EndpointTypeModel3DText}
+	case "meshy-image-to-3d":
+		return []constant.EndpointType{constant.EndpointTypeModel3DImage}
+	case "meshy-multi-image-to-3d":
+		return []constant.EndpointType{constant.EndpointTypeModel3DMultiImage}
+	case "meshy-remesh":
+		return []constant.EndpointType{constant.EndpointTypeModel3DRemesh}
+	case "meshy-convert":
+		return []constant.EndpointType{constant.EndpointTypeModel3DConvert}
+	case "meshy-resize":
+		return []constant.EndpointType{constant.EndpointTypeModel3DResize}
+	case "meshy-retexture":
+		return []constant.EndpointType{constant.EndpointTypeModel3DRetexture}
+	case "meshy-rigging":
+		return []constant.EndpointType{constant.EndpointTypeModel3DRigging}
+	case "meshy-animation":
+		return []constant.EndpointType{constant.EndpointTypeModel3DCharacterAnim}
+	default:
+		return nil
+	}
+}
+
 // GetEndpointTypesByChannelType 获取渠道最优先端点类型。
 // ElevenLabs 音频能力使用细粒度端点类型，避免模型广场把 TTS/STT/SFX/Music 等都显示成笼统 Audio。
 // 其他音频模型继续归入 audio，避免模型广场把 TTS/STT/语音处理模型显示为 Chat。
@@ -33,6 +58,8 @@ func GetEndpointTypesByChannelType(channelType int, modelName string) []constant
 	}
 	if elevenLabsTypes := elevenLabsEndpointTypes(modelName); len(elevenLabsTypes) > 0 {
 		endpointTypes = elevenLabsTypes
+	} else if meshyTypes := meshyEndpointTypes(modelName); len(meshyTypes) > 0 {
+		endpointTypes = meshyTypes
 	} else if IsAudioModel(modelName) {
 		endpointTypes = []constant.EndpointType{constant.EndpointTypeAudio}
 	} else {

@@ -20,10 +20,12 @@ type defaultModelCatalogMetadata struct {
 
 var defaultVendorDescriptions = map[string]string{
 	"ElevenLabs": "Voice AI platform for speech synthesis, transcription, sound effects, music generation, and audio processing.",
+	"Meshy":      "AI 3D asset platform for generating models, textures, remeshing, rigging, and animation workflows.",
 }
 
 var defaultVendorDescriptionKeys = map[string]string{
 	"ElevenLabs": "Voice AI platform for speech synthesis, transcription, sound effects, music generation, and audio processing.",
+	"Meshy":      "AI 3D asset platform for generating models, textures, remeshing, rigging, and animation workflows.",
 }
 
 var defaultModelCatalogMetadataByName = map[string]defaultModelCatalogMetadata{
@@ -83,6 +85,69 @@ var defaultModelCatalogMetadataByName = map[string]defaultModelCatalogMetadata{
 		Tags:           "alignment,timestamps,audio",
 		Icon:           "ElevenLabs.Avatar",
 	},
+	"meshy-text-to-3d": {
+		Vendor:         "Meshy",
+		Description:    "Text-to-3D workflow for generating preview meshes and refined textured 3D assets from prompts.",
+		DescriptionKey: "Text-to-3D workflow for generating preview meshes and refined textured 3D assets from prompts.",
+		Tags:           "3d,text-to-3d,generation",
+		Icon:           "Meshy",
+	},
+	"meshy-image-to-3d": {
+		Vendor:         "Meshy",
+		Description:    "Image-to-3D workflow for turning a single reference image into a textured 3D model.",
+		DescriptionKey: "Image-to-3D workflow for turning a single reference image into a textured 3D model.",
+		Tags:           "3d,image-to-3d,generation",
+		Icon:           "Meshy",
+	},
+	"meshy-multi-image-to-3d": {
+		Vendor:         "Meshy",
+		Description:    "Multi-image-to-3D workflow for generating 3D assets from multiple views of the same object.",
+		DescriptionKey: "Multi-image-to-3D workflow for generating 3D assets from multiple views of the same object.",
+		Tags:           "3d,multi-image,generation",
+		Icon:           "Meshy",
+	},
+	"meshy-remesh": {
+		Vendor:         "Meshy",
+		Description:    "Remesh workflow for changing topology, polygon count, and export formats of existing 3D models.",
+		DescriptionKey: "Remesh workflow for changing topology, polygon count, and export formats of existing 3D models.",
+		Tags:           "3d,remesh,post-processing",
+		Icon:           "Meshy",
+	},
+	"meshy-convert": {
+		Vendor:         "Meshy",
+		Description:    "3D conversion workflow for exporting models across GLB, FBX, OBJ, STL, USDZ, BLEND, and 3MF formats.",
+		DescriptionKey: "3D conversion workflow for exporting models across GLB, FBX, OBJ, STL, USDZ, BLEND, and 3MF formats.",
+		Tags:           "3d,convert,post-processing",
+		Icon:           "Meshy",
+	},
+	"meshy-resize": {
+		Vendor:         "Meshy",
+		Description:    "3D resize workflow for scaling generated assets to target physical dimensions.",
+		DescriptionKey: "3D resize workflow for scaling generated assets to target physical dimensions.",
+		Tags:           "3d,resize,post-processing",
+		Icon:           "Meshy",
+	},
+	"meshy-retexture": {
+		Vendor:         "Meshy",
+		Description:    "Retexture workflow for applying new text- or image-guided materials to existing 3D models.",
+		DescriptionKey: "Retexture workflow for applying new text- or image-guided materials to existing 3D models.",
+		Tags:           "3d,retexture,materials",
+		Icon:           "Meshy",
+	},
+	"meshy-rigging": {
+		Vendor:         "Meshy",
+		Description:    "Auto-rigging workflow for adding skeletons to humanoid 3D characters.",
+		DescriptionKey: "Auto-rigging workflow for adding skeletons to humanoid 3D characters.",
+		Tags:           "3d,rigging,animation",
+		Icon:           "Meshy",
+	},
+	"meshy-animation": {
+		Vendor:         "Meshy",
+		Description:    "Animation workflow for applying preset actions to rigged 3D characters.",
+		DescriptionKey: "Animation workflow for applying preset actions to rigged 3D characters.",
+		Tags:           "3d,animation,character",
+		Icon:           "Meshy",
+	},
 	"grok-composer-2.5-fast": {
 		Vendor:         "xAI",
 		Description:    "Fast Grok Composer model for code generation, agentic editing, and text workflows.",
@@ -105,6 +170,7 @@ var defaultVendorRules = map[string]string{
 	"eleven_text_to_sound": "ElevenLabs",
 	"music_v":              "ElevenLabs",
 	"scribe":               "ElevenLabs",
+	"meshy":                "Meshy",
 	"claude":               "Anthropic",
 	"gemini":               "Google",
 	"moonshot":             "Moonshot",
@@ -135,6 +201,7 @@ var defaultVendorRules = map[string]string{
 var defaultVendorIcons = map[string]string{
 	"OpenAI":     "OpenAI",
 	"ElevenLabs": "ElevenLabs.Avatar",
+	"Meshy":      "Meshy",
 	"Anthropic":  "Claude.Color",
 	"Google":     "Gemini.Color",
 	"Moonshot":   "Moonshot",
