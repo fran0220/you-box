@@ -118,6 +118,7 @@ import {
   ERROR_MESSAGES,
   FIELD_DESCRIPTIONS,
   FIELD_PLACEHOLDERS,
+  MESHY_DEFAULT_MODELS,
   MODEL_FETCHABLE_TYPES,
 } from '../../constants'
 import { useChannelMutateForm } from '../../hooks/use-channel-mutate-form'
@@ -606,6 +607,18 @@ export function ChannelMutateDrawer({
       const currentModelsValue = form.getValues('models')
       if (!currentModelsValue || currentModelsValue === '') {
         form.setValue('models', ELEVENLABS_DEFAULT_MODELS.join(','))
+      }
+    }
+
+    // Type 60 (Meshy) - set official base URL and 3D workflow models
+    if (currentType === 60) {
+      const currentBaseUrlValue = form.getValues('base_url')
+      if (!currentBaseUrlValue || currentBaseUrlValue === '') {
+        form.setValue('base_url', 'https://api.meshy.ai')
+      }
+      const currentModelsValue = form.getValues('models')
+      if (!currentModelsValue || currentModelsValue === '') {
+        form.setValue('models', MESHY_DEFAULT_MODELS.join(','))
       }
     }
 

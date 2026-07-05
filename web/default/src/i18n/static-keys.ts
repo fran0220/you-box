@@ -57,6 +57,8 @@ export const STATIC_I18N_KEYS = [
   'Image',
   'Embeddings',
   'Video',
+  '3D',
+  'Meshy',
   'Sort',
   'All',
   'All Vendors',
@@ -489,6 +491,8 @@ export const STATIC_I18N_KEYS = [
   'Detection complete: {{add}} to add, {{remove}} to remove',
   'Batch detection failed',
   'Batch detection complete: {{channels}} channels, {{add}} to add, {{remove}} to remove, {{fails}} failed',
+  'Format: Bearer API key from Meshy (msy-...)',
+  'Meshy native API is exposed under /meshy/openapi with an allowlist for 3D generation and post-processing task endpoints.',
 
   // Playground — reasoning effort (option labels)
   'Use effort level',

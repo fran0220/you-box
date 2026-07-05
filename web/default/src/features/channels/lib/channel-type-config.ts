@@ -150,6 +150,22 @@ export const CHANNEL_TYPE_CONFIGS: Record<number, ChannelTypeConfig> = {
       keyMinLength: 20,
     },
   },
+  60: {
+    id: 60,
+    name: CHANNEL_TYPES[60],
+    icon: 'Meshy',
+    defaultBaseUrl: 'https://api.meshy.ai',
+    hints: {
+      baseUrl: 'Default: https://api.meshy.ai',
+      key: 'Meshy Bearer API key (msy-...)',
+      models:
+        'meshy-text-to-3d,meshy-image-to-3d,meshy-multi-image-to-3d,meshy-remesh,meshy-convert,meshy-resize,meshy-retexture,meshy-rigging,meshy-animation',
+    },
+    validation: {
+      keyFormat: /^msy-/,
+      keyMinLength: 20,
+    },
+  },
 }
 
 /**

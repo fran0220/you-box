@@ -33,6 +33,18 @@ var defaultEndpointInfoMap = map[constant.EndpointType]EndpointInfo{
 	constant.EndpointTypeAudioMusic:            {Path: "/elevenlabs/v1/music/stream", Method: "POST"},
 	constant.EndpointTypeAudioIsolation:        {Path: "/elevenlabs/v1/audio-isolation", Method: "POST"},
 	constant.EndpointTypeAudioAlignment:        {Path: "/elevenlabs/v1/forced-alignment", Method: "POST"},
+	constant.EndpointTypeModel3D:               {Path: "/meshy/openapi/v2/text-to-3d", Method: "POST"},
+	constant.EndpointTypeModel3DText:           {Path: "/meshy/openapi/v2/text-to-3d", Method: "POST"},
+	constant.EndpointTypeModel3DImage:          {Path: "/meshy/openapi/v1/image-to-3d", Method: "POST"},
+	constant.EndpointTypeModel3DMultiImage:     {Path: "/meshy/openapi/v1/multi-image-to-3d", Method: "POST"},
+	constant.EndpointTypeModel3DPostProcess:    {Path: "/meshy/openapi/v1/remesh", Method: "POST"},
+	constant.EndpointTypeModel3DAnimation:      {Path: "/meshy/openapi/v1/rigging", Method: "POST"},
+	constant.EndpointTypeModel3DRemesh:         {Path: "/meshy/openapi/v1/remesh", Method: "POST"},
+	constant.EndpointTypeModel3DConvert:        {Path: "/meshy/openapi/v1/convert", Method: "POST"},
+	constant.EndpointTypeModel3DResize:         {Path: "/meshy/openapi/v1/resize", Method: "POST"},
+	constant.EndpointTypeModel3DRetexture:      {Path: "/meshy/openapi/v1/retexture", Method: "POST"},
+	constant.EndpointTypeModel3DRigging:        {Path: "/meshy/openapi/v1/rigging", Method: "POST"},
+	constant.EndpointTypeModel3DCharacterAnim:  {Path: "/meshy/openapi/v1/animations", Method: "POST"},
 }
 
 // GetDefaultEndpointInfo 返回指定端点类型的默认信息以及是否存在

@@ -16,9 +16,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import type { FacetOption } from './filters'
 import { ENDPOINT_TYPES } from '../constants'
 import type { PricingModel, PricingVendor } from '../types'
+import type { FacetOption } from './filters'
 
 /** Canonical model-type facet values (English labels; i18n at UI layer). */
 export const MODEL_TYPE_VALUES = {
@@ -27,6 +27,7 @@ export const MODEL_TYPE_VALUES = {
   RERANK: 'Rerank',
   VIDEO: 'Video',
   AUDIO: 'Audio',
+  MODEL_3D: '3D',
   CHAT: 'Chat',
 } as const
 
@@ -51,6 +52,21 @@ const AUDIO_ENDPOINT_TYPES = new Set<string>([
   ENDPOINT_TYPES.AUDIO_ALIGNMENT,
 ])
 
+const MODEL_3D_ENDPOINT_TYPES = new Set<string>([
+  ENDPOINT_TYPES.MODEL_3D,
+  ENDPOINT_TYPES.MODEL_3D_TEXT,
+  ENDPOINT_TYPES.MODEL_3D_IMAGE,
+  ENDPOINT_TYPES.MODEL_3D_MULTI_IMAGE,
+  ENDPOINT_TYPES.MODEL_3D_POST_PROCESS,
+  ENDPOINT_TYPES.MODEL_3D_ANIMATION,
+  ENDPOINT_TYPES.MODEL_3D_REMESH,
+  ENDPOINT_TYPES.MODEL_3D_CONVERT,
+  ENDPOINT_TYPES.MODEL_3D_RESIZE,
+  ENDPOINT_TYPES.MODEL_3D_RETEXTURE,
+  ENDPOINT_TYPES.MODEL_3D_RIGGING,
+  ENDPOINT_TYPES.MODEL_3D_CHARACTER_ANIMATION,
+])
+
 /**
  * Deterministic ordering when a model maps to multiple types (specialty types
  * before Chat). Membership is independent: each rule below may add a type.
@@ -61,7 +77,8 @@ const AUDIO_ENDPOINT_TYPES = new Set<string>([
  * 3. `jina-rerank` -> Rerank
  * 4. `openai-video` -> Video
  * 5. `audio*` endpoint, `audio_ratio`, or `audio_completion_ratio` > 0 -> Audio
- * 6. Any of openai / openai-response / anthropic / gemini in
+ * 6. `model-3d*` endpoint -> 3D
+ * 7. Any of openai / openai-response / anthropic / gemini in
  *    `supported_endpoint_types` -> Chat
  */
 const MODEL_TYPE_DISPLAY_ORDER: ModelTypeValue[] = [
@@ -70,6 +87,7 @@ const MODEL_TYPE_DISPLAY_ORDER: ModelTypeValue[] = [
   MODEL_TYPE_VALUES.RERANK,
   MODEL_TYPE_VALUES.VIDEO,
   MODEL_TYPE_VALUES.AUDIO,
+  MODEL_TYPE_VALUES.MODEL_3D,
   MODEL_TYPE_VALUES.CHAT,
 ]
 
@@ -107,6 +125,9 @@ export function deriveModelTypes(model: PricingModel): ModelTypeValue[] {
     hasPositiveAudioRatio(model)
   ) {
     matched.add(MODEL_TYPE_VALUES.AUDIO)
+  }
+  if (endpoints.some((e) => MODEL_3D_ENDPOINT_TYPES.has(e))) {
+    matched.add(MODEL_TYPE_VALUES.MODEL_3D)
   }
   if (endpoints.some((e) => CHAT_ENDPOINT_TYPES.has(e))) {
     matched.add(MODEL_TYPE_VALUES.CHAT)
@@ -149,11 +170,9 @@ export function extractModelTypeFacets(models: PricingModel[]): FacetOption[] {
     }
   }
 
-  return MODEL_TYPE_DISPLAY_ORDER.filter((t) => counts.has(t)).map(
-    (value) => ({
-      value,
-      label: value,
-      count: counts.get(value) ?? 0,
-    })
-  )
+  return MODEL_TYPE_DISPLAY_ORDER.filter((t) => counts.has(t)).map((value) => ({
+    value,
+    label: value,
+    count: counts.get(value) ?? 0,
+  }))
 }

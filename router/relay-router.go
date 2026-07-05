@@ -200,6 +200,16 @@ func SetRelayRouter(router *gin.Engine) {
 		relayElevenLabsRouter.Any("/*path", controller.RelayElevenLabs)
 	}
 
+	relayMeshyRouter := router.Group("/meshy")
+	relayMeshyRouter.Use(middleware.RouteTag("relay"))
+	relayMeshyRouter.Use(middleware.SystemPerformanceCheck())
+	relayMeshyRouter.Use(middleware.TokenAuth())
+	relayMeshyRouter.Use(middleware.ModelRequestRateLimit())
+	relayMeshyRouter.Use(middleware.Distribute())
+	{
+		relayMeshyRouter.Any("/*path", controller.RelayMeshy)
+	}
+
 	relayGeminiRouter := router.Group("/v1beta")
 	relayGeminiRouter.Use(middleware.RouteTag("relay"))
 	relayGeminiRouter.Use(middleware.SystemPerformanceCheck())

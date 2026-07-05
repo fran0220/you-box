@@ -121,6 +121,32 @@ describe('deriveModelTypes', () => {
     }
   })
 
+  it('maps 3D endpoint types to 3D', () => {
+    for (const endpoint of [
+      'model-3d',
+      'model-3d-text',
+      'model-3d-image',
+      'model-3d-multi-image',
+      'model-3d-post-process',
+      'model-3d-animation',
+      'model-3d-remesh',
+      'model-3d-convert',
+      'model-3d-resize',
+      'model-3d-retexture',
+      'model-3d-rigging',
+      'model-3d-character-animation',
+    ]) {
+      expect(
+        deriveModelTypes(
+          model({
+            model_name: endpoint,
+            supported_endpoint_types: [endpoint],
+          })
+        )
+      ).toEqual([MODEL_TYPE_VALUES.MODEL_3D])
+    }
+  })
+
   it('maps chat endpoint types to Chat', () => {
     for (const endpoint of [
       'openai',
@@ -251,9 +277,7 @@ describe('extractModelTypeFacets', () => {
       }),
     ]
     const facets = extractModelTypeFacets(models)
-    const byValue = Object.fromEntries(
-      facets.map((f) => [f.value, f.count])
-    )
+    const byValue = Object.fromEntries(facets.map((f) => [f.value, f.count]))
     expect(byValue[MODEL_TYPE_VALUES.CHAT]).toBe(2)
     expect(byValue[MODEL_TYPE_VALUES.IMAGE]).toBe(2)
   })

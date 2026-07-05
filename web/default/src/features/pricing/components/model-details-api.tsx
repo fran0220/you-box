@@ -17,7 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo, useState } from 'react'
-import { ChevronRight, KeyRound, ScrollText, ShieldCheck, Zap } from 'lucide-react'
+import {
+  ChevronRight,
+  KeyRound,
+  ScrollText,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { BundledLanguage } from 'shiki/bundle/web'
 import { useStatus } from '@/hooks/use-status'
@@ -611,6 +617,107 @@ function buildAudioSample(lang: Lang, ctx: SampleContext): string {
   )
 }
 
+function buildModel3DSample(lang: Lang, ctx: SampleContext): string {
+  const url = `${ctx.baseUrl}${ctx.endpointPath}`
+  const body = (() => {
+    if (ctx.endpointType === ENDPOINT_TYPES.MODEL_3D_TEXT) {
+      return {
+        mode: 'preview',
+        prompt: 'a stylized treasure chest',
+        ai_model: 'latest',
+      }
+    }
+    if (ctx.endpointType === ENDPOINT_TYPES.MODEL_3D_IMAGE) {
+      return {
+        image_url: 'https://example.com/reference.png',
+        ai_model: 'latest',
+        should_texture: true,
+      }
+    }
+    if (ctx.endpointType === ENDPOINT_TYPES.MODEL_3D_MULTI_IMAGE) {
+      return {
+        image_urls: [
+          'https://example.com/front.png',
+          'https://example.com/side.png',
+        ],
+        ai_model: 'latest',
+        should_texture: true,
+      }
+    }
+    if (ctx.endpointType === ENDPOINT_TYPES.MODEL_3D_RETEXTURE) {
+      return {
+        model_url: 'https://example.com/model.glb',
+        text_style_prompt: 'painted brass and blue ceramic',
+        enable_pbr: true,
+      }
+    }
+    if (ctx.endpointType === ENDPOINT_TYPES.MODEL_3D_RIGGING) {
+      return {
+        model_url: 'https://example.com/humanoid.glb',
+        height_meters: 1.8,
+      }
+    }
+    if (ctx.endpointType === ENDPOINT_TYPES.MODEL_3D_CHARACTER_ANIMATION) {
+      return { rig_task_id: 'completed-rig-task-id', action_id: 92 }
+    }
+    if (ctx.endpointType === ENDPOINT_TYPES.MODEL_3D_CONVERT) {
+      return {
+        input_task_id: 'completed-task-id',
+        target_formats: ['glb', 'fbx'],
+      }
+    }
+    if (ctx.endpointType === ENDPOINT_TYPES.MODEL_3D_RESIZE) {
+      return {
+        input_task_id: 'completed-task-id',
+        resize_height: 1.0,
+        origin_at: 'bottom',
+      }
+    }
+    return {
+      input_task_id: 'completed-task-id',
+      target_formats: ['glb'],
+      topology: 'quad',
+    }
+  })()
+  const bodyJson = JSON.stringify(body, null, 2)
+
+  if (lang === 'curl') {
+    return [
+      `curl ${url} \\`,
+      `  -H "Authorization: Bearer $${ctx.apiKeyEnv}" \\`,
+      `  -H "Content-Type: application/json" \\`,
+      `  -d '${bodyJson.replace(/\n/g, '\n     ')}'`,
+    ].join('\n')
+  }
+  if (lang === 'python') {
+    return [
+      'import requests',
+      '',
+      `response = requests.post(`,
+      `    "${url}",`,
+      `    headers={"Authorization": "Bearer <YOUR_API_KEY>"},`,
+      `    json=${bodyJson.replace(/\n/g, '\n         ')},`,
+      ')',
+      'response.raise_for_status()',
+      'task_id = response.json()["result"]',
+      'print("Task created:", task_id)',
+    ].join('\n')
+  }
+  return [
+    `const response = await fetch('${url}', {`,
+    `  method: 'POST',`,
+    `  headers: {`,
+    `    Authorization: \`Bearer \${process.env.${ctx.apiKeyEnv}}\`,`,
+    `    'Content-Type': 'application/json',`,
+    `  },`,
+    `  body: JSON.stringify(${bodyJson}),`,
+    `})`,
+    '',
+    `const data = await response.json()`,
+    `console.log('Task created:', data.result)`,
+  ].join('\n')
+}
+
 function buildSample(
   lang: Lang,
   endpointType: string,
@@ -622,6 +729,7 @@ function buildSample(
   ) {
     return buildAudioSample(lang, ctx)
   }
+  if (endpointType.startsWith('model-3d')) return buildModel3DSample(lang, ctx)
   if (endpointType === 'anthropic') return buildAnthropicSample(lang, ctx)
   if (endpointType === 'gemini') return buildGeminiSample(lang, ctx)
   if (endpointType === 'embeddings' || endpointType === 'jina-rerank')
