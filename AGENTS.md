@@ -40,13 +40,136 @@ web/             — Frontend themes container
 
 ## Production Deployment
 
-- Production host: `jpdata`
-- Production domain: `https://api.you-box.com/`
-- App directory on host: `/opt/you-box`
-- Runtime: Docker Compose, service/container `new-api`
-- Production image tag used by compose: `boxai:jpdata`
-- Public app port on host: `3000` behind the host reverse proxy
-- Deploy flow: push the release commit/tag, then on `jpdata` update `/opt/you-box`, rebuild `boxai:jpdata`, and restart the compose service without touching persistent volumes.
+YouBox runs on **two production hosts**. They share the same application image lineage but keep **separate compose projects, databases, Redis, volumes, and secrets**. Never treat them as one cluster unless multi-node config (shared DB/Redis/`SESSION_SECRET`) is explicitly designed.
+
+### Hosts
+
+| Role | SSH host | App directory | Compose service / container | Public domain | Host listen | Reverse proxy |
+| --- | --- | --- | --- | --- | --- | --- |
+| Primary product API | `jpdata` | `/opt/you-box` | `new-api` / `new-api` | `https://api.you-box.com/` | `0.0.0.0:3000` | Nginx → `127.0.0.1:3000` |
+| Secondary gateway | `bwg` | `/opt/origin-gateway` | `new-api` / `origin-gateway` | `https://api.origingame.dev/` | `127.0.0.1:9320` | Nginx → `127.0.0.1:9320` |
+
+Notes:
+
+- `jpdata` is the main YouBox product deployment (`api.you-box.com`).
+- `bwg` runs the same YouBox/new-api codebase as a second deployment (`api.origingame.dev`). It is **not** the same DB as jpdata.
+- Do **not** deploy this product as the shared `api.xiaomao.chat` gateway unless the operator intentionally points that domain at this stack.
+- `bwg` is memory-constrained (~2GB). Prefer **pulling a prebuilt image** over building frontend+Go on the host.
+
+### Image strategy (registry, not host-local-only)
+
+Historical local tags such as `boxai:jpdata` may still exist on hosts. Going forward, publish immutable versioned images to a registry and deploy both hosts from that image.
+
+Recommended naming:
+
+```text
+ghcr.io/fran0220/you-box:<git-tag>     # immutable, e.g. v0.1.7
+ghcr.io/fran0220/you-box:main          # optional floating tag for staging experiments
+```
+
+Local/dev still uses:
+
+```text
+boxai:local                            # docker-compose.yml default via BOXAI_IMAGE
+```
+
+Compose selects the image with:
+
+```bash
+BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.7
+```
+
+(or host `.env` equivalent). Do not rebuild different images per host for the same release; both hosts should pull the **same digest**.
+
+### Build / publish (once per release)
+
+From a builder machine or CI (linux/amd64 is required for both current hosts):
+
+```bash
+# 1) freeze version
+git checkout main
+git pull
+# set VERSION file / git tag, e.g. v0.1.7
+
+# 2) build and push
+docker buildx build \
+  --platform linux/amd64 \
+  -t ghcr.io/fran0220/you-box:v0.1.7 \
+  -t ghcr.io/fran0220/you-box:main \
+  --push \
+  .
+```
+
+Until GHCR (or another private registry) credentials/workflows are wired, an interim fallback is:
+
+```bash
+# build once on a capable host (prefer jpdata or local CI, not bwg)
+docker build -t boxai:v0.1.7 .
+docker save boxai:v0.1.7 | gzip > boxai-v0.1.7.tar.gz
+# copy archive to the other host, then:
+docker load < boxai-v0.1.7.tar.gz
+```
+
+Still tag the loaded image with the same version string on both hosts and set `BOXAI_IMAGE` accordingly.
+
+### Deploy on each host (same image, separate data)
+
+For **jpdata**:
+
+```bash
+ssh jpdata
+cd /opt/you-box
+git fetch && git checkout <release-commit-or-tag>   # keep compose/env in sync
+# edit .env: BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.7
+docker compose pull new-api   # or docker pull $BOXAI_IMAGE
+docker compose up -d new-api
+# do NOT recreate postgres/redis volumes
+docker compose ps
+curl -fsS http://127.0.0.1:3000/api/status
+```
+
+For **bwg**:
+
+```bash
+ssh bwg
+cd /opt/origin-gateway
+# keep host-local docker-compose.yml + .env (container name origin-gateway, port 9320)
+# edit .env: BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.7
+docker compose pull new-api   # service key is still new-api in compose file
+docker compose up -d new-api
+docker compose ps
+curl -fsS http://127.0.0.1:9320/api/status
+```
+
+Hard rules:
+
+1. **Never** delete/recreate persistent volumes (`data/`, postgres volume) during routine deploys.
+2. Keep each host’s `SESSION_SECRET`, DB password, Redis password, and `NODE_NAME` distinct unless deliberately running a shared multi-node cluster.
+3. Set `NODE_NAME` per host (examples: `jpdata-youbox-1`, `bwg-origin-gateway-1`) so logs/audit can tell nodes apart.
+4. Roll out **jpdata first** for product changes; roll out **bwg** after smoke checks, unless the release is bwg-specific.
+5. Upstream `calciumion/new-api` images are **not** production images for YouBox (missing YouBox frontend/extensions).
+
+### Local development
+
+```bash
+# repo root
+docker compose build new-api
+docker compose up -d
+# default image: boxai:local  (override with BOXAI_IMAGE)
+```
+
+### Temporary host-local rebuild (emergency only)
+
+If the registry is unavailable:
+
+```bash
+# on jpdata (has more RAM) — last resort
+cd /opt/you-box
+docker compose build new-api
+docker compose up -d new-api
+```
+
+Avoid routine builds on `bwg`.
 
 ## Internationalization (i18n)
 
