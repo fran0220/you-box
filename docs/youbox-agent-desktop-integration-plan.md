@@ -29,33 +29,9 @@ YouBox Agent 应作为一个独立桌面端产品建设：
 5. **当前仓库不再保留旧 `electron/` 壳子；桌面端入口由独立桌面仓库承载**。
 6. **YouBox Core 同步 `Calcium-Ion/new-api` 上游；YouBox Agent Desktop 独立同步 `craft-agents-oss` 上游**。
 
-## 2. 已移除的旧 `electron/` 壳子
+## 2. Core 不再包含 Electron 壳子
 
-旧 `electron/` 曾经只是轻量桌面包装壳：
-
-- 启动本地 Go `new-api`/`new-api.exe` 二进制。
-- 打开 `http://127.0.0.1:3000` 或开发端口。
-- 管理托盘、崩溃日志、数据目录。
-- `preload.js` 只暴露 Electron 版本、平台、数据目录等基础信息。
-
-它的结构是：
-
-```diagram
-╭────────────────────────────╮
-│ 当前 electron 壳子           │
-│ - 启动本地 Go 后端           │
-│ - 打开 localhost Web UI      │
-│ - 托盘/日志/数据目录          │
-╰─────────────┬──────────────╯
-              │
-              ▼
-╭────────────────────────────╮
-│ YouBox Web 控制台            │
-│ http://127.0.0.1:3000       │
-╰────────────────────────────╯
-```
-
-它不是 Agent 桌面端，不具备 Craft 的 Electron main/preload RPC、Agent runtime、workspace/session、MCP、shell/file tools 等能力。当前仓库已移除该壳子；如需桌面端能力，应在独立桌面仓库中集成 YouBox Core 的授权与模型网关 API，而不是恢复这个本地 Web 控制台壳。
+旧 Core `electron/` 只是启动本地 Go 后端并打开 Web 控制台的轻量包装，**不是** Agent 桌面端。该目录与相关 Core CI 已从本仓库移除；桌面能力只在独立仓库 `youbox-agent-desktop` 中演进。不要在 Core 里恢复 `electron/` 子项目。
 
 ## 3. 总体架构
 

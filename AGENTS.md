@@ -4,6 +4,8 @@
 
 This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI providers (OpenAI, Claude, Gemini, Azure, AWS Bedrock, etc.) behind a unified API, with user management, billing, rate limiting, and an admin dashboard.
 
+This repository is **YouBox Core only**. The legacy Core `electron/` desktop shell has been removed and must not be reintroduced. Agent desktop lives in the separate `youbox-agent-desktop` repository; see `docs/youbox-agent-desktop-integration-plan.md` and `docs/youbox-agent-upstream-sync.md`.
+
 ## Tech Stack
 
 - **Backend**: Go 1.22+, Gin web framework, GORM v2 ORM
