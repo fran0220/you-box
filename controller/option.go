@@ -346,3 +346,55 @@ func UpdateOption(c *gin.Context) {
 		"message": "",
 	})
 }
+
+type EmailTemplatePreviewRequest struct {
+	Kind    string `json:"kind"`
+	Subject string `json:"subject"`
+	HTML    string `json:"html"`
+}
+
+// GetEmailTemplateDefaults returns built-in auth email templates for admin UI restore.
+func GetEmailTemplateDefaults(c *gin.Context) {
+	vs, vh, rs, rh := common.DefaultEmailTemplates()
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data": gin.H{
+			"EmailVerificationSubject": vs,
+			"EmailVerificationHTML":    vh,
+			"PasswordResetSubject":     rs,
+			"PasswordResetHTML":        rh,
+			"variables": []string{
+				"{{.SystemName}}",
+				"{{.Code}}",
+				"{{.ValidMinutes}}",
+				"{{.ResetLink}}",
+			},
+		},
+	})
+}
+
+// PreviewEmailTemplate renders a draft subject/html with sample data.
+func PreviewEmailTemplate(c *gin.Context) {
+	var req EmailTemplatePreviewRequest
+	if err := common.DecodeJson(c.Request.Body, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "无效的参数",
+		})
+		return
+	}
+	subject, htmlBody, err := common.PreviewEmailTemplate(req.Kind, req.Subject, req.HTML)
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data": gin.H{
+			"subject": subject,
+			"html":    htmlBody,
+		},
+	})
+}

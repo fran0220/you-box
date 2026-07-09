@@ -38,6 +38,46 @@ export async function updateSystemOption(request: UpdateOptionRequest) {
   return res.data
 }
 
+export type EmailTemplateDefaultsResponse = {
+  success: boolean
+  message?: string
+  data?: {
+    EmailVerificationSubject: string
+    EmailVerificationHTML: string
+    PasswordResetSubject: string
+    PasswordResetHTML: string
+    variables: string[]
+  }
+}
+
+export type EmailTemplatePreviewResponse = {
+  success: boolean
+  message?: string
+  data?: {
+    subject: string
+    html: string
+  }
+}
+
+export async function getEmailTemplateDefaults() {
+  const res = await api.get<EmailTemplateDefaultsResponse>(
+    '/api/option/email_template_defaults'
+  )
+  return res.data
+}
+
+export async function previewEmailTemplate(request: {
+  kind: 'verification' | 'password_reset'
+  subject: string
+  html: string
+}) {
+  const res = await api.post<EmailTemplatePreviewResponse>(
+    '/api/option/email_template_preview',
+    request
+  )
+  return res.data
+}
+
 export async function confirmPaymentCompliance() {
   const res = await api.post<ConfirmPaymentComplianceResponse>(
     '/api/option/payment_compliance',

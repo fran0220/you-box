@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -66,6 +67,10 @@ func InitOptionMap() {
 	common.OptionMap["SMTPStartTLSEnabled"] = strconv.FormatBool(common.SMTPStartTLSEnabled)
 	common.OptionMap["SMTPInsecureSkipVerify"] = strconv.FormatBool(common.SMTPInsecureSkipVerify)
 	common.OptionMap["SMTPForceAuthLogin"] = strconv.FormatBool(common.SMTPForceAuthLogin)
+	common.OptionMap[common.OptionEmailVerificationSubject] = ""
+	common.OptionMap[common.OptionEmailVerificationHTML] = ""
+	common.OptionMap[common.OptionPasswordResetSubject] = ""
+	common.OptionMap[common.OptionPasswordResetHTML] = ""
 	common.OptionMap["Notice"] = ""
 	common.OptionMap["About"] = ""
 	common.OptionMap["HomePageContent"] = ""
@@ -386,6 +391,25 @@ func updateOptionMap(key string, value string) (err error) {
 		common.SMTPFrom = value
 	case "SMTPToken":
 		common.SMTPToken = value
+	case common.OptionEmailVerificationSubject,
+		common.OptionEmailVerificationHTML,
+		common.OptionPasswordResetSubject,
+		common.OptionPasswordResetHTML:
+		if err := common.ValidateEmailTemplate(key, value); err != nil {
+			return fmt.Errorf("invalid email template %s: %w", key, err)
+		}
+		vs, vh, rs, rh := common.GetEmailTemplates()
+		switch key {
+		case common.OptionEmailVerificationSubject:
+			vs = value
+		case common.OptionEmailVerificationHTML:
+			vh = value
+		case common.OptionPasswordResetSubject:
+			rs = value
+		case common.OptionPasswordResetHTML:
+			rh = value
+		}
+		common.SetEmailTemplates(vs, vh, rs, rh)
 	case "ServerAddress":
 		system_setting.ServerAddress = value
 	case "WorkerUrl":

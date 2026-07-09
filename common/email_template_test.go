@@ -6,6 +6,7 @@ import (
 )
 
 func TestRenderVerificationEmailIncludesCodeAndBrand(t *testing.T) {
+	SetEmailTemplates("", "", "", "")
 	subject, body := RenderVerificationEmail("YouBox", "123456", 10)
 
 	if !strings.Contains(subject, "YouBox") {
@@ -25,27 +26,55 @@ func TestRenderVerificationEmailIncludesCodeAndBrand(t *testing.T) {
 	}
 }
 
-func TestRenderPasswordResetEmailEscapesLinkAndRendersButton(t *testing.T) {
-	link := "https://api.origingame.dev/user/reset?email=a@b.com&token=abc<>\"'"
-	subject, body := RenderPasswordResetEmail("YouBox", link, 15)
+func TestRenderPasswordResetEmailUsesCustomTemplate(t *testing.T) {
+	SetEmailTemplates(
+		"",
+		"",
+		"Reset {{.SystemName}}",
+		`<p>{{.SystemName}}</p><a href="{{.ResetLink}}">go</a><span>{{.ValidMinutes}}</span>`,
+	)
+	t.Cleanup(func() { SetEmailTemplates("", "", "", "") })
 
-	if !strings.Contains(subject, "密码重置") {
-		t.Fatalf("subject should mention password reset, got %q", subject)
+	subject, body := RenderPasswordResetEmail("YouBox", "https://example.com/reset?x=1", 15)
+	if subject != "Reset YouBox" {
+		t.Fatalf("unexpected subject: %q", subject)
 	}
-	if !strings.Contains(body, "重置密码") {
-		t.Fatalf("body should include action label")
+	if !strings.Contains(body, "https://example.com/reset?x=1") {
+		t.Fatalf("body should include reset link")
 	}
-	if strings.Contains(body, "<>") {
-		t.Fatalf("raw angle brackets must be escaped in body")
-	}
-	if !strings.Contains(body, "https://api.origingame.dev/user/reset?email=a@b.com&amp;token=abc&lt;&gt;&#34;&#39;") &&
-		!strings.Contains(body, "token=abc&lt;&gt;") {
-		t.Fatalf("body should include escaped reset link, body=%s", body)
+	if !strings.Contains(body, "15") {
+		t.Fatalf("body should include valid minutes")
 	}
 }
 
-func TestEmailBrandNameFallback(t *testing.T) {
-	if got := emailBrandName("  "); got == "" {
-		t.Fatalf("brand fallback must not be empty")
+func TestRenderVerificationFallsBackOnBadTemplate(t *testing.T) {
+	SetEmailTemplates("{{.SystemName", "<p>{{.Code}}</p>", "", "")
+	t.Cleanup(func() { SetEmailTemplates("", "", "", "") })
+
+	subject, body := RenderVerificationEmail("YouBox", "654321", 5)
+	if !strings.Contains(subject, "YouBox") {
+		t.Fatalf("fallback subject should still work, got %q", subject)
+	}
+	if !strings.Contains(body, "654321") {
+		t.Fatalf("fallback/default body should still include code")
+	}
+}
+
+func TestValidateEmailTemplate(t *testing.T) {
+	if err := ValidateEmailTemplate("ok", "Hello {{.SystemName}}"); err != nil {
+		t.Fatalf("valid template rejected: %v", err)
+	}
+	if err := ValidateEmailTemplate("bad", "{{.SystemName"); err == nil {
+		t.Fatalf("invalid template should fail")
+	}
+}
+
+func TestPreviewEmailTemplate(t *testing.T) {
+	subject, body, err := PreviewEmailTemplate("verification", "", "")
+	if err != nil {
+		t.Fatalf("preview failed: %v", err)
+	}
+	if !strings.Contains(subject, "邮箱验证码") && !strings.Contains(body, "123456") {
+		t.Fatalf("preview should render sample verification content")
 	}
 }

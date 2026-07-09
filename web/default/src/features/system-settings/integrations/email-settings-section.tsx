@@ -16,13 +16,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useMemo, useState } from 'react'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { useSystemConfig } from '@/hooks/use-system-config'
+import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  getEmailTemplateDefaults,
+  previewEmailTemplate,
+} from '../api'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
@@ -52,6 +60,10 @@ const createEmailSchema = (t: (key: string) => string) =>
     SMTPToken: z.string(),
     SMTPSSLEnabled: z.boolean(),
     SMTPForceAuthLogin: z.boolean(),
+    EmailVerificationSubject: z.string(),
+    EmailVerificationHTML: z.string(),
+    PasswordResetSubject: z.string(),
+    PasswordResetHTML: z.string(),
   })
 
 type EmailFormValues = z.infer<ReturnType<typeof createEmailSchema>>
@@ -60,6 +72,13 @@ type EmailSettingsSectionProps = {
   defaultValues: EmailFormValues
 }
 
+const TEMPLATE_VARIABLES = [
+  '{{.SystemName}}',
+  '{{.Code}}',
+  '{{.ValidMinutes}}',
+  '{{.ResetLink}}',
+] as const
+
 export function EmailSettingsSection({
   defaultValues,
 }: EmailSettingsSectionProps) {
@@ -67,6 +86,13 @@ export function EmailSettingsSection({
   const { systemName } = useSystemConfig()
   const updateOption = useUpdateOption()
   const emailSchema = createEmailSchema(t)
+  const [previewKind, setPreviewKind] = useState<
+    'verification' | 'password_reset'
+  >('verification')
+  const [previewSubject, setPreviewSubject] = useState('')
+  const [previewHtml, setPreviewHtml] = useState('')
+  const [isPreviewing, setIsPreviewing] = useState(false)
+  const [isRestoring, setIsRestoring] = useState(false)
 
   const { form, handleSubmit, handleReset, isDirty, isSubmitting } =
     useSettingsForm<EmailFormValues>({
@@ -81,6 +107,10 @@ export function EmailSettingsSection({
           SMTPToken: values.SMTPToken.trim(),
           SMTPSSLEnabled: values.SMTPSSLEnabled,
           SMTPForceAuthLogin: values.SMTPForceAuthLogin,
+          EmailVerificationSubject: values.EmailVerificationSubject,
+          EmailVerificationHTML: values.EmailVerificationHTML,
+          PasswordResetSubject: values.PasswordResetSubject,
+          PasswordResetHTML: values.PasswordResetHTML,
         }
 
         for (const key of Object.keys(changedFields) as Array<
@@ -99,6 +129,70 @@ export function EmailSettingsSection({
         }
       },
     })
+
+  const variableHint = useMemo(
+    () => TEMPLATE_VARIABLES.join('  ·  '),
+    []
+  )
+
+  const runPreview = async (kind: 'verification' | 'password_reset') => {
+    setIsPreviewing(true)
+    setPreviewKind(kind)
+    try {
+      const values = form.getValues()
+      const subject =
+        kind === 'verification'
+          ? values.EmailVerificationSubject
+          : values.PasswordResetSubject
+      const html =
+        kind === 'verification'
+          ? values.EmailVerificationHTML
+          : values.PasswordResetHTML
+      const res = await previewEmailTemplate({ kind, subject, html })
+      if (!res.success || !res.data) {
+        throw new Error(res.message || t('Preview failed'))
+      }
+      setPreviewSubject(res.data.subject)
+      setPreviewHtml(res.data.html)
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : t('Preview failed')
+      )
+    } finally {
+      setIsPreviewing(false)
+    }
+  }
+
+  const restoreDefaults = async () => {
+    setIsRestoring(true)
+    try {
+      const res = await getEmailTemplateDefaults()
+      if (!res.success || !res.data) {
+        throw new Error(res.message || t('Failed to load defaults'))
+      }
+      form.setValue(
+        'EmailVerificationSubject',
+        res.data.EmailVerificationSubject,
+        { shouldDirty: true }
+      )
+      form.setValue('EmailVerificationHTML', res.data.EmailVerificationHTML, {
+        shouldDirty: true,
+      })
+      form.setValue('PasswordResetSubject', res.data.PasswordResetSubject, {
+        shouldDirty: true,
+      })
+      form.setValue('PasswordResetHTML', res.data.PasswordResetHTML, {
+        shouldDirty: true,
+      })
+      toast.success(t('Default templates loaded. Save to apply.'))
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : t('Failed to load defaults')
+      )
+    } finally {
+      setIsRestoring(false)
+    }
+  }
 
   return (
     <>
@@ -284,6 +378,160 @@ export function EmailSettingsSection({
                 )}
               />
             </SettingRowGroup>
+          </SettingsForm>
+        </Form>
+      </SettingsSection>
+
+      <SettingsSection title={t('Email Templates')}>
+        <Form {...form}>
+          <SettingsForm onSubmit={handleSubmit} autoComplete='off'>
+            <div className='mb-4 flex flex-wrap items-center gap-2'>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                disabled={isPreviewing}
+                onClick={() => void runPreview('verification')}
+              >
+                {t('Preview verification')}
+              </Button>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                disabled={isPreviewing}
+                onClick={() => void runPreview('password_reset')}
+              >
+                {t('Preview password reset')}
+              </Button>
+              <Button
+                type='button'
+                variant='ghost'
+                size='sm'
+                disabled={isRestoring}
+                onClick={() => void restoreDefaults()}
+              >
+                {t('Restore defaults')}
+              </Button>
+            </div>
+
+            <p className='text-text-muted mb-4 text-xs leading-relaxed'>
+              {t('Template variables')}: {variableHint}
+              <br />
+              {t(
+                'Leave blank to use the built-in template. Save SMTP settings to apply template changes.'
+              )}
+            </p>
+
+            <SettingRowGroup>
+              <FormField
+                control={form.control}
+                name='EmailVerificationSubject'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Verification subject')}
+                    description={t(
+                      'Subject for registration / email verification messages'
+                    )}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-full max-w-xl'
+                          autoComplete='off'
+                          placeholder='{{.SystemName}} · 邮箱验证码'
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='EmailVerificationHTML'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Verification HTML')}
+                    description={t(
+                      'HTML body. Use {{.Code}}, {{.SystemName}}, {{.ValidMinutes}}.'
+                    )}
+                    control={
+                      <FormControl>
+                        <Textarea
+                          className='min-h-48 w-full max-w-3xl font-mono text-xs'
+                          autoComplete='off'
+                          spellCheck={false}
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='PasswordResetSubject'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Password reset subject')}
+                    description={t('Subject for password reset messages')}
+                    control={
+                      <FormControl>
+                        <Input
+                          className='w-full max-w-xl'
+                          autoComplete='off'
+                          placeholder='{{.SystemName}} · 密码重置'
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='PasswordResetHTML'
+                render={({ field }) => (
+                  <SettingRowFormItem
+                    label={t('Password reset HTML')}
+                    description={t(
+                      'HTML body. Use {{.ResetLink}}, {{.SystemName}}, {{.ValidMinutes}}.'
+                    )}
+                    control={
+                      <FormControl>
+                        <Textarea
+                          className='min-h-48 w-full max-w-3xl font-mono text-xs'
+                          autoComplete='off'
+                          spellCheck={false}
+                          {...field}
+                        />
+                      </FormControl>
+                    }
+                  />
+                )}
+              />
+            </SettingRowGroup>
+
+            {(previewSubject || previewHtml) && (
+              <div className='border-border/70 mt-6 rounded-lg border bg-[#f3efe8]/40 p-4'>
+                <p className='yb-eyebrow text-text-muted mb-2'>
+                  {previewKind === 'verification'
+                    ? t('Verification preview')
+                    : t('Password reset preview')}
+                </p>
+                <p className='text-text-strong mb-3 text-sm font-medium'>
+                  {previewSubject}
+                </p>
+                <div
+                  className='overflow-hidden rounded-md border border-[#e7e1d7] bg-white'
+                  // Admin-only preview of templates they themselves edited.
+                  dangerouslySetInnerHTML={{ __html: previewHtml }}
+                />
+              </div>
+            )}
           </SettingsForm>
         </Form>
       </SettingsSection>
