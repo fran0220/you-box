@@ -33,6 +33,21 @@ export interface QuotaDataItem {
   quota?: number
 }
 
+export interface FlowQuotaData {
+  user_id: number
+  username: string
+  node_name: string
+  token_id: number
+  token_name: string
+  use_group: string
+  channel_id: number
+  channel_name: string
+  model_name: string
+  token_used: number
+  count: number
+  quota: number
+}
+
 // ============================================================================
 // Uptime Monitoring Types
 // ============================================================================

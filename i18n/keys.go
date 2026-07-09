@@ -97,6 +97,8 @@ const (
 	MsgUserAlreadyCommon             = "user.already_common"
 	MsgUserAdminCannotPromote        = "user.admin_cannot_promote"
 	MsgUserOriginalPasswordError     = "user.original_password_error"
+	MsgUserEmailAlreadyTaken         = "user.email_already_taken"
+	MsgUserPasswordUnset             = "user.password_unset"
 	MsgUserInviteQuotaInsufficient   = "user.invite_quota_insufficient"
 	MsgUserTransferQuotaMinimum      = "user.transfer_quota_minimum"
 	MsgUserTransferSuccess           = "user.transfer_success"

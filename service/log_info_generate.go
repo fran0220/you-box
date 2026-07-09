@@ -33,6 +33,31 @@ func appendRequestPath(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, other
 	}
 }
 
+// attachQuotaSaturationToOther nests a quota saturation marker under
+// admin_info so only admins see the audit detail. It is intentionally shared by
+// text/audio/task billing paths.
+func attachQuotaSaturationToOther(other map[string]interface{}, clamp *common.QuotaClamp) {
+	if other == nil || clamp == nil {
+		return
+	}
+	adminInfo, _ := other["admin_info"].(map[string]interface{})
+	if adminInfo == nil {
+		adminInfo = make(map[string]interface{})
+		other["admin_info"] = adminInfo
+	}
+	adminInfo["quota_saturation"] = clamp.AuditMap()
+}
+
+// attachQuotaSaturation records the request's quota clamp (if any) onto the
+// log payload. First non-nil clamp is stored on RelayInfo by billing callers.
+func attachQuotaSaturation(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, other map[string]interface{}) {
+	if relayInfo == nil || relayInfo.QuotaClamp == nil {
+		return
+	}
+	clamp := relayInfo.QuotaClamp
+	attachQuotaSaturationToOther(other, clamp)
+}
+
 func GenerateTextOtherInfo(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, modelRatio, groupRatio, completionRatio float64,
 	cacheTokens int, cacheRatio float64, modelPrice float64, userGroupRatio float64) map[string]interface{} {
 	other := make(map[string]interface{})

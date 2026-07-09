@@ -65,6 +65,7 @@ export interface GetRedemptionsResponse {
 
 export interface SearchRedemptionsParams {
   keyword?: string
+  status?: 'enabled' | 'disabled' | 'used' | 'expired'
   p?: number
   page_size?: number
 }
