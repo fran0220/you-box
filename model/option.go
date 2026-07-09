@@ -67,9 +67,19 @@ func InitOptionMap() {
 	common.OptionMap["SMTPStartTLSEnabled"] = strconv.FormatBool(common.SMTPStartTLSEnabled)
 	common.OptionMap["SMTPInsecureSkipVerify"] = strconv.FormatBool(common.SMTPInsecureSkipVerify)
 	common.OptionMap["SMTPForceAuthLogin"] = strconv.FormatBool(common.SMTPForceAuthLogin)
+	common.OptionMap[common.OptionEmailBrandName] = ""
+	common.OptionMap[common.OptionEmailBrandLogoURL] = ""
+	common.OptionMap[common.OptionEmailBrandPrimaryColor] = ""
+	common.OptionMap[common.OptionEmailBrandFooterText] = ""
 	common.OptionMap[common.OptionEmailVerificationSubject] = ""
-	common.OptionMap[common.OptionEmailVerificationHTML] = ""
+	common.OptionMap[common.OptionEmailVerificationTitle] = ""
+	common.OptionMap[common.OptionEmailVerificationLead] = ""
 	common.OptionMap[common.OptionPasswordResetSubject] = ""
+	common.OptionMap[common.OptionPasswordResetTitle] = ""
+	common.OptionMap[common.OptionPasswordResetLead] = ""
+	common.OptionMap[common.OptionPasswordResetButtonText] = ""
+	// Legacy raw HTML overrides (optional advanced path).
+	common.OptionMap[common.OptionEmailVerificationHTML] = ""
 	common.OptionMap[common.OptionPasswordResetHTML] = ""
 	common.OptionMap["Notice"] = ""
 	common.OptionMap["About"] = ""
@@ -391,23 +401,70 @@ func updateOptionMap(key string, value string) (err error) {
 		common.SMTPFrom = value
 	case "SMTPToken":
 		common.SMTPToken = value
-	case common.OptionEmailVerificationSubject,
-		common.OptionEmailVerificationHTML,
+	case common.OptionEmailBrandName,
+		common.OptionEmailBrandLogoURL,
+		common.OptionEmailBrandPrimaryColor,
+		common.OptionEmailBrandFooterText,
+		common.OptionEmailVerificationSubject,
+		common.OptionEmailVerificationTitle,
+		common.OptionEmailVerificationLead,
 		common.OptionPasswordResetSubject,
-		common.OptionPasswordResetHTML:
+		common.OptionPasswordResetTitle,
+		common.OptionPasswordResetLead,
+		common.OptionPasswordResetButtonText:
+		if err := common.ValidateEmailBrandField(key, value); err != nil {
+			return fmt.Errorf("invalid email brand field %s: %w", key, err)
+		}
+		// Subjects still need to parse as Go templates when non-empty.
+		if key == common.OptionEmailVerificationSubject || key == common.OptionPasswordResetSubject {
+			if err := common.ValidateEmailTemplate(key, value); err != nil {
+				return fmt.Errorf("invalid email template %s: %w", key, err)
+			}
+		}
+		cfg := common.GetEmailBrandConfig()
+		switch key {
+		case common.OptionEmailBrandName:
+			cfg.BrandName = value
+		case common.OptionEmailBrandLogoURL:
+			cfg.LogoURL = value
+		case common.OptionEmailBrandPrimaryColor:
+			cfg.PrimaryColor = value
+		case common.OptionEmailBrandFooterText:
+			cfg.FooterText = value
+		case common.OptionEmailVerificationSubject:
+			cfg.VerificationSubj = value
+		case common.OptionEmailVerificationTitle:
+			cfg.VerificationTitle = value
+		case common.OptionEmailVerificationLead:
+			cfg.VerificationLead = value
+		case common.OptionPasswordResetSubject:
+			cfg.ResetSubject = value
+		case common.OptionPasswordResetTitle:
+			cfg.ResetTitle = value
+		case common.OptionPasswordResetLead:
+			cfg.ResetLead = value
+		case common.OptionPasswordResetButtonText:
+			cfg.ResetButtonText = value
+		}
+		common.SetEmailBrandConfig(cfg)
+	case common.OptionEmailVerificationHTML, common.OptionPasswordResetHTML:
 		if err := common.ValidateEmailTemplate(key, value); err != nil {
 			return fmt.Errorf("invalid email template %s: %w", key, err)
 		}
 		vs, vh, rs, rh := common.GetEmailTemplates()
 		switch key {
-		case common.OptionEmailVerificationSubject:
-			vs = value
 		case common.OptionEmailVerificationHTML:
 			vh = value
-		case common.OptionPasswordResetSubject:
-			rs = value
 		case common.OptionPasswordResetHTML:
 			rh = value
+		}
+		// Keep subjects from brand config when only HTML is updated.
+		cfg := common.GetEmailBrandConfig()
+		if strings.TrimSpace(vs) == "" {
+			vs = cfg.VerificationSubj
+		}
+		if strings.TrimSpace(rs) == "" {
+			rs = cfg.ResetSubject
 		}
 		common.SetEmailTemplates(vs, vh, rs, rh)
 	case "ServerAddress":

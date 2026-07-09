@@ -42,11 +42,18 @@ export type EmailTemplateDefaultsResponse = {
   success: boolean
   message?: string
   data?: {
+    EmailBrandName: string
+    EmailBrandLogoURL: string
+    EmailBrandPrimaryColor: string
+    EmailBrandFooterText: string
     EmailVerificationSubject: string
-    EmailVerificationHTML: string
+    EmailVerificationTitle: string
+    EmailVerificationLead: string
     PasswordResetSubject: string
-    PasswordResetHTML: string
-    variables: string[]
+    PasswordResetTitle: string
+    PasswordResetLead: string
+    PasswordResetButtonText: string
+    placeholders?: string[]
   }
 }
 
@@ -59,6 +66,21 @@ export type EmailTemplatePreviewResponse = {
   }
 }
 
+export type EmailTemplatePreviewRequest = {
+  kind: 'verification' | 'password_reset'
+  brand_name?: string
+  logo_url?: string
+  primary_color?: string
+  footer_text?: string
+  verification_subject?: string
+  verification_title?: string
+  verification_lead?: string
+  password_reset_subject?: string
+  password_reset_title?: string
+  password_reset_lead?: string
+  password_reset_button_text?: string
+}
+
 export async function getEmailTemplateDefaults() {
   const res = await api.get<EmailTemplateDefaultsResponse>(
     '/api/option/email_template_defaults'
@@ -66,11 +88,9 @@ export async function getEmailTemplateDefaults() {
   return res.data
 }
 
-export async function previewEmailTemplate(request: {
-  kind: 'verification' | 'password_reset'
-  subject: string
-  html: string
-}) {
+export async function previewEmailTemplate(
+  request: EmailTemplatePreviewRequest
+) {
   const res = await api.post<EmailTemplatePreviewResponse>(
     '/api/option/email_template_preview',
     request

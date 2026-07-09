@@ -348,23 +348,44 @@ func UpdateOption(c *gin.Context) {
 }
 
 type EmailTemplatePreviewRequest struct {
-	Kind    string `json:"kind"`
+	Kind string `json:"kind"`
+	// Structured brand draft fields for live preview.
+	BrandName               string `json:"brand_name"`
+	LogoURL                 string `json:"logo_url"`
+	PrimaryColor            string `json:"primary_color"`
+	FooterText              string `json:"footer_text"`
+	VerificationSubject     string `json:"verification_subject"`
+	VerificationTitle       string `json:"verification_title"`
+	VerificationLead        string `json:"verification_lead"`
+	PasswordResetSubject    string `json:"password_reset_subject"`
+	PasswordResetTitle      string `json:"password_reset_title"`
+	PasswordResetLead       string `json:"password_reset_lead"`
+	PasswordResetButtonText string `json:"password_reset_button_text"`
+	// Legacy fields kept for backward compatibility with older admin UIs.
 	Subject string `json:"subject"`
 	HTML    string `json:"html"`
 }
 
-// GetEmailTemplateDefaults returns built-in auth email templates for admin UI restore.
+// GetEmailTemplateDefaults returns built-in auth email brand defaults for admin UI restore.
 func GetEmailTemplateDefaults(c *gin.Context) {
-	vs, vh, rs, rh := common.DefaultEmailTemplates()
+	vs, _, rs, _ := common.DefaultEmailTemplates()
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
 		"data": gin.H{
+			"EmailBrandName":           "",
+			"EmailBrandLogoURL":        "",
+			"EmailBrandPrimaryColor":   "",
+			"EmailBrandFooterText":     "",
 			"EmailVerificationSubject": vs,
-			"EmailVerificationHTML":    vh,
+			"EmailVerificationTitle":   "确认你的邮箱地址",
+			"EmailVerificationLead":    "",
 			"PasswordResetSubject":     rs,
-			"PasswordResetHTML":        rh,
-			"variables": []string{
+			"PasswordResetTitle":       "重置你的密码",
+			"PasswordResetLead":        "",
+			"PasswordResetButtonText":  "重置密码",
+			"placeholders": []string{
+				"{{.BrandName}}",
 				"{{.SystemName}}",
 				"{{.Code}}",
 				"{{.ValidMinutes}}",
@@ -374,7 +395,7 @@ func GetEmailTemplateDefaults(c *gin.Context) {
 	})
 }
 
-// PreviewEmailTemplate renders a draft subject/html with sample data.
+// PreviewEmailTemplate renders a draft brand config with sample data.
 func PreviewEmailTemplate(c *gin.Context) {
 	var req EmailTemplatePreviewRequest
 	if err := common.DecodeJson(c.Request.Body, &req); err != nil {
@@ -384,7 +405,43 @@ func PreviewEmailTemplate(c *gin.Context) {
 		})
 		return
 	}
-	subject, htmlBody, err := common.PreviewEmailTemplate(req.Kind, req.Subject, req.HTML)
+
+	draft := common.EmailBrandConfig{
+		BrandName:         req.BrandName,
+		LogoURL:           req.LogoURL,
+		PrimaryColor:      req.PrimaryColor,
+		FooterText:        req.FooterText,
+		VerificationSubj:  firstNonEmptyString(req.VerificationSubject, req.Subject),
+		VerificationTitle: req.VerificationTitle,
+		VerificationLead:  req.VerificationLead,
+		ResetSubject:      firstNonEmptyString(req.PasswordResetSubject, req.Subject),
+		ResetTitle:        req.PasswordResetTitle,
+		ResetLead:         req.PasswordResetLead,
+		ResetButtonText:   req.PasswordResetButtonText,
+	}
+
+	// Validate brand draft fields before rendering.
+	for key, value := range map[string]string{
+		common.OptionEmailBrandName:           draft.BrandName,
+		common.OptionEmailBrandLogoURL:        draft.LogoURL,
+		common.OptionEmailBrandPrimaryColor:   draft.PrimaryColor,
+		common.OptionEmailBrandFooterText:     draft.FooterText,
+		common.OptionEmailVerificationSubject: draft.VerificationSubj,
+		common.OptionPasswordResetSubject:     draft.ResetSubject,
+	} {
+		if err := common.ValidateEmailBrandField(key, value); err != nil {
+			common.ApiError(c, err)
+			return
+		}
+		if key == common.OptionEmailVerificationSubject || key == common.OptionPasswordResetSubject {
+			if err := common.ValidateEmailTemplate(key, value); err != nil {
+				common.ApiError(c, err)
+				return
+			}
+		}
+	}
+
+	subject, htmlBody, err := common.PreviewEmailTemplate(req.Kind, draft)
 	if err != nil {
 		common.ApiError(c, err)
 		return
@@ -397,4 +454,13 @@ func PreviewEmailTemplate(c *gin.Context) {
 			"html":    htmlBody,
 		},
 	})
+}
+
+func firstNonEmptyString(values ...string) string {
+	for _, v := range values {
+		if strings.TrimSpace(v) != "" {
+			return strings.TrimSpace(v)
+		}
+	}
+	return ""
 }

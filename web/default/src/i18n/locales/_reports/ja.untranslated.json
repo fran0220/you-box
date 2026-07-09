@@ -1,10 +1,10 @@
 {
   "Discord ID": "Discord ID",
-  "GitHub ID": "GitHub ID",
-  "Telegram ID": "Telegram ID",
-  "WeChat ID": "WeChat ID",
   "example.com\nblocked-site.com": "example.com\nblocked-site.com",
   "example.com\ncompany.com": "example.com\ncompany.com",
   "example.com\\nblocked-site.com": "example.com\\nblocked-site.com",
-  "example.com\\ncompany.com": "example.com\\ncompany.com"
+  "example.com\\ncompany.com": "example.com\\ncompany.com",
+  "GitHub ID": "GitHub ID",
+  "Telegram ID": "Telegram ID",
+  "WeChat ID": "WeChat ID"
 }
