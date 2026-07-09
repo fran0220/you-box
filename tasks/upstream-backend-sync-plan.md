@@ -95,9 +95,9 @@ go test ./...
 ## Progress
 
 - [x] Branch created
-- [ ] Batch A
-- [ ] Batch B
-- [ ] Batch C
-- [ ] Batch D
-- [ ] Batch E
-- [ ] Final verification
+- [x] Batch A
+- [x] Batch B
+- [x] Batch C
+- [x] Batch D
+- [x] Batch E
+- [x] Final verification (package-level)
