@@ -10,6 +10,9 @@ var (
 // User auth errors
 var (
 	ErrInvalidCredentials   = errors.New("invalid credentials")
+	ErrEmailAmbiguous       = errors.New("email matches multiple users")
+	ErrEmailNotFound        = errors.New("email not found")
+	ErrEmailAlreadyTaken    = errors.New("email already taken")
 	ErrUserEmptyCredentials = errors.New("empty credentials")
 )
 

@@ -84,7 +84,7 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.GET("/self/groups", controller.GetUserGroups)
 				selfRoute.GET("/self", controller.GetSelf)
 				selfRoute.GET("/models", controller.GetUserModels)
-				selfRoute.PUT("/self", controller.UpdateSelf)
+				selfRoute.PUT("/self", middleware.CriticalRateLimit(), controller.UpdateSelf)
 				selfRoute.DELETE("/self", controller.DeleteSelf)
 				selfRoute.GET("/token", controller.GenerateAccessToken)
 				selfRoute.GET("/passkey", controller.PasskeyStatus)
@@ -168,11 +168,13 @@ func SetApiRouter(router *gin.Engine) {
 			subscriptionAdminRoute.POST("/plans", controller.AdminCreateSubscriptionPlan)
 			subscriptionAdminRoute.PUT("/plans/:id", controller.AdminUpdateSubscriptionPlan)
 			subscriptionAdminRoute.PATCH("/plans/:id", controller.AdminUpdateSubscriptionPlanStatus)
+			subscriptionAdminRoute.POST("/plans/:id/subscriptions/reset", controller.AdminResetPlanSubscriptions)
 			subscriptionAdminRoute.POST("/bind", controller.AdminBindSubscription)
 
 			// User subscription management (admin)
 			subscriptionAdminRoute.GET("/users/:id/subscriptions", controller.AdminListUserSubscriptions)
 			subscriptionAdminRoute.POST("/users/:id/subscriptions", controller.AdminCreateUserSubscription)
+			subscriptionAdminRoute.POST("/users/:id/subscriptions/reset", controller.AdminResetUserSubscriptionsByPlan)
 			subscriptionAdminRoute.POST("/user_subscriptions/:id/invalidate", controller.AdminInvalidateUserSubscription)
 			subscriptionAdminRoute.DELETE("/user_subscriptions/:id", controller.AdminDeleteUserSubscription)
 		}
@@ -282,10 +284,20 @@ func SetApiRouter(router *gin.Engine) {
 			systemTaskRoute.GET("/:task_id", controller.GetSystemTask)
 		}
 
+		systemInfoRoute := apiRouter.Group("/system-info")
+		systemInfoRoute.Use(middleware.RootAuth())
+		{
+			systemInfoRoute.GET("/instances", controller.ListSystemInstances)
+			systemInfoRoute.DELETE("/stale-instances", controller.DeleteStaleSystemInstances)
+			systemInfoRoute.DELETE("/instances/:node_name", controller.DeleteStaleSystemInstance)
+		}
+
 		dataRoute := apiRouter.Group("/data")
 		dataRoute.GET("/", middleware.AdminAuth(), controller.GetAllQuotaDates)
 		dataRoute.GET("/users", middleware.AdminAuth(), controller.GetQuotaDatesByUser)
 		dataRoute.GET("/self", middleware.UserAuth(), controller.GetUserQuotaDates)
+		dataRoute.GET("/flow", middleware.AdminAuth(), controller.GetAllFlowQuotaDates)
+		dataRoute.GET("/flow/self", middleware.UserAuth(), controller.GetUserFlowQuotaDates)
 
 		logRoute.Use(middleware.CORS(), middleware.CriticalRateLimit())
 		{

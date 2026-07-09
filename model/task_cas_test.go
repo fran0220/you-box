@@ -51,6 +51,8 @@ func TestMain(m *testing.M) {
 		&PerfMetric{},
 		&SystemTask{},
 		&SystemTaskLock{},
+		&QuotaData{},
+		&Redemption{},
 	); err != nil {
 		panic("failed to migrate: " + err.Error())
 	}
@@ -77,6 +79,8 @@ func truncateTables(t *testing.T) {
 		DB.Exec("DELETE FROM perf_metrics")
 		DB.Exec("DELETE FROM system_task_locks")
 		DB.Exec("DELETE FROM system_tasks")
+		DB.Exec("DELETE FROM quota_data")
+		DB.Exec("DELETE FROM redemptions")
 	})
 }
 
