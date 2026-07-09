@@ -23,14 +23,19 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormField } from '@/components/ui/form'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  getEmailTemplateDefaults,
-  previewEmailTemplate,
-} from '../api'
+import { getEmailTemplateDefaults, previewEmailTemplate } from '../api'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
@@ -384,8 +389,15 @@ export function EmailSettingsSection({
 
       <SettingsSection title={t('Email Templates')}>
         <Form {...form}>
-          <SettingsForm onSubmit={handleSubmit} autoComplete='off'>
-            <div className='mb-4 flex flex-wrap items-center gap-2'>
+          <SettingsForm
+            onSubmit={handleSubmit}
+            autoComplete='off'
+            className='lg:grid-cols-1'
+          >
+            <div
+              data-settings-form-span='full'
+              className='mb-2 flex flex-wrap items-center gap-2'
+            >
               <Button
                 type='button'
                 variant='outline'
@@ -415,7 +427,10 @@ export function EmailSettingsSection({
               </Button>
             </div>
 
-            <p className='text-text-muted mb-4 text-xs leading-relaxed'>
+            <p
+              data-settings-form-span='full'
+              className='text-text-muted mb-2 text-xs leading-relaxed'
+            >
               {t('Template variables')}: {variableHint}
               <br />
               {t(
@@ -423,27 +438,33 @@ export function EmailSettingsSection({
               )}
             </p>
 
-            <SettingRowGroup>
+            {/* Stacked full-width editors: SettingRow's right-side shrink-0 control
+                column squeezes large HTML textareas into unusable narrow boxes. */}
+            <div
+              data-settings-form-span='full'
+              className='flex min-w-0 flex-col gap-6'
+            >
               <FormField
                 control={form.control}
                 name='EmailVerificationSubject'
                 render={({ field }) => (
-                  <SettingRowFormItem
-                    label={t('Verification subject')}
-                    description={t(
-                      'Subject for registration / email verification messages'
-                    )}
-                    control={
-                      <FormControl>
-                        <Input
-                          className='w-full max-w-xl'
-                          autoComplete='off'
-                          placeholder='{{.SystemName}} · 邮箱验证码'
-                          {...field}
-                        />
-                      </FormControl>
-                    }
-                  />
+                  <FormItem className='min-w-0 space-y-2'>
+                    <FormLabel>{t('Verification subject')}</FormLabel>
+                    <FormDescription>
+                      {t(
+                        'Subject for registration / email verification messages'
+                      )}
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        className='w-full'
+                        autoComplete='off'
+                        placeholder='{{.SystemName}} · 邮箱验证码'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
@@ -451,22 +472,23 @@ export function EmailSettingsSection({
                 control={form.control}
                 name='EmailVerificationHTML'
                 render={({ field }) => (
-                  <SettingRowFormItem
-                    label={t('Verification HTML')}
-                    description={t(
-                      'HTML body. Use {{.Code}}, {{.SystemName}}, {{.ValidMinutes}}.'
-                    )}
-                    control={
-                      <FormControl>
-                        <Textarea
-                          className='min-h-48 w-full max-w-3xl font-mono text-xs'
-                          autoComplete='off'
-                          spellCheck={false}
-                          {...field}
-                        />
-                      </FormControl>
-                    }
-                  />
+                  <FormItem className='min-w-0 space-y-2'>
+                    <FormLabel>{t('Verification HTML')}</FormLabel>
+                    <FormDescription>
+                      {t(
+                        'HTML body. Use {{.Code}}, {{.SystemName}}, {{.ValidMinutes}}.'
+                      )}
+                    </FormDescription>
+                    <FormControl>
+                      <Textarea
+                        className='min-h-72 w-full resize-y font-mono text-xs leading-relaxed'
+                        autoComplete='off'
+                        spellCheck={false}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
@@ -474,20 +496,21 @@ export function EmailSettingsSection({
                 control={form.control}
                 name='PasswordResetSubject'
                 render={({ field }) => (
-                  <SettingRowFormItem
-                    label={t('Password reset subject')}
-                    description={t('Subject for password reset messages')}
-                    control={
-                      <FormControl>
-                        <Input
-                          className='w-full max-w-xl'
-                          autoComplete='off'
-                          placeholder='{{.SystemName}} · 密码重置'
-                          {...field}
-                        />
-                      </FormControl>
-                    }
-                  />
+                  <FormItem className='min-w-0 space-y-2'>
+                    <FormLabel>{t('Password reset subject')}</FormLabel>
+                    <FormDescription>
+                      {t('Subject for password reset messages')}
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        className='w-full'
+                        autoComplete='off'
+                        placeholder='{{.SystemName}} · 密码重置'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
@@ -495,38 +518,42 @@ export function EmailSettingsSection({
                 control={form.control}
                 name='PasswordResetHTML'
                 render={({ field }) => (
-                  <SettingRowFormItem
-                    label={t('Password reset HTML')}
-                    description={t(
-                      'HTML body. Use {{.ResetLink}}, {{.SystemName}}, {{.ValidMinutes}}.'
-                    )}
-                    control={
-                      <FormControl>
-                        <Textarea
-                          className='min-h-48 w-full max-w-3xl font-mono text-xs'
-                          autoComplete='off'
-                          spellCheck={false}
-                          {...field}
-                        />
-                      </FormControl>
-                    }
-                  />
+                  <FormItem className='min-w-0 space-y-2'>
+                    <FormLabel>{t('Password reset HTML')}</FormLabel>
+                    <FormDescription>
+                      {t(
+                        'HTML body. Use {{.ResetLink}}, {{.SystemName}}, {{.ValidMinutes}}.'
+                      )}
+                    </FormDescription>
+                    <FormControl>
+                      <Textarea
+                        className='min-h-72 w-full resize-y font-mono text-xs leading-relaxed'
+                        autoComplete='off'
+                        spellCheck={false}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
-            </SettingRowGroup>
+            </div>
 
             {(previewSubject || previewHtml) && (
-              <div className='border-border/70 mt-6 rounded-lg border bg-[#f3efe8]/40 p-4'>
+              <div
+                data-settings-form-span='full'
+                className='border-border/70 mt-2 min-w-0 rounded-lg border bg-[#f3efe8]/40 p-4'
+              >
                 <p className='yb-eyebrow text-text-muted mb-2'>
                   {previewKind === 'verification'
                     ? t('Verification preview')
                     : t('Password reset preview')}
                 </p>
-                <p className='text-text-strong mb-3 text-sm font-medium'>
+                <p className='text-text-strong mb-3 text-sm font-medium break-words'>
                   {previewSubject}
                 </p>
                 <div
-                  className='overflow-hidden rounded-md border border-[#e7e1d7] bg-white'
+                  className='max-w-full overflow-x-auto rounded-md border border-[#e7e1d7] bg-white'
                   // Admin-only preview of templates they themselves edited.
                   dangerouslySetInnerHTML={{ __html: previewHtml }}
                 />
