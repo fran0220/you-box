@@ -1,0 +1,119 @@
+name: Publish YouBox image (GHCR)
+
+# Publishes ghcr.io/fran0220/you-box for dual-host deploys (jpdata + bwg).
+# Both production hosts are linux/amd64 today; keep the platform list explicit.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing git tag to build (e.g. v0.1.7). Leave empty to build the selected ref as a floating tag.'
+        required: false
+        type: string
+      floating_tag:
+        description: 'Optional floating tag to also push (e.g. main). Ignored when building a version tag.'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: fran0220/you-box
+
+jobs:
+  build-and-push:
+    name: Build & push linux/amd64
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+      version: ${{ steps.meta.outputs.version }}
+      digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Resolve version tags
+        id: meta
+        run: |
+          set -euo pipefail
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+            if ! git rev-parse "refs/tags/${VERSION}" >/dev/null 2>&1; then
+              echo "::error::Tag '${VERSION}' does not exist"
+              exit 1
+            fi
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION="${GITHUB_SHA::12}"
+          fi
+
+          IMAGE="${REGISTRY}/${IMAGE_NAME}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "${VERSION}" > VERSION
+          echo "Building ${IMAGE}:${VERSION}"
+
+          TAGS="${IMAGE}:${VERSION}"
+          # Always publish floating main when building from a version tag for dual-host convenience.
+          if [[ "${VERSION}" == v* ]]; then
+            TAGS="${TAGS}"$'\n'"${IMAGE}:main"
+          fi
+          if [ -n "${{ github.event.inputs.floating_tag }}" ]; then
+            TAGS="${TAGS}"$'\n'"${IMAGE}:${{ github.event.inputs.floating_tag }}"
+          fi
+          {
+            echo "tags<<EOF"
+            echo "${TAGS}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+          sbom: false
+
+      - name: Summary
+        run: |
+          {
+            echo "### YouBox image published"
+            echo ""
+            echo "- Image: \`${{ steps.meta.outputs.image }}\`"
+            echo "- Version: \`${{ steps.meta.outputs.version }}\`"
+            echo "- Digest: \`${{ steps.build.outputs.digest }}\`"
+            echo ""
+            echo "Deploy:"
+            echo "\`\`\`bash"
+            echo "BOXAI_IMAGE=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}"
+            echo "docker compose pull new-api && docker compose up -d new-api"
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"

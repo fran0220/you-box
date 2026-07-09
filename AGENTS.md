@@ -67,6 +67,9 @@ ghcr.io/fran0220/you-box:<git-tag>     # immutable, e.g. v0.1.7
 ghcr.io/fran0220/you-box:main          # optional floating tag for staging experiments
 ```
 
+CI publish workflow: `.github/workflows/ghcr-publish.yml`  
+Dual-host checklist: `docs/deploy-dual-host.md`
+
 Local/dev still uses:
 
 ```text
