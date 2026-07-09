@@ -41,7 +41,7 @@ import {
 import { getRedemptions, searchRedemptions } from '../api'
 import { REDEMPTION_STATUS, getRedemptionStatusOptions } from '../constants'
 import { isRedemptionExpired } from '../lib'
-import type { Redemption } from '../types'
+import type { Redemption, SearchRedemptionsParams } from '../types'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { useRedemptionsColumns } from './redemptions-columns'
 import { useRedemptions } from './redemptions-provider'
@@ -54,6 +54,17 @@ function isDisabledRedemptionRow(redemption: Redemption) {
     redemption.status !== REDEMPTION_STATUS.ENABLED ||
     isRedemptionExpired(redemption.expired_time, redemption.status)
   )
+}
+
+function getServerStatusFilter(
+  statusFilter: unknown
+): SearchRedemptionsParams['status'] | undefined {
+  const value = Array.isArray(statusFilter) ? statusFilter[0] : statusFilter
+  if (value === '1') return 'enabled'
+  if (value === '2') return 'disabled'
+  if (value === '3') return 'used'
+  if (value === 'expired') return 'expired'
+  return undefined
 }
 
 export function RedemptionsTable() {
@@ -88,17 +99,21 @@ export function RedemptionsTable() {
       pagination.pageIndex + 1,
       pagination.pageSize,
       globalFilter,
+      columnFilters,
       refreshTrigger,
     ],
     queryFn: async () => {
       const hasFilter = globalFilter?.trim()
+      const status = getServerStatusFilter(
+        columnFilters.find((filter) => filter.id === 'status')?.value
+      )
       const params = {
         p: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
       }
 
-      const result = hasFilter
-        ? await searchRedemptions({ ...params, keyword: globalFilter })
+      const result = hasFilter || status
+        ? await searchRedemptions({ ...params, keyword: globalFilter, status })
         : await getRedemptions(params)
 
       return {
@@ -142,7 +157,7 @@ export function RedemptionsTable() {
     onPaginationChange,
     onGlobalFilterChange,
     onColumnFiltersChange,
-    manualPagination: !globalFilter,
+    manualPagination: !globalFilter && columnFilters.length === 0,
     pageCount: Math.ceil((data?.total || 0) / pagination.pageSize),
   })
 

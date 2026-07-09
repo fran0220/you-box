@@ -25,6 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { SectionPageLayout } from '@/components/layout'
 import { FadeIn } from '@/components/page-transition'
 import { AccountOverview } from './components/overview/account-overview'
+import { TrafficFlow } from './components/flow/traffic-flow'
 import {
   type DashboardSectionId,
   DASHBOARD_DEFAULT_SECTION,
@@ -59,6 +60,9 @@ const SECTION_META: Record<DashboardSectionId, { titleKey: string }> = {
   users: {
     titleKey: 'User Analytics',
   },
+  flow: {
+    titleKey: 'Traffic Flow',
+  },
 }
 
 export function Dashboard() {
@@ -87,6 +91,7 @@ export function Dashboard() {
       <SectionPageLayout.Title>{t(meta.titleKey)}</SectionPageLayout.Title>
       <SectionPageLayout.Content>
         {activeSection === 'overview' && <AccountOverview />}
+        {activeSection === 'flow' && <TrafficFlow />}
         {activeSection === 'users' && isAdmin && (
           <div className='mx-auto w-full max-w-[1180px]'>
             <FadeIn>

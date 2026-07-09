@@ -62,6 +62,17 @@ export async function patchPlanStatus(
   return res.data
 }
 
+export async function resetPlanSubscriptions(
+  id: number,
+  data: { advance_reset_time?: boolean }
+): Promise<ApiResponse<{ message?: string }>> {
+  const res = await api.post(
+    `/api/subscription/admin/plans/${id}/subscriptions/reset`,
+    data
+  )
+  return res.data
+}
+
 // ============================================================================
 // Admin User Subscription Management
 // ============================================================================
@@ -100,6 +111,17 @@ export async function deleteUserSubscription(
 ): Promise<ApiResponse> {
   const res = await api.delete(
     `/api/subscription/admin/user_subscriptions/${subId}`
+  )
+  return res.data
+}
+
+export async function resetUserSubscriptions(
+  userId: number,
+  data: { plan_id: number; advance_reset_time?: boolean }
+): Promise<ApiResponse<{ message?: string }>> {
+  const res = await api.post(
+    `/api/subscription/admin/users/${userId}/subscriptions/reset`,
+    data
   )
   return res.data
 }

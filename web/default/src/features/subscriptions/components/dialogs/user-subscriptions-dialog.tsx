@@ -21,6 +21,8 @@ import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -51,6 +53,7 @@ import {
   createUserSubscription,
   invalidateUserSubscription,
   deleteUserSubscription,
+  resetUserSubscriptions,
 } from '../../api'
 import { formatTimestamp } from '../../lib'
 import type { PlanRecord, UserSubscriptionRecord } from '../../types'
@@ -104,9 +107,11 @@ export function UserSubscriptionsDialog(props: Props) {
   const [subs, setSubs] = useState<UserSubscriptionRecord[]>([])
   const [selectedPlanId, setSelectedPlanId] = useState<string>('')
   const [confirmAction, setConfirmAction] = useState<{
-    type: 'invalidate' | 'delete'
-    subId: number
+    type: 'invalidate' | 'delete' | 'reset'
+    subId?: number
+    planId?: number
   } | null>(null)
+  const [advanceResetTime, setAdvanceResetTime] = useState(true)
   // Reference time (seconds) for expiry checks. Date.now() is impure, so it
   // is snapshotted at mount and refreshed whenever the data is (re)fetched
   // instead of being read during render.
@@ -203,16 +208,28 @@ export function UserSubscriptionsDialog(props: Props) {
     if (!confirmAction) return
     try {
       if (confirmAction.type === 'invalidate') {
+        if (!confirmAction.subId) return
         const res = await invalidateUserSubscription(confirmAction.subId)
         if (res.success) {
           toast.success(res.data?.message || t('Has been invalidated'))
           await loadData()
           props.onSuccess?.()
         }
-      } else {
+      } else if (confirmAction.type === 'delete') {
+        if (!confirmAction.subId) return
         const res = await deleteUserSubscription(confirmAction.subId)
         if (res.success) {
           toast.success(t('Deleted'))
+          await loadData()
+          props.onSuccess?.()
+        }
+      } else if (props.user?.id && confirmAction.planId) {
+        const res = await resetUserSubscriptions(props.user.id, {
+          plan_id: confirmAction.planId,
+          advance_reset_time: advanceResetTime,
+        })
+        if (res.success) {
+          toast.success(res.data?.message || t('Subscription quotas reset'))
           await loadData()
           props.onSuccess?.()
         }
@@ -226,6 +243,21 @@ export function UserSubscriptionsDialog(props: Props) {
 
   const headerTitle = t('User Subscription Management')
   const headerDescription = `${props.user?.username || '-'} (ID: ${props.user?.id || '-'})`
+  let confirmTitle = t('Confirm delete')
+  let confirmDescription = t(
+    'Deleting will permanently remove this subscription record (including benefit details). Continue?'
+  )
+  if (confirmAction?.type === 'invalidate') {
+    confirmTitle = t('Confirm invalidate')
+    confirmDescription = t(
+      'After invalidating, this subscription will be immediately deactivated. Historical records are not affected. Continue?'
+    )
+  } else if (confirmAction?.type === 'reset') {
+    confirmTitle = t('Reset user subscription quota')
+    confirmDescription = t(
+      'Reset usage for this user and plan. This does not remove the subscription record.'
+    )
+  }
 
   return (
     <>
@@ -358,6 +390,20 @@ export function UserSubscriptionsDialog(props: Props) {
                               size='sm'
                               variant='outline'
                               disabled={!isActive}
+                              onClick={() => {
+                                setAdvanceResetTime(true)
+                                setConfirmAction({
+                                  type: 'reset',
+                                  planId: sub.plan_id,
+                                })
+                              }}
+                            >
+                              {t('Reset')}
+                            </Button>
+                            <Button
+                              size='sm'
+                              variant='outline'
+                              disabled={!isActive}
                               onClick={() =>
                                 setConfirmAction({
                                   type: 'invalidate',
@@ -395,23 +441,34 @@ export function UserSubscriptionsDialog(props: Props) {
         <ConfirmDialog
           open
           onOpenChange={(v) => !v && setConfirmAction(null)}
-          title={
-            confirmAction.type === 'invalidate'
-              ? t('Confirm invalidate')
-              : t('Confirm delete')
-          }
-          desc={
-            confirmAction.type === 'invalidate'
-              ? t(
-                  'After invalidating, this subscription will be immediately deactivated. Historical records are not affected. Continue?'
-                )
-              : t(
-                  'Deleting will permanently remove this subscription record (including benefit details). Continue?'
-                )
-          }
+          title={confirmTitle}
+          desc={confirmDescription}
           handleConfirm={handleConfirmAction}
           destructive={confirmAction.type === 'delete'}
-        />
+          confirmText={
+            confirmAction.type === 'reset' ? t('Reset quotas') : undefined
+          }
+        >
+          {confirmAction.type === 'reset' ? (
+            <label className='border-border/70 bg-muted/30 flex items-start gap-3 rounded-lg border p-3 text-sm'>
+              <Checkbox
+                checked={advanceResetTime}
+                onCheckedChange={(checked) => setAdvanceResetTime(checked === true)}
+                className='mt-0.5'
+              />
+              <span className='space-y-1'>
+                <Label className='font-medium'>
+                  {t('Advance next reset time')}
+                </Label>
+                <span className='text-muted-foreground block leading-5'>
+                  {t(
+                    'Keep this on to move the subscription to its next reset window after the quota reset.'
+                  )}
+                </span>
+              </span>
+            </label>
+          ) : null}
+        </ConfirmDialog>
       )}
     </>
   )
