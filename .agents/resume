@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Amp Orb lifecycle: runs when an existing orb resumes before the agent continues.
+# Must be fast and idempotent. Amp only blocks ~10s; long work continues in background.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+log() { printf '[.agents/resume] %s\n' "$*"; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+if [[ "$(id -u)" -eq 0 ]]; then
+  SUDO=()
+elif have sudo; then
+  SUDO=(sudo)
+else
+  SUDO=()
+fi
+
+start_service() {
+  local name="$1"
+  if have systemctl; then
+    "${SUDO[@]}" systemctl start "$name" 2>/dev/null || true
+    if systemctl is-active --quiet "$name" 2>/dev/null; then
+      log "$name active"
+      return 0
+    fi
+  fi
+  if have service; then
+    "${SUDO[@]}" service "$name" start 2>/dev/null || true
+    log "$name start attempted"
+  fi
+}
+
+# PATH shims from setup (go / bun)
+export PATH="/usr/local/go/bin:${BUN_INSTALL:-$HOME/.bun}/bin:${PATH}"
+export GOTOOLCHAIN="${GOTOOLCHAIN:-auto}"
+
+start_service postgresql
+start_service redis-server || start_service redis
+
+# Lightweight readiness probes (do not block long)
+if have redis-cli; then
+  redis-cli ping >/dev/null 2>&1 && log "redis ok" || log "redis not ready"
+fi
+if have psql && [[ "$(id -u)" -eq 0 || ${#SUDO[@]} -gt 0 ]]; then
+  if "${SUDO[@]}" -u postgres psql -tAc 'SELECT 1' >/dev/null 2>&1; then
+    log "postgres ok"
+  else
+    log "postgres not ready"
+  fi
+fi
+
+mkdir -p .amp
+date -u +%Y-%m-%dT%H:%M:%SZ >.amp/resume-last-ran.txt
+log "done"

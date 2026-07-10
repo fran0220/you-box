@@ -1,0 +1,306 @@
+#!/usr/bin/env bash
+# Amp Orb lifecycle: runs once on a fresh orb before the agent starts.
+# Keep this idempotent and short. Prefer Orb built-in Postgres/Redis over Docker.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+log() { printf '[.agents/setup] %s\n' "$*"; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+require_root_or_sudo() {
+  if [[ "$(id -u)" -eq 0 ]]; then
+    SUDO=()
+  elif have sudo; then
+    SUDO=(sudo)
+  else
+    log "need root or sudo for package/service setup"
+    exit 1
+  fi
+}
+
+apt_install() {
+  local pkgs=("$@")
+  local missing=()
+  local pkg
+  for pkg in "${pkgs[@]}"; do
+    if ! dpkg -s "$pkg" >/dev/null 2>&1; then
+      missing+=("$pkg")
+    fi
+  done
+  if ((${#missing[@]})); then
+    log "apt install: ${missing[*]}"
+    "${SUDO[@]}" apt-get update -y
+    DEBIAN_FRONTEND=noninteractive "${SUDO[@]}" apt-get install -y --no-install-recommends "${missing[@]}"
+  fi
+}
+
+ensure_go() {
+  local want_major=1
+  local want_minor=22
+  local current=""
+  if have go; then
+    current="$(go env GOVERSION 2>/dev/null || go version | awk '{print $3}')"
+    # Accept go1.22+ (module wants 1.25.1; install toolchain on demand via GOTOOLCHAIN).
+    if [[ "$current" =~ go([0-9]+)\.([0-9]+) ]]; then
+      local major="${BASH_REMATCH[1]}"
+      local minor="${BASH_REMATCH[2]}"
+      if (( major > want_major || (major == want_major && minor >= want_minor) )); then
+        log "go ok: $current"
+        export GOTOOLCHAIN="${GOTOOLCHAIN:-auto}"
+        return 0
+      fi
+    fi
+    log "go too old ($current); installing newer toolchain"
+  else
+    log "go missing; installing toolchain"
+  fi
+
+  local go_ver="1.25.1"
+  local arch
+  arch="$(uname -m)"
+  case "$arch" in
+    x86_64|amd64) arch=amd64 ;;
+    aarch64|arm64) arch=arm64 ;;
+    *) log "unsupported arch: $arch"; exit 1 ;;
+  esac
+
+  local tarball="go${go_ver}.linux-${arch}.tar.gz"
+  local url="https://go.dev/dl/${tarball}"
+  local tmp
+  tmp="$(mktemp -d)"
+  curl -fsSL "$url" -o "$tmp/$tarball"
+  "${SUDO[@]}" rm -rf /usr/local/go
+  "${SUDO[@]}" tar -C /usr/local -xzf "$tmp/$tarball"
+  rm -rf "$tmp"
+
+  export PATH="/usr/local/go/bin:${PATH}"
+  if ! grep -q '/usr/local/go/bin' "$HOME/.bashrc" 2>/dev/null; then
+    printf '\nexport PATH="/usr/local/go/bin:$PATH"\nexport GOTOOLCHAIN=auto\n' >>"$HOME/.bashrc"
+  fi
+  export GOTOOLCHAIN=auto
+  log "go installed: $(go version)"
+}
+
+ensure_bun() {
+  if have bun; then
+    log "bun ok: $(bun --version)"
+    return 0
+  fi
+  log "bun missing; installing"
+  curl -fsSL https://bun.sh/install | bash
+  export BUN_INSTALL="${BUN_INSTALL:-$HOME/.bun}"
+  export PATH="$BUN_INSTALL/bin:$PATH"
+  if ! grep -q 'BUN_INSTALL' "$HOME/.bashrc" 2>/dev/null; then
+    printf '\nexport BUN_INSTALL="$HOME/.bun"\nexport PATH="$BUN_INSTALL/bin:$PATH"\n' >>"$HOME/.bashrc"
+  fi
+  log "bun installed: $(bun --version)"
+}
+
+start_service() {
+  local name="$1"
+  if have systemctl; then
+    "${SUDO[@]}" systemctl enable --now "$name" 2>/dev/null || true
+    if systemctl is-active --quiet "$name" 2>/dev/null; then
+      log "service $name active (systemctl)"
+      return 0
+    fi
+  fi
+  if have service; then
+    "${SUDO[@]}" service "$name" start 2>/dev/null || true
+    log "service $name start attempted (service)"
+    return 0
+  fi
+  log "could not start service $name (no systemctl/service)"
+  return 0
+}
+
+ensure_postgres() {
+  # Orb ships PostgreSQL 17. Create a local superuser matching common SQL_DSN defaults.
+  local pg_user="${ORB_PG_USER:-root}"
+  local pg_pass="${ORB_PG_PASSWORD:-orbdev}"
+  local pg_db="${ORB_PG_DB:-new-api}"
+
+  if ! have psql && ! have postgres; then
+    apt_install postgresql postgresql-contrib
+  fi
+  start_service postgresql
+
+  # Wait briefly for socket readiness.
+  local i
+  for i in 1 2 3 4 5 6 7 8 9 10; do
+    if "${SUDO[@]}" -u postgres psql -tAc 'SELECT 1' >/dev/null 2>&1; then
+      break
+    fi
+    sleep 1
+  done
+
+  if ! "${SUDO[@]}" -u postgres psql -tAc 'SELECT 1' >/dev/null 2>&1; then
+    log "postgres not ready; agent can fall back to SQLite"
+    return 0
+  fi
+
+  if ! "${SUDO[@]}" -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='${pg_user}'" | grep -q 1; then
+    log "create postgres role ${pg_user}"
+    "${SUDO[@]}" -u postgres psql -v ON_ERROR_STOP=1 \
+      -c "CREATE USER ${pg_user} WITH PASSWORD '${pg_pass}' SUPERUSER CREATEDB CREATEROLE;"
+  else
+    "${SUDO[@]}" -u postgres psql -v ON_ERROR_STOP=1 \
+      -c "ALTER USER ${pg_user} WITH PASSWORD '${pg_pass}' SUPERUSER;"
+  fi
+
+  if ! "${SUDO[@]}" -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='${pg_db}'" | grep -q 1; then
+    log "create database ${pg_db}"
+    "${SUDO[@]}" -u postgres createdb -O "$pg_user" "$pg_db"
+  fi
+
+  log "postgres ready: user=${pg_user} db=${pg_db}"
+}
+
+ensure_redis() {
+  if ! have redis-server && ! have redis-cli; then
+    apt_install redis-server
+  fi
+  start_service redis-server || start_service redis
+  if have redis-cli; then
+    if redis-cli ping >/dev/null 2>&1; then
+      log "redis ready"
+    else
+      log "redis not responding; MEMORY_CACHE_ENABLED may be used instead"
+    fi
+  fi
+}
+
+write_env_file() {
+  # Project Settings env/secrets are already in the process environment.
+  # Materialize a local .env only when missing, so `go run` / godotenv work.
+  if [[ -f .env ]]; then
+    log ".env already present"
+    return 0
+  fi
+
+  local session_secret crypto_secret sql_dsn redis_dsn node_name port
+  session_secret="${SESSION_SECRET:-}"
+  crypto_secret="${CRYPTO_SECRET:-}"
+  sql_dsn="${SQL_DSN:-postgresql://root:orbdev@127.0.0.1:5432/new-api}"
+  redis_dsn="${REDIS_CONN_STRING:-redis://127.0.0.1:6379/0}"
+  node_name="${NODE_NAME:-orb-youbox-1}"
+  port="${PORT:-3000}"
+
+  if [[ -z "$session_secret" ]]; then
+    if have openssl; then
+      session_secret="$(openssl rand -hex 32)"
+    else
+      session_secret="orb-dev-$(date +%s)-$RANDOM"
+    fi
+  fi
+  if [[ -z "$crypto_secret" ]]; then
+    if have openssl; then
+      crypto_secret="$(openssl rand -hex 32)"
+    else
+      crypto_secret="orb-crypto-$(date +%s)-$RANDOM"
+    fi
+  fi
+
+  cat >.env <<EOF
+# Generated by .agents/setup for Amp Orb local development.
+# Prefer Project Settings env/secrets when present; this file is a fallback.
+PORT=${port}
+SESSION_SECRET=${session_secret}
+CRYPTO_SECRET=${crypto_secret}
+SQL_DSN=${sql_dsn}
+REDIS_CONN_STRING=${redis_dsn}
+NODE_NAME=${node_name}
+DEBUG=${DEBUG:-true}
+MEMORY_CACHE_ENABLED=${MEMORY_CACHE_ENABLED:-true}
+TZ=${TZ:-Asia/Shanghai}
+EOF
+  log "wrote .env (orb dev defaults; SESSION_SECRET/CRYPTO_SECRET generated if unset)"
+}
+
+install_deps() {
+  export GOTOOLCHAIN="${GOTOOLCHAIN:-auto}"
+  export PATH="/usr/local/go/bin:${BUN_INSTALL:-$HOME/.bun}/bin:${PATH}"
+
+  log "go mod download"
+  go mod download
+
+  if [[ -f web/package.json ]]; then
+    log "bun install (web)"
+    (
+      cd web
+      if [[ -f bun.lock ]]; then
+        bun install --frozen-lockfile
+      else
+        bun install
+      fi
+    )
+  fi
+}
+
+write_orb_agents_md() {
+  local amp_config_dir="${HOME}/.config/amp"
+  mkdir -p "$amp_config_dir"
+  cat >"${amp_config_dir}/AGENTS.md" <<'EOF'
+# Inside the Orb (you-box)
+
+This machine is an Amp Orb for the you-box (new-api) monorepo.
+
+## Toolchain
+- Go: `/usr/local/go/bin` may be on PATH; `GOTOOLCHAIN=auto` is fine.
+- Frontend package manager: Bun (preferred).
+- Postgres and Redis are started by `.agents/setup` when available.
+- Project Settings env/secrets are injected into the shell. `.env` is a fallback.
+
+## Validate (CI parity)
+```bash
+go test ./... -count=1
+cd web && bun install --frozen-lockfile
+cd default && bun run typecheck && bun run lint && bun run test
+```
+
+## Run locally (host, not Docker — preferred in Orb)
+```bash
+# API (uses .env / Project Settings: SQL_DSN, REDIS_CONN_STRING, SESSION_SECRET)
+go run main.go
+
+# Frontend
+cd web/default && bun run dev -- --host 0.0.0.0 --port 5173
+```
+
+Optional Docker path (heavier):
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## Defaults prepared by setup
+- Postgres: user `root`, password `orbdev`, db `new-api` (override via SQL_DSN / ORB_PG_*)
+- Redis: `redis://127.0.0.1:6379/0`
+- If Postgres is down, unset SQL_DSN and use SQLite (`one-api.db`)
+
+## Portal
+Expose a local service with `amp orb portal 3000` (or the frontend port).
+
+## Rules
+- Do not use production jpdata/bwg secrets in the orb.
+- Keep setup/resume idempotent; do not wipe DB volumes casually.
+EOF
+  log "wrote ${amp_config_dir}/AGENTS.md"
+}
+
+main() {
+  log "start root=$ROOT"
+  require_root_or_sudo
+  apt_install ca-certificates curl git build-essential
+  ensure_go
+  ensure_bun
+  ensure_postgres
+  ensure_redis
+  write_env_file
+  install_deps
+  write_orb_agents_md
+  log "done"
+}
+
+main "$@"
