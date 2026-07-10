@@ -56,6 +56,29 @@ export type DeleteLogsResponse = {
   data?: number
 }
 
+export type SystemTaskStatus = 'pending' | 'running' | 'succeeded' | 'failed'
+
+export type SystemTask = {
+  id: number
+  task_id: string
+  type: string
+  status: SystemTaskStatus
+  active_key?: string
+  payload?: Record<string, unknown>
+  state?: Record<string, unknown>
+  result?: Record<string, unknown>
+  error?: string
+  locked_by?: string
+  created_at: number
+  updated_at: number
+}
+
+export type SystemTaskListResponse = {
+  success: boolean
+  message: string
+  data?: SystemTask[]
+}
+
 export type SiteSettings = {
   Notice: string
   SystemName: string
@@ -341,6 +364,7 @@ export type SecuritySettings = {
   'fetch_setting.ip_list': string[]
   'fetch_setting.allowed_ports': number[]
   'fetch_setting.apply_ip_filter_for_domain': boolean
+  'token_setting.max_user_tokens': number
 }
 
 export type UpstreamChannel = {

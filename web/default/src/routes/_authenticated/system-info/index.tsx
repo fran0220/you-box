@@ -17,32 +17,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/auth-store'
 import { createLazyRouteComponent } from '@/lib/lazy-route-component'
-import {
-  DASHBOARD_DEFAULT_SECTION,
-  DASHBOARD_SECTION_IDS,
-} from '@/features/dashboard/section-registry'
+import { ROLE } from '@/lib/roles'
 
-const Dashboard = createLazyRouteComponent(async () => ({
-  default: (await import('@/features/dashboard')).Dashboard,
+const SystemInfo = createLazyRouteComponent(async () => ({
+  default: (await import('@/features/system-info')).SystemInfo,
 }))
 
-export const Route = createFileRoute('/_authenticated/dashboard/$section')({
-  beforeLoad: ({ params }) => {
-    if (params.section === 'models') {
-      throw redirect({
-        to: '/usage-logs/$section',
-        params: { section: 'common' },
-      })
-    }
-    if (
-      !(DASHBOARD_SECTION_IDS as readonly string[]).includes(params.section)
-    ) {
-      throw redirect({
-        to: '/dashboard/$section',
-        params: { section: DASHBOARD_DEFAULT_SECTION },
-      })
+export const Route = createFileRoute('/_authenticated/system-info/')({
+  beforeLoad: () => {
+    const { auth } = useAuthStore.getState()
+
+    if (auth.user?.role !== ROLE.SUPER_ADMIN) {
+      throw redirect({ to: '/403' })
     }
   },
-  component: Dashboard,
+  component: SystemInfo,
 })

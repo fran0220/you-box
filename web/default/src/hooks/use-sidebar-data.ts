@@ -95,6 +95,7 @@ export function useSidebarData(): SidebarData {
               '/users',
               '/redemption-codes',
               '/subscriptions',
+              '/system-info',
               '/system-settings',
             ],
             icon: ShieldCheck,

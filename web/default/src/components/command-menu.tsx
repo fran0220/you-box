@@ -20,6 +20,8 @@ import React from 'react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useAuthStore } from '@/stores/auth-store'
+import { ROLE } from '@/lib/roles'
 import { useSearch } from '@/context/search-provider'
 import { useSidebarData } from '@/hooks/use-sidebar-data'
 import {
@@ -40,10 +42,15 @@ export function CommandMenu() {
   const { open, setOpen } = useSearch()
   const { pathname } = useLocation()
   const sidebarData = useSidebarData()
+  const userRole = useAuthStore((state) => state.auth.user?.role)
+  const isAdmin = userRole !== undefined && userRole >= ROLE.ADMIN
 
   // Use the active nested sidebar view's nav groups when one matches
   // the current URL; otherwise fall back to the root navigation.
-  const navGroups = getNavGroupsForPath(pathname, t) ?? sidebarData.navGroups
+  const rootNavGroups = sidebarData.navGroups.filter((group) =>
+    group.id === 'admin' ? isAdmin : true
+  )
+  const navGroups = getNavGroupsForPath(pathname, t, userRole) ?? rootNavGroups
 
   const runCommand = React.useCallback(
     (command: () => unknown) => {

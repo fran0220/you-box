@@ -21,14 +21,34 @@ import {
   BarChart3,
   CreditCard,
   ListTodo,
+  Network,
   Radio,
+  ServerCog,
   Settings,
   Ticket,
   Users,
 } from 'lucide-react'
+import { ROLE } from '@/lib/roles'
 import type { NavGroup, SidebarView } from '../types'
 
-function getAdminNavGroups(t: TFunction): NavGroup[] {
+function getAdminNavGroups(t: TFunction, userRole?: number): NavGroup[] {
+  const rootOnlyItems: NavGroup['items'] =
+    userRole === ROLE.SUPER_ADMIN
+      ? [
+          {
+            title: t('System Info'),
+            url: '/system-info',
+            icon: ServerCog,
+          },
+          {
+            title: t('System Settings'),
+            url: '/system-settings/site',
+            activeUrls: ['/system-settings'],
+            icon: Settings,
+          },
+        ]
+      : []
+
   return [
     {
       id: 'admin-workspace',
@@ -56,6 +76,11 @@ function getAdminNavGroups(t: TFunction): NavGroup[] {
           icon: BarChart3,
         },
         {
+          title: t('Traffic Flow'),
+          url: '/dashboard/flow',
+          icon: Network,
+        },
+        {
           title: t('Redemption Codes'),
           url: '/redemption-codes',
           icon: Ticket,
@@ -65,12 +90,7 @@ function getAdminNavGroups(t: TFunction): NavGroup[] {
           url: '/subscriptions',
           icon: CreditCard,
         },
-        {
-          title: t('System Settings'),
-          url: '/system-settings/site',
-          activeUrls: ['/system-settings'],
-          icon: Settings,
-        },
+        ...rootOnlyItems,
       ],
     },
   ]
@@ -85,7 +105,7 @@ function getAdminNavGroups(t: TFunction): NavGroup[] {
 export const ADMIN_VIEW: SidebarView = {
   id: 'admin',
   pathPattern:
-    /^\/(channels|models|users|redemption-codes|subscriptions)(\/|$)|^\/dashboard\/users(\/|$)/,
+    /^\/(channels|models|users|redemption-codes|subscriptions|system-info)(\/|$)|^\/dashboard\/(users|flow)(\/|$)/,
   parent: {
     to: '/dashboard/overview',
     label: 'Back to Console',
