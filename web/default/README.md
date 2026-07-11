@@ -97,7 +97,7 @@ Run all commands from `web/default/`.
 bun install        # install dependencies
 bun run dev        # start the Rsbuild dev server
 bun run build      # production build to dist/
-bun run typecheck  # tsc -b
+bun run typecheck  # native TypeScript 7 (Go) project check
 bun run lint       # eslint .
 bun run test       # vitest run --passWithNoTests
 bun run knip       # unused files/deps audit (cleanup gate)
