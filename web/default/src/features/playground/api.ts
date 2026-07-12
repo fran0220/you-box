@@ -86,11 +86,16 @@ interface PricingRow {
   completion_ratio: number
   model_price?: number
   cache_ratio?: number | null
+  audio_ratio?: number | null
+  audio_completion_ratio?: number | null
+  tags?: string
+  enable_groups?: string[]
+  supported_endpoint_types?: string[]
 }
 
 /**
- * Fetch per-model pricing and reduce it to the fields needed to derive a USD
- * cost from token usage. Keyed by model name.
+ * Fetch per-model pricing (cost fields + capability signals used by Chat).
+ * Keyed by model name.
  */
 export async function getModelPricingMap(): Promise<
   Record<string, ModelPricing>
@@ -108,6 +113,11 @@ export async function getModelPricingMap(): Promise<
       completionRatio: row.completion_ratio,
       modelPrice: row.model_price,
       cacheRatio: row.cache_ratio,
+      audioRatio: row.audio_ratio,
+      audioCompletionRatio: row.audio_completion_ratio,
+      tags: row.tags,
+      enableGroups: row.enable_groups,
+      supportedEndpointTypes: row.supported_endpoint_types,
     }
   }
   return map

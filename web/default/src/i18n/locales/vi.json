@@ -5299,6 +5299,16 @@
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
     "Zoom": "Zoom",
-    "In-app chat (Playground). Shown in the site header as a product entry.": "Trò chuyện trong ứng dụng (Playground). Hiển thị trên thanh điều hướng như lối vào sản phẩm."
+    "In-app chat (Playground). Shown in the site header as a product entry.": "Trò chuyện trong ứng dụng (Playground). Hiển thị trên thanh điều hướng như lối vào sản phẩm.",
+    "Unable to load chat": "Không thể tải trò chuyện",
+    "Chat models could not be loaded. Check your account models and try again.": "Không thể tải mô hình trò chuyện. Kiểm tra mô hình của bạn và thử lại.",
+    "No chat-capable models are available. Audio and specialty models are hidden from Chat.": "Không có mô hình trò chuyện. Mô hình âm thanh và chuyên biệt bị ẩn.",
+    "Reasoning effort": "Cường độ suy luận",
+    "No extended reasoning": "Không suy luận mở rộng",
+    "Low reasoning effort": "Cường độ thấp",
+    "Medium reasoning effort": "Cường độ trung bình",
+    "High reasoning effort": "Cường độ cao",
+    "This will clear the current thread and start a new chat. Saved conversations are kept in the history rail.": "Xóa luồng hiện tại và bắt đầu chat mới. Hội thoại đã lưu vẫn nằm trong thanh lịch sử.",
+    "Med": "TB"
   }
 }

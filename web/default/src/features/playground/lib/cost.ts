@@ -31,6 +31,14 @@ export interface ModelPricing {
   modelPrice?: number
   /** Cached-prompt discount multiplier (applied to cached input tokens). */
   cacheRatio?: number | null
+  /** Endpoint types from /api/pricing (for chat/audio modality filtering). */
+  supportedEndpointTypes?: string[]
+  /** Free-form admin tags (e.g. "reasoning"). */
+  tags?: string
+  /** Groups that may use this model. */
+  enableGroups?: string[]
+  audioRatio?: number | null
+  audioCompletionRatio?: number | null
 }
 
 /**

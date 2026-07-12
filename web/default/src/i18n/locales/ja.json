@@ -5299,6 +5299,16 @@
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V 4",
     "Zoom": "ズーム",
-    "In-app chat (Playground). Shown in the site header as a product entry.": "アプリ内チャット（プレイグラウンド）。サイトヘッダーの製品入口として表示されます。"
+    "In-app chat (Playground). Shown in the site header as a product entry.": "アプリ内チャット（プレイグラウンド）。サイトヘッダーの製品入口として表示されます。",
+    "Unable to load chat": "チャットを読み込めません",
+    "Chat models could not be loaded. Check your account models and try again.": "チャットモデルを読み込めませんでした。利用可能なモデルを確認して再試行してください。",
+    "No chat-capable models are available. Audio and specialty models are hidden from Chat.": "チャット可能なモデルがありません。音声・専用モデルはチャットから除外されます。",
+    "Reasoning effort": "推論強度",
+    "No extended reasoning": "拡張推論なし",
+    "Low reasoning effort": "低い推論強度",
+    "Medium reasoning effort": "中程度の推論強度",
+    "High reasoning effort": "高い推論強度",
+    "This will clear the current thread and start a new chat. Saved conversations are kept in the history rail.": "現在のスレッドをクリアして新しいチャットを開始します。保存済みの会話は履歴レールに残ります。",
+    "Med": "中"
   }
 }

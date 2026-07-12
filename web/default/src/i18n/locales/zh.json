@@ -5299,6 +5299,16 @@
     "Zhipu": "智谱",
     "Zhipu V4": "智谱 V4",
     "Zoom": "缩放",
-    "In-app chat (Playground). Shown in the site header as a product entry.": "站内聊天（试用区）。作为产品入口显示在站点顶栏。"
+    "In-app chat (Playground). Shown in the site header as a product entry.": "站内聊天（试用区）。作为产品入口显示在站点顶栏。",
+    "Unable to load chat": "无法加载聊天",
+    "Chat models could not be loaded. Check your account models and try again.": "无法加载对话模型。请检查账号可用模型后重试。",
+    "No chat-capable models are available. Audio and specialty models are hidden from Chat.": "没有可用的对话模型。音频与专项模型不会出现在聊天中。",
+    "Reasoning effort": "推理强度",
+    "No extended reasoning": "不使用扩展推理",
+    "Low reasoning effort": "低推理强度",
+    "Medium reasoning effort": "中等推理强度",
+    "High reasoning effort": "高推理强度",
+    "This will clear the current thread and start a new chat. Saved conversations are kept in the history rail.": "将清空当前会话并开始新聊天。已保存的会话仍保留在历史栏中。",
+    "Med": "中"
   }
 }

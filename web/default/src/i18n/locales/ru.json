@@ -5299,6 +5299,16 @@
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
     "Zoom": "Zoom",
-    "In-app chat (Playground). Shown in the site header as a product entry.": "Встроенный чат (Playground). Отображается в шапке сайта как продуктовая точка входа."
+    "In-app chat (Playground). Shown in the site header as a product entry.": "Встроенный чат (Playground). Отображается в шапке сайта как продуктовая точка входа.",
+    "Unable to load chat": "Не удалось загрузить чат",
+    "Chat models could not be loaded. Check your account models and try again.": "Не удалось загрузить модели чата. Проверьте доступные модели и повторите попытку.",
+    "No chat-capable models are available. Audio and specialty models are hidden from Chat.": "Нет доступных чат-моделей. Аудио и специализированные модели скрыты.",
+    "Reasoning effort": "Интенсивность рассуждения",
+    "No extended reasoning": "Без расширенного рассуждения",
+    "Low reasoning effort": "Низкая интенсивность",
+    "Medium reasoning effort": "Средняя интенсивность",
+    "High reasoning effort": "Высокая интенсивность",
+    "This will clear the current thread and start a new chat. Saved conversations are kept in the history rail.": "Текущий тред будет очищен. Сохранённые беседы останутся в панели истории.",
+    "Med": "Ср."
   }
 }

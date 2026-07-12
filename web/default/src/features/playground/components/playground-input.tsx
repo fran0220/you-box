@@ -31,6 +31,8 @@ import {
   CodeSquareIcon,
   GraduationCapIcon,
 } from 'lucide-react'
+import type { ReasoningEffort } from '../types'
+import { ReasoningEffortControl } from './reasoning-effort-control'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -61,6 +63,10 @@ interface PlaygroundInputProps {
   /** Native web search toggle state + setter (wired to config.webSearch). */
   webSearch?: boolean
   onWebSearchChange?: (value: boolean) => void
+  /** Show product reasoning intensity control when the model supports it. */
+  showReasoningEffort?: boolean
+  reasoningEffort?: ReasoningEffort
+  onReasoningEffortChange?: (value: ReasoningEffort) => void
 }
 
 const isMacPlatform = () =>
@@ -86,6 +92,9 @@ export function PlaygroundInput({
   isGenerating,
   webSearch = false,
   onWebSearchChange,
+  showReasoningEffort = false,
+  reasoningEffort = 'off',
+  onReasoningEffortChange,
 }: PlaygroundInputProps) {
   const { t } = useTranslation()
   const [text, setText] = useState('')
@@ -297,6 +306,14 @@ export function PlaygroundInput({
               <span className='hidden sm:inline'>{t('Search')}</span>
               <span className='sr-only sm:hidden'>{t('Search')}</span>
             </PromptInputButton>
+
+            {showReasoningEffort && onReasoningEffortChange ? (
+              <ReasoningEffortControl
+                value={reasoningEffort}
+                onChange={onReasoningEffortChange}
+                disabled={disabled}
+              />
+            ) : null}
           </PromptInputTools>
 
           <div className='flex items-center gap-1.5 md:gap-2'>

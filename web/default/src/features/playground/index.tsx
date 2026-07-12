@@ -30,13 +30,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import {
-  ModelMetaTag,
-  ModelSelectorHeader,
-} from '@/components/ai-elements/model-selector-header'
+import { ModelSelectorHeader } from '@/components/ai-elements/model-selector-header'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ConfirmDialog } from '@/components/confirm-dialog'
-import { ModelGroupSelector } from '@/components/model-group-selector'
+import { ModelSelector } from '@/components/model-group-selector'
 import {
   createConversation,
   getConversation,
@@ -45,7 +42,6 @@ import {
   getModelPricingMap,
   updateConversation,
 } from './api'
-import { ChatLinksMenu } from './components/chat-links-menu'
 import { CompareModelsSelector } from './components/compare-models-selector'
 import { ConversationRail } from './components/conversation-rail'
 import { ExportMenu } from './components/export-menu'
@@ -65,7 +61,17 @@ import {
   pushAssistantVersion,
   saveActiveConversationId,
 } from './lib'
-import type { Message as MessageType, ParameterEnabled, PlaygroundConfig } from './types'
+import {
+  filterChatModels,
+  pickGroupForModel,
+  supportsReasoning,
+} from './lib/model-capabilities'
+import type {
+  Message as MessageType,
+  ParameterEnabled,
+  PlaygroundConfig,
+  ReasoningEffort,
+} from './types'
 
 type PlaygroundProps = {
   initialModel?: string
@@ -253,11 +259,7 @@ export function Playground(props: PlaygroundProps) {
     retry: 1,
   })
 
-  const {
-    data: groupsData,
-    isError: groupsLoadError,
-    isFetched: groupsFetched,
-  } = useQuery({
+  const { data: groupsData } = useQuery({
     queryKey: ['playground-groups'],
     queryFn: async () => {
       try {
@@ -274,31 +276,52 @@ export function Playground(props: PlaygroundProps) {
     retry: 1,
   })
 
-  const modelsLoadFailed =
-    modelsLoadError || (modelsFetched && (modelsData?.length ?? 0) === 0)
-  const groupsLoadFailed =
-    groupsLoadError || (groupsFetched && (groupsData?.length ?? 0) === 0)
+  const chatModels = useMemo(
+    () => filterChatModels(modelsData ?? [], pricingMap),
+    [modelsData, pricingMap]
+  )
+
+  const modelsLoadFailed = modelsLoadError
+  const noChatModels =
+    modelsFetched &&
+    !modelsLoadError &&
+    chatModels.length === 0 &&
+    (modelsData?.length ?? 0) > 0
+
+  const modelSupportsReasoning = useMemo(
+    () => supportsReasoning(config.model, pricingMap?.[config.model]),
+    [config.model, pricingMap]
+  )
 
   useEffect(() => {
-    if (!modelsData) return
-    setModels(modelsData)
-    const isCurrentModelValid = modelsData.some((m) => m.value === config.model)
-    if (modelsData.length > 0 && !isCurrentModelValid) {
-      updateConfig('model', modelsData[0].value)
+    setModels(chatModels)
+    const isCurrentModelValid = chatModels.some((m) => m.value === config.model)
+    if (chatModels.length > 0 && !isCurrentModelValid) {
+      updateConfig('model', chatModels[0].value)
     }
-  }, [modelsData, config.model, setModels, updateConfig])
+  }, [chatModels, config.model, setModels, updateConfig])
 
   useEffect(() => {
     if (!groupsData) return
     setGroups(groupsData)
-    const hasCurrentGroup = groupsData.some((g) => g.value === config.group)
-    if (!hasCurrentGroup && groupsData.length > 0) {
-      const fallback =
-        groupsData.find((g) => g.value === 'default')?.value ??
-        groupsData[0].value
-      updateConfig('group', fallback)
+  }, [groupsData, setGroups])
+
+  // Silent group reconciliation: no UI, but keep payload group valid for the model.
+  useEffect(() => {
+    if (!groupsData || groupsData.length === 0) return
+    const enableGroups = pricingMap?.[config.model]?.enableGroups
+    const next = pickGroupForModel(config.group, enableGroups, groupsData)
+    if (next !== config.group) {
+      updateConfig('group', next)
     }
-  }, [groupsData, setGroups, config.group, updateConfig])
+  }, [config.model, config.group, groupsData, pricingMap, updateConfig])
+
+  // Force reasoning off when switching to a non-reasoning model (incl. restore).
+  useEffect(() => {
+    if (!modelSupportsReasoning && config.reasoningEffort !== 'off') {
+      updateConfig('reasoningEffort', 'off')
+    }
+  }, [modelSupportsReasoning, config.reasoningEffort, updateConfig])
 
   const handleSendMessage = (text: string, imageUrls?: string[]) => {
     const userMessage = createUserMessage(text, imageUrls)
@@ -444,36 +467,27 @@ export function Playground(props: PlaygroundProps) {
     }
   }
 
-  const selectedGroup = useMemo(
-    () => groups.find((g) => g.value === config.group),
-    [groups, config.group]
-  )
   const selectedModelLabel = useMemo(
     () => models.find((m) => m.value === config.model)?.label || config.model,
     [models, config.model]
   )
 
   const isSelectorDisabled =
-    isGenerating ||
-    isLoadingModels ||
-    models.length === 0 ||
-    groups.length === 0
+    isGenerating || isLoadingModels || models.length === 0
 
   const loadFailureMessage = useMemo(() => {
-    if (modelsLoadFailed && groupsLoadFailed) {
-      return t(
-        'Models and groups could not be loaded. Check your channel configuration and try again.'
-      )
-    }
     if (modelsLoadFailed) {
       return t(
-        'Models could not be loaded. Check your channel configuration and try again.'
+        'Chat models could not be loaded. Check your account models and try again.'
       )
     }
-    return t(
-      'Groups could not be loaded. Check your channel configuration and try again.'
-    )
-  }, [modelsLoadFailed, groupsLoadFailed, t])
+    if (noChatModels) {
+      return t(
+        'No chat-capable models are available. Audio and specialty models are hidden from Chat.'
+      )
+    }
+    return t('Unable to load chat.')
+  }, [modelsLoadFailed, noChatModels, t])
 
   const parametersPanel = (
     <PlaygroundParameters
@@ -497,9 +511,9 @@ export function Playground(props: PlaygroundProps) {
       </div>
 
       <div className='flex min-w-0 flex-1 flex-col overflow-hidden'>
-        {(modelsLoadFailed || groupsLoadFailed) && !isLoadingModels ? (
+        {(modelsLoadFailed || noChatModels) && !isLoadingModels ? (
           <Alert variant='destructive' className='mx-4 mt-3 shrink-0 sm:mx-6'>
-            <AlertTitle>{t('Unable to load playground')}</AlertTitle>
+            <AlertTitle>{t('Unable to load chat')}</AlertTitle>
             <AlertDescription>{loadFailureMessage}</AlertDescription>
           </Alert>
         ) : null}
@@ -507,33 +521,16 @@ export function Playground(props: PlaygroundProps) {
         <ModelSelectorHeader
           className='bg-surface/80 border-border shrink-0 backdrop-blur-sm'
           trigger={
-            <ModelGroupSelector
+            <ModelSelector
               selectedModel={config.model}
               models={models}
               onModelChange={handlePrimaryModelChange}
-              selectedGroup={config.group}
-              groups={groups}
-              onGroupChange={(value) => updateConfig('group', value)}
               disabled={isSelectorDisabled}
+              className='min-w-0 sm:min-w-[12rem]'
             />
-          }
-          tags={
-            selectedGroup && (selectedGroup.ratio || selectedGroup.desc) ? (
-              <>
-                {selectedGroup.ratio ? (
-                  <ModelMetaTag>
-                    {t('Ratio: {{value}}', { value: selectedGroup.ratio })}
-                  </ModelMetaTag>
-                ) : null}
-                {selectedGroup.desc ? (
-                  <ModelMetaTag>{selectedGroup.desc}</ModelMetaTag>
-                ) : null}
-              </>
-            ) : undefined
           }
           actions={
             <>
-              <ChatLinksMenu />
               <ExportMenu
                 messages={messages}
                 config={config}
@@ -598,12 +595,17 @@ export function Playground(props: PlaygroundProps) {
 
             <div className='border-border bg-bg mx-auto w-full max-w-4xl border-t px-4 py-3 sm:px-6'>
               <PlaygroundInput
-                disabled={isGenerating}
+                disabled={isGenerating || models.length === 0}
                 isGenerating={isGenerating}
                 onStop={stopGeneration}
                 onSubmit={handleSendMessage}
                 webSearch={config.webSearch}
                 onWebSearchChange={(value) => updateConfig('webSearch', value)}
+                showReasoningEffort={modelSupportsReasoning}
+                reasoningEffort={config.reasoningEffort}
+                onReasoningEffortChange={(value: ReasoningEffort) =>
+                  updateConfig('reasoningEffort', value)
+                }
               />
             </div>
           </div>
@@ -630,7 +632,7 @@ export function Playground(props: PlaygroundProps) {
         destructive
         title={t('Reset conversation')}
         desc={t(
-          'This will clear the current thread and start a new chat. Saved conversations are kept in the sidebar.'
+          'This will clear the current thread and start a new chat. Saved conversations are kept in the history rail.'
         )}
         confirmText={t('Reset')}
         handleConfirm={handleResetConfirm}

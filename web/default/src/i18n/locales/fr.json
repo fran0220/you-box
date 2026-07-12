@@ -5299,6 +5299,16 @@
     "Zhipu": "Zhipu",
     "Zhipu V4": "Zhipu V4",
     "Zoom": "Zoom",
-    "In-app chat (Playground). Shown in the site header as a product entry.": "Chat intégré (Playground). Affiché dans l’en-tête du site comme entrée produit."
+    "In-app chat (Playground). Shown in the site header as a product entry.": "Chat intégré (Playground). Affiché dans l’en-tête du site comme entrée produit.",
+    "Unable to load chat": "Impossible de charger le chat",
+    "Chat models could not be loaded. Check your account models and try again.": "Impossible de charger les modèles de chat. Vérifiez vos modèles et réessayez.",
+    "No chat-capable models are available. Audio and specialty models are hidden from Chat.": "Aucun modèle de chat disponible. Les modèles audio et spécialisés sont masqués.",
+    "Reasoning effort": "Effort de raisonnement",
+    "No extended reasoning": "Pas de raisonnement étendu",
+    "Low reasoning effort": "Faible effort de raisonnement",
+    "Medium reasoning effort": "Effort de raisonnement moyen",
+    "High reasoning effort": "Effort de raisonnement élevé",
+    "This will clear the current thread and start a new chat. Saved conversations are kept in the history rail.": "Ceci efface le fil actuel et démarre un nouveau chat. Les conversations enregistrées restent dans l’historique.",
+    "Med": "Moy."
   }
 }

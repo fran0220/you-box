@@ -63,11 +63,17 @@ function AuthenticatedAppLayout() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
-  // Viewport-locked surfaces manage their own scroll and skip the footer.
+  // Viewport-locked product surfaces (Chat / Playground, external chat
+  // presets) manage their own scroll, skip the site footer, and do not
+  // mount the console sidebar — ChatGPT/Claude-style product chrome.
   const fullscreen =
     pathname.startsWith('/playground') || pathname.startsWith('/chat')
 
   return (
-    <AppShell withSidebar contentMode='bare' showFooter={!fullscreen} />
+    <AppShell
+      withSidebar={!fullscreen}
+      contentMode='bare'
+      showFooter={!fullscreen}
+    />
   )
 }
