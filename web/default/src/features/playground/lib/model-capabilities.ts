@@ -30,7 +30,7 @@ const SPECIALTY_NAME_RE =
 
 /** Name patterns that indicate reasoning-capable models. */
 const REASONING_NAME_RE =
-  /(^|[/:])o[1-4]([.\-]|$)|gpt-5|deepseek-r|qwq|reasoning|thinking|glm-z|grok-[34]|gemini-2\.5|claude-.*(?:thinking|4)/i
+  /(^|[/:])o[1-4]([.-]|$)|gpt-5|deepseek-r|qwq|reasoning|thinking|glm-z|grok-[34]|gemini-2\.5|claude-.*(?:thinking|4)/i
 
 const REASONING_TAG_RE = /reasoning|thinking/i
 

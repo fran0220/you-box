@@ -16,44 +16,53 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo, useRef, useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import {
-  PaperclipIcon,
-  UploadIcon,
-  ImageIcon,
+  ArrowUpIcon,
+  BrainIcon,
   GlobeIcon,
-  SendIcon,
+  ImageIcon,
+  LinkIcon,
   SquareIcon,
   XIcon,
-  BarChartIcon,
-  BoxIcon,
-  NotepadTextIcon,
-  CodeSquareIcon,
-  GraduationCapIcon,
 } from 'lucide-react'
-import type { ReasoningEffort } from '../types'
-import { ReasoningEffortControl } from './reasoning-effort-control'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import {
   PromptInput,
+  PromptInputActionAddAttachments,
+  PromptInputActionMenu,
+  PromptInputActionMenuContent,
+  PromptInputActionMenuTrigger,
+  PromptInputActionMenuItem,
+  PromptInputAttachment,
+  PromptInputAttachments,
   PromptInputButton,
   PromptInputFooter,
+  PromptInputHeader,
   PromptInputTextarea,
   PromptInputTools,
   type PromptInputMessage,
 } from '@/components/ai-elements/prompt-input'
-import { Suggestion, Suggestions } from '@/components/ai-elements/suggestion'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import type { ReasoningEffort } from '../types'
 
 interface PlaygroundInputProps {
   onSubmit: (text: string, imageUrls?: string[]) => void
@@ -67,314 +76,258 @@ interface PlaygroundInputProps {
   showReasoningEffort?: boolean
   reasoningEffort?: ReasoningEffort
   onReasoningEffortChange?: (value: ReasoningEffort) => void
+  /** Claude-style model chip rendered in the footer, next to send. */
+  modelSelector?: ReactNode
 }
-
-const isMacPlatform = () =>
-  typeof navigator !== 'undefined' &&
-  /mac/i.test(navigator.platform || navigator.userAgent)
 
 // Max size for an uploaded (base64-inlined) image.
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024
 
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(String(reader.result))
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
-}
+const REASONING_LEVELS: Array<{
+  value: ReasoningEffort
+  labelKey: string
+}> = [
+  { value: 'off', labelKey: 'Off' },
+  { value: 'low', labelKey: 'Low' },
+  { value: 'medium', labelKey: 'Medium' },
+  { value: 'high', labelKey: 'High' },
+]
 
-export function PlaygroundInput({
-  onSubmit,
-  onStop,
-  disabled,
-  isGenerating,
-  webSearch = false,
-  onWebSearchChange,
-  showReasoningEffort = false,
-  reasoningEffort = 'off',
-  onReasoningEffortChange,
-}: PlaygroundInputProps) {
+/**
+ * PlaygroundInput — the Claude-style composer: one rounded card with the
+ * textarea on top and a single tools row below (attach menu + web search +
+ * reasoning on the left, model chip + round send button on the right).
+ */
+export function PlaygroundInput(props: PlaygroundInputProps) {
   const { t } = useTranslation()
   const [text, setText] = useState('')
   const [imageUrls, setImageUrls] = useState<string[]>([])
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const isMac = isMacPlatform()
+  const [urlDialogOpen, setUrlDialogOpen] = useState(false)
+  const [urlDraft, setUrlDraft] = useState('')
 
-  const suggestions = useMemo(
-    () => [
-      {
-        icon: BarChartIcon,
-        textKey: 'Analyze data' as const,
-        color: 'var(--brand)',
-      },
-      {
-        icon: BoxIcon,
-        textKey: 'Surprise me' as const,
-        color: 'var(--text-muted)',
-      },
-      {
-        icon: NotepadTextIcon,
-        textKey: 'Summarize text' as const,
-        color: 'var(--text-muted)',
-      },
-      { icon: CodeSquareIcon, textKey: 'Code' as const, color: 'var(--brand)' },
-      {
-        icon: GraduationCapIcon,
-        textKey: 'Get advice' as const,
-        color: 'var(--text-muted)',
-      },
-      { icon: null, textKey: 'More' as const, color: undefined },
-    ],
-    []
-  )
+  const webSearch = props.webSearch ?? false
+  const reasoningEffort = props.reasoningEffort ?? 'off'
+  // The advanced sheet may set 'minimal'; surface it as Low in the chip.
+  const reasoningDisplay: ReasoningEffort =
+    reasoningEffort === 'minimal' ? 'low' : reasoningEffort
+  const reasoningActive = reasoningDisplay !== 'off'
+  const reasoningLabelKey =
+    REASONING_LEVELS.find((level) => level.value === reasoningDisplay)
+      ?.labelKey ?? 'Off'
 
   const handleSubmit = (message: PromptInputMessage) => {
-    if (!message.text?.trim() || disabled) return
-    const validImages = imageUrls.filter((url) => url.trim() !== '')
-    onSubmit(message.text, validImages.length > 0 ? validImages : undefined)
+    if (!message.text?.trim() || props.disabled) return
+    const pasted = (message.files ?? [])
+      .filter((file) => file.mediaType?.startsWith('image/') && file.url)
+      .map((file) => file.url as string)
+    const urls = imageUrls.filter((url) => url.trim() !== '')
+    const allImages = [...pasted, ...urls]
+    props.onSubmit(message.text, allImages.length > 0 ? allImages : undefined)
     setText('')
     setImageUrls([])
   }
 
-  const handleAddImageUrl = () => {
-    setImageUrls((urls) => [...urls, ''])
-  }
-
-  const handleUpdateImageUrl = (index: number, value: string) => {
-    setImageUrls((urls) => urls.map((url, i) => (i === index ? value : url)))
+  const handleAddUrl = () => {
+    const url = urlDraft.trim()
+    if (!url) return
+    setImageUrls((urls) => [...urls, url])
+    setUrlDraft('')
+    setUrlDialogOpen(false)
   }
 
   const handleRemoveImageUrl = (index: number) => {
     setImageUrls((urls) => urls.filter((_, i) => i !== index))
   }
 
-  const handlePickFiles = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleFilesSelected = async (files: FileList | null) => {
-    if (!files?.length) return
-    const dataUrls: string[] = []
-    for (const file of Array.from(files)) {
-      if (!file.type.startsWith('image/')) {
-        toast.error(t('Only image files are supported'))
-        continue
-      }
-      if (file.size > MAX_IMAGE_BYTES) {
-        toast.error(t('Image is too large (max 10MB)'))
-        continue
-      }
-      try {
-        dataUrls.push(await readFileAsDataUrl(file))
-      } catch {
-        toast.error(t('Failed to read image'))
-      }
-    }
-    if (dataUrls.length) {
-      setImageUrls((urls) => [...urls, ...dataUrls])
-    }
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }
-
-  const handleSuggestionClick = (suggestion: string) => {
-    onSubmit(suggestion)
-  }
-
   return (
-    <div className='grid shrink-0 gap-4 px-1 md:pb-4'>
-      <input
-        ref={fileInputRef}
-        type='file'
+    <>
+      <PromptInput
+        groupClassName='rounded-xl'
         accept='image/*'
         multiple
-        className='hidden'
-        onChange={(event) => void handleFilesSelected(event.target.files)}
-      />
-      <PromptInput groupClassName='rounded-xl' onSubmit={handleSubmit}>
+        maxFileSize={MAX_IMAGE_BYTES}
+        onError={(err) => {
+          if (err.code === 'max_file_size') {
+            toast.error(t('Image is too large (max 10MB)'))
+            return
+          }
+          toast.error(t('Only image files are supported'))
+        }}
+        onSubmit={handleSubmit}
+      >
+        <PromptInputHeader className='gap-1.5 empty:hidden'>
+          <PromptInputAttachments>
+            {(attachment) => <PromptInputAttachment data={attachment} />}
+          </PromptInputAttachments>
+          {imageUrls.map((url, index) => (
+            <div
+              key={`${url}-${index}`}
+              className='group border-border relative h-14 w-14 overflow-hidden rounded-md border'
+            >
+              <img
+                src={url}
+                alt={t('Attached image')}
+                className='h-full w-full object-cover'
+              />
+              <button
+                type='button'
+                onClick={() => handleRemoveImageUrl(index)}
+                aria-label={t('Remove image URL')}
+                className='bg-background/80 absolute top-0.5 right-0.5 rounded p-0.5 opacity-0 transition-opacity group-hover:opacity-100'
+              >
+                <XIcon size={12} />
+              </button>
+            </div>
+          ))}
+        </PromptInputHeader>
+
         <PromptInputTextarea
           autoComplete='off'
           autoCorrect='off'
           autoCapitalize='off'
           spellCheck={false}
-          className='px-5 md:text-base'
-          disabled={disabled}
+          className='px-4 md:text-base'
+          disabled={props.disabled}
           onChange={(event) => setText(event.target.value)}
           placeholder={t('Send a message…')}
           value={text}
         />
 
-        {imageUrls.length > 0 && (
-          <div className='flex flex-wrap gap-2 px-3 pb-1'>
-            {imageUrls.map((url, index) => {
-              const isData = url.startsWith('data:')
-              if (isData) {
-                // Uploaded image → thumbnail chip (data URLs are too long to edit).
-                return (
-                  <div
-                    key={index}
-                    className='group relative h-16 w-16 overflow-hidden rounded-md border'
-                  >
-                    <img
-                      src={url}
-                      alt={t('Attached image')}
-                      className='h-full w-full object-cover'
-                    />
-                    <button
-                      type='button'
-                      onClick={() => handleRemoveImageUrl(index)}
-                      aria-label={t('Remove image URL')}
-                      className='bg-background/80 absolute top-0.5 right-0.5 rounded p-0.5 opacity-0 transition-opacity group-hover:opacity-100'
-                    >
-                      <XIcon size={12} />
-                    </button>
-                  </div>
-                )
-              }
-              // URL entry → editable text field.
-              return (
-                <div key={index} className='flex w-full items-center gap-1.5'>
-                  <ImageIcon
-                    size={14}
-                    className='text-muted-foreground shrink-0'
-                  />
-                  <Input
-                    value={url}
-                    onChange={(event) =>
-                      handleUpdateImageUrl(index, event.target.value)
-                    }
-                    placeholder={t('https://example.com/image.png')}
-                    className='h-7 flex-1 text-xs'
-                    disabled={disabled}
-                  />
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon'
-                    className='h-7 w-7 shrink-0'
-                    onClick={() => handleRemoveImageUrl(index)}
-                    aria-label={t('Remove image URL')}
-                  >
-                    <XIcon size={14} />
-                  </Button>
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        <PromptInputFooter className='p-2.5'>
+        <PromptInputFooter className='p-2'>
           <PromptInputTools>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <PromptInputButton
-                    className='border font-medium'
-                    disabled={disabled}
-                    variant='outline'
-                  />
-                }
-              >
-                <PaperclipIcon size={16} />
-                <span className='hidden sm:inline'>{t('Attach')}</span>
-                <span className='sr-only sm:hidden'>{t('Attach')}</span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='start'>
-                <DropdownMenuItem onClick={handlePickFiles}>
-                  <UploadIcon className='mr-2' size={16} />
-                  {t('Upload image')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleAddImageUrl}>
-                  <ImageIcon className='mr-2' size={16} />
+            <PromptInputActionMenu>
+              <PromptInputActionMenuTrigger
+                aria-label={t('Attach')}
+                title={t('Attach')}
+                disabled={props.disabled}
+              />
+              <PromptInputActionMenuContent>
+                <PromptInputActionAddAttachments label={t('Upload image')} />
+                <PromptInputActionMenuItem
+                  onClick={() => setUrlDialogOpen(true)}
+                >
+                  <LinkIcon className='mr-2 size-4' />
                   {t('Add image URL')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </PromptInputActionMenuItem>
+              </PromptInputActionMenuContent>
+            </PromptInputActionMenu>
 
             <PromptInputButton
-              className={cn(
-                'border font-medium',
-                webSearch && 'border-brand-border'
-              )}
-              disabled={disabled}
-              onClick={() => onWebSearchChange?.(!webSearch)}
-              variant={webSearch ? 'default' : 'outline'}
+              disabled={props.disabled}
+              onClick={() => props.onWebSearchChange?.(!webSearch)}
               aria-pressed={webSearch}
+              aria-label={t('Search')}
+              title={t('Web search')}
+              className={cn(
+                webSearch &&
+                  'bg-brand-subtle text-brand hover:bg-brand-subtle hover:text-brand'
+              )}
             >
               <GlobeIcon size={16} />
-              <span className='hidden sm:inline'>{t('Search')}</span>
-              <span className='sr-only sm:hidden'>{t('Search')}</span>
             </PromptInputButton>
 
-            {showReasoningEffort && onReasoningEffortChange ? (
-              <ReasoningEffortControl
-                value={reasoningEffort}
-                onChange={onReasoningEffortChange}
-                disabled={disabled}
-              />
+            {props.showReasoningEffort && props.onReasoningEffortChange ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <PromptInputButton
+                      disabled={props.disabled}
+                      size={reasoningActive ? 'sm' : 'icon-sm'}
+                      aria-label={t('Reasoning effort')}
+                      title={t('Reasoning effort')}
+                      className={cn(
+                        reasoningActive &&
+                          'bg-brand-subtle text-brand hover:bg-brand-subtle hover:text-brand'
+                      )}
+                    />
+                  }
+                >
+                  <BrainIcon size={16} />
+                  {reasoningActive && (
+                    <span className='text-xs'>{t(reasoningLabelKey)}</span>
+                  )}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start' className='w-36'>
+                  <DropdownMenuRadioGroup
+                    value={reasoningDisplay}
+                    onValueChange={(value) =>
+                      props.onReasoningEffortChange?.(value as ReasoningEffort)
+                    }
+                  >
+                    {REASONING_LEVELS.map((level) => (
+                      <DropdownMenuRadioItem
+                        key={level.value}
+                        value={level.value}
+                      >
+                        {t(level.labelKey)}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : null}
           </PromptInputTools>
 
-          <div className='flex items-center gap-1.5 md:gap-2'>
-            {/* Enter and mod+Enter both submit (Shift+Enter inserts a newline) */}
-            <span className='text-muted-foreground hidden items-center gap-1.5 text-xs sm:flex'>
-              <KbdGroup>
-                <Kbd>{isMac ? '⌘' : 'Ctrl'}</Kbd>
-                <Kbd>↵</Kbd>
-              </KbdGroup>
-              {t('to send')}
-            </span>
-
-            {isGenerating && onStop ? (
+          <div className='flex min-w-0 items-center gap-1.5'>
+            {props.modelSelector}
+            {props.isGenerating && props.onStop ? (
               <PromptInputButton
-                className='text-foreground font-medium'
-                onClick={onStop}
                 variant='secondary'
+                size='icon-sm'
+                className='rounded-full'
+                onClick={props.onStop}
+                aria-label={t('Stop')}
+                title={t('Stop')}
               >
-                <SquareIcon className='fill-current' size={16} />
-                <span className='hidden sm:inline'>{t('Stop')}</span>
-                <span className='sr-only sm:hidden'>{t('Stop')}</span>
+                <SquareIcon className='fill-current' size={14} />
               </PromptInputButton>
             ) : (
               <PromptInputButton
-                className='text-foreground font-medium'
-                disabled={disabled || !text.trim()}
+                variant='default'
+                size='icon-sm'
+                className='rounded-full'
+                disabled={props.disabled || !text.trim()}
                 type='submit'
-                variant='secondary'
+                aria-label={t('Send message')}
+                title={t('Send message')}
               >
-                <SendIcon size={16} />
-                <span className='hidden sm:inline'>{t('Send')}</span>
-                <span className='sr-only sm:hidden'>{t('Send')}</span>
+                <ArrowUpIcon size={16} />
               </PromptInputButton>
             )}
           </div>
         </PromptInputFooter>
       </PromptInput>
 
-      <Suggestions>
-        {suggestions.map(({ icon: Icon, textKey, color }) => {
-          const label = t(textKey)
-          return (
-            <Suggestion
-              className={cn(
-                'text-xs font-normal sm:text-sm',
-                textKey === 'More' && 'hidden sm:flex'
-              )}
-              key={textKey}
-              onClick={() => handleSuggestionClick(label)}
-              suggestion={label}
-            >
-              {Icon && color ? (
-                <Icon size={16} style={{ color }} />
-              ) : Icon ? (
-                <Icon size={16} className='text-muted-foreground' />
-              ) : null}
-              {label}
-            </Suggestion>
-          )
-        })}
-      </Suggestions>
-    </div>
+      <Dialog open={urlDialogOpen} onOpenChange={setUrlDialogOpen}>
+        <DialogContent className='sm:max-w-sm'>
+          <DialogHeader>
+            <DialogTitle>{t('Add image URL')}</DialogTitle>
+            <DialogDescription>
+              {t('Attach an image by pasting a direct link.')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className='flex items-center gap-2'>
+            <ImageIcon size={16} className='text-muted-foreground shrink-0' />
+            <Input
+              autoFocus
+              value={urlDraft}
+              onChange={(event) => setUrlDraft(event.target.value)}
+              placeholder={t('https://example.com/image.png')}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') handleAddUrl()
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setUrlDialogOpen(false)}>
+              {t('Cancel')}
+            </Button>
+            <Button onClick={handleAddUrl} disabled={!urlDraft.trim()}>
+              {t('Add')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

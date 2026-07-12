@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { BookmarkPlus, Check, Trash2 } from 'lucide-react'
+import { BookmarkPlus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -26,19 +26,11 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 import {
   createPreset,
   deletePreset,
@@ -52,7 +44,9 @@ interface PresetPayload {
   parameterEnabled: ParameterEnabled
 }
 
-interface PresetsMenuProps {
+interface PresetsDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
   /** Current config, serialized when saving a new preset. */
   config: PlaygroundConfig
   parameterEnabled: ParameterEnabled
@@ -61,24 +55,23 @@ interface PresetsMenuProps {
     config: Partial<PlaygroundConfig>,
     enabled?: ParameterEnabled
   ) => void
-  disabled?: boolean
 }
 
-export function PresetsMenu({
-  config,
-  parameterEnabled,
-  onApply,
-  disabled,
-}: PresetsMenuProps) {
+/**
+ * PresetsDialog — save the current model/parameters/system prompt as a
+ * named preset and re-apply saved presets. Hosted from the chat overflow
+ * menu (no top-level chrome of its own).
+ */
+export function PresetsDialog(props: PresetsDialogProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const [saveOpen, setSaveOpen] = useState(false)
   const [name, setName] = useState('')
 
   const { data: presets = [] } = useQuery({
     queryKey: ['playground-presets'],
     queryFn: getPresets,
     staleTime: 30 * 1000,
+    enabled: props.open,
   })
 
   const invalidate = () =>
@@ -86,12 +79,14 @@ export function PresetsMenu({
 
   const saveMutation = useMutation({
     mutationFn: (presetName: string) => {
-      const payload: PresetPayload = { config, parameterEnabled }
+      const payload: PresetPayload = {
+        config: props.config,
+        parameterEnabled: props.parameterEnabled,
+      }
       return createPreset(presetName, JSON.stringify(payload))
     },
     onSuccess: () => {
       toast.success(t('Preset saved'))
-      setSaveOpen(false)
       setName('')
       void invalidate()
     },
@@ -108,78 +103,28 @@ export function PresetsMenu({
     try {
       const payload = JSON.parse(preset.config) as PresetPayload
       if (!payload?.config) throw new Error('invalid preset')
-      onApply(payload.config, payload.parameterEnabled)
+      props.onApply(payload.config, payload.parameterEnabled)
       toast.success(t('Preset “{{name}}” applied', { name: preset.name }))
+      props.onOpenChange(false)
     } catch {
       toast.error(t('This preset could not be loaded'))
     }
   }
 
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant='ghost'
-              size='sm'
-              disabled={disabled}
-              className='gap-1.5'
-            />
-          }
-        >
-          <BookmarkPlus className='size-4' />
-          <span className='hidden sm:inline'>{t('Presets')}</span>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-60'>
-          <DropdownMenuItem onClick={() => setSaveOpen(true)}>
-            <BookmarkPlus className='mr-2 size-4' />
-            {t('Save current as preset…')}
-          </DropdownMenuItem>
-          {presets.length > 0 && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>{t('Saved presets')}</DropdownMenuLabel>
-              {presets.map((preset) => (
-                <DropdownMenuItem
-                  key={preset.id}
-                  className='group justify-between gap-2'
-                  onClick={() => applyPreset(preset)}
-                >
-                  <span className='flex min-w-0 items-center gap-2'>
-                    <Check className='size-3.5 shrink-0 opacity-0' />
-                    <span className='truncate'>{preset.name}</span>
-                  </span>
-                  <button
-                    type='button'
-                    aria-label={t('Delete preset')}
-                    className='text-muted-foreground hover:text-destructive shrink-0 opacity-0 transition-opacity group-hover:opacity-100'
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      deleteMutation.mutate(preset.id)
-                    }}
-                  >
-                    <Trash2 className='size-3.5' />
-                  </button>
-                </DropdownMenuItem>
-              ))}
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent className='sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>{t('Presets')}</DialogTitle>
+          <DialogDescription>
+            {t(
+              'Save the current model, parameters, and system prompt as a reusable preset.'
+            )}
+          </DialogDescription>
+        </DialogHeader>
 
-      <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
-        <DialogContent className='sm:max-w-sm'>
-          <DialogHeader>
-            <DialogTitle>{t('Save preset')}</DialogTitle>
-            <DialogDescription>
-              {t(
-                'Save the current model, parameters, and system prompt as a reusable preset.'
-              )}
-            </DialogDescription>
-          </DialogHeader>
+        <div className='flex items-center gap-2'>
           <Input
-            autoFocus
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder={t('Preset name')}
@@ -189,19 +134,49 @@ export function PresetsMenu({
               }
             }}
           />
-          <DialogFooter>
-            <Button variant='outline' onClick={() => setSaveOpen(false)}>
-              {t('Cancel')}
-            </Button>
-            <Button
-              onClick={() => saveMutation.mutate(name.trim())}
-              disabled={!name.trim() || saveMutation.isPending}
-            >
-              {t('Save')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+          <Button
+            onClick={() => saveMutation.mutate(name.trim())}
+            disabled={!name.trim() || saveMutation.isPending}
+            className='shrink-0'
+          >
+            <BookmarkPlus className='size-4' />
+            {t('Save')}
+          </Button>
+        </div>
+
+        {presets.length > 0 && (
+          <>
+            <Separator />
+            <div className='max-h-64 space-y-0.5 overflow-y-auto'>
+              {presets.map((preset) => (
+                <div
+                  key={preset.id}
+                  className='group hover:bg-surface-hover flex items-center gap-2 rounded-md px-2 py-1.5'
+                >
+                  <button
+                    type='button'
+                    onClick={() => applyPreset(preset)}
+                    className='text-foreground min-w-0 flex-1 truncate text-start text-sm'
+                    title={t('Apply preset')}
+                  >
+                    {preset.name}
+                  </button>
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='icon-sm'
+                    aria-label={t('Delete preset')}
+                    className='text-muted-foreground hover:text-destructive size-6 opacity-0 group-hover:opacity-100'
+                    onClick={() => deleteMutation.mutate(preset.id)}
+                  >
+                    <Trash2 className='size-3.5' />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }

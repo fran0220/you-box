@@ -86,6 +86,7 @@ export const STORAGE_KEYS = {
   MESSAGES: 'playground_messages_v2',
   PARAMETER_ENABLED: 'playground_parameter_enabled_v2',
   ACTIVE_CONVERSATION_ID: 'playground_active_conversation_id',
+  RAIL_COLLAPSED: 'playground_rail_collapsed',
   // Legacy keys — migrated once on load
   LEGACY_CONFIG: 'playground_config',
   LEGACY_MESSAGES: 'playground_messages',

@@ -17,11 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo, useState } from 'react'
-import { MessagesSquare } from 'lucide-react'
-import { EmptyState } from '@/components/youbox'
 import { m, useReducedMotion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
-import { useAuthStore } from '@/stores/auth-store'
 import { MOTION_TRANSITION } from '@/lib/motion'
 import {
   Conversation,
@@ -29,13 +26,13 @@ import {
   ConversationScrollButton,
 } from '@/components/ai-elements/conversation'
 import { MESSAGE_ROLES } from '../constants'
-import { formatCostUsd } from '../lib/cost'
+import { getCurrentVersion } from '../lib/message-utils'
 import type { Message as MessageType } from '../types'
 import { PlaygroundMessage } from './playground-message'
 
 interface PlaygroundChatProps {
   messages: MessageType[]
-  /** Display name of the currently selected model (assistant speaker label). */
+  /** Display name of the currently selected model (compare column fallback). */
   modelLabel?: string
   onCopyMessage?: (message: MessageType) => void
   onRegenerateMessage?: (message: MessageType) => void
@@ -79,27 +76,6 @@ function buildRows(messages: MessageType[]): ChatRow[] {
   return rows
 }
 
-/** Compact per-response meta line (model compare columns). */
-function ResponseMeta({ message }: { message: MessageType }) {
-  const { t } = useTranslation()
-  const parts: string[] = []
-  if (message.usage?.total_tokens != null) {
-    parts.push(`${message.usage.total_tokens.toLocaleString()} ${t('tokens')}`)
-  }
-  if (message.costUsd != null) {
-    parts.push(formatCostUsd(message.costUsd))
-  }
-  if (message.latencyMs != null) {
-    parts.push(`${(message.latencyMs / 1000).toFixed(2)}s`)
-  }
-  if (parts.length === 0) return null
-  return (
-    <div className='text-muted-foreground mt-2 text-[11px]'>
-      {parts.join(' · ')}
-    </div>
-  )
-}
-
 export function PlaygroundChat({
   messages,
   modelLabel,
@@ -116,17 +92,14 @@ export function PlaygroundChat({
   onSaveEditAndSubmit,
 }: PlaygroundChatProps) {
   const { t } = useTranslation()
-  const user = useAuthStore((state) => state.auth.user)
   const shouldReduce = useReducedMotion()
   const [editText, setEditText] = useState('')
   const [originalText, setOriginalText] = useState('')
 
-  const userInitials = (user?.username || '').slice(0, 2).toUpperCase() || 'ME'
-
   useEffect(() => {
     if (!editingKey) return
     const message = messages.find((m) => m.key === editingKey)
-    const content = message?.versions?.[0]?.content || ''
+    const content = message ? getCurrentVersion(message).content : ''
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setEditText(content)
     setOriginalText(content)
@@ -149,7 +122,6 @@ export function PlaygroundChat({
 
   const sharedMessageProps = (message: MessageType, isLatestTurn: boolean) => ({
     message,
-    userInitials,
     isLatestTurn,
     isGenerating,
     isEditing: editingKey === message.key,
@@ -182,18 +154,7 @@ export function PlaygroundChat({
   return (
     <Conversation>
       <ConversationContent className='p-0'>
-        <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-4'>
-          {messages.length === 0 && !isGenerating && (
-            <EmptyState
-              className='min-h-[50vh]'
-              icon={MessagesSquare}
-              title={t('Start a conversation')}
-              description={t(
-                'Pick a model, tune the parameters, and send a message below — responses stream here.'
-              )}
-            />
-          )}
-
+        <div className='mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6'>
           {rows.map((row, rowIndex) => {
             if (row.kind === 'single') {
               return (
@@ -204,7 +165,6 @@ export function PlaygroundChat({
                   transition={reveal?.transition}
                 >
                   <PlaygroundMessage
-                    modelLabel={modelLabel}
                     {...sharedMessageProps(row.message, false)}
                   />
                 </m.div>
@@ -223,7 +183,6 @@ export function PlaygroundChat({
                   transition={reveal?.transition}
                 >
                   <PlaygroundMessage
-                    modelLabel={message.model || modelLabel}
                     {...sharedMessageProps(message, isLatestTurn)}
                   />
                 </m.div>
@@ -252,16 +211,14 @@ export function PlaygroundChat({
                     }
                   >
                     <div
-                      className='text-muted-foreground mb-1 truncate text-xs font-medium'
+                      className='text-muted-foreground mb-1 truncate font-mono text-[11px]'
                       title={message.model || modelLabel}
                     >
                       {message.model || modelLabel || t('Assistant')}
                     </div>
                     <PlaygroundMessage
-                      modelLabel={message.model || modelLabel}
                       {...sharedMessageProps(message, isLatestTurn)}
                     />
-                    <ResponseMeta message={message} />
                   </m.div>
                 ))}
               </div>

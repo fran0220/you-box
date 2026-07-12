@@ -30,10 +30,7 @@ import {
   BranchPrevious,
   BranchSelector,
 } from '@/components/ai-elements/branch'
-import {
-  MessageContent,
-  SpeakerMessage,
-} from '@/components/ai-elements/message'
+import { Message, MessageContent } from '@/components/ai-elements/message'
 import {
   Reasoning,
   ReasoningContent,
@@ -62,8 +59,6 @@ import { MessageError } from './message-error'
 
 interface PlaygroundMessageProps {
   message: MessageType
-  modelLabel?: string
-  userInitials: string
   isLatestTurn: boolean
   isGenerating: boolean
   isEditing: boolean
@@ -159,12 +154,12 @@ function ToolCallsBlock({
 }
 
 /**
- * Renders a single playground message (user, assistant, or tool).
+ * Renders a single playground message with the Claude-style anatomy:
+ * user turns are right-aligned paper bubbles, assistant turns are flat
+ * editorial text on the page, tool results are compact mono blocks.
  */
 export function PlaygroundMessage({
   message,
-  modelLabel,
-  userInitials,
   isLatestTurn,
   isGenerating,
   isEditing,
@@ -185,19 +180,27 @@ export function PlaygroundMessage({
   const { t } = useTranslation()
   const versions = message.versions ?? []
   const isAssistant = message.from === MESSAGE_ROLES.ASSISTANT
+  const isUser = message.from === MESSAGE_ROLES.USER
   const isTool = message.from === MESSAGE_ROLES.TOOL
   const defaultBranch = getActiveVersionIndex(message)
 
+  const contentStyles = cn(
+    getMessageContentStyles(),
+    'group-[.is-user]:px-4 group-[.is-user]:py-2.5'
+  )
+
   if (isTool) {
     return (
-      <SpeakerMessage from='assistant' tile='⚙' speaker={t('Tool')}>
+      <Message from='assistant'>
         <div className='w-full min-w-0'>
-          <div className='text-muted-foreground mb-1 font-mono text-[11px]'>
-            {message.toolName || 'tool'} · {message.toolCallId}
+          <div className='border-border/70 bg-surface-inset rounded-lg border p-3'>
+            <div className='text-muted-foreground mb-1 font-mono text-[11px]'>
+              {t('Tool')} · {message.toolName || 'tool'} · {message.toolCallId}
+            </div>
+            <MessageContent variant='flat' className={contentStyles}>
+              <Response>{getCurrentVersion(message).content}</Response>
+            </MessageContent>
           </div>
-          <MessageContent variant='flat' className={cn(getMessageContentStyles())}>
-            <Response>{getCurrentVersion(message).content}</Response>
-          </MessageContent>
           <MessageActions
             message={message}
             onDelete={onDeleteMessage}
@@ -206,7 +209,7 @@ export function PlaygroundMessage({
             className='mt-1'
           />
         </div>
-      </SpeakerMessage>
+      </Message>
     )
   }
 
@@ -258,31 +261,45 @@ export function PlaygroundMessage({
               onDelete={onDeleteMessage}
               isGenerating={isGenerating}
               alwaysVisible={isLatestTurn && isAssistant}
-              className='mt-1'
+              className={cn('mt-1', isUser && 'justify-end')}
             />
           )
 
           return (
-            <SpeakerMessage
+            <Message
               from={message.from === 'tool' ? 'assistant' : message.from}
-              tile={message.from === MESSAGE_ROLES.USER ? userInitials : '✦'}
-              speaker={
-                message.from === MESSAGE_ROLES.USER
-                  ? t('You')
-                  : modelLabel || t('Assistant')
-              }
               key={`${message.key}-${version.id}-${versionIndex}`}
             >
-              <div className='w-full min-w-0'>
+              <div
+                className={cn(
+                  'w-full min-w-0',
+                  isUser && 'flex flex-col items-end'
+                )}
+              >
                 {isEditing && versionIndex === defaultBranch ? (
-                  <div className='space-y-2'>
+                  <div className='border-border bg-surface w-full space-y-2 rounded-xl border p-3'>
                     <Textarea
                       value={editText}
                       onChange={(e) => onEditTextChange(e.target.value)}
-                      className='font-mono text-sm'
-                      rows={8}
+                      className='border-0 p-1 text-sm shadow-none focus-visible:ring-0'
+                      rows={6}
                     />
-                    <div className='flex gap-2'>
+                    <div className='flex justify-end gap-2'>
+                      <Button
+                        size='sm'
+                        variant='ghost'
+                        onClick={() => onCancelEdit?.(false)}
+                      >
+                        {t('Cancel')}
+                      </Button>
+                      <Button
+                        size='sm'
+                        variant='outline'
+                        onClick={() => onSaveEdit?.(editText)}
+                        disabled={editEmpty || !editChanged}
+                      >
+                        {t('Save')}
+                      </Button>
                       {message.from === MESSAGE_ROLES.USER && (
                         <Button
                           size='sm'
@@ -292,20 +309,6 @@ export function PlaygroundMessage({
                           {t('Save & Submit')}
                         </Button>
                       )}
-                      <Button
-                        size='sm'
-                        onClick={() => onSaveEdit?.(editText)}
-                        disabled={editEmpty || !editChanged}
-                      >
-                        {t('Save')}
-                      </Button>
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        onClick={() => onCancelEdit?.(false)}
-                      >
-                        {t('Cancel')}
-                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -340,7 +343,7 @@ export function PlaygroundMessage({
 
                     {!!message.imageUrls?.length &&
                       message.from === MESSAGE_ROLES.USER && (
-                        <div className='mb-1 flex flex-wrap gap-2'>
+                        <div className='mb-1 flex flex-wrap justify-end gap-2'>
                           {message.imageUrls.map((url, imageIndex) => (
                             <a
                               key={`${message.key}-img-${imageIndex}`}
@@ -405,7 +408,7 @@ export function PlaygroundMessage({
                           <>
                             <MessageContent
                               variant='flat'
-                              className={cn(getMessageContentStyles())}
+                              className={contentStyles}
                             >
                               <Response>{displayContent}</Response>
                               {message.status === 'streaming' &&
@@ -425,13 +428,16 @@ export function PlaygroundMessage({
                   </>
                 )}
               </div>
-            </SpeakerMessage>
+            </Message>
           )
         })}
       </BranchMessages>
 
       {versions.length > 1 && (
-        <BranchSelector className='px-0' from={message.from === 'tool' ? 'assistant' : message.from}>
+        <BranchSelector
+          className='px-0'
+          from={message.from === 'tool' ? 'assistant' : message.from}
+        >
           <BranchPrevious />
           <BranchPage />
           <BranchNext />

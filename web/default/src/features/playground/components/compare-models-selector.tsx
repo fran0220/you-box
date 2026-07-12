@@ -17,10 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo, useState } from 'react'
-import { Check, Columns3 } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -31,13 +30,17 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import type { ModelOption } from '../types'
 
-interface CompareModelsSelectorProps {
+interface CompareModelsDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
   models: ModelOption[]
   /** The primary model (always active; excluded from this list). */
   primaryModel: string
@@ -46,28 +49,20 @@ interface CompareModelsSelectorProps {
   onChange: (next: string[]) => void
   /** Maximum total models compared, including the primary. */
   max: number
-  disabled?: boolean
 }
 
 /**
- * Multi-select used to pick additional models to compare side by side with the
- * primary model. The primary model is implicit and excluded here.
+ * CompareModelsDialog — pick additional models to answer side by side with
+ * the primary model. Entered from the chat overflow menu; the primary model
+ * is implicit and excluded here.
  */
-export function CompareModelsSelector({
-  models,
-  primaryModel,
-  value,
-  onChange,
-  max,
-  disabled,
-}: CompareModelsSelectorProps) {
+export function CompareModelsDialog(props: CompareModelsDialogProps) {
   const { t } = useTranslation()
-  const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
 
   const selectable = useMemo(
-    () => models.filter((m) => m.value !== primaryModel),
-    [models, primaryModel]
+    () => props.models.filter((m) => m.value !== props.primaryModel),
+    [props.models, props.primaryModel]
   )
 
   const filtered = useMemo(() => {
@@ -80,60 +75,39 @@ export function CompareModelsSelector({
   }, [selectable, search])
 
   // Extra models allowed in addition to the primary.
-  const maxExtra = Math.max(0, max - 1)
-  const selectedSet = new Set(value)
+  const maxExtra = Math.max(0, props.max - 1)
+  const selectedSet = new Set(props.value)
 
   const toggle = (modelValue: string) => {
     if (selectedSet.has(modelValue)) {
-      onChange(value.filter((v) => v !== modelValue))
+      props.onChange(props.value.filter((v) => v !== modelValue))
     } else {
-      if (value.length >= maxExtra) return
-      onChange([...value, modelValue])
+      if (props.value.length >= maxExtra) return
+      props.onChange([...props.value, modelValue])
     }
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        render={
-          <Button
-            type='button'
-            variant='ghost'
-            size='sm'
-            disabled={disabled}
-            aria-label={t('Compare models')}
-            title={t('Compare models')}
-            className='gap-1.5'
-          />
-        }
-      >
-        <Columns3 className='size-4' />
-        <span className='hidden sm:inline'>{t('Compare')}</span>
-        {value.length > 0 && (
-          <Badge variant='secondary' className='ml-0.5 px-1.5 text-[10px]'>
-            {value.length + 1}
-          </Badge>
-        )}
-      </PopoverTrigger>
-      <PopoverContent
-        align='end'
-        className='w-72 overflow-hidden rounded-xl p-0 shadow-lg'
-      >
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent className='gap-0 p-0 sm:max-w-md'>
+        <DialogHeader className='border-b px-4 py-3'>
+          <DialogTitle>{t('Compare models')}</DialogTitle>
+          <DialogDescription>
+            {t('Select up to {{count}} more to compare', { count: maxExtra })}
+          </DialogDescription>
+        </DialogHeader>
         <Command shouldFilter={false}>
           <CommandInput
             placeholder={t('Search models...')}
             value={search}
             onValueChange={setSearch}
           />
-          <div className='text-muted-foreground border-b px-3 py-1.5 text-[11px]'>
-            {t('Select up to {{count}} more to compare', { count: maxExtra })}
-          </div>
           <CommandList className='max-h-[320px]'>
             <CommandEmpty>{t('No models found.')}</CommandEmpty>
             <CommandGroup>
               {filtered.map((model) => {
                 const checked = selectedSet.has(model.value)
-                const atLimit = !checked && value.length >= maxExtra
+                const atLimit = !checked && props.value.length >= maxExtra
                 return (
                   <CommandItem
                     key={model.value}
@@ -159,21 +133,26 @@ export function CompareModelsSelector({
               })}
             </CommandGroup>
           </CommandList>
-          {value.length > 0 && (
-            <div className='border-t p-1.5'>
-              <Button
-                type='button'
-                variant='ghost'
-                size='sm'
-                className='w-full'
-                onClick={() => onChange([])}
-              >
-                {t('Clear comparison')}
-              </Button>
-            </div>
-          )}
         </Command>
-      </PopoverContent>
-    </Popover>
+        <div className='flex items-center justify-between gap-2 border-t p-2'>
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
+            disabled={props.value.length === 0}
+            onClick={() => props.onChange([])}
+          >
+            {t('Clear comparison')}
+          </Button>
+          <Button
+            type='button'
+            size='sm'
+            onClick={() => props.onOpenChange(false)}
+          >
+            {t('Done')}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
