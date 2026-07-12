@@ -35,6 +35,7 @@ import type {
   ParameterEnabled,
   TokenUsage,
   UrlCitationAnnotation,
+  ToolCall,
 } from '../types'
 import { useStreamRequest } from './use-stream-request'
 
@@ -48,13 +49,10 @@ interface UseChatHandlerOptions {
   config: PlaygroundConfig
   parameterEnabled: ParameterEnabled
   onMessageUpdate: (updater: (prev: Message[]) => Message[]) => void
-  /** model name → pricing, used to derive per-response cost. */
   pricingMap?: Record<string, ModelPricing>
-  /** Ratio of the active group, multiplied into the cost. */
   groupRatio?: number
 }
 
-/** Merge new url citations into an assistant message's sources (dedup by href). */
 function mergeSources(
   message: Message,
   annotations: UrlCitationAnnotation[]
@@ -76,9 +74,7 @@ function mergeSources(
 }
 
 /**
- * Hook for handling chat message sending and receiving. Drives one or many
- * concurrent model responses (side-by-side compare), routing each stream to
- * its own assistant message by key.
+ * Hook for handling chat message sending and receiving.
  */
 export function useChatHandler({
   config,
@@ -89,10 +85,7 @@ export function useChatHandler({
 }: UseChatHandlerOptions) {
   const { sendStreamRequest, stopStream, isStreaming } = useStreamRequest()
 
-  // Wall-clock start per in-flight target (keyed by assistant message key).
   const requestStartRef = useRef<Map<string, number>>(new Map())
-  // Count of in-flight non-streaming requests (the stream manager only tracks
-  // SSE connections), so `isGenerating` is correct in non-streaming mode too.
   const [pendingCount, setPendingCount] = useState(0)
 
   const costFor = useCallback(
@@ -100,8 +93,6 @@ export function useChatHandler({
       computeCostUsd(usage, pricingMap?.[model], groupRatio),
     [pricingMap, groupRatio]
   )
-
-  // ---- streaming -----------------------------------------------------------
 
   const sendStreamingTo = useCallback(
     (messages: Message[], target: ChatTarget) => {
@@ -132,11 +123,27 @@ export function useChatHandler({
                   status: MESSAGE_STATUS.STREAMING,
                 }
               }
+              if (type === 'refusal') {
+                return {
+                  ...message,
+                  refusal: (message.refusal || '') + chunk,
+                  status: MESSAGE_STATUS.STREAMING,
+                }
+              }
               return {
                 ...processStreamingContent(message, chunk),
                 status: MESSAGE_STATUS.STREAMING,
               }
             })
+          )
+        },
+        onToolCalls: (toolCalls: ToolCall[]) => {
+          onMessageUpdate((prev) =>
+            updateMessageByKey(prev, target.key, (message) => ({
+              ...message,
+              toolCalls,
+              status: MESSAGE_STATUS.STREAMING,
+            }))
           )
         },
         onAnnotations: (annotations) => {
@@ -147,7 +154,7 @@ export function useChatHandler({
             }))
           )
         },
-        onComplete: (usage) => {
+        onComplete: (usage, meta) => {
           const startedAt = requestStartRef.current.get(target.key)
           const latencyMs =
             startedAt != null ? Date.now() - startedAt : undefined
@@ -155,10 +162,14 @@ export function useChatHandler({
           onMessageUpdate((prev) =>
             updateMessageByKey(prev, target.key, (message) =>
               message.status === MESSAGE_STATUS.COMPLETE ||
-              message.status === MESSAGE_STATUS.ERROR
+              message.status === MESSAGE_STATUS.ERROR ||
+              message.status === MESSAGE_STATUS.TRUNCATED
                 ? message
                 : {
-                    ...finalizeMessage(message),
+                    ...finalizeMessage(message, undefined, {
+                      toolCalls: meta?.toolCalls,
+                      finishReason: meta?.finishReason,
+                    }),
                     status: MESSAGE_STATUS.COMPLETE,
                     usage,
                     costUsd: costFor(target.model, usage),
@@ -178,8 +189,6 @@ export function useChatHandler({
     },
     [config, parameterEnabled, sendStreamRequest, onMessageUpdate, costFor]
   )
-
-  // ---- non-streaming -------------------------------------------------------
 
   const sendNonStreamingTo = useCallback(
     async (messages: Message[], target: ChatTarget) => {
@@ -207,15 +216,23 @@ export function useChatHandler({
               ...message,
               versions: [
                 {
-                  ...message.versions[0],
+                  ...message.versions[getActiveIdx(message)],
                   content: choice.message?.content || '',
+                  toolCalls: choice.message?.tool_calls,
                 },
               ],
+              toolCalls: choice.message?.tool_calls,
+              refusal: choice.message?.refusal,
             }
             return {
               ...finalizeMessage(
                 withContent,
-                choice.message?.reasoning_content
+                choice.message?.reasoning_content,
+                {
+                  toolCalls: choice.message?.tool_calls,
+                  finishReason: choice.finish_reason,
+                  refusal: choice.message?.refusal,
+                }
               ),
               status: MESSAGE_STATUS.COMPLETE,
               usage: response.usage,
@@ -252,12 +269,6 @@ export function useChatHandler({
     [config, parameterEnabled, onMessageUpdate, costFor]
   )
 
-  // ---- public api ----------------------------------------------------------
-
-  /**
-   * Send the conversation to one or more model targets. Each target streams
-   * (or resolves) into its own assistant message by key.
-   */
   const sendChat = useCallback(
     (messages: Message[], targets: ChatTarget[]) => {
       for (const target of targets) {
@@ -271,7 +282,6 @@ export function useChatHandler({
     [config.stream, sendStreamingTo, sendNonStreamingTo]
   )
 
-  // Stop all in-flight generations and finalize any still-pending messages.
   const stopGeneration = useCallback(() => {
     stopStream()
     requestStartRef.current.clear()
@@ -281,7 +291,10 @@ export function useChatHandler({
         message.from === 'assistant' &&
         (message.status === MESSAGE_STATUS.LOADING ||
           message.status === MESSAGE_STATUS.STREAMING)
-          ? { ...finalizeMessage(message), status: MESSAGE_STATUS.COMPLETE }
+          ? {
+              ...finalizeMessage(message, undefined, { truncated: true }),
+              status: MESSAGE_STATUS.TRUNCATED,
+            }
           : message
       )
     )
@@ -292,4 +305,15 @@ export function useChatHandler({
     stopGeneration,
     isGenerating: isStreaming || pendingCount > 0,
   }
+}
+
+function getActiveIdx(message: Message): number {
+  if (
+    message.activeVersionIndex != null &&
+    message.activeVersionIndex >= 0 &&
+    message.activeVersionIndex < message.versions.length
+  ) {
+    return message.activeVersionIndex
+  }
+  return Math.max(0, message.versions.length - 1)
 }

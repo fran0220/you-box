@@ -21,34 +21,37 @@ import { useCallback, useRef, useState } from 'react'
 import { SSE } from 'sse.js'
 import { getCommonHeaders } from '@/lib/api'
 import { API_ENDPOINTS, ERROR_MESSAGES } from '../constants'
+import {
+  applyToolCallDelta,
+  finalizeToolCalls,
+  parseSseData,
+  type ToolCallAccumulator,
+} from '../lib/stream-parser'
 import type {
   ChatCompletionRequest,
-  ChatCompletionChunk,
   TokenUsage,
+  ToolCall,
   UrlCitationAnnotation,
 } from '../types'
 
 export interface StreamCallbacks {
-  onUpdate: (type: 'reasoning' | 'content', chunk: string) => void
+  onUpdate: (type: 'reasoning' | 'content' | 'refusal', chunk: string) => void
+  onToolCalls?: (toolCalls: ToolCall[]) => void
   onAnnotations?: (annotations: UrlCitationAnnotation[]) => void
-  onComplete: (usage?: TokenUsage) => void
+  onComplete: (
+    usage?: TokenUsage,
+    meta?: { finishReason?: string | null; toolCalls?: ToolCall[] }
+  ) => void
   onError: (error: string, errorCode?: string) => void
 }
 
 /**
  * Hook for handling streaming chat completion requests.
- *
- * Supports multiple concurrent streams keyed by an opaque `streamId`, which the
- * side-by-side compare view relies on (one in-flight SSE per compared model).
- * Single-model mode simply uses one stream.
+ * Supports multiple concurrent streams keyed by an opaque `streamId`.
  */
 export function useStreamRequest() {
-  // Active SSE connections keyed by streamId.
   const sourcesRef = useRef<Map<string, SSE>>(new Map())
-  // streamIds that have already completed normally (suppress late errors).
   const completedRef = useRef<Set<string>>(new Set())
-  // Drives re-renders so `isStreaming` reflects reality independent of message
-  // state updates.
   const [activeCount, setActiveCount] = useState(0)
 
   const closeStream = useCallback((streamId: string) => {
@@ -66,7 +69,8 @@ export function useStreamRequest() {
       payload: ChatCompletionRequest,
       callbacks: StreamCallbacks
     ) => {
-      const { onUpdate, onAnnotations, onComplete, onError } = callbacks
+      const { onUpdate, onToolCalls, onAnnotations, onComplete, onError } =
+        callbacks
 
       const source = new SSE(API_ENDPOINTS.CHAT_COMPLETIONS, {
         headers: getCommonHeaders(),
@@ -74,14 +78,14 @@ export function useStreamRequest() {
         payload: JSON.stringify(payload),
       })
 
-      // Replace any prior source under this id, then register the new one.
       sourcesRef.current.get(streamId)?.close()
       sourcesRef.current.set(streamId, source)
       completedRef.current.delete(streamId)
       setActiveCount(sourcesRef.current.size)
 
-      // Usage may arrive on the final chunk; hold it until [DONE].
       let pendingUsage: TokenUsage | undefined
+      let finishReason: string | null | undefined
+      const toolAcc: ToolCallAccumulator = new Map()
 
       const handleError = (errorMessage: string, errorCode?: string) => {
         if (!completedRef.current.has(streamId)) {
@@ -91,46 +95,56 @@ export function useStreamRequest() {
       }
 
       source.addEventListener('message', (e: MessageEvent) => {
-        if (e.data === '[DONE]') {
-          completedRef.current.add(streamId)
-          closeStream(streamId)
-          onComplete(pendingUsage)
-          return
-        }
-
-        try {
-          const chunk: ChatCompletionChunk = JSON.parse(e.data)
-
-          // Usage-only chunk (stream_options.include_usage): no choices.
-          if (chunk.usage) {
-            pendingUsage = chunk.usage
+        const events = parseSseData(e.data)
+        for (const event of events) {
+          switch (event.kind) {
+            case 'done': {
+              completedRef.current.add(streamId)
+              closeStream(streamId)
+              const toolCalls = finalizeToolCalls(toolAcc)
+              onComplete(pendingUsage, {
+                finishReason: finishReason ?? null,
+                toolCalls: toolCalls.length ? toolCalls : undefined,
+              })
+              return
+            }
+            case 'parse_error':
+              // eslint-disable-next-line no-console
+              console.error('Failed to parse SSE message:', event.raw)
+              handleError(i18next.t(ERROR_MESSAGES.PARSE_ERROR))
+              return
+            case 'usage':
+              pendingUsage = event.usage
+              break
+            case 'finish':
+              finishReason = event.finishReason
+              break
+            case 'reasoning':
+              onUpdate('reasoning', event.text)
+              break
+            case 'content':
+              onUpdate('content', event.text)
+              break
+            case 'refusal':
+              onUpdate('refusal', event.text)
+              break
+            case 'annotations':
+              onAnnotations?.(event.annotations)
+              break
+            case 'tool_call_delta':
+              applyToolCallDelta(toolAcc, event)
+              onToolCalls?.(finalizeToolCalls(toolAcc))
+              break
           }
-
-          const delta = chunk.choices?.[0]?.delta
-          if (delta) {
-            if (delta.reasoning_content) {
-              onUpdate('reasoning', delta.reasoning_content)
-            }
-            if (delta.content) {
-              onUpdate('content', delta.content)
-            }
-            if (delta.annotations?.length && onAnnotations) {
-              onAnnotations(delta.annotations)
-            }
-          }
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error('Failed to parse SSE message:', error)
-          handleError(i18next.t(ERROR_MESSAGES.PARSE_ERROR))
         }
       })
 
       source.addEventListener('error', (e: Event & { data?: string }) => {
-        // Only handle errors if stream didn't complete normally
         if (source.readyState !== 2) {
           // eslint-disable-next-line no-console
           console.error('SSE Error:', e)
-          let errorMessage = e.data || i18next.t(ERROR_MESSAGES.API_REQUEST_ERROR)
+          let errorMessage =
+            e.data || i18next.t(ERROR_MESSAGES.API_REQUEST_ERROR)
           let errorCode: string | undefined
           if (e.data) {
             try {
@@ -142,7 +156,7 @@ export function useStreamRequest() {
                 errorCode = parsed.error.code || undefined
               }
             } catch {
-              // not JSON, use raw string
+              // not JSON
             }
           }
           handleError(errorMessage, errorCode)
@@ -178,7 +192,6 @@ export function useStreamRequest() {
     [closeStream]
   )
 
-  // Stop one stream (id given) or all in-flight streams.
   const stopStream = useCallback((streamId?: string) => {
     if (streamId) {
       const source = sourcesRef.current.get(streamId)

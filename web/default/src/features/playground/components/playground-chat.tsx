@@ -41,6 +41,11 @@ interface PlaygroundChatProps {
   onRegenerateMessage?: (message: MessageType) => void
   onEditMessage?: (message: MessageType) => void
   onDeleteMessage?: (message: MessageType) => void
+  onSubmitToolResults?: (
+    message: MessageType,
+    results: Array<{ toolCallId: string; toolName: string; result: string }>
+  ) => void
+  onActiveVersionChange?: (messageKey: string, index: number) => void
   isGenerating?: boolean
   editingKey?: string | null
   onSaveEdit?: (newContent: string) => void
@@ -102,6 +107,8 @@ export function PlaygroundChat({
   onRegenerateMessage,
   onEditMessage,
   onDeleteMessage,
+  onSubmitToolResults,
+  onActiveVersionChange,
   isGenerating = false,
   editingKey,
   onSaveEdit,
@@ -157,6 +164,8 @@ export function PlaygroundChat({
     onRegenerateMessage,
     onEditMessage,
     onDeleteMessage,
+    onSubmitToolResults,
+    onActiveVersionChange,
   })
 
   // Per-message mount reveal (opacity + small rise). Transform/opacity only so

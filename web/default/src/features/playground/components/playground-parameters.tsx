@@ -38,8 +38,12 @@ import type {
   Message,
   ParameterEnabled,
   PlaygroundConfig,
+  PlaygroundToolDefinition,
+  ResponseFormat,
   ReasoningEffort,
+  ToolChoice,
 } from '../types'
+import { ToolsEditor } from './tools-editor'
 
 type SliderParameterKey =
   | 'temperature'
@@ -305,6 +309,25 @@ export function PlaygroundParameters({
           </div>
         )}
       </div>
+
+      <Separator />
+
+      <Separator />
+
+      <ToolsEditor
+        tools={config.tools ?? []}
+        toolChoice={config.toolChoice ?? 'auto'}
+        responseFormat={config.responseFormat ?? { type: 'text' }}
+        onToolsChange={(tools: PlaygroundToolDefinition[]) =>
+          onConfigChange('tools', tools)
+        }
+        onToolChoiceChange={(choice: ToolChoice) =>
+          onConfigChange('toolChoice', choice)
+        }
+        onResponseFormatChange={(format: ResponseFormat) =>
+          onConfigChange('responseFormat', format)
+        }
+      />
 
       <Separator />
 

@@ -16,8 +16,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import i18next from 'i18next'
 import { RotateCcw, SlidersHorizontal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -37,9 +37,18 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { ModelGroupSelector } from '@/components/model-group-selector'
-import { getUserModels, getUserGroups, getModelPricingMap } from './api'
+import {
+  createConversation,
+  getConversation,
+  getUserModels,
+  getUserGroups,
+  getModelPricingMap,
+  updateConversation,
+} from './api'
 import { ChatLinksMenu } from './components/chat-links-menu'
 import { CompareModelsSelector } from './components/compare-models-selector'
+import { ConversationRail } from './components/conversation-rail'
+import { ExportMenu } from './components/export-menu'
 import { PlaygroundChat } from './components/playground-chat'
 import { PlaygroundInput } from './components/playground-input'
 import { PlaygroundParameters } from './components/playground-parameters'
@@ -49,9 +58,14 @@ import { usePlaygroundState, useChatHandler, type ChatTarget } from './hooks'
 import {
   createUserMessage,
   createLoadingAssistantMessage,
+  createToolResultMessage,
+  deriveConversationTitle,
   getActiveModels,
+  loadActiveConversationId,
+  pushAssistantVersion,
+  saveActiveConversationId,
 } from './lib'
-import type { Message as MessageType } from './types'
+import type { Message as MessageType, ParameterEnabled, PlaygroundConfig } from './types'
 
 type PlaygroundProps = {
   initialModel?: string
@@ -59,6 +73,7 @@ type PlaygroundProps = {
 
 export function Playground(props: PlaygroundProps) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const {
     config,
     parameterEnabled,
@@ -74,13 +89,18 @@ export function Playground(props: PlaygroundProps) {
     applyPreset,
   } = usePlaygroundState()
 
+  const [activeConversationId, setActiveConversationId] = useState<
+    number | null
+  >(() => loadActiveConversationId())
+  const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const skipNextPersistRef = useRef(false)
+
   useEffect(() => {
     const model = props.initialModel?.trim()
     if (!model) return
     updateConfig('model', model)
   }, [props.initialModel, updateConfig])
 
-  // Pricing map (model → ratios) used to derive real per-response cost.
   const { data: pricingMap } = useQuery({
     queryKey: ['playground-pricing'],
     queryFn: async () => {
@@ -106,16 +126,111 @@ export function Playground(props: PlaygroundProps) {
     groupRatio,
   })
 
-  // Edit dialog state
   const [editingMessageKey, setEditingMessageKey] = useState<string | null>(
     null
   )
-
-  // Reset-conversation confirm + mobile parameters sheet
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false)
   const [parametersSheetOpen, setParametersSheetOpen] = useState(false)
 
-  // Load models
+  // Debounced cloud persistence of the active conversation.
+  useEffect(() => {
+    if (skipNextPersistRef.current) {
+      skipNextPersistRef.current = false
+      return
+    }
+    if (isGenerating) return
+    if (messages.length === 0 && activeConversationId == null) return
+
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
+    persistTimerRef.current = setTimeout(() => {
+      void (async () => {
+        try {
+          const title = deriveConversationTitle(messages)
+          const messagesJson = JSON.stringify(messages)
+          const configJson = JSON.stringify({ config, parameterEnabled })
+          if (activeConversationId == null) {
+            if (messages.length === 0) return
+            const created = await createConversation({
+              title,
+              messages: messagesJson,
+              config: configJson,
+            })
+            setActiveConversationId(created.id)
+            saveActiveConversationId(created.id)
+          } else {
+            await updateConversation(activeConversationId, {
+              title,
+              messages: messagesJson,
+              config: configJson,
+            })
+          }
+          void queryClient.invalidateQueries({
+            queryKey: ['playground-conversations'],
+          })
+        } catch {
+          // Cloud save is best-effort; localStorage already holds a draft.
+        }
+      })()
+    }, 800)
+
+    return () => {
+      if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
+    }
+  }, [
+    messages,
+    config,
+    parameterEnabled,
+    activeConversationId,
+    isGenerating,
+    queryClient,
+  ])
+
+  const handleSelectConversation = useCallback(
+    async (id: number) => {
+      try {
+        const conv = await getConversation(id)
+        if (!conv) {
+          toast.error(t('Conversation not found'))
+          return
+        }
+        skipNextPersistRef.current = true
+        let parsedMessages: MessageType[] = []
+        try {
+          parsedMessages = JSON.parse(conv.messages || '[]') as MessageType[]
+          if (!Array.isArray(parsedMessages)) parsedMessages = []
+        } catch {
+          parsedMessages = []
+        }
+        updateMessages(parsedMessages)
+        if (conv.config) {
+          try {
+            const payload = JSON.parse(conv.config) as {
+              config?: Partial<PlaygroundConfig>
+              parameterEnabled?: ParameterEnabled
+            }
+            if (payload.config) {
+              applyPreset(payload.config, payload.parameterEnabled)
+            }
+          } catch {
+            // ignore bad config snapshot
+          }
+        }
+        setActiveConversationId(id)
+        saveActiveConversationId(id)
+      } catch {
+        toast.error(t('Failed to load conversation'))
+      }
+    },
+    [applyPreset, t, updateMessages]
+  )
+
+  const handleNewConversation = useCallback(() => {
+    skipNextPersistRef.current = true
+    clearMessages()
+    setActiveConversationId(null)
+    saveActiveConversationId(null)
+  }, [clearMessages])
+
   const {
     data: modelsData,
     isLoading: isLoadingModels,
@@ -138,7 +253,6 @@ export function Playground(props: PlaygroundProps) {
     retry: 1,
   })
 
-  // Load groups
   const {
     data: groupsData,
     isError: groupsLoadError,
@@ -165,25 +279,18 @@ export function Playground(props: PlaygroundProps) {
   const groupsLoadFailed =
     groupsLoadError || (groupsFetched && (groupsData?.length ?? 0) === 0)
 
-  // Update models when data changes
   useEffect(() => {
     if (!modelsData) return
-
     setModels(modelsData)
-
-    // Set default model if current model is not available
     const isCurrentModelValid = modelsData.some((m) => m.value === config.model)
     if (modelsData.length > 0 && !isCurrentModelValid) {
       updateConfig('model', modelsData[0].value)
     }
   }, [modelsData, config.model, setModels, updateConfig])
 
-  // Update groups when data changes
   useEffect(() => {
     if (!groupsData) return
-
     setGroups(groupsData)
-
     const hasCurrentGroup = groupsData.some((g) => g.value === config.group)
     if (!hasCurrentGroup && groupsData.length > 0) {
       const fallback =
@@ -196,8 +303,6 @@ export function Playground(props: PlaygroundProps) {
   const handleSendMessage = (text: string, imageUrls?: string[]) => {
     const userMessage = createUserMessage(text, imageUrls)
     const activeModels = getActiveModels(config)
-
-    // One loading assistant slot per active model (side-by-side compare).
     const assistantMessages = activeModels.map((model) =>
       createLoadingAssistantMessage(model)
     )
@@ -205,7 +310,6 @@ export function Playground(props: PlaygroundProps) {
       key: m.key,
       model: activeModels[i],
     }))
-
     const newMessages = [...messages, userMessage, ...assistantMessages]
     updateMessages(newMessages)
     sendChat(newMessages, targets)
@@ -215,9 +319,6 @@ export function Playground(props: PlaygroundProps) {
     const messageIndex = messages.findIndex((m) => m.key === message.key)
     if (messageIndex === -1) return
 
-    // Regenerate only this model's response, in place, preserving sibling
-    // columns. History = everything up to and including the preceding user
-    // message (the chat handler scopes it to this model).
     const model = message.model || config.model
     let userIndex = -1
     for (let i = messageIndex - 1; i >= 0; i--) {
@@ -227,15 +328,51 @@ export function Playground(props: PlaygroundProps) {
       }
     }
 
-    const reloaded = createLoadingAssistantMessage(model)
+    // Push a new version branch instead of overwriting.
+    const branched = pushAssistantVersion(message)
     const newMessages = messages.map((m) =>
-      m.key === message.key ? { ...reloaded, key: message.key } : m
+      m.key === message.key ? branched : m
     )
     updateMessages(newMessages)
 
     const history = newMessages.slice(0, userIndex + 1)
     sendChat(history, [{ key: message.key, model }])
   }
+
+  const handleSubmitToolResults = useCallback(
+    (
+      assistantMessage: MessageType,
+      results: Array<{
+        toolCallId: string
+        toolName: string
+        result: string
+      }>
+    ) => {
+      const toolMessages = results.map((r) =>
+        createToolResultMessage(r.toolCallId, r.toolName, r.result)
+      )
+      const activeModels = getActiveModels(config)
+      // Continue only for the model that issued the tool calls (or primary).
+      const model = assistantMessage.model || config.model
+      const loading = createLoadingAssistantMessage(model)
+      const base = [...messages, ...toolMessages, loading]
+      updateMessages(base)
+      sendChat(base, [{ key: loading.key, model }])
+      void activeModels
+    },
+    [config, messages, sendChat, updateMessages]
+  )
+
+  const handleActiveVersionChange = useCallback(
+    (messageKey: string, index: number) => {
+      updateMessages((prev) =>
+        prev.map((m) =>
+          m.key === messageKey ? { ...m, activeVersionIndex: index } : m
+        )
+      )
+    },
+    [updateMessages]
+  )
 
   const handleEditMessage = useCallback((message: MessageType) => {
     setEditingMessageKey(message.key)
@@ -245,7 +382,6 @@ export function Playground(props: PlaygroundProps) {
     if (!open) setEditingMessageKey(null)
   }, [])
 
-  // Apply edit and optionally re-submit from the edited user message
   const applyEdit = useCallback(
     (newContent: string, submit: boolean) => {
       if (!editingMessageKey) return
@@ -254,7 +390,14 @@ export function Playground(props: PlaygroundProps) {
 
       const updated = messages.map((m) =>
         m.key === editingMessageKey
-          ? { ...m, versions: [{ ...m.versions[0], content: newContent }] }
+          ? {
+              ...m,
+              versions: m.versions.map((v, i) =>
+                i === (m.activeVersionIndex ?? m.versions.length - 1)
+                  ? { ...v, content: newContent }
+                  : v
+              ),
+            }
           : m
       )
 
@@ -265,7 +408,6 @@ export function Playground(props: PlaygroundProps) {
         return
       }
 
-      // Re-run all active models from the edited user message.
       const activeModels = getActiveModels(config)
       const assistantMessages = activeModels.map((model) =>
         createLoadingAssistantMessage(model)
@@ -288,11 +430,10 @@ export function Playground(props: PlaygroundProps) {
   }
 
   const handleResetConfirm = () => {
-    clearMessages()
+    handleNewConversation()
     setResetConfirmOpen(false)
   }
 
-  // Switching the primary model drops it from the compare set (it is implicit).
   const handlePrimaryModelChange = (value: string) => {
     updateConfig('model', value)
     if (config.compareModels.includes(value)) {
@@ -345,115 +486,130 @@ export function Playground(props: PlaygroundProps) {
   )
 
   return (
-    <div className='bg-bg text-foreground relative flex size-full flex-col overflow-hidden'>
-      {(modelsLoadFailed || groupsLoadFailed) && !isLoadingModels ? (
-        <Alert variant='destructive' className='mx-4 mt-3 shrink-0 sm:mx-6'>
-          <AlertTitle>{t('Unable to load playground')}</AlertTitle>
-          <AlertDescription>{loadFailureMessage}</AlertDescription>
-        </Alert>
-      ) : null}
-      {/* Header: model/group picker + meta tags + reset / mobile parameters */}
-      <ModelSelectorHeader
-        className='bg-surface/80 border-border shrink-0 backdrop-blur-sm'
-        trigger={
-          <ModelGroupSelector
-            selectedModel={config.model}
-            models={models}
-            onModelChange={handlePrimaryModelChange}
-            selectedGroup={config.group}
-            groups={groups}
-            onGroupChange={(value) => updateConfig('group', value)}
-            disabled={isSelectorDisabled}
-          />
-        }
-        tags={
-          selectedGroup && (selectedGroup.ratio || selectedGroup.desc) ? (
-            <>
-              {selectedGroup.ratio ? (
-                <ModelMetaTag>
-                  {t('Ratio: {{value}}', { value: selectedGroup.ratio })}
-                </ModelMetaTag>
-              ) : null}
-              {selectedGroup.desc ? (
-                <ModelMetaTag>{selectedGroup.desc}</ModelMetaTag>
-              ) : null}
-            </>
-          ) : undefined
-        }
-        actions={
-          <>
-            <ChatLinksMenu />
-            <PresetsMenu
-              config={config}
-              parameterEnabled={parameterEnabled}
-              onApply={applyPreset}
-              disabled={isLoadingModels}
-            />
-            <CompareModelsSelector
+    <div className='bg-bg text-foreground relative flex size-full overflow-hidden'>
+      <div className='hidden h-full lg:block'>
+        <ConversationRail
+          activeId={activeConversationId}
+          onSelect={(id) => void handleSelectConversation(id)}
+          onNew={handleNewConversation}
+          disabled={isGenerating}
+        />
+      </div>
+
+      <div className='flex min-w-0 flex-1 flex-col overflow-hidden'>
+        {(modelsLoadFailed || groupsLoadFailed) && !isLoadingModels ? (
+          <Alert variant='destructive' className='mx-4 mt-3 shrink-0 sm:mx-6'>
+            <AlertTitle>{t('Unable to load playground')}</AlertTitle>
+            <AlertDescription>{loadFailureMessage}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <ModelSelectorHeader
+          className='bg-surface/80 border-border shrink-0 backdrop-blur-sm'
+          trigger={
+            <ModelGroupSelector
+              selectedModel={config.model}
               models={models}
-              primaryModel={config.model}
-              value={config.compareModels}
-              onChange={(next) => updateConfig('compareModels', next)}
-              max={MAX_COMPARE_MODELS}
+              onModelChange={handlePrimaryModelChange}
+              selectedGroup={config.group}
+              groups={groups}
+              onGroupChange={(value) => updateConfig('group', value)}
               disabled={isSelectorDisabled}
             />
-            <Button
-              variant='ghost'
-              size='icon-sm'
-              aria-label={t('Reset conversation')}
-              title={t('Reset conversation')}
-              disabled={isGenerating || messages.length === 0}
-              onClick={() => setResetConfirmOpen(true)}
-            >
-              <RotateCcw className='size-4' />
-            </Button>
-            <Button
-              variant='ghost'
-              size='icon-sm'
-              aria-label={t('Parameters')}
-              title={t('Parameters')}
-              onClick={() => setParametersSheetOpen(true)}
-            >
-              <SlidersHorizontal className='size-4' />
-            </Button>
-          </>
-        }
-      />
+          }
+          tags={
+            selectedGroup && (selectedGroup.ratio || selectedGroup.desc) ? (
+              <>
+                {selectedGroup.ratio ? (
+                  <ModelMetaTag>
+                    {t('Ratio: {{value}}', { value: selectedGroup.ratio })}
+                  </ModelMetaTag>
+                ) : null}
+                {selectedGroup.desc ? (
+                  <ModelMetaTag>{selectedGroup.desc}</ModelMetaTag>
+                ) : null}
+              </>
+            ) : undefined
+          }
+          actions={
+            <>
+              <ChatLinksMenu />
+              <ExportMenu
+                messages={messages}
+                config={config}
+                parameterEnabled={parameterEnabled}
+                disabled={isGenerating}
+              />
+              <PresetsMenu
+                config={config}
+                parameterEnabled={parameterEnabled}
+                onApply={applyPreset}
+                disabled={isLoadingModels}
+              />
+              <CompareModelsSelector
+                models={models}
+                primaryModel={config.model}
+                value={config.compareModels}
+                onChange={(next) => updateConfig('compareModels', next)}
+                max={MAX_COMPARE_MODELS}
+                disabled={isSelectorDisabled}
+              />
+              <Button
+                variant='ghost'
+                size='icon-sm'
+                aria-label={t('Reset conversation')}
+                title={t('Reset conversation')}
+                disabled={isGenerating || messages.length === 0}
+                onClick={() => setResetConfirmOpen(true)}
+              >
+                <RotateCcw className='size-4' />
+              </Button>
+              <Button
+                variant='ghost'
+                size='icon-sm'
+                aria-label={t('Parameters')}
+                title={t('Parameters')}
+                onClick={() => setParametersSheetOpen(true)}
+              >
+                <SlidersHorizontal className='size-4' />
+              </Button>
+            </>
+          }
+        />
 
-      {/* Body: single conversation column; parameters live in the sheet */}
-      <div className='grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)]'>
-        <div className='flex min-h-0 min-w-0 flex-col overflow-hidden'>
-          {/* Full-width scroll container: scrolling works even over side whitespace */}
-          <div className='flex flex-1 flex-col overflow-hidden'>
-            <PlaygroundChat
-              messages={messages}
-              modelLabel={selectedModelLabel}
-              onRegenerateMessage={handleRegenerateMessage}
-              onEditMessage={handleEditMessage}
-              onDeleteMessage={handleDeleteMessage}
-              isGenerating={isGenerating}
-              editingKey={editingMessageKey}
-              onCancelEdit={handleEditOpenChange}
-              onSaveEdit={(newContent) => applyEdit(newContent, false)}
-              onSaveEditAndSubmit={(newContent) => applyEdit(newContent, true)}
-            />
-          </div>
+        <div className='grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)]'>
+          <div className='flex min-h-0 min-w-0 flex-col overflow-hidden'>
+            <div className='flex flex-1 flex-col overflow-hidden'>
+              <PlaygroundChat
+                messages={messages}
+                modelLabel={selectedModelLabel}
+                onRegenerateMessage={handleRegenerateMessage}
+                onEditMessage={handleEditMessage}
+                onDeleteMessage={handleDeleteMessage}
+                onSubmitToolResults={handleSubmitToolResults}
+                onActiveVersionChange={handleActiveVersionChange}
+                isGenerating={isGenerating}
+                editingKey={editingMessageKey}
+                onCancelEdit={handleEditOpenChange}
+                onSaveEdit={(newContent) => applyEdit(newContent, false)}
+                onSaveEditAndSubmit={(newContent) => applyEdit(newContent, true)}
+              />
+            </div>
 
-          {/* Input area: center content and constrain to the same container width */}
-          <div className='border-border bg-bg mx-auto w-full max-w-4xl border-t px-4 py-3 sm:px-6'>
-            <PlaygroundInput
-              disabled={isGenerating}
-              isGenerating={isGenerating}
-              onStop={stopGeneration}
-              onSubmit={handleSendMessage}
-              webSearch={config.webSearch}
-              onWebSearchChange={(value) => updateConfig('webSearch', value)}
-            />
+            <div className='border-border bg-bg mx-auto w-full max-w-4xl border-t px-4 py-3 sm:px-6'>
+              <PlaygroundInput
+                disabled={isGenerating}
+                isGenerating={isGenerating}
+                onStop={stopGeneration}
+                onSubmit={handleSendMessage}
+                webSearch={config.webSearch}
+                onWebSearchChange={(value) => updateConfig('webSearch', value)}
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Parameter sheet (all breakpoints) */}
       <Sheet open={parametersSheetOpen} onOpenChange={setParametersSheetOpen}>
         <SheetContent side='right' className='gap-0'>
           <SheetHeader className='border-b'>
@@ -468,14 +624,13 @@ export function Playground(props: PlaygroundProps) {
         </SheetContent>
       </Sheet>
 
-      {/* Reset conversation confirm */}
       <ConfirmDialog
         open={resetConfirmOpen}
         onOpenChange={setResetConfirmOpen}
         destructive
         title={t('Reset conversation')}
         desc={t(
-          'This will clear all messages in the current session. This action cannot be undone.'
+          'This will clear the current thread and start a new chat. Saved conversations are kept in the sidebar.'
         )}
         confirmText={t('Reset')}
         handleConfirm={handleResetConfirm}

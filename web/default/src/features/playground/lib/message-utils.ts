@@ -24,36 +24,60 @@ import type {
   MessageVersion,
   ChatCompletionMessage,
   ContentPart,
+  ToolCall,
 } from '../types'
 
 /**
  * Create a new message version
  */
-export function createMessageVersion(content: string): MessageVersion {
+export function createMessageVersion(
+  content: string,
+  extras?: Partial<MessageVersion>
+): MessageVersion {
   return {
     id: nanoid(),
     content,
+    ...extras,
   }
 }
 
 /**
- * Get current version from message (always returns the first version)
+ * Active version index (defaults to last version for regenerate branches).
  */
-export function getCurrentVersion(message: Message): MessageVersion {
-  return message.versions[0] || { id: 'default', content: '' }
+export function getActiveVersionIndex(message: Message): number {
+  if (!message.versions.length) return 0
+  if (
+    message.activeVersionIndex != null &&
+    message.activeVersionIndex >= 0 &&
+    message.activeVersionIndex < message.versions.length
+  ) {
+    return message.activeVersionIndex
+  }
+  return message.versions.length - 1
 }
 
 /**
- * Update current version content in message
+ * Get current (active) version from message
+ */
+export function getCurrentVersion(message: Message): MessageVersion {
+  const idx = getActiveVersionIndex(message)
+  return message.versions[idx] || { id: 'default', content: '' }
+}
+
+/**
+ * Update active version content in message
  */
 export function updateCurrentVersionContent(
   message: Message,
   content: string
 ): Message {
-  const currentVersion = getCurrentVersion(message)
+  const idx = getActiveVersionIndex(message)
+  const versions = message.versions.map((v, i) =>
+    i === idx ? { ...v, content } : v
+  )
   return {
     ...message,
-    versions: [{ ...currentVersion, content }],
+    versions,
   }
 }
 
@@ -74,6 +98,24 @@ export function createUserMessage(
 }
 
 /**
+ * Create a tool-result message answering a prior tool_call.
+ */
+export function createToolResultMessage(
+  toolCallId: string,
+  toolName: string,
+  result: string
+): Message {
+  return {
+    key: nanoid(),
+    from: MESSAGE_ROLES.TOOL,
+    toolCallId,
+    toolName,
+    versions: [createMessageVersion(result)],
+    status: MESSAGE_STATUS.COMPLETE,
+  }
+}
+
+/**
  * Create a loading assistant message, optionally tagged with the model that
  * will produce it (used by the side-by-side compare view).
  */
@@ -82,12 +124,39 @@ export function createLoadingAssistantMessage(model?: string): Message {
     key: nanoid(),
     from: MESSAGE_ROLES.ASSISTANT,
     versions: [createMessageVersion('')],
+    activeVersionIndex: 0,
     reasoning: undefined,
+    toolCalls: undefined,
     isReasoningComplete: false,
     isContentComplete: false,
     isReasoningStreaming: false,
     status: MESSAGE_STATUS.LOADING,
     ...(model ? { model } : {}),
+  }
+}
+
+/**
+ * Push a new empty version onto an assistant message for regenerate (branch).
+ * Returns the updated message with the new version active.
+ */
+export function pushAssistantVersion(message: Message): Message {
+  const versions = [...message.versions, createMessageVersion('')]
+  return {
+    ...message,
+    versions,
+    activeVersionIndex: versions.length - 1,
+    reasoning: undefined,
+    toolCalls: undefined,
+    refusal: undefined,
+    finishReason: undefined,
+    isReasoningComplete: false,
+    isContentComplete: false,
+    isReasoningStreaming: false,
+    status: MESSAGE_STATUS.LOADING,
+    usage: undefined,
+    costUsd: undefined,
+    latencyMs: undefined,
+    errorCode: null,
   }
 }
 
@@ -135,29 +204,75 @@ export function getTextContent(content: string | ContentPart[]): string {
 }
 
 /**
- * Format message for API request
+ * Format message for API request (uses active version).
  */
 export function formatMessageForAPI(message: Message): ChatCompletionMessage {
   const currentVersion = getCurrentVersion(message)
-  return {
-    role: message.from,
+
+  if (message.from === MESSAGE_ROLES.TOOL) {
+    return {
+      role: 'tool',
+      content: currentVersion.content,
+      tool_call_id: message.toolCallId || '',
+      ...(message.toolName ? { name: message.toolName } : {}),
+    }
+  }
+
+  const toolCalls =
+    currentVersion.toolCalls?.length
+      ? currentVersion.toolCalls
+      : message.toolCalls
+
+  const base: ChatCompletionMessage = {
+    role: message.from === 'system' ? 'system' : message.from,
     content: buildMessageContent(currentVersion.content, message.imageUrls),
   }
+
+  if (message.from === MESSAGE_ROLES.ASSISTANT && toolCalls?.length) {
+    // OpenAI allows content null when only tool_calls are present.
+    const text = currentVersion.content?.trim()
+    return {
+      ...base,
+      content: text ? base.content : null,
+      tool_calls: toolCalls,
+    }
+  }
+
+  return base
 }
 
 /**
  * Check if message is valid for API request
  * Excludes loading/streaming assistant messages and empty content
+ * (except assistant with tool_calls or tool role with result).
  */
 export function isValidMessage(message: Message): boolean {
   if (!message || !message.from || !message.versions.length) return false
 
-  const content = message.versions[0]?.content
+  if (
+    message.status === MESSAGE_STATUS.LOADING ||
+    message.status === MESSAGE_STATUS.STREAMING
+  ) {
+    return false
+  }
+
+  const current = getCurrentVersion(message)
+  const content = current.content
+
+  if (message.from === MESSAGE_ROLES.TOOL) {
+    return !!message.toolCallId && content !== undefined
+  }
+
+  if (message.from === MESSAGE_ROLES.ASSISTANT) {
+    const toolCalls = current.toolCalls?.length
+      ? current.toolCalls
+      : message.toolCalls
+    if (toolCalls?.length) return true
+    if (!content?.trim() && !message.refusal) return false
+    return true
+  }
+
   if (content === undefined) return false
-
-  // Exclude empty assistant messages (loading/streaming placeholders)
-  if (message.from === 'assistant' && !content.trim()) return false
-
   return true
 }
 
@@ -180,33 +295,27 @@ export function parseThinkTags(content: string): {
   let hasUnclosed = false
 
   while (true) {
-    // Find next <think> tag
     const openPos = content.indexOf('<think>', currentPos)
 
     if (openPos === -1) {
-      // No more think tags, add remaining content
       if (currentPos < content.length) {
         visibleParts.push(content.substring(currentPos))
       }
       break
     }
 
-    // Add visible content before this tag
     if (openPos > currentPos) {
       visibleParts.push(content.substring(currentPos, openPos))
     }
 
-    // Look for matching </think> tag
     const closePos = content.indexOf('</think>', openPos + 7)
 
     if (closePos === -1) {
-      // Unclosed tag: rest is reasoning buffer
       reasoningParts.push(content.substring(openPos + 7))
       hasUnclosed = true
       break
     }
 
-    // Extract reasoning content between tags
     reasoningParts.push(content.substring(openPos + 7, closePos))
     currentPos = closePos + 8
   }
@@ -218,12 +327,6 @@ export function parseThinkTags(content: string): {
   }
 }
 
-/**
- * Update the last assistant message with an error
- * @param messages - Current messages array
- * @param errorMessage - Error message to display
- * @returns Updated messages array
- */
 export function updateAssistantMessageWithError(
   messages: Message[],
   errorMessage: string,
@@ -243,12 +346,6 @@ export function updateAssistantMessageWithError(
   })
 }
 
-/**
- * Helper function to update the last assistant message
- * @param messages - Current messages array
- * @param updater - Function to update the message
- * @returns Updated messages array or original if no assistant message found
- */
 export function updateLastAssistantMessage(
   messages: Message[],
   updater: (message: Message) => Message
@@ -262,11 +359,6 @@ export function updateLastAssistantMessage(
   return updated
 }
 
-/**
- * Update a specific message by key. Used by the side-by-side compare view,
- * where multiple assistant messages stream concurrently and "the last
- * assistant message" is ambiguous — each stream targets its own key.
- */
 export function updateMessageByKey(
   messages: Message[],
   key: string,
@@ -279,9 +371,6 @@ export function updateMessageByKey(
   return updated
 }
 
-/**
- * Set a specific assistant message (by key) into the error state.
- */
 export function setMessageErrorByKey(
   messages: Message[],
   key: string,
@@ -301,8 +390,6 @@ export function setMessageErrorByKey(
 
 /**
  * Process content chunk during streaming
- * Separates <think> reasoning from visible content in real-time
- * Note: versions[0].content keeps the full raw content (with tags) during streaming
  */
 export function processStreamingContent(
   message: Message,
@@ -315,7 +402,6 @@ export function processStreamingContent(
 
   const { reasoning, hasUnclosedTag } = parseThinkTags(fullContent)
 
-  // Preserve existing reasoning if no think tags found (e.g., from API reasoning_content)
   const finalReasoning = reasoning
     ? { content: reasoning, duration: 0 }
     : message.reasoning
@@ -329,72 +415,106 @@ export function processStreamingContent(
 
 /**
  * Finalize message after streaming completes
- * Cleans content and consolidates reasoning from all sources
  */
 export function finalizeMessage(
   message: Message,
-  apiReasoningContent?: string
+  apiReasoningContent?: string,
+  options?: {
+    toolCalls?: ToolCall[]
+    finishReason?: string | null
+    refusal?: string
+    truncated?: boolean
+  }
 ): Message {
   const currentVersion = getCurrentVersion(message)
   const { visibleContent, reasoning } = parseThinkTags(currentVersion.content)
 
-  // Priority:
-  // 1. API reasoning_content passed as parameter (non-streaming response)
-  // 2. Existing message.reasoning (from streaming reasoning_content)
-  // 3. Extracted think tags from content
   const finalReasoning =
     apiReasoningContent || message.reasoning?.content || reasoning || ''
 
+  const toolCalls =
+    options?.toolCalls ??
+    message.toolCalls ??
+    currentVersion.toolCalls
+
+  const idx = getActiveVersionIndex(message)
+  const versions = message.versions.map((v, i) =>
+    i === idx
+      ? {
+          ...v,
+          content: visibleContent,
+          toolCalls: toolCalls?.length ? toolCalls : undefined,
+          reasoning: finalReasoning
+            ? {
+                content: finalReasoning,
+                duration: message.reasoning?.duration || 0,
+              }
+            : undefined,
+          refusal: options?.refusal ?? message.refusal,
+          finishReason: options?.finishReason ?? message.finishReason,
+        }
+      : v
+  )
+
   return {
-    ...updateCurrentVersionContent(message, visibleContent),
+    ...message,
+    versions,
     reasoning: finalReasoning
       ? { content: finalReasoning, duration: message.reasoning?.duration || 0 }
       : undefined,
+    toolCalls: toolCalls?.length ? toolCalls : undefined,
+    refusal: options?.refusal ?? message.refusal,
+    finishReason: options?.finishReason ?? message.finishReason,
     isReasoningStreaming: false,
+    status: options?.truncated
+      ? MESSAGE_STATUS.TRUNCATED
+      : message.status === MESSAGE_STATUS.ERROR
+        ? MESSAGE_STATUS.ERROR
+        : MESSAGE_STATUS.COMPLETE,
   }
 }
 
 /**
  * Sanitize messages loaded from storage
- * Converts stuck loading/streaming messages to stable state
  */
 export function sanitizeMessagesOnLoad(messages: Message[]): Message[] {
-  let targetIndex = -1
-  for (let i = messages.length - 1; i >= 0; i--) {
-    const m = messages[i]
+  return messages.map((m) => {
     if (
       m?.from === MESSAGE_ROLES.ASSISTANT &&
       (m?.status === MESSAGE_STATUS.LOADING ||
         m?.status === MESSAGE_STATUS.STREAMING)
     ) {
-      targetIndex = i
-      break
-    }
-  }
+      const finalized = finalizeMessage(m, undefined, { truncated: true })
+      const hasContent = getCurrentVersion(finalized).content?.trim()
+      const hasReasoning = finalized.reasoning?.content?.trim()
+      const hasTools = !!finalized.toolCalls?.length
 
-  if (targetIndex === -1) return messages
-
-  const finalized = finalizeMessage(messages[targetIndex])
-  const hasContent = finalized.versions?.[0]?.content?.trim()
-  const hasReasoning = finalized.reasoning?.content?.trim()
-
-  const sanitized: Message =
-    hasContent || hasReasoning
-      ? {
+      if (hasContent || hasReasoning || hasTools) {
+        return {
           ...finalized,
-          status: MESSAGE_STATUS.COMPLETE,
+          status: MESSAGE_STATUS.TRUNCATED,
           isReasoningStreaming: false,
         }
-      : {
-          ...updateCurrentVersionContent(
-            finalized,
-            `${i18next.t(ERROR_MESSAGES.API_REQUEST_ERROR)}: ${i18next.t(ERROR_MESSAGES.INTERRUPTED)}`
-          ),
-          status: MESSAGE_STATUS.ERROR,
-          isReasoningStreaming: false,
-        }
+      }
+      return {
+        ...updateCurrentVersionContent(
+          finalized,
+          `${i18next.t(ERROR_MESSAGES.API_REQUEST_ERROR)}: ${i18next.t(ERROR_MESSAGES.INTERRUPTED)}`
+        ),
+        status: MESSAGE_STATUS.ERROR,
+        isReasoningStreaming: false,
+      }
+    }
+    return m
+  })
+}
 
-  const result = [...messages]
-  result[targetIndex] = sanitized
-  return result
+/** Derive a short conversation title from the first user message. */
+export function deriveConversationTitle(messages: Message[]): string {
+  const firstUser = messages.find((m) => m.from === MESSAGE_ROLES.USER)
+  if (!firstUser) return 'New chat'
+  const text = getCurrentVersion(firstUser).content?.trim() || ''
+  if (!text) return 'New chat'
+  const oneLine = text.replace(/\s+/g, ' ')
+  return oneLine.length > 48 ? `${oneLine.slice(0, 48)}…` : oneLine
 }

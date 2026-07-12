@@ -24,6 +24,8 @@ import type {
   ChatCompletionResponse,
   ModelOption,
   GroupOption,
+  ConversationListItem,
+  ConversationRecord,
 } from './types'
 
 /**
@@ -145,4 +147,39 @@ export async function updatePreset(
 
 export async function deletePreset(id: number): Promise<void> {
   await api.delete(`/api/preset/${id}`)
+}
+
+// ---- Conversations --------------------------------------------------------
+
+export async function listConversations(): Promise<ConversationListItem[]> {
+  const res = await api.get(API_ENDPOINTS.CONVERSATIONS)
+  return res.data?.success && Array.isArray(res.data.data) ? res.data.data : []
+}
+
+export async function getConversation(
+  id: number
+): Promise<ConversationRecord | null> {
+  const res = await api.get(`${API_ENDPOINTS.CONVERSATIONS}${id}`)
+  return res.data?.success ? (res.data.data as ConversationRecord) : null
+}
+
+export async function createConversation(payload: {
+  title: string
+  messages: string
+  config?: string
+}): Promise<ConversationRecord> {
+  const res = await api.post(API_ENDPOINTS.CONVERSATIONS, payload)
+  return res.data.data as ConversationRecord
+}
+
+export async function updateConversation(
+  id: number,
+  payload: { title?: string; messages?: string; config?: string }
+): Promise<ConversationRecord> {
+  const res = await api.put(`${API_ENDPOINTS.CONVERSATIONS}${id}`, payload)
+  return res.data.data as ConversationRecord
+}
+
+export async function deleteConversation(id: number): Promise<void> {
+  await api.delete(`${API_ENDPOINTS.CONVERSATIONS}${id}`)
 }

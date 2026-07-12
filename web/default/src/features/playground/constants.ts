@@ -23,6 +23,7 @@ export const MESSAGE_ROLES = {
   USER: 'user',
   ASSISTANT: 'assistant',
   SYSTEM: 'system',
+  TOOL: 'tool',
 } as const
 
 export const MESSAGE_STATUS = {
@@ -30,6 +31,7 @@ export const MESSAGE_STATUS = {
   STREAMING: 'streaming',
   COMPLETE: 'complete',
   ERROR: 'error',
+  TRUNCATED: 'truncated',
 } as const
 
 // API endpoints
@@ -38,6 +40,7 @@ export const API_ENDPOINTS = {
   USER_MODELS: '/api/user/models',
   USER_GROUPS: '/api/user/self/groups',
   PRICING: '/api/pricing',
+  CONVERSATIONS: '/api/conversation/',
 } as const
 
 // Default group — uses 'default' as the safe fallback; auto-group is
@@ -63,6 +66,9 @@ export const DEFAULT_CONFIG: PlaygroundConfig = {
   reasoningEffort: 'off',
   reasoningMaxTokens: 0,
   webSearch: false,
+  tools: [],
+  toolChoice: 'auto',
+  responseFormat: { type: 'text' },
 }
 
 export const DEFAULT_PARAMETER_ENABLED: ParameterEnabled = {
@@ -74,11 +80,16 @@ export const DEFAULT_PARAMETER_ENABLED: ParameterEnabled = {
   seed: false,
 }
 
-// Storage keys
+// Storage keys (MESSAGES_V2 bumps schema for tool_calls / truncated)
 export const STORAGE_KEYS = {
-  CONFIG: 'playground_config',
-  MESSAGES: 'playground_messages',
-  PARAMETER_ENABLED: 'playground_parameter_enabled',
+  CONFIG: 'playground_config_v2',
+  MESSAGES: 'playground_messages_v2',
+  PARAMETER_ENABLED: 'playground_parameter_enabled_v2',
+  ACTIVE_CONVERSATION_ID: 'playground_active_conversation_id',
+  // Legacy keys — migrated once on load
+  LEGACY_CONFIG: 'playground_config',
+  LEGACY_MESSAGES: 'playground_messages',
+  LEGACY_PARAMETER_ENABLED: 'playground_parameter_enabled',
 } as const
 
 // Error messages

@@ -52,10 +52,17 @@ export function MessageActions({
   const { guardAction } = useMessageActionGuard(isGenerating)
 
   const isAssistant = message.from === 'assistant'
-  const hasContent = message.versions.some((v) => v.content)
+  const activeIdx =
+    message.activeVersionIndex != null &&
+    message.activeVersionIndex >= 0 &&
+    message.activeVersionIndex < message.versions.length
+      ? message.activeVersionIndex
+      : Math.max(0, message.versions.length - 1)
+  const hasContent =
+    message.versions.some((v) => v.content) || !!message.toolCalls?.length
   const isLoading =
     message.status === 'loading' || message.status === 'streaming'
-  const content = message.versions[0]?.content || ''
+  const content = message.versions[activeIdx]?.content || ''
   const isCopied = copiedText === content
 
   const handleCopy = () => {

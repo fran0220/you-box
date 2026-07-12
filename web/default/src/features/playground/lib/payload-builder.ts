@@ -37,10 +37,9 @@ export function getActiveModels(config: PlaygroundConfig): string[] {
 }
 
 /**
- * Select the conversation history for a single model. User messages are shared
- * across all compared models; assistant messages are only included when they
- * were produced by the target model (or are untagged — legacy/single-model
- * history). This keeps each compared model's thread independent.
+ * Select the conversation history for a single model. User/tool/system
+ * messages are shared; assistant messages are only included when they
+ * were produced by the target model (or are untagged).
  */
 export function selectModelHistory(
   messages: Message[],
@@ -61,9 +60,6 @@ interface BuildPayloadOptions {
 
 /**
  * Build API request payload from messages and config.
- *
- * When `options.model` is provided the payload targets that model and (if
- * `scopeHistoryToModel`) only that model's assistant turns are included.
  */
 export function buildChatCompletionPayload(
   messages: Message[],
@@ -78,12 +74,10 @@ export function buildChatCompletionPayload(
       ? selectModelHistory(messages, options.model)
       : messages
 
-  // Filter and format valid messages
   const processedMessages = scoped
     .filter(isValidMessage)
     .map(formatMessageForAPI)
 
-  // Prepend the system prompt, if set, so it applies to every model.
   const systemPrompt = config.systemPrompt?.trim()
   const apiMessages = systemPrompt
     ? [{ role: 'system' as const, content: systemPrompt }, ...processedMessages]
@@ -96,13 +90,10 @@ export function buildChatCompletionPayload(
     stream: config.stream,
   }
 
-  // Request usage accounting on streaming responses so the session stats and
-  // per-response cost can be derived from real token counts.
   if (config.stream) {
     payload.stream_options = { include_usage: true }
   }
 
-  // Add enabled parameters
   const parameterKeys: Array<keyof ParameterEnabled> = [
     'temperature',
     'top_p',
@@ -121,9 +112,6 @@ export function buildChatCompletionPayload(
     }
   })
 
-  // Reasoning control. A positive token budget takes precedence (Anthropic /
-  // Gemini style); otherwise an effort level is sent (OpenAI / OpenRouter
-  // style). 'off' sends nothing.
   if (config.reasoningEffort !== 'off') {
     if (config.reasoningMaxTokens && config.reasoningMaxTokens > 0) {
       payload.reasoning = { max_tokens: config.reasoningMaxTokens }
@@ -133,9 +121,20 @@ export function buildChatCompletionPayload(
     }
   }
 
-  // Native web search.
   if (config.webSearch) {
     payload.web_search_options = {}
+  }
+
+  // Function-calling debugger: only send when tools are defined.
+  const tools = (config.tools ?? []).filter((t) => t?.function?.name?.trim())
+  if (tools.length > 0) {
+    payload.tools = tools
+    payload.tool_choice = config.toolChoice ?? 'auto'
+  }
+
+  // Structured output — omit plain text (default OpenAI behavior).
+  if (config.responseFormat && config.responseFormat.type !== 'text') {
+    payload.response_format = config.responseFormat
   }
 
   return payload

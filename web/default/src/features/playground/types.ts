@@ -17,13 +17,26 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 // Message types
-export type MessageRole = 'user' | 'assistant' | 'system'
+export type MessageRole = 'user' | 'assistant' | 'system' | 'tool'
 
-export type MessageStatus = 'loading' | 'streaming' | 'complete' | 'error'
+export type MessageStatus =
+  | 'loading'
+  | 'streaming'
+  | 'complete'
+  | 'error'
+  | 'truncated'
 
 export interface MessageVersion {
   id: string
   content: string
+  /** Tool calls captured for this assistant version (regenerate branches). */
+  toolCalls?: ToolCall[]
+  reasoning?: {
+    content: string
+    duration: number
+  }
+  refusal?: string
+  finishReason?: string | null
 }
 
 export interface TokenUsage {
@@ -36,10 +49,53 @@ export interface TokenUsage {
   }
 }
 
+/** OpenAI-style function tool call on an assistant message. */
+export interface ToolCall {
+  id: string
+  type: 'function'
+  function: {
+    name: string
+    arguments: string
+  }
+}
+
+/** Client-defined tool schema for the function-calling debugger. */
+export interface PlaygroundToolDefinition {
+  type: 'function'
+  function: {
+    name: string
+    description?: string
+    parameters?: Record<string, unknown>
+  }
+}
+
+export type ToolChoice =
+  | 'none'
+  | 'auto'
+  | 'required'
+  | { type: 'function'; function: { name: string } }
+
+export type ResponseFormat =
+  | { type: 'text' }
+  | { type: 'json_object' }
+  | {
+      type: 'json_schema'
+      json_schema: {
+        name: string
+        strict?: boolean
+        schema: Record<string, unknown>
+      }
+    }
+
 export interface Message {
   key: string
   from: MessageRole
   versions: MessageVersion[]
+  /**
+   * Active version index for branch carousel (regenerate pushes new versions).
+   * Defaults to 0 / last when omitted.
+   */
+  activeVersionIndex?: number
   /**
    * Model that produced this assistant message. Set on assistant messages so
    * the side-by-side compare view can group responses per model. User messages
@@ -49,10 +105,19 @@ export interface Message {
   /** Image URLs attached to a user message (vision input). */
   imageUrls?: string[]
   sources?: { href: string; title: string }[]
+  /** Live / latest reasoning (mirrors active version while streaming). */
   reasoning?: {
     content: string
     duration: number
   }
+  /** Live tool calls while streaming; finalized into versions on complete. */
+  toolCalls?: ToolCall[]
+  refusal?: string
+  finishReason?: string | null
+  /** For role=tool messages: which tool_call this result answers. */
+  toolCallId?: string
+  /** For role=tool messages: tool name (display). */
+  toolName?: string
   isReasoningStreaming?: boolean
   isReasoningComplete?: boolean
   isContentComplete?: boolean
@@ -79,7 +144,10 @@ export type ReasoningEffort = 'off' | 'minimal' | 'low' | 'medium' | 'high'
 // API payload types
 export interface ChatCompletionMessage {
   role: MessageRole
-  content: string | ContentPart[]
+  content: string | ContentPart[] | null
+  tool_calls?: ToolCall[]
+  tool_call_id?: string
+  name?: string
 }
 
 export interface ContentPart {
@@ -128,6 +196,9 @@ export interface ChatCompletionRequest {
   reasoning?: { max_tokens?: number; effort?: Exclude<ReasoningEffort, 'off'> }
   /** Native web search controls (OpenAI/OpenRouter `web_search_options`). */
   web_search_options?: WebSearchOptions
+  tools?: PlaygroundToolDefinition[]
+  tool_choice?: ToolChoice
+  response_format?: ResponseFormat
 }
 
 export interface ChatCompletionChunk {
@@ -141,7 +212,17 @@ export interface ChatCompletionChunk {
       role?: MessageRole
       content?: string
       reasoning_content?: string
+      refusal?: string
       annotations?: UrlCitationAnnotation[]
+      tool_calls?: Array<{
+        index?: number
+        id?: string
+        type?: 'function'
+        function?: {
+          name?: string
+          arguments?: string
+        }
+      }>
     }
     finish_reason: string | null
   }>
@@ -158,9 +239,11 @@ export interface ChatCompletionResponse {
     index: number
     message: {
       role: MessageRole
-      content: string
+      content: string | null
       reasoning_content?: string
+      refusal?: string
       annotations?: UrlCitationAnnotation[]
+      tool_calls?: ToolCall[]
     }
     finish_reason: string
   }>
@@ -192,6 +275,12 @@ export interface PlaygroundConfig {
   reasoningMaxTokens: number
   /** Toggle native web search for the request. */
   webSearch: boolean
+  /** Function tools for the tool-calling debugger (sent when non-empty). */
+  tools: PlaygroundToolDefinition[]
+  /** tool_choice control; default auto when tools are present. */
+  toolChoice: ToolChoice
+  /** Structured output mode. */
+  responseFormat: ResponseFormat
 }
 
 export interface ParameterEnabled {
@@ -214,4 +303,23 @@ export interface GroupOption {
   value: string
   ratio: number
   desc?: string
+}
+
+/** Server-side conversation list row. */
+export interface ConversationListItem {
+  id: number
+  title: string
+  created_time: number
+  updated_time: number
+}
+
+/** Full conversation document from the API. */
+export interface ConversationRecord {
+  id: number
+  user_id: number
+  title: string
+  messages: string
+  config: string
+  created_time: number
+  updated_time: number
 }
