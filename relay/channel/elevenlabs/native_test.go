@@ -41,13 +41,15 @@ func TestDefaultModelListUsesCurrentPublicModels(t *testing.T) {
 
 func TestNativeEndpointDefaultsUsePublicModels(t *testing.T) {
 	tests := []struct {
-		path string
-		want string
+		path   string
+		want   string
+		stream bool
 	}{
 		{path: "/v1/audio-isolation", want: NativeAudioIsolationModel},
 		{path: "/v1/forced-alignment", want: NativeForcedAlignmentModel},
 		{path: "/v1/sound-generation", want: NativeSoundGenerationModel},
-		{path: "/v1/music/stream", want: NativeMusicModel},
+		{path: "/v1/music", want: NativeMusicModel},
+		{path: "/v1/music/stream", want: NativeMusicModel, stream: true},
 		{path: "/v1/text-to-dialogue", want: DefaultTTSModel},
 	}
 
@@ -60,7 +62,45 @@ func TestNativeEndpointDefaultsUsePublicModels(t *testing.T) {
 			if endpoint.DefaultModel != tt.want {
 				t.Fatalf("DefaultModel = %q, want %q", endpoint.DefaultModel, tt.want)
 			}
+			if endpoint.Stream != tt.stream {
+				t.Fatalf("Stream = %v, want %v", endpoint.Stream, tt.stream)
+			}
 		})
+	}
+}
+
+func TestBareNativeAliasPaths(t *testing.T) {
+	for _, path := range []string{
+		"/v1/sound-generation",
+		"/v1/music",
+		"/v1/music/stream",
+		"/v1/audio-isolation",
+		"/v1/forced-alignment",
+		"/v1/speech-to-speech/voice-id",
+		"/v1/speech-to-speech/voice-id/stream",
+	} {
+		if !IsNativeProxyPath(path) {
+			t.Fatalf("IsNativeProxyPath(%q) = false, want true", path)
+		}
+		if got := UpstreamPathFromProxyPath(path); got != path {
+			t.Fatalf("UpstreamPathFromProxyPath(%q) = %q, want same bare path", path, got)
+		}
+	}
+
+	// Must not claim OpenAI-compatible routes.
+	for _, path := range []string{
+		"/v1/audio/speech",
+		"/v1/audio/transcriptions",
+		"/v1/chat/completions",
+		"/v1/models",
+	} {
+		if IsNativeProxyPath(path) {
+			t.Fatalf("IsNativeProxyPath(%q) = true, want false (OpenAI route)", path)
+		}
+	}
+
+	if got := UpstreamPathFromProxyPath("/elevenlabs/v1/sound-generation"); got != "/v1/sound-generation" {
+		t.Fatalf("prefixed upstream path = %q, want /v1/sound-generation", got)
 	}
 }
 
@@ -105,6 +145,8 @@ func TestMatchNativeEndpointAllowlist(t *testing.T) {
 		{name: "tts", method: http.MethodPost, path: "/v1/text-to-speech/voice-id", want: true},
 		{name: "tts stream timestamps", method: http.MethodPost, path: "/v1/text-to-speech/voice-id/stream/with-timestamps", want: true},
 		{name: "stt", method: http.MethodPost, path: "/v1/speech-to-text", want: true},
+		{name: "sound generation", method: http.MethodPost, path: "/v1/sound-generation", want: true},
+		{name: "music", method: http.MethodPost, path: "/v1/music", want: true},
 		{name: "music stream", method: http.MethodPost, path: "/v1/music/stream", want: true},
 		{name: "text to dialogue", method: http.MethodPost, path: "/v1/text-to-dialogue", want: true},
 		{name: "text to dialogue timestamps", method: http.MethodPost, path: "/v1/text-to-dialogue/with-timestamps", want: true},

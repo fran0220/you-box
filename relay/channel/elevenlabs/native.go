@@ -75,15 +75,44 @@ var DefaultModelList = []string{
 }
 
 func IsNativeProxyPath(path string) bool {
-	return strings.HasPrefix(path, "/elevenlabs/")
+	if strings.HasPrefix(path, "/elevenlabs/") {
+		return true
+	}
+	// Studio/Portal may call unique ElevenLabs endpoints without the /elevenlabs
+	// prefix (e.g. POST /v1/sound-generation). Only paths that do not collide
+	// with OpenAI-compatible /v1 routes are treated as native aliases.
+	return IsBareNativeAliasPath(path)
+}
+
+// IsBareNativeAliasPath reports whether path is a short /v1 alias for an
+// ElevenLabs-native endpoint that cannot be confused with OpenAI routes.
+func IsBareNativeAliasPath(path string) bool {
+	clean := normalizeNativePath(path)
+	switch clean {
+	case "/v1/sound-generation",
+		"/v1/music",
+		"/v1/music/stream",
+		"/v1/audio-isolation",
+		"/v1/audio-isolation/stream",
+		"/v1/forced-alignment":
+		return true
+	}
+	if strings.HasPrefix(clean, "/v1/speech-to-speech/") {
+		return true
+	}
+	return false
 }
 
 func UpstreamPathFromProxyPath(path string) string {
-	upstreamPath := strings.TrimPrefix(path, "/elevenlabs")
-	if upstreamPath == "" {
-		return "/"
+	if strings.HasPrefix(path, "/elevenlabs") {
+		upstreamPath := strings.TrimPrefix(path, "/elevenlabs")
+		if upstreamPath == "" {
+			return "/"
+		}
+		return upstreamPath
 	}
-	return upstreamPath
+	// Bare alias already matches the upstream ElevenLabs path.
+	return path
 }
 
 func MatchNativeEndpoint(method string, upstreamPath string) (*NativeEndpoint, bool) {
@@ -151,6 +180,11 @@ func MatchNativeEndpoint(method string, upstreamPath string) (*NativeEndpoint, b
 				return &NativeEndpoint{Name: "sound-generation", BillingKind: billingCharacters, DefaultModel: NativeSoundGenerationModel}, true
 			}
 		case "music":
+			// ElevenLabs supports both non-stream compose (/v1/music) and stream
+			// (/v1/music/stream). Studio commonly posts to /v1/music.
+			if len(segments) == 2 {
+				return &NativeEndpoint{Name: "music", BillingKind: billingMusicDuration, DefaultModel: NativeMusicModel}, true
+			}
 			if len(segments) == 3 && segments[2] == "stream" {
 				return &NativeEndpoint{Name: "music", BillingKind: billingMusicDuration, DefaultModel: NativeMusicModel, Stream: true}, true
 			}

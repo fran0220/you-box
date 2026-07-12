@@ -136,6 +136,17 @@ func SetRelayRouter(router *gin.Engine) {
 			controller.Relay(c, types.RelayFormatOpenAIAudio)
 		})
 
+		// ElevenLabs short aliases under /v1 (Studio/Portal may omit /elevenlabs).
+		// Canonical native surface remains /elevenlabs/v1/...; these only cover
+		// unique paths that do not collide with OpenAI-compatible routes.
+		httpRouter.POST("/sound-generation", controller.RelayElevenLabs)
+		httpRouter.POST("/music", controller.RelayElevenLabs)
+		httpRouter.POST("/music/stream", controller.RelayElevenLabs)
+		httpRouter.POST("/audio-isolation", controller.RelayElevenLabs)
+		httpRouter.POST("/audio-isolation/stream", controller.RelayElevenLabs)
+		httpRouter.POST("/forced-alignment", controller.RelayElevenLabs)
+		httpRouter.POST("/speech-to-speech/*path", controller.RelayElevenLabs)
+
 		// rerank related routes
 		httpRouter.POST("/rerank", func(c *gin.Context) {
 			controller.Relay(c, types.RelayFormatRerank)
