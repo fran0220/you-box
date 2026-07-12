@@ -153,6 +153,7 @@ export function Footer(props: FooterProps) {
         title: t('Product'),
         links: [
           { text: t('Model Square'), href: '/pricing' },
+          { text: t('Chat'), href: '/playground' },
           { text: t('Console'), href: '/dashboard' },
           { text: t('Status'), href: '/status' },
         ],
@@ -162,7 +163,6 @@ export function Footer(props: FooterProps) {
         links: [
           { text: t('Documentation'), href: '/docs' },
           { text: t('API reference'), href: '/docs' },
-          { text: t('Playground'), href: '/playground' },
         ],
       },
       {

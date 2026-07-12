@@ -19,7 +19,6 @@ For commercial licensing, please contact support@quantumnous.com
 import {
   Activity,
   FileText,
-  FlaskConical,
   Key,
   ShieldCheck,
   SlidersHorizontal,
@@ -69,11 +68,6 @@ export function useSidebarData(): SidebarData {
             title: t('Billing'),
             url: '/wallet',
             icon: Wallet,
-          },
-          {
-            title: t('Playground'),
-            url: '/playground',
-            icon: FlaskConical,
           },
           {
             title: t('Settings'),
