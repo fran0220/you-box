@@ -19,7 +19,10 @@ For commercial licensing, please contact support@quantumnous.com
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
-import { parseHeaderNavModulesFromStatus } from '@/lib/nav-modules'
+import {
+  isChatEntryEnabled,
+  parseHeaderNavModulesFromStatus,
+} from '@/lib/nav-modules'
 import { useStatus } from '@/hooks/use-status'
 
 export type TopNavLink = {
@@ -36,6 +39,7 @@ export type TopNavLink = {
  * {
  *   home: true,
  *   console: true,
+ *   chat: true,
  *   pricing: { enabled: true, requireAuth: false },
  *   rankings: { enabled: true, requireAuth: false },
  *   docs: true,
@@ -58,6 +62,7 @@ export function useTopNavLinks(): TopNavLink[] {
   const docsLink: string | undefined = status?.docs_link as string | undefined
 
   const isAuthed = !!auth?.user
+  const statusRecord = status as Record<string, unknown> | null
 
   const links: TopNavLink[] = []
 
@@ -71,6 +76,15 @@ export function useTopNavLinks(): TopNavLink[] {
     links.push({
       title: t('Console'),
       href: '/dashboard',
+      requiresAuth: !isAuthed,
+    })
+  }
+
+  // Product Chat (in-app Playground) — homepage product capability
+  if (isChatEntryEnabled(statusRecord)) {
+    links.push({
+      title: t('Chat'),
+      href: '/playground',
       requiresAuth: !isAuthed,
     })
   }

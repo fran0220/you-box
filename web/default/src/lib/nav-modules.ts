@@ -25,6 +25,8 @@ export type HeaderNavModule = 'rankings' | 'pricing'
 export type HeaderNavModules = {
   home: boolean
   console: boolean
+  /** Product chat entry (in-app Playground at /playground). */
+  chat: boolean
   pricing: ModuleAccess
   rankings: ModuleAccess
   apps: boolean
@@ -37,6 +39,7 @@ export type HeaderNavModules = {
 const DEFAULT_HEADER_NAV_MODULES: HeaderNavModules = {
   home: true,
   console: true,
+  chat: true,
   pricing: { enabled: true, requireAuth: false },
   rankings: { enabled: false, requireAuth: false },
   apps: false,
@@ -212,4 +215,24 @@ export function isSidebarModuleEnabled(
   } catch {
     return true
   }
+}
+
+/**
+ * Product Chat entry is enabled when both:
+ * - HeaderNavModules.chat is not false (defaults true)
+ * - Legacy SidebarModulesAdmin.chat.playground is not false (defaults true)
+ *
+ * Used by the homepage top nav and the /playground route gate so an admin
+ * kill-switch on either surface still works.
+ */
+export function isChatEntryEnabled(
+  status?: Record<string, unknown> | null
+): boolean {
+  const resolved =
+    status === undefined
+      ? getCachedStatus()
+      : (status as Record<string, unknown> | null)
+  const header = parseHeaderNavModulesFromStatus(resolved)
+  if (header.chat === false) return false
+  return isSidebarModuleEnabled('chat', 'playground')
 }

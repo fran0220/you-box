@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createLazyComponent } from '@/lib/lazy-route-component'
-import { isSidebarModuleEnabled } from '@/lib/nav-modules'
+import { isChatEntryEnabled } from '@/lib/nav-modules'
 
 const Playground = createLazyComponent(async () => ({
   default: (await import('@/features/playground')).Playground,
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/_authenticated/playground/')({
         : undefined,
   }),
   beforeLoad: () => {
-    if (!isSidebarModuleEnabled('chat', 'playground')) {
+    if (!isChatEntryEnabled()) {
       throw redirect({ to: '/dashboard' })
     }
   },
