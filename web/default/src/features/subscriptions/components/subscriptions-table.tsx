@@ -19,12 +19,12 @@ For commercial licensing, please contact support@quantumnous.com
 import { useMemo, useState } from 'react'
 import {
   type SortingState,
-  type VisibilityState,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+import { usePersistedColumnVisibility } from '@/hooks'
 import { useTranslation } from 'react-i18next'
 import { DataTablePage } from '@/components/data-table'
 import { useSubscriptionsColumns } from './subscriptions-columns'
@@ -35,7 +35,16 @@ export function SubscriptionsTable() {
   const { t } = useTranslation()
   const columns = useSubscriptionsColumns()
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = usePersistedColumnVisibility(
+    'youbox.table.columns.subscriptions',
+    {
+      payment: false,
+      total_amount: false,
+      upgrade_group: false,
+      reset: false,
+      sort_order: false,
+    }
+  )
 
   // Shared with PlanPreviewPanel — same queryKey, single fetch.
   const { data, isLoading, isFetching, isError, refetch } = useAdminPlans()
@@ -69,6 +78,7 @@ export function SubscriptionsTable() {
         'Click "Create Plan" to create your first subscription plan'
       )}
       skeletonKeyPrefix='subscriptions-skeleton'
+      stickyActions
     />
   )
 }

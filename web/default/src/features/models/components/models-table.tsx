@@ -23,9 +23,8 @@ import {
   getCoreRowModel,
   useReactTable,
   type SortingState,
-  type VisibilityState,
 } from '@tanstack/react-table'
-import { useMediaQuery } from '@/hooks'
+import { useMediaQuery, usePersistedColumnVisibility } from '@/hooks'
 import { useTranslation } from 'react-i18next'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
 import { DataTablePage } from '@/components/data-table'
@@ -49,15 +48,24 @@ export function ModelsTable() {
 
   // Table state
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    // icon + name_rule info now lives in the model_name CellFlex
-    // (r2-B11 §1); both columns stay available via View Options.
-    icon: false,
-    name_rule: false,
-    description: false,
-    bound_channels: false,
-    quota_types: false,
-  })
+  // Essential: model_name, status, vendor, actions (+ select/id). Secondary
+  // metadata stays in View Options so the admin list fits laptop widths.
+  const [columnVisibility, setColumnVisibility] = usePersistedColumnVisibility(
+    'youbox.table.columns.models',
+    {
+      icon: false,
+      name_rule: false,
+      description: false,
+      bound_channels: false,
+      quota_types: false,
+      tags: false,
+      endpoints: false,
+      enable_groups: false,
+      sync_official: false,
+      created_time: false,
+      updated_time: false,
+    }
+  )
   const [rowSelection, setRowSelection] = useState({})
 
   // URL state management
@@ -249,6 +257,7 @@ export function ModelsTable() {
       )}
       skeletonKeyPrefix='model-skeleton'
       applyHeaderSize
+      stickyActions
       toolbarProps={{
         searchPlaceholder: t('Filter by model name...'),
         filters: [

@@ -21,7 +21,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import {
   type SortingState,
-  type VisibilityState,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
@@ -30,13 +29,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useDebounce } from '@/hooks'
+import { useDebounce, usePersistedColumnVisibility } from '@/hooks'
 import { AlertTriangle, Database } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { formatQuota } from '@/lib/format'
+import { formatQuota, formatTimestampToDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
+import { GroupBadge } from '@/components/group-badge'
 import { Button } from '@/components/ui/button'
 import {
   Empty,
@@ -224,6 +224,23 @@ function ApiKeysMobileList({
                 </span>
               )}
             </div>
+
+            <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-xs'>
+              {apiKey.group ? (
+                <div className='flex min-w-0 items-center gap-1.5'>
+                  <span className='text-muted-foreground'>{t('Group')}</span>
+                  <GroupBadge group={apiKey.group} />
+                </div>
+              ) : null}
+              <div className='flex items-center gap-1.5'>
+                <span className='text-muted-foreground'>{t('Expires')}</span>
+                <span className='font-mono tabular-nums'>
+                  {apiKey.expired_time === -1
+                    ? t('Never')
+                    : formatTimestampToDate(apiKey.expired_time)}
+                </span>
+              </div>
+            </div>
           </div>
         )
       })}
@@ -237,12 +254,18 @@ export function ApiKeysTable() {
   const columns = useApiKeysColumns()
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
-  // The masked key now lives in the name cell's secondary line; the
-  // standalone key column stays available via View Options but is hidden
-  // by default.
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    key: false,
-  })
+  // Essential columns only by default: name (+ masked key), status, quota,
+  // group, expires, actions. Secondary cols stay available via View Options.
+  const [columnVisibility, setColumnVisibility] = usePersistedColumnVisibility(
+    'youbox.table.columns.keys',
+    {
+      key: false,
+      model_limits: false,
+      allow_ips: false,
+      created_time: false,
+      accessed_time: false,
+    }
+  )
 
   const {
     globalFilter,
@@ -417,6 +440,7 @@ export function ApiKeysTable() {
           }}
         />
       }
+      stickyActions
       getRowClassName={(row) =>
         isDisabledApiKeyRow(row.original) ? DISABLED_ROW_DESKTOP : undefined
       }

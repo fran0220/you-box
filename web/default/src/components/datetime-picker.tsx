@@ -112,14 +112,19 @@ export function DateTimePicker({
   }
 
   return (
-    <div className={cn('flex gap-2', className)}>
+    <div
+      className={cn(
+        'flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center',
+        className
+      )}
+    >
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           render={
             <Button
               variant='outline'
               className={cn(
-                'flex-1 justify-between font-normal',
+                'min-w-0 flex-1 justify-between font-normal',
                 !date && 'text-muted-foreground'
               )}
             />
@@ -140,25 +145,27 @@ export function DateTimePicker({
           />
         </PopoverContent>
       </Popover>
-      <Input
-        type='time'
-        value={time}
-        onChange={handleTimeChange}
-        className='w-32 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
-        disabled={!date}
-      />
-      {date && (
-        <Button
-          type='button'
-          variant='outline'
-          size='icon'
-          onClick={handleClear}
-          className='shrink-0'
-          aria-label={t('Clear')}
-        >
-          <span aria-hidden='true'>✕</span>
-        </Button>
-      )}
+      <div className='flex items-center gap-2'>
+        <Input
+          type='time'
+          value={time}
+          onChange={handleTimeChange}
+          className='w-full appearance-none sm:w-32 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+          disabled={!date}
+        />
+        {date && (
+          <Button
+            type='button'
+            variant='outline'
+            size='icon'
+            onClick={handleClear}
+            className='shrink-0'
+            aria-label={t('Clear')}
+          >
+            <span aria-hidden='true'>✕</span>
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

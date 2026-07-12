@@ -21,7 +21,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import {
   type SortingState,
-  type VisibilityState,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
@@ -30,7 +29,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useMediaQuery } from '@/hooks'
+import { useMediaQuery, usePersistedColumnVisibility } from '@/hooks'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
@@ -71,7 +70,14 @@ export function UsersTable() {
   const isMobile = useMediaQuery('(max-width: 640px)')
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = usePersistedColumnVisibility(
+    'youbox.table.columns.users',
+    {
+      invite_info: false,
+      created_at: false,
+      last_login_at: false,
+    }
+  )
 
   const {
     globalFilter,
@@ -258,6 +264,7 @@ export function UsersTable() {
       )}
       skeletonKeyPrefix='users-skeleton'
       applyHeaderSize
+      stickyActions
       statHeader={
         // Admins / Banned / Total balance aggregate over the currently
         // loaded page (no global user-stats endpoint); Total uses the API

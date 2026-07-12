@@ -221,7 +221,27 @@ export type DataTablePageProps<TData> = {
    * Useful for sticky headers (`'sticky top-0 z-10 bg-muted/30'`) on long lists.
    */
   tableHeaderClassName?: string
+
+  /**
+   * Pin the last visible column (usually row actions / details) to the right
+   * edge of the table scroll container so operators can act without H-scrolling.
+   * Only applies to the default header/row renderers — custom `renderRow` must
+   * apply {@link STICKY_ACTIONS_HEAD_CLASS} / {@link STICKY_ACTIONS_CELL_CLASS}
+   * itself on the last cell.
+   */
+  stickyActions?: boolean
 }
+
+/** Sticky-right header cell styles (matches TableHeader surface). */
+export const STICKY_ACTIONS_HEAD_CLASS =
+  'sticky right-0 z-20 bg-surface-inset shadow-[-8px_0_8px_-8px_rgb(0_0_0_/_0.12)]'
+
+/**
+ * Sticky-right body cell styles. Tracks row hover/selected surfaces so the
+ * pinned column does not flash a different background while scrolling.
+ */
+export const STICKY_ACTIONS_CELL_CLASS =
+  'sticky right-0 z-10 bg-background group-hover/row:bg-surface-hover group-data-[state=selected]/row:bg-surface-2 shadow-[-8px_0_8px_-8px_rgb(0_0_0_/_0.12)]'
 
 /**
  * Unified table page wrapper. Encapsulates the canonical structure used across
@@ -344,24 +364,30 @@ function renderDesktop<TData>(
         <TableHeader className={props.tableHeaderClassName}>
           {props.table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  colSpan={header.colSpan}
-                  style={
-                    props.applyHeaderSize
-                      ? { width: header.getSize() }
-                      : undefined
-                  }
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              ))}
+              {headerGroup.headers.map((header, headerIndex) => {
+                const isLast =
+                  props.stickyActions &&
+                  headerIndex === headerGroup.headers.length - 1
+                return (
+                  <TableHead
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className={isLast ? STICKY_ACTIONS_HEAD_CLASS : undefined}
+                    style={
+                      props.applyHeaderSize
+                        ? { width: header.getSize() }
+                        : undefined
+                    }
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                )
+              })}
             </TableRow>
           ))}
         </TableHeader>
@@ -394,6 +420,7 @@ function renderDesktop<TData>(
                 <DefaultRow
                   key={row.id}
                   row={row}
+                  stickyActions={props.stickyActions}
                   className={props.getRowClassName?.(row, { isMobile: false })}
                 />
               )
@@ -444,20 +471,29 @@ function TableErrorRow({
 function DefaultRow<TData>({
   row,
   className,
+  stickyActions,
 }: {
   row: Row<TData>
   className?: string
+  stickyActions?: boolean
 }) {
+  const cells = row.getVisibleCells()
   return (
     <TableRow
       data-state={row.getIsSelected() && 'selected'}
       className={cn('group/row', className)}
     >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </TableCell>
-      ))}
+      {cells.map((cell, cellIndex) => {
+        const isLast = stickyActions && cellIndex === cells.length - 1
+        return (
+          <TableCell
+            key={cell.id}
+            className={isLast ? STICKY_ACTIONS_CELL_CLASS : undefined}
+          >
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        )
+      })}
     </TableRow>
   )
 }

@@ -29,14 +29,17 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useMediaQuery } from '@/hooks'
+import { useMediaQuery, usePersistedColumnVisibility } from '@/hooks'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { useIsAdmin } from '@/hooks/use-admin'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { DataTablePage } from '@/components/data-table'
+import {
+  DataTablePage,
+  STICKY_ACTIONS_CELL_CLASS,
+} from '@/components/data-table'
 import {
   DEFAULT_LOGS_DATA,
   LOG_TYPE_ALL_VALUE,
@@ -70,6 +73,15 @@ export function UsageLogsTable({ logCategory }: UsageLogsTableProps) {
   const isAdmin = useIsAdmin()
   const isMobile = useMediaQuery('(max-width: 640px)')
   const searchParams = route.useSearch()
+  // Keep Details (`content`) visible — it opens the detail dialog.
+  // Hide wide secondary columns by default (timing badges, token chip).
+  const [columnVisibility, setColumnVisibility] = usePersistedColumnVisibility(
+    `youbox.table.columns.usage-logs.${logCategory}`,
+    {
+      use_time: false,
+      token_name: false,
+    }
+  )
 
   const {
     columnFilters,
@@ -154,11 +166,13 @@ export function UsageLogsTable({ logCategory }: UsageLogsTableProps) {
     columns: columns as ColumnDef<Record<string, unknown>>[],
     state: {
       columnFilters,
+      columnVisibility,
       pagination,
     },
     enableRowSelection: false,
     onPaginationChange,
     onColumnFiltersChange,
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -187,6 +201,7 @@ export function UsageLogsTable({ logCategory }: UsageLogsTableProps) {
         'No usage logs available. Logs will appear here once API calls are made.'
       )}
       skeletonKeyPrefix='usage-log-skeleton'
+      stickyActions
       tableClassName={cn(
         'overflow-x-auto',
         '[&_[data-slot=table]]:text-[13px] [&_[data-slot=table]_td]:text-[13px] [&_[data-slot=table]_td_*]:text-[13px] [&_[data-slot=table]_th]:text-[13px] [&_[data-slot=table]_th_*]:text-[13px]',
@@ -213,11 +228,21 @@ export function UsageLogsTable({ logCategory }: UsageLogsTableProps) {
           | undefined
         const tintClass =
           isCommon && logType != null ? (logTypeRowTint[logType] ?? '') : ''
+        const cells = row.getVisibleCells()
 
         return (
-          <TableRow key={row.id} className={cn('transition-colors', tintClass)}>
-            {row.getVisibleCells().map((cell) => (
-              <TableCell key={cell.id} className={isCommon ? 'py-2' : 'py-3.5'}>
+          <TableRow
+            key={row.id}
+            className={cn('group/row transition-colors', tintClass)}
+          >
+            {cells.map((cell, cellIndex) => (
+              <TableCell
+                key={cell.id}
+                className={cn(
+                  isCommon ? 'py-2' : 'py-3.5',
+                  cellIndex === cells.length - 1 && STICKY_ACTIONS_CELL_CLASS
+                )}
+              >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>
             ))}

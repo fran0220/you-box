@@ -276,6 +276,7 @@ export default function TableDemos() {
             emptyDescription='Adjust filters or add a channel.'
             paginationInFooter={false}
             showPagination={false}
+            stickyActions
             statHeader={
               <StatCardRow columns={4}>
                 <StatCard size='sm' label='Total channels' value='34' />

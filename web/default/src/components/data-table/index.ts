@@ -25,7 +25,12 @@ export { DataTableBulkActions } from './bulk-actions'
 export { TableSkeleton } from './table-skeleton'
 export { TableEmpty } from './table-empty'
 export { MobileCardList } from './mobile-card-list'
-export { DataTablePage, type DataTablePageProps } from './data-table-page'
+export {
+  DataTablePage,
+  type DataTablePageProps,
+  STICKY_ACTIONS_HEAD_CLASS,
+  STICKY_ACTIONS_CELL_CLASS,
+} from './data-table-page'
 export { FilterBar, FilterBarSearch } from './filter-bar'
 export { FilterTabs, type FilterTabItem } from './filter-tabs'
 export {

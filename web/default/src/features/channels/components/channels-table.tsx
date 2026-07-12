@@ -25,11 +25,14 @@ import {
   getExpandedRowModel,
   type OnChangeFn,
   type SortingState,
-  type VisibilityState,
   type ExpandedState,
   type Row,
 } from '@tanstack/react-table'
-import { useDebounce, useMediaQuery } from '@/hooks'
+import {
+  useDebounce,
+  useMediaQuery,
+  usePersistedColumnVisibility,
+} from '@/hooks'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
@@ -86,14 +89,20 @@ export function ChannelsTable() {
 
   // Table state
   const [sorting, setSorting] = useState<SortingState>([])
-  // `type` is folded into the name cell (CellFlex secondary line); the
-  // standalone type column stays available via View Options but is hidden
-  // by default (r2-B7 §4).
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    models: false,
-    tag: false,
-    type: false,
-  })
+  // Essential: id, name (+ type secondary), status, priority, balance, actions.
+  // Secondary ops/meta columns stay available via View Options (persisted).
+  const [columnVisibility, setColumnVisibility] = usePersistedColumnVisibility(
+    'youbox.table.columns.channels',
+    {
+      models: false,
+      tag: false,
+      type: false,
+      group: false,
+      weight: false,
+      response_time: false,
+      test_time: false,
+    }
+  )
   const [rowSelection, setRowSelection] = useState({})
   const [expanded, setExpanded] = useState<ExpandedState>({})
 
@@ -419,6 +428,7 @@ export function ChannelsTable() {
       )}
       skeletonKeyPrefix='channel-skeleton'
       applyHeaderSize
+      stickyActions
       statHeader={
         // Health stats aggregate over the currently loaded page (no global
         // health endpoint); Total uses the API pagination total (r2-B7 §2).

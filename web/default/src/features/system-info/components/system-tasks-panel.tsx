@@ -125,7 +125,7 @@ export function SystemTasksPanel() {
         />
       ) : (
         <div className='overflow-x-auto py-1'>
-          <Table className='min-w-[860px]'>
+          <Table className='min-w-0 w-full'>
             <TableHeader>
               <TableRow>
                 <TableHead>{t('Type')}</TableHead>

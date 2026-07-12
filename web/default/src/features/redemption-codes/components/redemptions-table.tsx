@@ -21,7 +21,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import {
   type SortingState,
-  type VisibilityState,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
@@ -30,7 +29,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useMediaQuery } from '@/hooks'
+import { useMediaQuery, usePersistedColumnVisibility } from '@/hooks'
 import { useTranslation } from 'react-i18next'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
 import {
@@ -74,7 +73,13 @@ export function RedemptionsTable() {
   const isMobile = useMediaQuery('(max-width: 640px)')
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = usePersistedColumnVisibility(
+    'youbox.table.columns.redemptions',
+    {
+      created_time: false,
+      used_user_id: false,
+    }
+  )
 
   const {
     globalFilter,
@@ -186,6 +191,7 @@ export function RedemptionsTable() {
         'No redemption codes available. Create your first redemption code to get started.'
       )}
       skeletonKeyPrefix='redemptions-skeleton'
+      stickyActions
       statHeader={
         // Unused / Redeemed value aggregate over the currently loaded
         // page (no global redemption-stats endpoint); Codes issued uses

@@ -372,7 +372,7 @@ export function MultiKeyManageDialog({
                 {t('No keys found')}
               </div>
             ) : (
-              <div className='min-w-[800px]'>
+              <div className='min-w-0'>
                 <Table>
                   <TableHeader>
                     <TableRow>

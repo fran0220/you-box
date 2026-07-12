@@ -427,7 +427,7 @@ export function ApiKeysMutateDrawer({
                         className='min-w-0 [&_input[type=time]]:w-24 sm:[&_input[type=time]]:w-32'
                       />
                     </FormControl>
-                    <div className='grid grid-cols-4 gap-2 sm:flex'>
+                    <div className='flex flex-wrap gap-2'>
                       <Button
                         type='button'
                         variant='outline'

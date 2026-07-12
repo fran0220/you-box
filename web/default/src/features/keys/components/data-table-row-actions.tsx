@@ -83,10 +83,16 @@ function encodeConnectionString(key: string, url: string): string {
 
 type DataTableRowActionsProps<TData> = {
   row: Row<TData>
+  /**
+   * Hide menu items already promoted as icon buttons in {@link ApiKeysRowActions}
+   * (Copy Key / Edit). Leave false for mobile cards that only render this menu.
+   */
+  hideInlinePromoted?: boolean
 }
 
 export function DataTableRowActions<TData>({
   row,
+  hideInlinePromoted = false,
 }: DataTableRowActionsProps<TData>) {
   const { t } = useTranslation()
   const apiKey = apiKeySchema.parse(row.original)
@@ -236,19 +242,21 @@ export function DataTableRowActions<TData>({
           <span className='sr-only'>{t('Open menu')}</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-[200px]'>
-          <DropdownMenuItem
-            onClick={async () => {
-              const realKey = getCachedRealKey()
-              if (!realKey) return
-              const ok = await copyToClipboard(realKey)
-              if (ok) toast.success(t('Copied'))
-            }}
-          >
-            {t('Copy Key')}
-            <DropdownMenuShortcut>
-              <Copy size={16} />
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
+          {!hideInlinePromoted && (
+            <DropdownMenuItem
+              onClick={async () => {
+                const realKey = getCachedRealKey()
+                if (!realKey) return
+                const ok = await copyToClipboard(realKey)
+                if (ok) toast.success(t('Copied'))
+              }}
+            >
+              {t('Copy Key')}
+              <DropdownMenuShortcut>
+                <Copy size={16} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             onClick={async () => {
               const realKey = getCachedRealKey()
@@ -266,18 +274,22 @@ export function DataTableRowActions<TData>({
               <Link size={16} />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => {
-              setCurrentRow(apiKey)
-              setOpen('update')
-            }}
-          >
-            {t('Edit')}
-            <DropdownMenuShortcut>
-              <Edit size={16} />
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
+          {!hideInlinePromoted && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentRow(apiKey)
+                  setOpen('update')
+                }}
+              >
+                {t('Edit')}
+                <DropdownMenuShortcut>
+                  <Edit size={16} />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuItem
             onClick={async () => {
               const realKey = await resolveRealKey(apiKey.id)
@@ -398,7 +410,7 @@ export function ApiKeysRowActions<TData>({
       >
         <Edit className='size-3.5' />
       </RowActionButton>
-      <DataTableRowActions row={row} />
+      <DataTableRowActions row={row} hideInlinePromoted />
     </RowActions>
   )
 }
