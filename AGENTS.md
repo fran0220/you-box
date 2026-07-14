@@ -6,7 +6,8 @@ This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI pro
 
 This repository is **YouBox Core only** (API gateway + web console). The legacy Core `electron/` desktop shell has been removed and must not be reintroduced. This repo does not ship or document a desktop client.
 
-**Dual-host is two products, one core:** `youbox` (`you-box.com`) and `origingame` (`api.origingame.dev`) share one image and one codebase. Product identity is selected at runtime with `PRODUCT_ID` (design tokens + feature flags). Do not maintain two git forks or two full frontends. See [Rule 8: Multi-product profile](#rule-8-multi-product-profile--core--runtime-skin).
+**Production scope (2026-07 cutover):** this codebase is deployed **only on BWG** as Origin Gateway (`PRODUCT_ID=origingame`, `api.origingame.dev`).  
+**Do not deploy this image to `youbox` / `you-box.com` anymore.** That host is now the **BoxAI** product stack (`fran0220/boxAI`, image `ghcr.io/fran0220/boxai`). Dual-host “youbox + bwg both run you-box” is **retired**. Runtime product skins may still include `youbox` for local/dev demos; production ops target is **BWG only**.
 
 ## Tech Stack
 
@@ -47,27 +48,26 @@ web/             — Frontend themes container
 
 ## Production Deployment
 
-Two **products** share the same application image lineage but keep **separate compose projects, databases, Redis, volumes, secrets, and `PRODUCT_ID`**. Never treat them as one cluster unless multi-node config (shared DB/Redis/`SESSION_SECRET`) is explicitly designed.
-
-### Hosts
+### Hosts (current)
 
 | Role | SSH host | App directory | Compose service / container | Product (`PRODUCT_ID`) | Public domain | Host listen | Reverse proxy |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Primary product | `youbox` | `/opt/you-box` | `new-api` / `new-api` | `youbox` | `https://you-box.com/` | `0.0.0.0:3000` | Nginx → `127.0.0.1:3000` |
-| Secondary product | `bwg` | `/opt/origin-gateway` | `new-api` / `origin-gateway` | `origingame` | `https://api.origingame.dev/` | `127.0.0.1:9320` | Nginx → `127.0.0.1:9320` |
+| **Only production host for this repo** | `bwg` | `/opt/origin-gateway` | `new-api` / `origin-gateway` | `origingame` | `https://api.origingame.dev/` | `127.0.0.1:9320` | Nginx → `127.0.0.1:9320` |
+
+| Retired for this repo | Notes |
+| --- | --- |
+| `youbox` (`160.187.1.155`, `you-box.com`) | **No longer runs you-box.** Offlined 2026-07-15 → archive `/opt/you-box.offlined-*`, volume `you-box_pg_data` retained for recovery. Site is **BoxAI**: `/opt/boxAI`, image `ghcr.io/fran0220/boxai`, Nginx → `127.0.0.1:8080`. Ops for that host live in `fran0220/boxAI`. |
+| `jpdata` | Previously retired; do not redeploy you-box there. |
 
 Notes:
 
-- `youbox` (`160.187.1.155`) is the YouBox product (`PRODUCT_ID=youbox`, `you-box.com`).
-- `bwg` is the Origin Gateway product (`PRODUCT_ID=origingame`, `api.origingame.dev`). **Separate DB** from youbox.
-- Same image digest on both hosts; product differences are runtime (`PRODUCT_ID`, tokens, features), not separate builds.
+- Production deploys of **this** repository target **BWG only**.
 - Do **not** deploy this product as the shared `api.xiaomao.chat` gateway unless the operator intentionally points that domain at this stack.
-- Former host `jpdata` is retired for YouBox; do not redeploy the product stack there.
 - `bwg` is memory-constrained (~2GB). Prefer **pulling a prebuilt image** over building frontend+Go on the host.
 
 ### Image strategy (registry, not host-local-only)
 
-Publish immutable versioned images to a registry and deploy both hosts from that image.
+Publish immutable versioned images and deploy **BWG** from that image.
 
 Recommended naming:
 
@@ -77,7 +77,7 @@ ghcr.io/fran0220/you-box:main          # optional floating tag for staging exper
 ```
 
 CI publish workflow: `.github/workflows/ghcr-publish.yml`  
-Dual-host checklist: `docs/deploy-dual-host.md`
+Ops checklist: `docs/deploy-dual-host.md` (historical dual-host notes; **BWG-only** is the live path)
 
 Local/dev still uses:
 
@@ -124,23 +124,7 @@ docker load < boxai-v0.1.7.tar.gz
 
 Still tag the loaded image with the same version string on both hosts and set `BOXAI_IMAGE` accordingly.
 
-### Deploy on each host (same image, separate data)
-
-For **youbox**:
-
-```bash
-ssh youbox
-cd /opt/you-box
-git fetch && git checkout <release-commit-or-tag>   # keep compose/env in sync
-# edit .env: BOXAI_IMAGE=… PRODUCT_ID=youbox NODE_NAME=youbox-1
-docker compose pull new-api   # or docker pull $BOXAI_IMAGE
-docker compose up -d new-api
-# do NOT recreate postgres/redis volumes
-docker compose ps
-curl -fsS http://127.0.0.1:3000/api/status   # expect data.product.id == "youbox"
-```
-
-For **bwg**:
+### Deploy on BWG only
 
 ```bash
 ssh bwg
@@ -156,11 +140,11 @@ curl -fsS http://127.0.0.1:9320/api/status   # expect data.product.id == "origin
 Hard rules:
 
 1. **Never** delete/recreate persistent volumes (`data/`, postgres volume) during routine deploys.
-2. Keep each host’s `SESSION_SECRET`, DB password, Redis password, and `NODE_NAME` distinct unless deliberately running a shared multi-node cluster.
-3. Set `NODE_NAME` per host (examples: `youbox-1`, `bwg-origin-gateway-1`) so logs/audit can tell nodes apart.
-4. Set `PRODUCT_ID` per product host (`youbox` vs `origingame`). Optional: `PRODUCT_PUBLIC_BASE_URL`.
-5. Roll out **youbox first** for shared/core changes; roll out **bwg** after smoke checks, unless the release is origingame-specific.
-6. Upstream `calciumion/new-api` images are **not** production images for YouBox (missing YouBox frontend/extensions).
+2. Keep BWG `SESSION_SECRET`, DB password, Redis password, and `NODE_NAME` stable across rollouts.
+3. Set `NODE_NAME=bwg-origin-gateway-1` (or similar) so logs/audit identify the node.
+4. Production `PRODUCT_ID=origingame`. Optional: `PRODUCT_PUBLIC_BASE_URL=https://api.origingame.dev`.
+5. Do **not** deploy this image to `youbox` — that host is BoxAI (`fran0220/boxAI`).
+6. Upstream `calciumion/new-api` images are **not** production images for this product (missing frontend/extensions).
 
 ### Local development
 
