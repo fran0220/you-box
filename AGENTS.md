@@ -56,7 +56,7 @@ web/             — Frontend themes container
 
 | Retired for this repo | Notes |
 | --- | --- |
-| `youbox` (`160.187.1.155`, `you-box.com`) | **No longer runs you-box.** Offlined 2026-07-15 → archive `/opt/you-box.offlined-*`, volume `you-box_pg_data` retained for recovery. Site is **BoxAI**: `/opt/boxAI`, image `ghcr.io/fran0220/boxai`, Nginx → `127.0.0.1:8080`. Ops for that host live in `fran0220/boxAI`. |
+| `youbox` (`160.187.1.155`, `you-box.com`) | **No longer runs you-box.** Fully purged 2026-07-15 (no archive/volume). Site is **BoxAI**: `/opt/boxAI`, Postgres+Redis in compose, Nginx → `127.0.0.1:8080`. Ops: `fran0220/boxAI` → `docs/PRODUCTION.md`. |
 | `jpdata` | Previously retired; do not redeploy you-box there. |
 
 Notes:

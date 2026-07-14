@@ -10,7 +10,7 @@ Image registry for this repo: `ghcr.io/fran0220/you-box`
 | --- | --- | --- | --- | --- | --- | --- |
 | `bwg` | `bwg` | `/opt/origin-gateway` | `origin-gateway` | `https://api.origingame.dev/` | `127.0.0.1:9320` | **Active (this repo)** |
 | `youbox` | `youbox` / `160.187.1.155` | `/opt/boxAI` (BoxAI) | `sub2api` | `https://you-box.com/` | `127.0.0.1:8080` | **BoxAI — not you-box** |
-| `youbox` (archive) | — | `/opt/you-box.offlined-*` | — | — | — | Offline archive + volume `you-box_pg_data` |
+| `youbox` (legacy) | — | purged | — | — | — | **Deleted** 2026-07-15 (no you-box archive/volume on host) |
 
 ## BWG deploy (only production path for you-box)
 
@@ -71,16 +71,16 @@ Do **not** recreate postgres/redis volumes during rollback.
 - Do not routinely `docker compose build` on `bwg` (low memory).
 - Do not delete named volumes / `./data` during routine deploys.
 
-## Historical: youbox offlined from you-box (2026-07-15)
+## Historical: youbox fully purged of you-box (2026-07-15)
 
 On `youbox`:
 
-1. `cd /opt/you-box && docker compose down` (containers removed; volume `you-box_pg_data` **kept**)
-2. Archived `/opt/you-box` → `/opt/you-box.offlined-20260715013721`
-3. Deployed BoxAI under `/opt/boxAI` with `ghcr.io/fran0220/boxai:0.1.155-box.2`
-4. Nginx `you-box.com` now proxies to `127.0.0.1:8080`
+1. Stopped and removed you-box containers
+2. **Deleted** archive `/opt/you-box.offlined-*`, volume `you-box_pg_data`, images `you-box` / old postgres15 / redis:latest
+3. BoxAI runs under `/opt/boxAI` (`ghcr.io/fran0220/boxai`, Postgres 18 + Redis 8 in compose)
+4. Nginx `you-box.com` → `127.0.0.1:8080`
 
-BoxAI ops: repository `fran0220/boxAI`, docs under that repo (`AGENTS.md`, `docs/agents/deploy-release.md`).
+BoxAI ops: `fran0220/boxAI` → **`docs/PRODUCTION.md`**.
 
 ## Retired host: jpdata
 
