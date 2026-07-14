@@ -19,6 +19,7 @@ import (
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/model"
+	"github.com/QuantumNous/new-api/product"
 	"github.com/QuantumNous/new-api/setting/system_setting"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -127,7 +128,11 @@ func parseRSAPrivateKeyPEM(data []byte) (*rsa.PrivateKey, error) {
 func agentIssuer() string {
 	addr := strings.TrimSpace(system_setting.ServerAddress)
 	if addr == "" {
-		return "https://api.you-box.com"
+		// Fall back to the runtime product public origin (PRODUCT_ID), not a hardcoded host.
+		if base := product.PublicBaseURL(); base != "" {
+			return base
+		}
+		return "https://you-box.com"
 	}
 	return strings.TrimRight(addr, "/")
 }

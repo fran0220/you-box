@@ -87,9 +87,9 @@ export function TopNav(props: TopNavProps) {
 
   const linkClassName = (isActive: boolean, disabled?: boolean) =>
     cn(
-      'duration-fast rounded-sm px-3 py-1.5 text-[13px] font-medium transition-colors sm:text-sm',
+      'duration-fast rounded-md px-3 py-1.5 text-[13px] font-medium transition-[background-color,color,box-shadow] sm:text-sm',
       isActive
-        ? 'bg-surface-2 text-foreground'
+        ? 'bg-surface-2 text-foreground shadow-[inset_0_0_0_1px_var(--border)]'
         : 'text-muted-foreground hover:bg-surface-hover hover:text-foreground',
       disabled && 'pointer-events-none opacity-50'
     )

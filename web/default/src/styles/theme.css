@@ -17,31 +17,34 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 /*
- * YouBox theme foundation — editorial paper, light-only.
+ * Shared theme foundation.
  *
- * Two paper surfaces share one token vocabulary:
- *   - console (default): near-white paper, white cards, hairline borders
- *   - marketing (`.paper` scope): cream newsprint, ink-tinted flat cards
+ * :root defaults = Paper (origingame + baseline). YouBox "Circuit" overrides
+ * live in products/skins/youbox.css under html[data-product='youbox'].
  *
- * Ink is a green-tinted near-black. Accent is indigo (rules, anchors,
- * selected states); links are editorial blue and underlined. Cards are
- * flat: 1px hairline border, no drop shadows.
+ * Font/radius utilities must use CSS-variable indirection so product skins
+ * can swap them at runtime (Tailwind @theme inline literals are not
+ * overridable via data-product otherwise).
+ *
+ * Dark mode utilities are scoped to youbox only so origingame cannot go dark.
  */
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (
+  &:is(
+    html[data-product='youbox'].dark *,
+    html[data-product='youbox'] .dark *
+  )
+);
 
 @theme inline {
   --font-sans:
     'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui,
     -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  --font-display:
-    'Instrument Serif', Georgia, 'Times New Roman', 'Songti SC',
-    'Noto Serif SC', serif;
+  /* Runtime-swappable via --display-family / --serif-family on :root or product */
+  --font-display: var(--display-family);
   --font-mono:
     'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo,
     Consolas, monospace;
-  --font-serif:
-    'Instrument Serif', Georgia, 'Times New Roman', 'Songti SC',
-    'Noto Serif SC', serif;
+  --font-serif: var(--serif-family);
   --font-inter: var(--font-sans);
   --font-manrope: var(--font-sans);
 
@@ -118,14 +121,15 @@ For commercial licensing, please contact support@quantumnous.com
   --color-code: var(--code-bg);
   --color-code-border: var(--code-border);
 
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-  --radius-3xl: 20px;
-  --radius-4xl: 24px;
+  /* Runtime-swappable radii (Paper defaults set on :root) */
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --radius-2xl: var(--r-2xl);
+  --radius-3xl: var(--r-3xl);
+  --radius-4xl: var(--r-4xl);
 }
 
 @theme {
@@ -135,6 +139,35 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 :root {
+  /* -------- Typography / radius indirection (Paper defaults) -------- */
+  --display-family:
+    'Instrument Serif', Georgia, 'Times New Roman', 'Songti SC',
+    'Noto Serif SC', serif;
+  --serif-family:
+    'Instrument Serif', Georgia, 'Times New Roman', 'Songti SC',
+    'Noto Serif SC', serif;
+  --display-weight: 400;
+  --display-tracking: 0;
+  --eyebrow-tracking: 0.14em;
+  --eyebrow-size: 11px;
+
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-xl: 12px;
+  --r-2xl: 16px;
+  --r-3xl: 20px;
+  --r-4xl: 24px;
+
+  /* Hero washes (Paper cream secondary; youbox overrides in skin) */
+  --hero-wash-a: color-mix(in srgb, var(--brand) 26%, transparent);
+  --hero-wash-b: color-mix(
+    in srgb,
+    var(--paper-cream, #dfdfc1) 92%,
+    transparent
+  );
+
   /* -------- Raw ramps (theme-invariant) -------- */
   /* Green-tinted ink, matching the paper aesthetic. */
   --ink-950: #0b0d0b;

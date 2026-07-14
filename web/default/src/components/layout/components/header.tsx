@@ -26,6 +26,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { NotificationPopover } from '@/components/notification-popover'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
+import { ThemeSwitch } from '@/components/theme-switch'
 import { HeaderFrame } from './header-frame'
 import { SystemBrand } from './system-brand'
 import { TopNav } from './top-nav'
@@ -99,6 +100,7 @@ export function Header(props: HeaderProps) {
           />
         ) : null}
         {showLanguageSwitcher ? <LanguageSwitcher /> : null}
+        <ThemeSwitch />
         {isAuthenticated ? (
           <ProfileDropdown />
         ) : (

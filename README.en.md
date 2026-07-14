@@ -150,7 +150,7 @@ docker run --name you-box -d --restart always \
 > [!WARNING]
 > When operating this project as a public generative AI service or API resale service, users should first complete all required filing, licensing, content safety, real-name verification, log retention, tax, payment, and upstream authorization obligations.
 
-📖 For more deployment methods, please refer to [Deployment Guide](https://api.you-box.com/api-docs/installation)
+📖 For more deployment methods, please refer to [Deployment Guide](https://you-box.com/api-docs/installation)
 
 ---
 
@@ -158,7 +158,7 @@ docker run --name you-box -d --restart always \
 
 <div align="center">
 
-### 📖 [Official Documentation](https://api.you-box.com/api-docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fran0220/you-box)
+### 📖 [Official Documentation](https://you-box.com/api-docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fran0220/you-box)
 
 </div>
 
@@ -166,17 +166,17 @@ docker run --name you-box -d --restart always \
 
 | Category | Link |
 |------|------|
-| 🚀 Deployment Guide | [Installation Documentation](https://api.you-box.com/api-docs/installation) |
-| ⚙️ Environment Configuration | [Environment Variables](https://api.you-box.com/api-docs/installation/config-maintenance/environment-variables) |
-| 📡 API Documentation | [API Documentation](https://api.you-box.com/api-docs/api) |
-| ❓ FAQ | [FAQ](https://api.you-box.com/api-docs/support/faq) |
-| 💬 Community Interaction | [Communication Channels](https://api.you-box.com/api-docs/support/community-interaction) |
+| 🚀 Deployment Guide | [Installation Documentation](https://you-box.com/api-docs/installation) |
+| ⚙️ Environment Configuration | [Environment Variables](https://you-box.com/api-docs/installation/config-maintenance/environment-variables) |
+| 📡 API Documentation | [API Documentation](https://you-box.com/api-docs/api) |
+| ❓ FAQ | [FAQ](https://you-box.com/api-docs/support/faq) |
+| 💬 Community Interaction | [Communication Channels](https://you-box.com/api-docs/support/community-interaction) |
 
 ---
 
 ## ✨ Key Features
 
-> For detailed features, please refer to [Features Introduction](https://api.you-box.com/api-docs/guide/wiki/basic-concepts/features-introduction)
+> For detailed features, please refer to [Features Introduction](https://you-box.com/api-docs/guide/wiki/basic-concepts/features-introduction)
 
 ### 🎨 Core Functions
 
@@ -205,11 +205,11 @@ docker run --name you-box -d --restart always \
 ### 🚀 Advanced Features
 
 **API Format Support:**
-- ⚡ [OpenAI Responses](https://api.you-box.com/api-docs/api/ai-model/chat/openai/create-response)
-- ⚡ [OpenAI Realtime API](https://api.you-box.com/api-docs/api/ai-model/realtime/create-realtime-session) (including Azure)
-- ⚡ [Claude Messages](https://api.you-box.com/api-docs/api/ai-model/chat/create-message)
-- ⚡ [Google Gemini](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
-- 🔄 [Rerank Models](https://api.you-box.com/api-docs/api/ai-model/rerank/create-rerank) (Cohere, Jina)
+- ⚡ [OpenAI Responses](https://you-box.com/api-docs/api/ai-model/chat/openai/create-response)
+- ⚡ [OpenAI Realtime API](https://you-box.com/api-docs/api/ai-model/realtime/create-realtime-session) (including Azure)
+- ⚡ [Claude Messages](https://you-box.com/api-docs/api/ai-model/chat/create-message)
+- ⚡ [Google Gemini](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
+- 🔄 [Rerank Models](https://you-box.com/api-docs/api/ai-model/rerank/create-rerank) (Cohere, Jina)
 
 **Intelligent Routing:**
 - ⚖️ Channel weighted random
@@ -252,16 +252,16 @@ docker run --name you-box -d --restart always \
 
 ## 🤖 Model Support
 
-> For details, please refer to [API Documentation - Gateway Interface](https://api.you-box.com/api-docs/api)
+> For details, please refer to [API Documentation - Gateway Interface](https://you-box.com/api-docs/api)
 
 | Model Type | Description | Documentation |
 |---------|------|------|
 | 🤖 OpenAI GPTs | gpt-4-gizmo-* series | - |
-| 🎨 Midjourney-Proxy | [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy) | [Documentation](https://api.you-box.com/api-docs/api) |
-| 🎵 Suno-API | [Suno API](https://github.com/Suno-API/Suno-API) | [Documentation](https://api.you-box.com/api-docs/api) |
-| 🔄 Rerank | Cohere, Jina | [Documentation](https://api.you-box.com/api-docs/api/ai-model/rerank/create-rerank) |
-| 💬 Claude | Messages format | [Documentation](https://api.you-box.com/api-docs/api/ai-model/chat/create-message) |
-| 🌐 Gemini | Google Gemini format | [Documentation](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta) |
+| 🎨 Midjourney-Proxy | [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy) | [Documentation](https://you-box.com/api-docs/api) |
+| 🎵 Suno-API | [Suno API](https://github.com/Suno-API/Suno-API) | [Documentation](https://you-box.com/api-docs/api) |
+| 🔄 Rerank | Cohere, Jina | [Documentation](https://you-box.com/api-docs/api/ai-model/rerank/create-rerank) |
+| 💬 Claude | Messages format | [Documentation](https://you-box.com/api-docs/api/ai-model/chat/create-message) |
+| 🌐 Gemini | Google Gemini format | [Documentation](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta) |
 | 🔧 Dify | ChatFlow mode | - |
 | 🎯 Custom upstream | Supports configuring legally authorized upstream endpoints | - |
 
@@ -270,16 +270,16 @@ docker run --name you-box -d --restart always \
 <details>
 <summary>View complete interface list</summary>
 
-- [Chat Interface (Chat Completions)](https://api.you-box.com/api-docs/api/ai-model/chat/openai/create-chat-completion)
-- [Response Interface (Responses)](https://api.you-box.com/api-docs/api/ai-model/chat/openai/create-response)
-- [Image Interface (Image)](https://api.you-box.com/api-docs/api/ai-model/images/openai/v1-images-generations--post)
-- [Audio Interface (Audio)](https://api.you-box.com/api-docs/api/ai-model/audio/openai/create-transcription)
-- [Video Interface (Video)](https://api.you-box.com/api-docs/api/ai-model/videos/create-video-generation)
-- [Embedding Interface (Embeddings)](https://api.you-box.com/api-docs/api/ai-model/embeddings/create-embedding)
-- [Rerank Interface (Rerank)](https://api.you-box.com/api-docs/api/ai-model/rerank/create-rerank)
-- [Realtime Conversation (Realtime)](https://api.you-box.com/api-docs/api/ai-model/realtime/create-realtime-session)
-- [Claude Chat](https://api.you-box.com/api-docs/api/ai-model/chat/create-message)
-- [Google Gemini Chat](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
+- [Chat Interface (Chat Completions)](https://you-box.com/api-docs/api/ai-model/chat/openai/create-chat-completion)
+- [Response Interface (Responses)](https://you-box.com/api-docs/api/ai-model/chat/openai/create-response)
+- [Image Interface (Image)](https://you-box.com/api-docs/api/ai-model/images/openai/v1-images-generations--post)
+- [Audio Interface (Audio)](https://you-box.com/api-docs/api/ai-model/audio/openai/create-transcription)
+- [Video Interface (Video)](https://you-box.com/api-docs/api/ai-model/videos/create-video-generation)
+- [Embedding Interface (Embeddings)](https://you-box.com/api-docs/api/ai-model/embeddings/create-embedding)
+- [Rerank Interface (Rerank)](https://you-box.com/api-docs/api/ai-model/rerank/create-rerank)
+- [Realtime Conversation (Realtime)](https://you-box.com/api-docs/api/ai-model/realtime/create-realtime-session)
+- [Claude Chat](https://you-box.com/api-docs/api/ai-model/chat/create-message)
+- [Google Gemini Chat](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
 
 </details>
 
@@ -322,7 +322,7 @@ docker run --name you-box -d --restart always \
 | `PYROSCOPE_BLOCK_RATE` | Pyroscope block sampling rate | `5` |
 | `HOSTNAME` | Hostname tag for Pyroscope | `you-box` |
 
-📖 **Complete configuration:** [Environment Variables Documentation](https://api.you-box.com/api-docs/installation/config-maintenance/environment-variables)
+📖 **Complete configuration:** [Environment Variables Documentation](https://you-box.com/api-docs/installation/config-maintenance/environment-variables)
 
 </details>
 
@@ -424,10 +424,10 @@ docker run --name you-box -d --restart always \
 
 | Resource | Link |
 |------|------|
-| 📘 FAQ | [FAQ](https://api.you-box.com/api-docs/support/faq) |
-| 💬 Community Interaction | [Communication Channels](https://api.you-box.com/api-docs/support/community-interaction) |
-| 🐛 Issue Feedback | [Issue Feedback](https://api.you-box.com/api-docs/support/feedback-issues) |
-| 📚 Complete Documentation | [Official Documentation](https://api.you-box.com/api-docs) |
+| 📘 FAQ | [FAQ](https://you-box.com/api-docs/support/faq) |
+| 💬 Community Interaction | [Communication Channels](https://you-box.com/api-docs/support/community-interaction) |
+| 🐛 Issue Feedback | [Issue Feedback](https://you-box.com/api-docs/support/feedback-issues) |
+| 📚 Complete Documentation | [Official Documentation](https://you-box.com/api-docs) |
 
 ### 🤝 Contribution Guide
 
@@ -456,7 +456,7 @@ Welcome all forms of contribution!
 
 If this project is helpful to you, welcome to give us a ⭐️ Star！
 
-**[Official Documentation](https://api.you-box.com/api-docs)** • **[Issue Feedback](https://github.com/fran0220/you-box/issues)** • **[Latest Release](https://github.com/fran0220/you-box/releases)**
+**[Official Documentation](https://you-box.com/api-docs)** • **[Issue Feedback](https://github.com/fran0220/you-box/issues)** • **[Latest Release](https://github.com/fran0220/you-box/releases)**
 
 <sub>Built with ❤️ by BoxAI contributors</sub>
 

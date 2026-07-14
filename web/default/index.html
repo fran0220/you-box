@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-product="youbox">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
@@ -23,15 +23,45 @@
       content="Unified AI API gateway and admin dashboard."
     />
 
-    <meta name="theme-color" content="#fafaf8" />
+    <meta name="theme-color" content="#f6f8fa" />
     <!--umami-->
     <!--Google Analytics-->
+    <!-- FOUC: apply product + color scheme before paint (youbox may be dark). -->
+    <script>
+      ;(function () {
+        try {
+          var root = document.documentElement
+          var product = root.getAttribute('data-product') || 'youbox'
+          if (product !== 'youbox' && product !== 'origingame') product = 'youbox'
+          root.setAttribute('data-product', product)
+          var allowDark = product === 'youbox'
+          var theme = 'system'
+          try {
+            var stored = localStorage.getItem('yb-ui-theme')
+            if (stored === 'light' || stored === 'dark' || stored === 'system') {
+              theme = stored
+            }
+          } catch (e) {}
+          var dark = false
+          if (allowDark) {
+            if (theme === 'dark') dark = true
+            else if (theme === 'system') {
+              dark =
+                window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+            }
+          }
+          root.classList.remove('light', 'dark')
+          root.classList.add(dark ? 'dark' : 'light')
+          root.style.colorScheme = dark ? 'dark' : 'light'
+        } catch (e) {
+          document.documentElement.classList.add('light')
+        }
+      })()
+    </script>
   </head>
 
   <body>
-    <script>
-      document.documentElement.classList.add('light')
-    </script>
     <div id="root"></div>
   </body>
 </html>

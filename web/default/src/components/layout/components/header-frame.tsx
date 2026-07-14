@@ -34,6 +34,7 @@ export function HeaderFrame({
 }: HeaderFrameProps) {
   return (
     <header
+      data-slot='app-header'
       className={cn(
         'border-border sticky top-0 z-[var(--z-sticky)] h-[var(--app-header-height,3.75rem)] w-full shrink-0 border-b backdrop-blur-[18px]',
         'bg-[color-mix(in_srgb,var(--bg)_82%,transparent)]',

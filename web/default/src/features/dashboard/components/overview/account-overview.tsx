@@ -49,7 +49,7 @@ const OVERVIEW_RANGE_DAYS = 30
 const BANNER_DISMISSED_KEY = 'overview_announcement_dismissed'
 
 const FIRST_CALL_SNIPPET = [
-  'curl https://api.you-box.com/v1/chat/completions \\',
+  'curl https://you-box.com/v1/chat/completions \\',
   '  -H "Authorization: Bearer $YOUBOX_API_KEY" \\',
   '  -d \'{"model": "gpt-4.1-mini", "messages": [{"role": "user", "content": "Hello"}]}\'',
 ].join('\n')

@@ -4,6 +4,8 @@
 
 This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI providers (OpenAI, Claude, Gemini, Azure, AWS Bedrock, etc.) behind a unified API, with user management, billing, rate limiting, and an admin dashboard.
 
+**Multi-product:** dual-host deployments are two runtime products (`PRODUCT_ID=youbox` | `origingame`) on one core/image. See root `AGENTS.md` Rule 8 and `docs/product-profile.md`. Do not fork the repo or duplicate `web/default` per product.
+
 ## Tech Stack
 
 - **Backend**: Go 1.22+, Gin web framework, GORM v2 ORM
@@ -19,12 +21,14 @@ Layered architecture: Router -> Controller -> Service -> Model
 
 ```
 router/        — HTTP routing (API, relay, dashboard, web)
+  router/youbox-router.go — product extension seam
 controller/    — Request handlers
 service/       — Business logic
 model/         — Data models and DB access (GORM)
 relay/         — AI API relay/proxy with provider adapters
   relay/channel/ — Provider-specific adapters (openai/, claude/, gemini/, aws/, etc.)
-middleware/    — Auth, rate limiting, CORS, logging, distribution
+middleware/    — Auth, rate limiting, CORS, logging, distribution, RequireFeature
+product/       — Runtime product profile (PRODUCT_ID, features, public base URL)
 setting/       — Configuration management (ratio, model, operation, system, performance)
 common/        — Shared utilities (JSON, crypto, Redis, env, rate-limit, etc.)
 dto/           — Data transfer objects (request/response structs)
@@ -35,8 +39,17 @@ oauth/         — OAuth provider implementations
 pkg/           — Internal packages (cachex, ionet)
 web/             — Frontend themes container
  web/default/   — Default frontend (React 19, Rsbuild, Base UI, Tailwind)
+  web/default/src/products/ — runtime skins + feature flags
   web/default/src/i18n/ — Frontend internationalization (i18next, zh/en/fr/ru/ja/vi)
 ```
+
+## Multi-product (summary)
+
+- Env: `PRODUCT_ID=youbox|origingame`, optional `PRODUCT_PUBLIC_BASE_URL`
+- Status: nested `data.product` on `GET /api/status`
+- FE: `useFeature` / `useProduct` from `@/products`; tokens via `html[data-product]`
+- Gate product-only APIs on seams only; shared bugfixes stay in core `features/*`
+- Full rules: root `AGENTS.md` Rule 8
 
 ## Internationalization (i18n)
 
@@ -51,18 +64,12 @@ web/             — Frontend themes container
 - Usage: `useTranslation()` hook, call `t('English key')` in components
 - CLI tools: `bun run i18n:sync` (from `web/default/`)
 
-## Frontend Design Language — "Paper" (Amp-style)
+## Frontend Design Languages
 
-The default web theme (`web/default/`) follows a restrained, editorial design language inspired by Amp's paper aesthetic. All new or reworked UI must follow it:
-
-- **One shell**: marketing site, docs, user console, and admin share a single `AppShell` (document-level scroll, sticky header, footer). Public pages render without a sidebar; authenticated console pages mount the sidebar slot; admin is a drill-in view inside the same shell. Never build a page that feels like a second site.
-- **Paper surface**: a light, warm "paper" background is the default. Content sits directly on the page; avoid heavy cards, drop shadows, and gradients. Use hairline borders and dividers (`border-border/70`) to delimit content.
-- **Typography carries hierarchy**: serif display face (`font-display`, normal weight) for headings; mono uppercase micro-labels (`yb-eyebrow`) for eyebrows, section labels, and metadata; sans for body. Numeric data uses `tabular-nums`.
-- **Restraint over decoration**: color is reserved for brand accents and state. Animation is CSS-only, slow, and subtle (drifting washes, fade-up in view) — never attention-grabbing motion.
-- **Editorial layout**: generous whitespace, left-aligned content, constrained prose measures, hairline-grid lists (provider wall, modality rows) over card walls where possible.
-- **Catalog pattern**: list/grid pages (e.g., Model Plaza) use a search input plus one facet dropdown per major dimension, URL-driven filters, and window-virtualized results — no pagination.
-- **Auth pages**: a single centered narrow column on paper with the brand top-left — no split/two-column brand panels.
-- **Reusable primitives first**: prefer `web/default/src/components/youbox/` (PageHeader, Panel, Metric, SettingRow, EmptyState, Eyebrow) over bespoke markup.
+- **YouBox Circuit** (`PRODUCT_ID=youbox`): modern slate + violet, sans display, light/dark — `src/products/skins/youbox.css`
+- **Origin Paper** (`PRODUCT_ID=origingame`): Amp cream paper, serif display, light-only — `:root` + teal accents
+- Shared: one `AppShell`, semantic tokens, `components/youbox/*` primitives
+- Full rules: root `AGENTS.md` design languages + Rule 8
 
 ## Rules
 

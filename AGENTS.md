@@ -6,6 +6,8 @@ This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI pro
 
 This repository is **YouBox Core only** (API gateway + web console). The legacy Core `electron/` desktop shell has been removed and must not be reintroduced. This repo does not ship or document a desktop client.
 
+**Dual-host is two products, one core:** `youbox` (`you-box.com`) and `origingame` (`api.origingame.dev`) share one image and one codebase. Product identity is selected at runtime with `PRODUCT_ID` (design tokens + feature flags). Do not maintain two git forks or two full frontends. See [Rule 8: Multi-product profile](#rule-8-multi-product-profile--core--runtime-skin).
+
 ## Tech Stack
 
 - **Backend**: Go 1.22+, Gin web framework, GORM v2 ORM
@@ -21,12 +23,14 @@ Layered architecture: Router -> Controller -> Service -> Model
 
 ```
 router/        — HTTP routing (API, relay, dashboard, web)
+  router/youbox-router.go — product extension seam (gated routes)
 controller/    — Request handlers
 service/       — Business logic
 model/         — Data models and DB access (GORM)
 relay/         — AI API relay/proxy with provider adapters
   relay/channel/ — Provider-specific adapters (openai/, claude/, gemini/, aws/, etc.)
-middleware/    — Auth, rate limiting, CORS, logging, distribution
+middleware/    — Auth, rate limiting, CORS, logging, distribution, RequireFeature
+product/       — Runtime product profile (PRODUCT_ID, FeatureSet, public base URL)
 setting/       — Configuration management (ratio, model, operation, system, performance)
 common/        — Shared utilities (JSON, crypto, Redis, env, rate-limit, etc.)
 dto/           — Data transfer objects (request/response structs)
@@ -37,30 +41,33 @@ oauth/         — OAuth provider implementations
 pkg/           — Internal packages (cachex, ionet)
 web/             — Frontend themes container
  web/default/   — Default frontend (React 19, Rsbuild, Base UI, Tailwind)
+  web/default/src/products/ — runtime skins + features (youbox | origingame)
   web/default/src/i18n/ — Frontend internationalization (i18next, zh/en/fr/ru/ja/vi)
 ```
 
 ## Production Deployment
 
-YouBox runs on **two production hosts**. They share the same application image lineage but keep **separate compose projects, databases, Redis, volumes, and secrets**. Never treat them as one cluster unless multi-node config (shared DB/Redis/`SESSION_SECRET`) is explicitly designed.
+Two **products** share the same application image lineage but keep **separate compose projects, databases, Redis, volumes, secrets, and `PRODUCT_ID`**. Never treat them as one cluster unless multi-node config (shared DB/Redis/`SESSION_SECRET`) is explicitly designed.
 
 ### Hosts
 
-| Role | SSH host | App directory | Compose service / container | Public domain | Host listen | Reverse proxy |
-| --- | --- | --- | --- | --- | --- | --- |
-| Primary product API | `jpdata` | `/opt/you-box` | `new-api` / `new-api` | `https://api.you-box.com/` | `0.0.0.0:3000` | Nginx → `127.0.0.1:3000` |
-| Secondary gateway | `bwg` | `/opt/origin-gateway` | `new-api` / `origin-gateway` | `https://api.origingame.dev/` | `127.0.0.1:9320` | Nginx → `127.0.0.1:9320` |
+| Role | SSH host | App directory | Compose service / container | Product (`PRODUCT_ID`) | Public domain | Host listen | Reverse proxy |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Primary product | `youbox` | `/opt/you-box` | `new-api` / `new-api` | `youbox` | `https://you-box.com/` | `0.0.0.0:3000` | Nginx → `127.0.0.1:3000` |
+| Secondary product | `bwg` | `/opt/origin-gateway` | `new-api` / `origin-gateway` | `origingame` | `https://api.origingame.dev/` | `127.0.0.1:9320` | Nginx → `127.0.0.1:9320` |
 
 Notes:
 
-- `jpdata` is the main YouBox product deployment (`api.you-box.com`).
-- `bwg` runs the same YouBox/new-api codebase as a second deployment (`api.origingame.dev`). It is **not** the same DB as jpdata.
+- `youbox` (`160.187.1.155`) is the YouBox product (`PRODUCT_ID=youbox`, `you-box.com`).
+- `bwg` is the Origin Gateway product (`PRODUCT_ID=origingame`, `api.origingame.dev`). **Separate DB** from youbox.
+- Same image digest on both hosts; product differences are runtime (`PRODUCT_ID`, tokens, features), not separate builds.
 - Do **not** deploy this product as the shared `api.xiaomao.chat` gateway unless the operator intentionally points that domain at this stack.
+- Former host `jpdata` is retired for YouBox; do not redeploy the product stack there.
 - `bwg` is memory-constrained (~2GB). Prefer **pulling a prebuilt image** over building frontend+Go on the host.
 
 ### Image strategy (registry, not host-local-only)
 
-Historical local tags such as `boxai:jpdata` may still exist on hosts. Going forward, publish immutable versioned images to a registry and deploy both hosts from that image.
+Publish immutable versioned images to a registry and deploy both hosts from that image.
 
 Recommended naming:
 
@@ -108,7 +115,7 @@ docker buildx build \
 Until GHCR (or another private registry) credentials/workflows are wired, an interim fallback is:
 
 ```bash
-# build once on a capable host (prefer jpdata or local CI, not bwg)
+# build once on a capable host (prefer youbox or local CI, not bwg)
 docker build -t boxai:v0.1.7 .
 docker save boxai:v0.1.7 | gzip > boxai-v0.1.7.tar.gz
 # copy archive to the other host, then:
@@ -119,18 +126,18 @@ Still tag the loaded image with the same version string on both hosts and set `B
 
 ### Deploy on each host (same image, separate data)
 
-For **jpdata**:
+For **youbox**:
 
 ```bash
-ssh jpdata
+ssh youbox
 cd /opt/you-box
 git fetch && git checkout <release-commit-or-tag>   # keep compose/env in sync
-# edit .env: BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.7
+# edit .env: BOXAI_IMAGE=… PRODUCT_ID=youbox NODE_NAME=youbox-1
 docker compose pull new-api   # or docker pull $BOXAI_IMAGE
 docker compose up -d new-api
 # do NOT recreate postgres/redis volumes
 docker compose ps
-curl -fsS http://127.0.0.1:3000/api/status
+curl -fsS http://127.0.0.1:3000/api/status   # expect data.product.id == "youbox"
 ```
 
 For **bwg**:
@@ -139,20 +146,21 @@ For **bwg**:
 ssh bwg
 cd /opt/origin-gateway
 # keep host-local docker-compose.yml + .env (container name origin-gateway, port 9320)
-# edit .env: BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.7
+# edit .env: BOXAI_IMAGE=… PRODUCT_ID=origingame NODE_NAME=bwg-origin-gateway-1
 docker compose pull new-api   # service key is still new-api in compose file
 docker compose up -d new-api
 docker compose ps
-curl -fsS http://127.0.0.1:9320/api/status
+curl -fsS http://127.0.0.1:9320/api/status   # expect data.product.id == "origingame"
 ```
 
 Hard rules:
 
 1. **Never** delete/recreate persistent volumes (`data/`, postgres volume) during routine deploys.
 2. Keep each host’s `SESSION_SECRET`, DB password, Redis password, and `NODE_NAME` distinct unless deliberately running a shared multi-node cluster.
-3. Set `NODE_NAME` per host (examples: `jpdata-youbox-1`, `bwg-origin-gateway-1`) so logs/audit can tell nodes apart.
-4. Roll out **jpdata first** for product changes; roll out **bwg** after smoke checks, unless the release is bwg-specific.
-5. Upstream `calciumion/new-api` images are **not** production images for YouBox (missing YouBox frontend/extensions).
+3. Set `NODE_NAME` per host (examples: `youbox-1`, `bwg-origin-gateway-1`) so logs/audit can tell nodes apart.
+4. Set `PRODUCT_ID` per product host (`youbox` vs `origingame`). Optional: `PRODUCT_PUBLIC_BASE_URL`.
+5. Roll out **youbox first** for shared/core changes; roll out **bwg** after smoke checks, unless the release is origingame-specific.
+6. Upstream `calciumion/new-api` images are **not** production images for YouBox (missing YouBox frontend/extensions).
 
 ### Local development
 
@@ -168,7 +176,7 @@ docker compose up -d
 If the registry is unavailable:
 
 ```bash
-# on jpdata (has more RAM) — last resort
+# on youbox (has more RAM) — last resort
 cd /opt/you-box
 docker compose build new-api
 docker compose up -d new-api
@@ -189,18 +197,40 @@ Avoid routine builds on `bwg`.
 - Usage: `useTranslation()` hook, call `t('English key')` in components
 - CLI tools: `bun run i18n:sync` (from `web/default/`)
 
-## Frontend Design Language — "Paper" (Amp-style)
+## Frontend Design Languages (per product)
 
-The default web theme (`web/default/`) follows a restrained, editorial design language inspired by Amp's paper aesthetic. All new or reworked UI must follow it:
+One shell and one component tree; **two skins** selected by `PRODUCT_ID` / `html[data-product]`.
 
-- **One shell**: marketing site, docs, user console, and admin share a single `AppShell` (document-level scroll, sticky header, footer). Public pages render without a sidebar; authenticated console pages mount the sidebar slot; admin is a drill-in view inside the same shell. Never build a page that feels like a second site.
-- **Paper surface**: a light, warm "paper" background is the default. Content sits directly on the page; avoid heavy cards, drop shadows, and gradients. Use hairline borders and dividers (`border-border/70`) to delimit content.
-- **Typography carries hierarchy**: serif display face (`font-display`, normal weight) for headings; mono uppercase micro-labels (`yb-eyebrow`) for eyebrows, section labels, and metadata; sans for body. Numeric data uses `tabular-nums`.
-- **Restraint over decoration**: color is reserved for brand accents and state. Animation is CSS-only, slow, and subtle (drifting washes, fade-up in view) — never attention-grabbing motion.
-- **Editorial layout**: generous whitespace, left-aligned content, constrained prose measures, hairline-grid lists (provider wall, modality rows) over card walls where possible.
-- **Catalog pattern**: list/grid pages (e.g., Model Plaza) use a search input plus one facet dropdown per major dimension, URL-driven filters, and window-virtualized results — no pagination.
-- **Auth pages**: a single centered narrow column on paper with the brand top-left — no split/two-column brand panels.
-- **Reusable primitives first**: prefer `web/default/src/components/youbox/` (PageHeader, Panel, Metric, SettingRow, EmptyState, Eyebrow) over bespoke markup.
+### Shared shell rules (both products)
+
+- **One shell**: marketing, docs, console, and admin share `AppShell` (document scroll, sticky header, footer). Public pages without sidebar; console mounts the sidebar slot; admin is a drill-in in the same shell.
+- **Catalog pattern**: Model Plaza-style pages use search + facet dropdowns, URL-driven filters, window-virtualized results — no pagination.
+- **Auth**: single centered narrow column with brand top-left — no split brand panels.
+- **Primitives first**: `web/default/src/components/youbox/` (PageHeader, StatCard, ModelCard, EmptyState, Eyebrow, …).
+- **Semantic tokens only**: names live in `styles/theme.css`; product values in skins. Do not hardcode product colors in features.
+
+### YouBox — "Circuit" (`PRODUCT_ID=youbox`, `ui.skin=circuit`)
+
+Modern tech skin: cool slate neutrals, electric violet accent, **sans display** (~620 weight), layered elevation, **light + dark + system**.
+
+| | Light | Dark |
+| --- | --- | --- |
+| Canvas | `#f6f8fa` | `#0b0e13` |
+| Brand | `#4f46e5` | `#818cf8` |
+| Display | Hanken Grotesk | same |
+| Elevation | soft shadows | border + deep shadow |
+
+- Skin file: `web/default/src/products/skins/youbox.css`
+- No cream `.paper` class (`ui.paperMarketing=false`)
+- Theme toggle in header (`ThemeSwitch`); `ThemeProvider` respects `ui.darkMode`
+- Motion: violet/cyan hero washes; restrained CSS only
+
+### Origin Gateway — "Paper" (`PRODUCT_ID=origingame`, `ui.skin=paper`)
+
+Editorial Amp-style paper (unchanged baseline `:root`): cream marketing `.paper`, green-tinted ink, indigo accent, Instrument Serif display, **light-only**, flat hairlines.
+
+- Teal accent overrides: `web/default/src/products/product-tokens.css`
+- `ui.darkMode=false` — dark utilities scoped so Paper cannot activate dark mode
 
 ## Local validation (CI parity)
 
@@ -281,3 +311,50 @@ For request structs that are parsed from client JSON and then re-marshaled to up
 ### Rule 7: Billing Expression System — Read `pkg/billingexpr/expr.md`
 
 When working on tiered/dynamic billing (expression-based pricing), you MUST read `pkg/billingexpr/expr.md` first. It documents the design philosophy, expression language (variables, functions, examples), full system architecture (editor → storage → pre-consume → settlement → log display), token normalization rules (`p`/`c` auto-exclusion), quota conversion, and expression versioning. All code changes to the billing expression system must follow the patterns described in that document.
+
+### Rule 8: Multi-product profile — Core + runtime skin
+
+This monorepo ships **one core** and **two runtime products** selected by env (not separate repos or full frontend trees).
+
+| Product | `PRODUCT_ID` | Host | Public default |
+| --- | --- | --- | --- |
+| YouBox | `youbox` | `youbox` | `https://you-box.com` |
+| Origin Gateway | `origingame` | `bwg` | `https://api.origingame.dev` |
+
+**Source of truth**
+
+| Layer | Path | Responsibility |
+| --- | --- | --- |
+| Backend profile | `product/` | `PRODUCT_ID`, `FeatureSet`, `PublicBaseURL`, `/api/status` → `data.product` |
+| Extension seam | `router/youbox-router.go`, `service/youbox_runtime.go` | Product-only routes / init; gate with `product.Enabled` / `middleware.RequireFeature` |
+| Frontend profile | `web/default/src/products/` | Defaults, `useFeature` / `useProduct`, DOM `data-product`, token CSS |
+| Design tokens | `web/default/src/products/product-tokens.css` | Per-product CSS variable overrides only |
+
+**Day-to-day development**
+
+| Change type | Where to work | Extra steps |
+| --- | --- | --- |
+| Both products (shared) | `features/*`, `controller/`, `service/`, `relay/`, shared components | None — one PR, one image |
+| Design / brand only | `product-tokens.css`, optional copy defaults | No business forks |
+| A-only or B-only capability | Shared code + one `FeatureSet` key; gate FE with `useFeature` / `productHasFeature`; gate BE on **seams** with `product.Enabled` or `RequireFeature` | Keep keys ≤ ~15; delete when products converge |
+| Whole product-only domain (later) | New package under a product module pattern; private tables `og_*` / product-prefixed | Do **not** alter core table semantics |
+
+**Hard red lines (maintenance explosion)**
+
+1. **No dual git repos / no second full frontend** (`web/origingame` clone of `web/default`) while both remain AI-gateway products.
+2. **No `if productID == …` inside** `controller/`, `service/` (except thin product helpers), `relay/`, or shared `components/` / `features/*` business logic. Conditionals live in `product/`, seams, middleware, or `web/default/src/products/`.
+3. **No silent semantic fork** of the same API path per product. Different behavior → feature gate, new path, or config — not two meanings for one route.
+4. **No product-specific migrations on core tables.** Product-private data → prefixed tables + product-scoped migrate later.
+5. **No divergent image digests per host** for routine releases. Same tag/digest; `PRODUCT_ID` selects profile. (Dual image tags only if a later phase consciously requires them.)
+6. **Upstream Calcium-Ion sync** touches core only; do not put product skins into merge conflict surfaces. Preserve seams (`registerYouBoxRoutes`, YouBox runtime init).
+
+**Env**
+
+```bash
+PRODUCT_ID=youbox|origingame          # required per host in production
+PRODUCT_PUBLIC_BASE_URL=https://…     # optional override (OpenRouter referer, issuer fallback)
+```
+
+**Status contract:** `GET /api/status` includes nested `data.product` `{ id, display_name, public_base_url, features }`. Frontend applies skin from this payload. Prefer the nested key when extending so upstream flat status merges stay clean.
+
+**Details:** `docs/product-profile.md`, dual-host deploy: `docs/deploy-dual-host.md`.

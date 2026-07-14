@@ -279,7 +279,7 @@ export function ViewLogsDialog({
       </div>
       <div
         ref={scrollRef}
-        className='flex-1 overflow-auto rounded-md border bg-black p-3 sm:p-4'
+        className='bg-code text-foreground flex-1 overflow-auto rounded-md border p-3 sm:p-4'
         onScroll={(e) => {
           const target = e.target as HTMLDivElement
           const isAtBottom =

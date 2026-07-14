@@ -155,7 +155,7 @@ docker run --name you-box -d --restart always \
 > [!WARNING]
 > 本プロジェクトを公衆向け生成 AI サービスまたは API 再販サービスとして運営する場合、ユーザーは届出、コンテンツセキュリティ、本人確認、ログ保持、税務、決済、上流認可などの必要なコンプライアンス義務を先に完了してください。
 
-📖 その他のデプロイ方法については[デプロイガイド](https://api.you-box.com/api-docs/installation)を参照してください。
+📖 その他のデプロイ方法については[デプロイガイド](https://you-box.com/api-docs/installation)を参照してください。
 
 ---
 
@@ -163,7 +163,7 @@ docker run --name you-box -d --restart always \
 
 <div align="center">
 
-### 📖 [公式ドキュメント](https://api.you-box.com/api-docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fran0220/you-box)
+### 📖 [公式ドキュメント](https://you-box.com/api-docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fran0220/you-box)
 
 </div>
 
@@ -171,17 +171,17 @@ docker run --name you-box -d --restart always \
 
 | カテゴリ | リンク |
 |------|------|
-| 🚀 デプロイガイド | [インストールドキュメント](https://api.you-box.com/api-docs/installation) |
-| ⚙️ 環境設定 | [環境変数](https://api.you-box.com/api-docs/installation/config-maintenance/environment-variables) |
-| 📡 APIドキュメント | [APIドキュメント](https://api.you-box.com/api-docs/api) |
-| ❓ よくある質問 | [FAQ](https://api.you-box.com/api-docs/support/faq) |
-| 💬 コミュニティ交流 | [交流チャネル](https://api.you-box.com/api-docs/support/community-interaction) |
+| 🚀 デプロイガイド | [インストールドキュメント](https://you-box.com/api-docs/installation) |
+| ⚙️ 環境設定 | [環境変数](https://you-box.com/api-docs/installation/config-maintenance/environment-variables) |
+| 📡 APIドキュメント | [APIドキュメント](https://you-box.com/api-docs/api) |
+| ❓ よくある質問 | [FAQ](https://you-box.com/api-docs/support/faq) |
+| 💬 コミュニティ交流 | [交流チャネル](https://you-box.com/api-docs/support/community-interaction) |
 
 ---
 
 ## ✨ 主な機能
 
-> 詳細な機能については[機能説明](https://api.you-box.com/api-docs/guide/wiki/basic-concepts/features-introduction)を参照してください。
+> 詳細な機能については[機能説明](https://you-box.com/api-docs/guide/wiki/basic-concepts/features-introduction)を参照してください。
 
 ### 🎨 コア機能
 
@@ -213,11 +213,11 @@ docker run --name you-box -d --restart always \
 ### 🚀 高度な機能
 
 **APIフォーマットサポート:**
-- ⚡ [OpenAI Responses](https://api.you-box.com/api-docs/api/ai-model/chat/openai/create-response)
-- ⚡ [OpenAI Realtime API](https://api.you-box.com/api-docs/api/ai-model/realtime/create-realtime-session)（Azureを含む）
-- ⚡ [Claude Messages](https://api.you-box.com/api-docs/api/ai-model/chat/create-message)
-- ⚡ [Google Gemini](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
-- 🔄 [Rerankモデル](https://api.you-box.com/api-docs/api/ai-model/rerank/create-rerank)（Cohere、Jina）
+- ⚡ [OpenAI Responses](https://you-box.com/api-docs/api/ai-model/chat/openai/create-response)
+- ⚡ [OpenAI Realtime API](https://you-box.com/api-docs/api/ai-model/realtime/create-realtime-session)（Azureを含む）
+- ⚡ [Claude Messages](https://you-box.com/api-docs/api/ai-model/chat/create-message)
+- ⚡ [Google Gemini](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
+- 🔄 [Rerankモデル](https://you-box.com/api-docs/api/ai-model/rerank/create-rerank)（Cohere、Jina）
 
 **インテリジェントルーティング:**
 - ⚖️ チャネル重み付けランダム
@@ -260,17 +260,17 @@ docker run --name you-box -d --restart always \
 
 ## 🤖 モデルサポート
 
-> 詳細については[APIドキュメント - ゲートウェイインターフェース](https://api.you-box.com/api-docs/api)
+> 詳細については[APIドキュメント - ゲートウェイインターフェース](https://you-box.com/api-docs/api)
 
 | モデルタイプ | 説明 | ドキュメント |
 |---------|------|------|
-| 🤖 OpenAI-Compatible | OpenAI互換モデル | [ドキュメント](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion) |
-| 🤖 OpenAI Responses | OpenAI Responsesフォーマット | [ドキュメント](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createresponse) |
-| 🎨 Midjourney-Proxy | [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy) | [ドキュメント](https://api.you-box.com/api-docs/api) |
-| 🎵 Suno-API | [Suno API](https://github.com/Suno-API/Suno-API) | [ドキュメント](https://api.you-box.com/api-docs/api) |
-| 🔄 Rerank | Cohere、Jina | [ドキュメント](https://api.you-box.com/api-docs/api/ai-model/rerank/creatererank) |
-| 💬 Claude | Messagesフォーマット | [ドキュメント](https://api.you-box.com/api-docs/api/ai-model/chat/createmessage) |
-| 🌐 Gemini | Google Geminiフォーマット | [ドキュメント](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta) |
+| 🤖 OpenAI-Compatible | OpenAI互換モデル | [ドキュメント](https://you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion) |
+| 🤖 OpenAI Responses | OpenAI Responsesフォーマット | [ドキュメント](https://you-box.com/api-docs/api/ai-model/chat/openai/createresponse) |
+| 🎨 Midjourney-Proxy | [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy) | [ドキュメント](https://you-box.com/api-docs/api) |
+| 🎵 Suno-API | [Suno API](https://github.com/Suno-API/Suno-API) | [ドキュメント](https://you-box.com/api-docs/api) |
+| 🔄 Rerank | Cohere、Jina | [ドキュメント](https://you-box.com/api-docs/api/ai-model/rerank/creatererank) |
+| 💬 Claude | Messagesフォーマット | [ドキュメント](https://you-box.com/api-docs/api/ai-model/chat/createmessage) |
+| 🌐 Gemini | Google Geminiフォーマット | [ドキュメント](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta) |
 | 🔧 Dify | ChatFlowモード | - |
 | 🎯 カスタム上流 | 合法的に許可された上流エンドポイントの設定をサポート | - |
 
@@ -279,16 +279,16 @@ docker run --name you-box -d --restart always \
 <details>
 <summary>完全なインターフェースリストを表示</summary>
 
-- [チャットインターフェース (Chat Completions)](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion)
-- [レスポンスインターフェース (Responses)](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createresponse)
-- [イメージインターフェース (Image)](https://api.you-box.com/api-docs/api/ai-model/images/openai/post-v1-images-generations)
-- [オーディオインターフェース (Audio)](https://api.you-box.com/api-docs/api/ai-model/audio/openai/create-transcription)
-- [ビデオインターフェース (Video)](https://api.you-box.com/api-docs/api/ai-model/audio/openai/createspeech)
-- [エンベッドインターフェース (Embeddings)](https://api.you-box.com/api-docs/api/ai-model/embeddings/createembedding)
-- [再ランク付けインターフェース (Rerank)](https://api.you-box.com/api-docs/api/ai-model/rerank/creatererank)
-- [リアルタイム対話インターフェース (Realtime)](https://api.you-box.com/api-docs/api/ai-model/realtime/createrealtimesession)
-- [Claudeチャット](https://api.you-box.com/api-docs/api/ai-model/chat/createmessage)
-- [Google Geminiチャット](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
+- [チャットインターフェース (Chat Completions)](https://you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion)
+- [レスポンスインターフェース (Responses)](https://you-box.com/api-docs/api/ai-model/chat/openai/createresponse)
+- [イメージインターフェース (Image)](https://you-box.com/api-docs/api/ai-model/images/openai/post-v1-images-generations)
+- [オーディオインターフェース (Audio)](https://you-box.com/api-docs/api/ai-model/audio/openai/create-transcription)
+- [ビデオインターフェース (Video)](https://you-box.com/api-docs/api/ai-model/audio/openai/createspeech)
+- [エンベッドインターフェース (Embeddings)](https://you-box.com/api-docs/api/ai-model/embeddings/createembedding)
+- [再ランク付けインターフェース (Rerank)](https://you-box.com/api-docs/api/ai-model/rerank/creatererank)
+- [リアルタイム対話インターフェース (Realtime)](https://you-box.com/api-docs/api/ai-model/realtime/createrealtimesession)
+- [Claudeチャット](https://you-box.com/api-docs/api/ai-model/chat/createmessage)
+- [Google Geminiチャット](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
 
 </details>
 
@@ -331,7 +331,7 @@ docker run --name you-box -d --restart always \
 | `PYROSCOPE_BLOCK_RATE` | Pyroscope blockサンプリング率 | `5` |
 | `HOSTNAME` | Pyroscope用のホスト名タグ | `you-box` |
 
-📖 **完全な設定:** [環境変数ドキュメント](https://api.you-box.com/api-docs/installation/config-maintenance/environment-variables)
+📖 **完全な設定:** [環境変数ドキュメント](https://you-box.com/api-docs/installation/config-maintenance/environment-variables)
 
 </details>
 
@@ -431,10 +431,10 @@ docker run --name you-box -d --restart always \
 
 | リソース | リンク |
 |------|------|
-| 📘 よくある質問 | [FAQ](https://api.you-box.com/api-docs/support/faq) |
-| 💬 コミュニティ交流 | [交流チャネル](https://api.you-box.com/api-docs/support/community-interaction) |
-| 🐛 問題のフィードバック | [問題フィードバック](https://api.you-box.com/api-docs/support/feedback-issues) |
-| 📚 完全なドキュメント | [公式ドキュメント](https://api.you-box.com/api-docs) |
+| 📘 よくある質問 | [FAQ](https://you-box.com/api-docs/support/faq) |
+| 💬 コミュニティ交流 | [交流チャネル](https://you-box.com/api-docs/support/community-interaction) |
+| 🐛 問題のフィードバック | [問題フィードバック](https://you-box.com/api-docs/support/feedback-issues) |
+| 📚 完全なドキュメント | [公式ドキュメント](https://you-box.com/api-docs) |
 
 ### 🤝 貢献ガイド
 
@@ -473,7 +473,7 @@ docker run --name you-box -d --restart always \
 
 このプロジェクトがあなたのお役に立てたなら、ぜひ ⭐️ スターをください！
 
-**[公式ドキュメント](https://api.you-box.com/api-docs)** • **[問題フィードバック](https://github.com/fran0220/you-box/issues)** • **[最新リリース](https://github.com/fran0220/you-box/releases)**
+**[公式ドキュメント](https://you-box.com/api-docs)** • **[問題フィードバック](https://github.com/fran0220/you-box/issues)** • **[最新リリース](https://github.com/fran0220/you-box/releases)**
 
 <sub>BoxAI contributors によって ❤️ を込めて構築</sub>
 

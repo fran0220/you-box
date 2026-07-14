@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/pkg/appusage"
+	"github.com/QuantumNous/new-api/product"
 )
 
 func StartYouBoxBackgroundTasks() {
@@ -15,7 +16,9 @@ func StartYouBoxBackgroundTasks() {
 
 func InitYouBoxRuntimeResources() {
 	appusage.Init()
-	if err := InitAgentAuthKeys(); err != nil {
-		common.SysLog("agent auth keys not initialized: " + err.Error())
+	if product.Enabled(product.FeatureAgentDesktop) {
+		if err := InitAgentAuthKeys(); err != nil {
+			common.SysLog("agent auth keys not initialized: " + err.Error())
+		}
 	}
 }

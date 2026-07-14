@@ -1,0 +1,60 @@
+/*
+Copyright (C) 2023-2026 QuantumNous
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+For commercial licensing, please contact support@quantumnous.com
+*/
+
+/*
+ * Lightweight product accents. Full YouBox Circuit skin lives in
+ * products/skins/youbox.css (light + dark). Origingame keeps Paper :root
+ * plus the teal overrides below.
+ */
+
+html[data-product='youbox'] {
+  /* Full token pack: skins/youbox.css */
+  --product-id: youbox;
+}
+
+html[data-product='origingame'] {
+  --product-id: origingame;
+
+  /* Teal brand ramp (Origin Gateway) */
+  --indigo-500: #0f766e;
+  --indigo-600: #0d9488;
+  --indigo-700: #115e59;
+  --blue-link: #0e7490;
+  --blue-600: #0e7490;
+
+  --brand: var(--indigo-500);
+  --brand-hover: var(--indigo-600);
+  --brand-active: var(--indigo-700);
+  --brand-subtle: rgba(15, 118, 110, 0.1);
+  --brand-border: rgba(15, 118, 110, 0.32);
+  --brand-on: #ffffff;
+  --brand-ring: rgba(15, 118, 110, 0.38);
+  --teal: var(--indigo-500);
+  --teal-subtle: rgba(15, 118, 110, 0.08);
+
+  --text-link: var(--blue-link);
+  --ring: var(--brand-ring);
+  --chart-1: var(--indigo-500);
+  --glow-brand: 0 0 0 1px var(--brand-border);
+
+  /* Cooler paper for marketing surfaces */
+  --paper-cream: #dce8e6;
+  --paper-cream-2: #d0dedb;
+  --paper-cream-bright: #e8f2f0;
+}

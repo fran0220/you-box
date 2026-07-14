@@ -199,7 +199,7 @@ export function TwoFASetupDialog({
                     'Scan this QR code with your authenticator app (Google Authenticator, Microsoft Authenticator, etc.)'
                   )}
                 </p>
-                <div className='flex justify-center rounded-lg bg-white p-4'>
+                <div className='bg-card flex justify-center rounded-lg border p-4'>
                   <QRCodeSVG value={setupData.qr_code_data} size={200} />
                 </div>
                 <div className='bg-muted rounded-lg p-3'>

@@ -28,6 +28,10 @@ For commercial licensing, please contact support@quantumnous.com
 
 @import './theme.css';
 @import './theme-presets.css';
+/* Runtime product skins (html[data-product]); must load after theme.css. */
+@import '../products/product-tokens.css';
+/* YouBox Circuit full light+dark pack (origingame stays on :root Paper). */
+@import '../products/skins/youbox.css';
 
 /* Shiki dual themes: token colors follow dark theme (pre background stays `bg-background` on the block) */
 @layer components {
@@ -62,9 +66,8 @@ For commercial licensing, please contact support@quantumnous.com
     overflow: unset !important;
   }
 
-  /* YouBox typographic defaults: page headings run in the editorial serif
-   * display face at its single native weight; UI chrome titles (cards,
-   * dialogs, sheets) stay in the grotesque so dense surfaces read as UI. */
+  /* Page headings use display face; weight/tracking are product-tokenized
+   * (Paper serif 400 / Circuit sans ~620). UI chrome titles stay grotesque. */
   h1,
   h2,
   h3,
@@ -72,8 +75,8 @@ For commercial licensing, please contact support@quantumnous.com
   h5,
   h6 {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: 0;
+    font-weight: var(--display-weight, 400);
+    letter-spacing: var(--display-tracking, 0);
   }
 
   [data-slot='card-title'],
@@ -148,25 +151,33 @@ For commercial licensing, please contact support@quantumnous.com
   }
 }
 
-/* YouBox mono eyebrow — the recurring UPPERCASE editorial section label. */
+/* Mono eyebrow — product-tokenized tracking/size (Paper editorial vs Circuit tech). */
 @utility yb-eyebrow {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--eyebrow-size, 11px);
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--eyebrow-tracking, 0.14em);
   text-transform: uppercase;
   color: var(--text-secondary);
 }
 
-/* Editorial inline link — underlined, ink to link-blue on hover. */
+/* Inline link — brand-colored; Circuit prefers underline-on-hover, Paper keeps always-on. */
 @utility yb-link {
   color: var(--text-link);
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
   text-underline-offset: 3px;
-  transition: text-decoration-color var(--dur-fast) var(--ease-out);
+  transition:
+    text-decoration-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
 }
 .yb-link:hover {
+  text-decoration-color: currentColor;
+}
+html[data-product='youbox'] .yb-link {
+  text-decoration-color: transparent;
+}
+html[data-product='youbox'] .yb-link:hover {
   text-decoration-color: currentColor;
 }
 
@@ -523,10 +534,8 @@ For commercial licensing, please contact support@quantumnous.com
   }
 }
 
-/* Home hero backdrop — restrained paper aurora.
- * Two large blurred washes (brand indigo + deepened cream) drift very
- * slowly behind a faint editorial column grid. Pure CSS, no JS; static
- * under prefers-reduced-motion. */
+/* Home hero backdrop — product-tokenized washes (--hero-wash-a/b).
+ * Paper: cream + indigo. Circuit (youbox): violet + cyan. Pure CSS. */
 .hero-backdrop {
   position: absolute;
   inset: 0;
@@ -567,7 +576,7 @@ For commercial licensing, please contact support@quantumnous.com
   right: -14rem;
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--brand) 26%, transparent),
+    var(--hero-wash-a),
     transparent 74%
   );
   animation: hero-drift-a 32s ease-in-out infinite alternate;
@@ -578,7 +587,7 @@ For commercial licensing, please contact support@quantumnous.com
   left: -16rem;
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--paper-cream, #dfdfc1) 92%, transparent),
+    var(--hero-wash-b),
     transparent 74%
   );
   animation: hero-drift-b 40s ease-in-out infinite alternate;

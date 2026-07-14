@@ -33,7 +33,7 @@ export function Eyebrow(props: EyebrowProps) {
     <p
       data-slot='youbox-eyebrow'
       className={cn(
-        'text-text-secondary m-0 font-mono text-[11px] font-semibold tracking-[0.14em] uppercase',
+        'text-text-secondary m-0 font-mono text-[length:var(--eyebrow-size,11px)] font-semibold tracking-[var(--eyebrow-tracking,0.14em)] uppercase',
         className
       )}
       {...rest}

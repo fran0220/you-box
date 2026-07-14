@@ -283,7 +283,7 @@ docker compose -f docker-compose.dev.yml up -d
 Expose a local service with `amp orb portal 3000` (or the frontend port).
 
 ## Rules
-- Do not use production jpdata/bwg secrets in the orb.
+- Do not use production youbox/bwg secrets in the orb.
 - Keep setup/resume idempotent; do not wipe DB volumes casually.
 EOF
   log "wrote ${amp_config_dir}/AGENTS.md"

@@ -162,7 +162,7 @@ Local development:
 cd web/default && bun install && bun run dev
 ```
 
-The frontend dev server proxies API requests to `https://api.you-box.com` by
+The frontend dev server proxies API requests to `https://you-box.com` by
 default. Use `VITE_REACT_APP_SERVER_URL=http://localhost:3000 bun run dev` when
 you want to test against a local backend (see `web/default/README.md` for
 layout, Model Plaza, i18n, and `bun run knip`).
@@ -170,7 +170,7 @@ layout, Model Plaza, i18n, and `bun run knip`).
 > [!WARNING]
 > When operating this project as a public generative AI service or API resale service, users should first complete all required filing, licensing, content safety, real-name verification, log retention, tax, payment, and upstream authorization obligations.
 
-📖 For more deployment methods, please refer to [Deployment Guide](https://api.you-box.com/api-docs/installation)
+📖 For more deployment methods, please refer to [Deployment Guide](https://you-box.com/api-docs/installation)
 
 ---
 
@@ -178,7 +178,7 @@ layout, Model Plaza, i18n, and `bun run knip`).
 
 <div align="center">
 
-### 📖 [Official Documentation](https://api.you-box.com/api-docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fran0220/you-box)
+### 📖 [Official Documentation](https://you-box.com/api-docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fran0220/you-box)
 
 </div>
 
@@ -186,17 +186,17 @@ layout, Model Plaza, i18n, and `bun run knip`).
 
 | Category | Link |
 |------|------|
-| 🚀 Deployment Guide | [Installation Documentation](https://api.you-box.com/api-docs/installation) |
-| ⚙️ Environment Configuration | [Environment Variables](https://api.you-box.com/api-docs/installation/config-maintenance/environment-variables) |
-| 📡 API Documentation | [API Documentation](https://api.you-box.com/api-docs/api) |
-| ❓ FAQ | [FAQ](https://api.you-box.com/api-docs/support/faq) |
-| 💬 Community Interaction | [Communication Channels](https://api.you-box.com/api-docs/support/community-interaction) |
+| 🚀 Deployment Guide | [Installation Documentation](https://you-box.com/api-docs/installation) |
+| ⚙️ Environment Configuration | [Environment Variables](https://you-box.com/api-docs/installation/config-maintenance/environment-variables) |
+| 📡 API Documentation | [API Documentation](https://you-box.com/api-docs/api) |
+| ❓ FAQ | [FAQ](https://you-box.com/api-docs/support/faq) |
+| 💬 Community Interaction | [Communication Channels](https://you-box.com/api-docs/support/community-interaction) |
 
 ---
 
 ## ✨ Key Features
 
-> For detailed features, please refer to [Features Introduction](https://api.you-box.com/api-docs/guide/wiki/basic-concepts/features-introduction)
+> For detailed features, please refer to [Features Introduction](https://you-box.com/api-docs/guide/wiki/basic-concepts/features-introduction)
 
 ### 🎨 Core Functions
 
@@ -226,11 +226,11 @@ layout, Model Plaza, i18n, and `bun run knip`).
 ### 🚀 Advanced Features
 
 **API Format Support:**
-- ⚡ [OpenAI Responses](https://api.you-box.com/api-docs/api/ai-model/chat/openai/create-response)
-- ⚡ [OpenAI Realtime API](https://api.you-box.com/api-docs/api/ai-model/realtime/create-realtime-session) (including Azure)
-- ⚡ [Claude Messages](https://api.you-box.com/api-docs/api/ai-model/chat/create-message)
-- ⚡ [Google Gemini](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
-- 🔄 [Rerank Models](https://api.you-box.com/api-docs/api/ai-model/rerank/create-rerank) (Cohere, Jina)
+- ⚡ [OpenAI Responses](https://you-box.com/api-docs/api/ai-model/chat/openai/create-response)
+- ⚡ [OpenAI Realtime API](https://you-box.com/api-docs/api/ai-model/realtime/create-realtime-session) (including Azure)
+- ⚡ [Claude Messages](https://you-box.com/api-docs/api/ai-model/chat/create-message)
+- ⚡ [Google Gemini](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
+- 🔄 [Rerank Models](https://you-box.com/api-docs/api/ai-model/rerank/create-rerank) (Cohere, Jina)
 
 **Intelligent Routing:**
 - ⚖️ Channel weighted random
@@ -273,17 +273,17 @@ layout, Model Plaza, i18n, and `bun run knip`).
 
 ## 🤖 Model Support
 
-> For details, please refer to [API Documentation - Gateway Interface](https://api.you-box.com/api-docs/api)
+> For details, please refer to [API Documentation - Gateway Interface](https://you-box.com/api-docs/api)
 
 | Model Type | Description | Documentation |
 |---------|------|------|
-| 🤖 OpenAI-Compatible | OpenAI compatible models | [Documentation](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion) |
-| 🤖 OpenAI Responses | OpenAI Responses format | [Documentation](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createresponse) |
-| 🎨 Midjourney-Proxy | [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy) | [Documentation](https://api.you-box.com/api-docs/api) |
-| 🎵 Suno-API | [Suno API](https://github.com/Suno-API/Suno-API) | [Documentation](https://api.you-box.com/api-docs/api) |
-| 🔄 Rerank | Cohere, Jina | [Documentation](https://api.you-box.com/api-docs/api/ai-model/rerank/creatererank) |
-| 💬 Claude | Messages format | [Documentation](https://api.you-box.com/api-docs/api/ai-model/chat/createmessage) |
-| 🌐 Gemini | Google Gemini format | [Documentation](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta) |
+| 🤖 OpenAI-Compatible | OpenAI compatible models | [Documentation](https://you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion) |
+| 🤖 OpenAI Responses | OpenAI Responses format | [Documentation](https://you-box.com/api-docs/api/ai-model/chat/openai/createresponse) |
+| 🎨 Midjourney-Proxy | [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy) | [Documentation](https://you-box.com/api-docs/api) |
+| 🎵 Suno-API | [Suno API](https://github.com/Suno-API/Suno-API) | [Documentation](https://you-box.com/api-docs/api) |
+| 🔄 Rerank | Cohere, Jina | [Documentation](https://you-box.com/api-docs/api/ai-model/rerank/creatererank) |
+| 💬 Claude | Messages format | [Documentation](https://you-box.com/api-docs/api/ai-model/chat/createmessage) |
+| 🌐 Gemini | Google Gemini format | [Documentation](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta) |
 | 🔧 Dify | ChatFlow mode | - |
 | 🎯 Custom upstream | Supports configuring legally authorized upstream endpoints | - |
 
@@ -292,16 +292,16 @@ layout, Model Plaza, i18n, and `bun run knip`).
 <details>
 <summary>View complete interface list</summary>
 
-- [Chat Interface (Chat Completions)](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion)
-- [Response Interface (Responses)](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createresponse)
-- [Image Interface (Image)](https://api.you-box.com/api-docs/api/ai-model/images/openai/post-v1-images-generations)
-- [Audio Interface (Audio)](https://api.you-box.com/api-docs/api/ai-model/audio/openai/create-transcription)
-- [Video Interface (Video)](https://api.you-box.com/api-docs/api/ai-model/audio/openai/createspeech)
-- [Embedding Interface (Embeddings)](https://api.you-box.com/api-docs/api/ai-model/embeddings/createembedding)
-- [Rerank Interface (Rerank)](https://api.you-box.com/api-docs/api/ai-model/rerank/creatererank)
-- [Realtime Conversation (Realtime)](https://api.you-box.com/api-docs/api/ai-model/realtime/createrealtimesession)
-- [Claude Chat](https://api.you-box.com/api-docs/api/ai-model/chat/createmessage)
-- [Google Gemini Chat](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
+- [Chat Interface (Chat Completions)](https://you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion)
+- [Response Interface (Responses)](https://you-box.com/api-docs/api/ai-model/chat/openai/createresponse)
+- [Image Interface (Image)](https://you-box.com/api-docs/api/ai-model/images/openai/post-v1-images-generations)
+- [Audio Interface (Audio)](https://you-box.com/api-docs/api/ai-model/audio/openai/create-transcription)
+- [Video Interface (Video)](https://you-box.com/api-docs/api/ai-model/audio/openai/createspeech)
+- [Embedding Interface (Embeddings)](https://you-box.com/api-docs/api/ai-model/embeddings/createembedding)
+- [Rerank Interface (Rerank)](https://you-box.com/api-docs/api/ai-model/rerank/creatererank)
+- [Realtime Conversation (Realtime)](https://you-box.com/api-docs/api/ai-model/realtime/createrealtimesession)
+- [Claude Chat](https://you-box.com/api-docs/api/ai-model/chat/createmessage)
+- [Google Gemini Chat](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
 
 </details>
 
@@ -345,7 +345,7 @@ layout, Model Plaza, i18n, and `bun run knip`).
 | `PYROSCOPE_BLOCK_RATE` | Pyroscope block sampling rate | `5` |
 | `HOSTNAME` | Hostname tag for Pyroscope | `you-box` |
 
-📖 **Complete configuration:** [Environment Variables Documentation](https://api.you-box.com/api-docs/installation/config-maintenance/environment-variables)
+📖 **Complete configuration:** [Environment Variables Documentation](https://you-box.com/api-docs/installation/config-maintenance/environment-variables)
 
 </details>
 
@@ -447,10 +447,10 @@ docker run --name you-box -d --restart always \
 
 | Resource | Link |
 |------|------|
-| 📘 FAQ | [FAQ](https://api.you-box.com/api-docs/support/faq) |
-| 💬 Community Interaction | [Communication Channels](https://api.you-box.com/api-docs/support/community-interaction) |
-| 🐛 Issue Feedback | [Issue Feedback](https://api.you-box.com/api-docs/support/feedback-issues) |
-| 📚 Complete Documentation | [Official Documentation](https://api.you-box.com/api-docs) |
+| 📘 FAQ | [FAQ](https://you-box.com/api-docs/support/faq) |
+| 💬 Community Interaction | [Communication Channels](https://you-box.com/api-docs/support/community-interaction) |
+| 🐛 Issue Feedback | [Issue Feedback](https://you-box.com/api-docs/support/feedback-issues) |
+| 📚 Complete Documentation | [Official Documentation](https://you-box.com/api-docs) |
 
 ### 🤝 Contribution Guide
 
@@ -497,7 +497,7 @@ If your organization's policies do not permit AGPLv3-licensed software, consult 
 
 If this project is helpful to you, welcome to give us a ⭐️ Star！
 
-**[Official Documentation](https://api.you-box.com/api-docs)** • **[Issue Feedback](https://github.com/fran0220/you-box/issues)** • **[Latest Release](https://github.com/fran0220/you-box/releases)**
+**[Official Documentation](https://you-box.com/api-docs)** • **[Issue Feedback](https://github.com/fran0220/you-box/issues)** • **[Latest Release](https://github.com/fran0220/you-box/releases)**
 
 <sub>Built with ❤️ by BoxAI contributors</sub>
 

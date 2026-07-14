@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://api.you-box.com/contracts/agent-auth.json",
+  "$id": "https://you-box.com/contracts/agent-auth.json",
   "title": "YouBox Agent Auth API",
   "description": "Contract for desktop agent authentication against YouBox Core",
   "definitions": {

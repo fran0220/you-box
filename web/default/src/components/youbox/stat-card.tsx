@@ -59,7 +59,7 @@ export function StatCard(props: StatCardProps) {
     <div
       data-slot='youbox-stat-card'
       className={cn(
-        'bg-card rounded-lg border',
+        'bg-card border-border rounded-xl border shadow-[var(--shadow-sm)]',
         sm ? 'p-3.5' : 'p-4 sm:p-5',
         className
       )}

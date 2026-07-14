@@ -846,7 +846,7 @@ export function EmailSettingsSection({
                     </p>
                   )}
 
-                  <div className='max-w-full overflow-x-auto rounded-md border border-[#e7e1d7] bg-white'>
+                  <div className='border-border bg-card max-w-full overflow-x-auto rounded-md border'>
                     {previewHtml ? (
                       <div
                         // Admin-only preview of templates they themselves configured.

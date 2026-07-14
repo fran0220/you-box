@@ -106,4 +106,4 @@ go test ./common ./model ./relay/channel/elevenlabs -count=1
 cd web/default && bun run typecheck && bun run i18n:sync
 ```
 
-For production deployment, follow the project `AGENTS.md` deployment policy for `jpdata` and verify `docker compose ps new-api` is healthy.
+For production deployment, follow the project `AGENTS.md` deployment policy for `youbox` and verify `docker compose ps new-api` is healthy.

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://api.you-box.com/contracts/agent-models.json",
+  "$id": "https://you-box.com/contracts/agent-models.json",
   "title": "YouBox Agent Models API",
   "type": "object",
   "required": ["models", "default_model", "policy_version"],

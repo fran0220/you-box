@@ -206,8 +206,8 @@ export function HeroTerminalDemo(props: HeroTerminalDemoProps) {
       <div
         className={cn(
           'overflow-hidden rounded-2xl border backdrop-blur-sm',
-          'border-border/60 bg-white/95 shadow-[0_20px_50px_-25px_rgba(15,23,42,0.18)]',
-          'dark:bg-background/95 dark:border-white/[0.06] dark:shadow-[0_20px_60px_-25px_rgba(0,0,0,0.7)]'
+          'border-border/60 bg-card/95 shadow-[var(--shadow-lg)]',
+          'dark:bg-card/95 dark:border-border dark:shadow-[var(--shadow-lg)]'
         )}
       >
         {/* Tab strip */}

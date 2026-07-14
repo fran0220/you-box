@@ -28,18 +28,19 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active',
+          /* Brand-forward CTA (Circuit violet / Paper indigo / Origin teal via tokens). */
+          'bg-brand text-brand-on hover:bg-brand-hover active:bg-brand-active shadow-[0_1px_2px_rgba(13,17,23,0.1)] focus-visible:shadow-[0_0_0_3px_var(--brand-subtle)]',
         outline:
-          'border-border-strong bg-transparent text-foreground hover:bg-surface-hover aria-expanded:bg-surface-hover',
+          'border-border-strong bg-transparent text-foreground hover:bg-surface-hover hover:border-brand-border aria-expanded:bg-surface-hover',
         secondary:
-          'border-border-strong bg-surface-2 text-foreground hover:bg-surface-3 aria-expanded:bg-surface-3',
+          'border-border bg-surface-2 text-foreground hover:bg-surface-3 hover:border-border-strong aria-expanded:bg-surface-3',
         ghost:
           'text-[var(--text-secondary)] hover:bg-surface-hover hover:text-foreground aria-expanded:bg-surface-hover aria-expanded:text-foreground',
         subtle:
-          'bg-brand-subtle text-brand hover:text-brand-hover hover:border-brand-border',
+          'bg-brand-subtle text-brand hover:text-brand-hover hover:border-brand-border border border-transparent',
         destructive:
           'bg-destructive text-white hover:brightness-[1.08] focus-visible:border-destructive/40 focus-visible:shadow-[0_0_0_3px_var(--danger-subtle)]',
-        link: 'text-primary underline-offset-4 hover:underline',
+        link: 'text-brand underline-offset-4 hover:underline',
       },
       size: {
         default:

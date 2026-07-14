@@ -43,7 +43,7 @@ export function PageHeader(props: PageHeaderProps) {
     >
       <div className='min-w-0 flex-1'>
         {eyebrow != null && <Eyebrow className='mb-1.5'>{eyebrow}</Eyebrow>}
-        <h1 className='font-display text-foreground text-2xl leading-tight font-bold tracking-[-0.02em]'>
+        <h1 className='font-display text-foreground text-2xl leading-tight font-semibold tracking-[-0.02em]'>
           {title}
         </h1>
         {subtitle != null && (

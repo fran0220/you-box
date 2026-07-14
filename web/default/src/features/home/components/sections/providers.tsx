@@ -20,9 +20,9 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
+import { cn } from '@/lib/utils'
+import { useProduct } from '@/products'
 
-/** Model providers routed through the gateway. Names stay untranslated
- * (lab names); icons come from @lobehub/icons. */
 const PROVIDERS: Array<{ name: string; icon: string }> = [
   { name: 'Anthropic', icon: 'Anthropic' },
   { name: 'OpenAI', icon: 'OpenAI' },
@@ -45,17 +45,32 @@ const PROVIDERS: Array<{ name: string; icon: string }> = [
 ]
 
 /**
- * Provider wall: every frontier lab behind the one endpoint. Editorial
- * hairline grid, no cards — restraint over decoration.
+ * Provider wall. Circuit: elevated tile grid. Paper: hairline grid.
  */
 export function Providers() {
   const { t } = useTranslation()
+  const product = useProduct()
+  const isCircuit = product.ui.skin === 'circuit'
 
   return (
-    <section className='border-border/70 border-t py-14 md:py-20'>
-      <div className='mx-auto w-full max-w-6xl px-4 md:px-6'>
+    <section
+      data-slot={isCircuit ? 'home-section' : undefined}
+      className={cn(!isCircuit && 'border-border/70 border-t py-14 md:py-20')}
+    >
+      <div
+        className={cn(
+          isCircuit
+            ? 'home-section-inner'
+            : 'mx-auto w-full max-w-6xl px-4 md:px-6'
+        )}
+      >
         <p className='yb-eyebrow mb-4'>{t('Model providers')}</p>
-        <h2 className='font-display max-w-[16em] text-3xl leading-[1.1] font-normal md:text-4xl'>
+        <h2
+          className={cn(
+            'font-display max-w-[16em] text-3xl leading-[1.1] md:text-4xl',
+            isCircuit ? 'font-semibold tracking-[-0.03em]' : 'font-normal'
+          )}
+        >
           {t('Every frontier lab, one endpoint')}
         </h2>
         <p className='text-muted-foreground mt-4 max-w-[36em] text-base leading-relaxed'>
@@ -64,23 +79,41 @@ export function Providers() {
           )}
         </p>
 
-        <ul className='border-border/70 mt-10 grid grid-cols-2 border-t border-l sm:grid-cols-3 lg:grid-cols-6'>
-          {PROVIDERS.map((provider) => (
-            <li
-              key={provider.name}
-              className='border-border/70 text-muted-foreground hover:text-foreground flex items-center gap-2.5 border-r border-b px-4 py-4 text-[13px] font-medium transition-colors'
-            >
-              <span className='shrink-0' aria-hidden='true'>
-                {getLobeIcon(provider.icon, 18)}
-              </span>
-              <span className='truncate'>{provider.name}</span>
-            </li>
-          ))}
-        </ul>
+        {isCircuit ? (
+          <ul className='mt-10 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6'>
+            {PROVIDERS.map((provider) => (
+              <li key={provider.name} data-slot='circuit-tile'>
+                <span className='shrink-0' aria-hidden='true'>
+                  {getLobeIcon(provider.icon, 18)}
+                </span>
+                <span className='truncate'>{provider.name}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className='border-border/70 mt-10 grid grid-cols-2 border-t border-l sm:grid-cols-3 lg:grid-cols-6'>
+            {PROVIDERS.map((provider) => (
+              <li
+                key={provider.name}
+                className='border-border/70 text-muted-foreground hover:text-foreground flex items-center gap-2.5 border-r border-b px-4 py-4 text-[13px] font-medium transition-colors'
+              >
+                <span className='shrink-0' aria-hidden='true'>
+                  {getLobeIcon(provider.icon, 18)}
+                </span>
+                <span className='truncate'>{provider.name}</span>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <Link
           to='/pricing'
-          className='text-muted-foreground hover:text-foreground group mt-6 inline-flex items-center gap-1.5 text-sm transition-colors'
+          className={cn(
+            'group mt-6 inline-flex items-center gap-1.5 text-sm transition-colors',
+            isCircuit
+              ? 'text-brand font-medium hover:underline'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
         >
           {t('Browse all models in the Model Plaza')}
           <ArrowRight

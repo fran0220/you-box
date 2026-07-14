@@ -93,9 +93,9 @@ export function ModelCard(props: ModelCardProps) {
       onClick={onClick}
       onKeyDown={handleKeyDown}
       className={cn(
-        'bg-card border-border flex flex-col rounded-lg border p-4 transition-[border-color,box-shadow,transform] duration-base ease-out',
+        'bg-card border-border flex flex-col rounded-xl border p-4 shadow-[var(--shadow-sm)] transition-[border-color,box-shadow,transform] duration-base ease-out',
         showInteractiveChrome &&
-          'hover:border-brand-border hover:shadow-[var(--glow-brand)] motion-safe:hover:-translate-y-0.5',
+          'hover:border-brand-border hover:shadow-[var(--glow-brand),var(--shadow-md)] motion-safe:hover:-translate-y-0.5',
         isClickable &&
           'cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
         className

@@ -47,7 +47,8 @@
   - [3.14 测试](#314-测试)
   - [3.15 依赖管理](#315-依赖管理)
   - [3.16 构建与部署](#316-构建与部署)
-  - [3.17 设计语言（Paper · Amp 式）](#317-设计语言paper--amp-式)
+  - [3.17 多产品（Product profile）](#317-多产品product-profile)
+  - [3.18 设计语言（双产品皮肤）](#318-设计语言双产品皮肤)
 - [四、协作与提交](#四协作与提交)
 - [更新日志](#更新日志)
 
@@ -158,18 +159,45 @@
 - 代码分割与懒加载策略见 [3.4 性能](#34-性能)；资源使用合适格式与压缩，环境变量用 `.env` 且以 `VITE_` 前缀，不在代码中硬编码。
 - **发布前**：执行 typecheck、lint、format 检查，完成生产构建并检查产物体积与环境变量配置。
 
-### 3.17 设计语言（Paper · Amp 式）
+### 3.17 多产品（Product profile）
 
-本项目的视觉语言参照 Amp 的「纸面」美学，克制、编辑式。所有新增或重构的界面都必须遵循：
+双机部署对应两个**运行时产品**（同一镜像，`PRODUCT_ID` 选择），不是两套前端仓库：
 
-- **单一外壳**：营销页、文档、用户控制台与管理后台共用一个 `AppShell`（文档级滚动、吸顶头部、页脚）。公开页不挂侧栏；已登录控制台页挂侧栏插槽；管理端是同一外壳内的下钻视图。任何页面都不应让人感觉像「另一个网站」。
-- **纸面底色**：默认使用浅色暖调「纸面」背景，内容直接落在页面上；少用厚重卡片、投影与渐变，用发丝线（hairline，`border-border/70`）边框与分隔线划分内容。
-- **排版承担层级**：标题用衬线展示字体（`font-display`，常规字重）；眉题、小节标签与元信息用等宽大写微标签（`yb-eyebrow`）；正文用无衬线；数字统一 `tabular-nums`。
-- **克制优先**：颜色只留给品牌强调与状态表达；动画仅用 CSS，缓慢而微妙（漂移色晕、入场浮现），禁止抢眼的动效。
-- **编辑式版式**：留白充足、内容左对齐、行宽受限；能用发丝线网格列表（如首页厂商墙、模态分行）就不用卡片墙。
-- **目录页范式**：列表/网格页（如模型广场）采用「搜索框 + 每个主维度一个门面下拉」的筛选条、URL 驱动筛选、窗口虚拟化结果，不分页。
-- **认证页**：纸面上单栏居中窄列，品牌置于左上角；不使用双栏品牌侧板。
-- **通用件优先**：优先使用 `src/components/youbox/` 下的原语（PageHeader、Panel、Metric、SettingRow、EmptyState、Eyebrow 等），不要各写各的。
+| `PRODUCT_ID` | 域名默认 | 用途 |
+| --- | --- | --- |
+| `youbox` | you-box.com | 主站 YouBox |
+| `origingame` | api.origingame.dev | Origin Gateway |
+
+**代码位置**
+
+- `src/products/` — 类型、默认 features、store、`useFeature` / `useProduct`
+- `src/products/product-tokens.css` — 仅覆盖语义 token 取值（`html[data-product=…]`）
+- 后端同源：`product/` 包 + `/api/status` 的 `data.product`
+
+**开发约定**
+
+1. **两边都要的功能**：写在 `src/features/*` / 共享组件，不要复制目录。
+2. **仅一边要的功能**：共享实现 + `FeatureSet` 开关；菜单用 `useFeature('…')`，路由可用 `productHasFeature` + `redirect`；后端在 seam 上 `RequireFeature` / 条件注册。
+3. **禁止**在 `features/*` 业务逻辑里散落 `productId === 'origingame'`；禁止复制 `PageHeader` 等共享组件做产品分支。
+4. 设计差异只改 token / 少量 product copy，不发明第二套组件色板。
+5. 细节与红线见仓库根目录 `AGENTS.md` Rule 8、`docs/product-profile.md`。
+
+### 3.18 设计语言（双产品皮肤）
+
+同一套组件与外壳，**两套视觉语言**（`PRODUCT_ID` / `profile.ui.skin`）：
+
+| 产品 | skin | 特征 |
+| --- | --- | --- |
+| YouBox | `circuit` | 冷 slate、电光紫、无衬线标题、分层阴影、**明暗切换**；`skins/youbox.css` |
+| Origin | `paper` | Amp 纸面、奶油 `.paper`、衬线标题、发丝线、**仅浅色** |
+
+**共用**
+
+- 单一 `AppShell`；目录页搜索+分面+虚拟化；认证页窄栏；优先 `components/youbox/`。
+- 只改语义 token / product skin，禁止在 `features/*` 写死色值或散落 `productId ===`。
+- YouBox 明暗：`useTheme` + 顶栏 `ThemeSwitch`；Origin 隐藏切换并强制 light。
+
+细节见仓库根 `AGENTS.md` 设计语言节、`docs/product-profile.md`。
 
 ---
 
@@ -188,3 +216,5 @@
 - **2026-01-29**：重组文档结构，合并重复内容，明确主次与交叉引用。
 - **2026-01-31**：在 3.2 中补充「类型检查」要求：改动 TS/TSX 后须执行 typecheck 并修复至无错。
 - **2026-07-03**：新增 3.17「设计语言（Paper · Amp 式）」：单一外壳、纸面底色、衬线标题 + 等宽眉题、发丝线分隔、目录页与认证页范式。
+- **2026-07-14**：新增 3.17「多产品（Product profile）」；原设计语言顺延为 3.18。与根目录 `PRODUCT_ID` / `src/products` 对齐。
+- **2026-07-14**：3.18 改为双产品皮肤：YouBox Circuit（明暗）+ Origin Paper；不再要求全局仅 Amp 纸面。

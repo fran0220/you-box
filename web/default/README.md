@@ -111,7 +111,7 @@ User-adjustable layout prefs are density and content width only
 
 `bun run dev` starts the Rsbuild dev server, which proxies backend paths
 (`/api`, `/api/*`, `/mj`, `/mj/*`, `/pg`, `/pg/*`) to the Go backend. The
-target defaults to the production API at `https://api.you-box.com` for
+target defaults to the production API at `https://you-box.com` for
 frontend-only debugging. Override with `VITE_REACT_APP_SERVER_URL`, for example
 `VITE_REACT_APP_SERVER_URL=http://localhost:3000 bun run dev`, when testing a
 local backend (see `rsbuild.config.ts`).

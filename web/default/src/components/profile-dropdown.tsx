@@ -25,6 +25,7 @@ import { getUserAvatarFallback, getUserAvatarStyle } from '@/lib/avatar'
 import { ROLE } from '@/lib/roles'
 import useDialogState from '@/hooks/use-dialog'
 import { useUserDisplay } from '@/hooks/use-user-display'
+import { useFeature } from '@/products'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -45,6 +46,7 @@ export function ProfileDropdown() {
   const user = useAuthStore((state) => state.auth.user)
   const { displayName, roleLabel } = useUserDisplay(user)
   const isSuperAdmin = user?.role === ROLE.SUPER_ADMIN
+  const agentDesktopEnabled = useFeature('agent_desktop')
   const avatarName = user?.username || displayName
   const avatarFallback = getUserAvatarFallback(avatarName)
   const avatarFallbackStyle = useMemo(
@@ -109,10 +111,12 @@ export function ProfileDropdown() {
             {t('Wallet')}
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={() => navigate({ to: '/agent/devices' })}>
-            <Monitor className='size-4' />
-            {t('Connected devices')}
-          </DropdownMenuItem>
+          {agentDesktopEnabled ? (
+            <DropdownMenuItem onClick={() => navigate({ to: '/agent/devices' })}>
+              <Monitor className='size-4' />
+              {t('Connected devices')}
+            </DropdownMenuItem>
+          ) : null}
 
           {isSuperAdmin && (
             <DropdownMenuItem

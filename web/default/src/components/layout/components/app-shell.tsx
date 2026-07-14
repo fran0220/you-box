@@ -17,8 +17,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { getCookie } from '@/lib/cookies'
+import { cn } from '@/lib/utils'
 import { LayoutProvider } from '@/context/layout-provider'
 import { SearchProvider } from '@/context/search-provider'
+import { useProduct } from '@/products'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AnimatedOutlet } from '@/components/page-transition'
 import { SkipToMain } from '@/components/skip-to-main'
@@ -40,16 +42,19 @@ export type AppShellProps = {
 }
 
 /**
- * The single site shell: sticky header, document scroll, cream `.paper`
- * canvas and footer everywhere. The console sidebar is an optional slot
- * inside the same shell (never a second shell), so public pages, the
- * user console and the admin drill-in workspace share one visual
- * language and one scroll model. Viewport-locked surfaces (playground,
- * chat) opt out via their own fixed-height wrappers and `showFooter`.
+ * The single site shell: sticky header, document scroll, optional cream
+ * `.paper` canvas (origingame Paper only — youbox Circuit uses slate tokens
+ * without .paper so product skins are not shadowed). Console sidebar is an
+ * optional slot inside the same shell.
  */
 export function AppShell(props: AppShellProps) {
   const contentMode = props.contentMode ?? 'standard'
   const showFooter = props.showFooter ?? true
+  const product = useProduct()
+  const shellClass = cn(
+    product.ui.paperMarketing && 'paper',
+    'bg-background text-foreground relative flex min-h-svh flex-col overflow-x-clip'
+  )
 
   const body = (
     <>
@@ -63,7 +68,7 @@ export function AppShell(props: AppShellProps) {
   if (!props.withSidebar) {
     return (
       <SearchProvider>
-        <div className='paper bg-background text-foreground relative flex min-h-svh flex-col overflow-x-clip'>
+        <div className={shellClass}>
           <SkipToMain />
           <Header />
           {body}
@@ -79,7 +84,7 @@ export function AppShell(props: AppShellProps) {
       <SearchProvider>
         <SidebarProvider
           defaultOpen={defaultOpen}
-          className='paper bg-background text-foreground flex-col overflow-x-clip'
+          className={cn(shellClass, 'flex-col')}
         >
           <AppContentScrollRestoration />
           <SkipToMain />

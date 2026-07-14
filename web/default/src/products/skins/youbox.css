@@ -1,0 +1,658 @@
+/*
+Copyright (C) 2023-2026 QuantumNous
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+For commercial licensing, please contact support@quantumnous.com
+*/
+
+/*
+ * YouBox "Circuit" — modern tech skin (light + dark).
+ *
+ * Scoped to html[data-product='youbox'] so :root Paper (origingame) is untouched.
+ * Semantic token *names* match theme.css; only values change.
+ */
+
+/* ── Light ─────────────────────────────────────────────────────────────── */
+html[data-product='youbox'] {
+  --product-id: youbox;
+  --product-skin: circuit;
+
+  /* Sans display (tech), not editorial serif */
+  --display-family:
+    'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui,
+    -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  --serif-family: var(--display-family);
+  --display-weight: 620;
+  --display-tracking: -0.022em;
+  --eyebrow-tracking: 0.08em;
+  --eyebrow-size: 10.5px;
+
+  --r-xs: 3px;
+  --r-sm: 5px;
+  --r-md: 8px;
+  --r-lg: 10px;
+  --r-xl: 14px;
+  --r-2xl: 18px;
+  --r-3xl: 22px;
+  --r-4xl: 28px;
+  --radius: 10px;
+
+  /* Cool slate ramp (does not mutate --ink-* used by Paper) */
+  --slate-950: #0b0e13;
+  --slate-900: #12161c;
+  --slate-850: #1a1f26;
+  --slate-800: #21262e;
+  --slate-700: #2c333d;
+  --slate-600: #3d4654;
+  --slate-500: #5b6572;
+  --slate-400: #7a8491;
+  --slate-300: #98a2ae;
+  --slate-200: #c5cbd3;
+  --slate-100: #e3e7ec;
+  --slate-50: #eef1f4;
+  --slate-25: #f6f8fa;
+
+  --violet-500: #4f46e5;
+  --violet-600: #4338ca;
+  --violet-700: #3730a3;
+  --violet-400: #818cf8;
+  --cyan-400: #22d3ee;
+
+  --indigo-500: var(--violet-500);
+  --indigo-600: var(--violet-600);
+  --indigo-700: var(--violet-700);
+  --blue-link: var(--violet-500);
+  --blue-600: #2563eb;
+  --green-600: #16a34a;
+  --amber-600: #d97706;
+  --red-600: #dc2626;
+
+  --brand: var(--violet-500);
+  --brand-hover: var(--violet-600);
+  --brand-active: var(--violet-700);
+  --brand-subtle: rgba(79, 70, 229, 0.08);
+  --brand-border: rgba(79, 70, 229, 0.28);
+  --brand-on: #ffffff;
+  --brand-ring: rgba(79, 70, 229, 0.35);
+  --teal: var(--violet-500);
+  --teal-subtle: rgba(79, 70, 229, 0.08);
+
+  --accent: rgba(13, 17, 23, 0.06);
+  --accent-subtle: rgba(13, 17, 23, 0.04);
+
+  --background: var(--slate-25);
+  --foreground: var(--slate-900);
+  --bg: var(--slate-25);
+  --surface: #ffffff;
+  --surface-2: var(--slate-50);
+  --surface-3: var(--slate-100);
+  --surface-hover: rgba(13, 17, 23, 0.045);
+  --surface-inset: var(--slate-50);
+  --surface-card: #ffffff;
+  --overlay: rgba(11, 14, 19, 0.48);
+  --card: #ffffff;
+  --card-foreground: var(--slate-900);
+  --popover: #ffffff;
+  --popover-foreground: var(--slate-900);
+
+  --text: var(--slate-900);
+  --text-strong: var(--slate-950);
+  --text-secondary: var(--slate-500);
+  --text-muted: var(--slate-400);
+  --text-faint: var(--slate-300);
+  --text-on-brand: #ffffff;
+  --text-link: var(--violet-500);
+
+  --primary: var(--slate-950);
+  --primary-foreground: var(--slate-25);
+  --primary-hover: var(--slate-800);
+  --primary-active: var(--slate-700);
+  --secondary: var(--slate-50);
+  --secondary-foreground: var(--slate-900);
+  --muted: var(--slate-50);
+  --muted-foreground: var(--slate-500);
+  --accent-foreground: var(--slate-900);
+
+  --destructive: var(--red-600);
+  --destructive-foreground: #ffffff;
+  --success: var(--green-600);
+  --success-foreground: var(--slate-950);
+  --warning: var(--amber-600);
+  --warning-foreground: var(--slate-950);
+  --info: var(--blue-600);
+  --info-foreground: var(--slate-950);
+  --neutral: var(--slate-400);
+  --neutral-foreground: var(--slate-900);
+  --success-subtle: rgba(22, 163, 74, 0.1);
+  --warning-subtle: rgba(217, 119, 6, 0.1);
+  --danger-subtle: rgba(220, 38, 38, 0.08);
+  --info-subtle: rgba(37, 99, 235, 0.08);
+
+  --border: rgba(13, 17, 23, 0.1);
+  --border-strong: rgba(13, 17, 23, 0.18);
+  --border-faint: rgba(13, 17, 23, 0.05);
+  --divider: rgba(13, 17, 23, 0.08);
+  --input: rgba(13, 17, 23, 0.14);
+  --ring: var(--brand-ring);
+  --field-bg: #ffffff;
+  --field-border: rgba(13, 17, 23, 0.14);
+  --field-placeholder: var(--slate-300);
+  --code-bg: #f0f3f6;
+  --code-border: rgba(13, 17, 23, 0.08);
+
+  --chart-1: var(--violet-500);
+  --chart-2: #0891b2;
+  --chart-3: #a78bfa;
+  --chart-4: var(--amber-600);
+  --chart-5: var(--slate-500);
+
+  --sidebar: var(--slate-25);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--surface-hover);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--brand-ring);
+
+  --skeleton-base: var(--slate-100);
+  --skeleton-highlight: var(--slate-50);
+
+  /* Layered elevation (Circuit is not flat Paper) */
+  --shadow-xs: 0 1px 2px rgba(13, 17, 23, 0.05);
+  --shadow-sm: 0 1px 3px rgba(13, 17, 23, 0.07), 0 1px 2px rgba(13, 17, 23, 0.04);
+  --shadow-md:
+    0 4px 12px rgba(13, 17, 23, 0.08), 0 1px 3px rgba(13, 17, 23, 0.06);
+  --shadow-lg:
+    0 10px 28px rgba(13, 17, 23, 0.1), 0 2px 6px rgba(13, 17, 23, 0.05);
+  --shadow-xl:
+    0 18px 48px rgba(13, 17, 23, 0.12), 0 4px 12px rgba(13, 17, 23, 0.06);
+  --glow-brand: 0 0 0 1px var(--brand-border), 0 0 20px rgba(79, 70, 229, 0.12);
+  --glow-soft: 0 0 40px rgba(79, 70, 229, 0.08);
+
+  --hero-wash-a: color-mix(in srgb, var(--violet-500) 22%, transparent);
+  --hero-wash-b: color-mix(in srgb, var(--cyan-400) 14%, transparent);
+
+  /* Marketing surfaces share console slate (no cream .paper) */
+  --paper-cream: var(--slate-25);
+  --paper-cream-2: var(--slate-50);
+  --paper-cream-bright: #ffffff;
+}
+
+/* ── Dark ──────────────────────────────────────────────────────────────── */
+html[data-product='youbox'].dark {
+  --violet-500: #818cf8;
+  --violet-600: #93a0ff;
+  --violet-700: #6b76f0;
+  --indigo-500: var(--violet-500);
+  --indigo-600: var(--violet-600);
+  --indigo-700: var(--violet-700);
+  --blue-link: var(--violet-500);
+  --blue-600: #58a6ff;
+  --green-600: #3fb950;
+  --amber-600: #d29922;
+  --red-600: #f85149;
+
+  --brand: var(--violet-500);
+  --brand-hover: var(--violet-600);
+  --brand-active: var(--violet-700);
+  --brand-subtle: rgba(129, 140, 248, 0.12);
+  --brand-border: rgba(129, 140, 248, 0.32);
+  --brand-on: #0b0e13;
+  --brand-ring: rgba(129, 140, 248, 0.4);
+  --teal: var(--violet-500);
+  --teal-subtle: rgba(129, 140, 248, 0.1);
+
+  --accent: rgba(255, 255, 255, 0.06);
+  --accent-subtle: rgba(255, 255, 255, 0.04);
+
+  --background: #0b0e13;
+  --foreground: #e6e9ee;
+  --bg: #0b0e13;
+  --surface: #12161c;
+  --surface-2: #1a1f26;
+  --surface-3: #21262e;
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --surface-inset: #0f1319;
+  --surface-card: #12161c;
+  --overlay: rgba(0, 0, 0, 0.55);
+  --card: #12161c;
+  --card-foreground: #e6e9ee;
+  --popover: #12161c;
+  --popover-foreground: #e6e9ee;
+
+  --text: #e6e9ee;
+  --text-strong: #f3f5f7;
+  --text-secondary: #99a3ad;
+  --text-muted: #7a8491;
+  --text-faint: #67717e;
+  --text-on-brand: #0b0e13;
+  --text-link: var(--violet-500);
+
+  --primary: #e6e9ee;
+  --primary-foreground: #0b0e13;
+  --primary-hover: #f3f5f7;
+  --primary-active: #c5cbd3;
+  --secondary: #1a1f26;
+  --secondary-foreground: #e6e9ee;
+  --muted: #1a1f26;
+  --muted-foreground: #99a3ad;
+  --accent-foreground: #e6e9ee;
+
+  --destructive: #f85149;
+  --destructive-foreground: #ffffff;
+  --success: #3fb950;
+  --success-foreground: #0b0e13;
+  --warning: #d29922;
+  --warning-foreground: #0b0e13;
+  --info: #58a6ff;
+  --info-foreground: #0b0e13;
+  --neutral: #7a8491;
+  --neutral-foreground: #e6e9ee;
+  --success-subtle: rgba(63, 185, 80, 0.14);
+  --warning-subtle: rgba(210, 153, 34, 0.14);
+  --danger-subtle: rgba(248, 81, 73, 0.14);
+  --info-subtle: rgba(88, 166, 255, 0.14);
+
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-faint: rgba(255, 255, 255, 0.05);
+  --divider: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: var(--brand-ring);
+  --field-bg: #0f1319;
+  --field-border: rgba(255, 255, 255, 0.12);
+  --field-placeholder: #67717e;
+  --code-bg: #0d1117;
+  --code-border: rgba(255, 255, 255, 0.08);
+
+  --chart-1: #818cf8;
+  --chart-2: #22d3ee;
+  --chart-3: #a78bfa;
+  --chart-4: #d29922;
+  --chart-5: #99a3ad;
+
+  --sidebar: #0b0e13;
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--surface-hover);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--brand-ring);
+
+  --skeleton-base: #1a1f26;
+  --skeleton-highlight: #21262e;
+
+  --shadow-xs: 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-sm:
+    0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md:
+    0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 28px rgba(0, 0, 0, 0.5);
+  --shadow-lg:
+    0 0 0 1px rgba(255, 255, 255, 0.07), 0 16px 40px rgba(0, 0, 0, 0.55);
+  --shadow-xl:
+    0 0 0 1px rgba(255, 255, 255, 0.08), 0 24px 56px rgba(0, 0, 0, 0.6);
+  --glow-brand:
+    0 0 0 1px var(--brand-border), 0 0 24px rgba(129, 140, 248, 0.15);
+  --glow-soft: 0 0 48px rgba(129, 140, 248, 0.1);
+
+  --hero-wash-a: color-mix(in srgb, #818cf8 28%, transparent);
+  --hero-wash-b: color-mix(in srgb, #22d3ee 16%, transparent);
+
+  --paper-cream: #0b0e13;
+  --paper-cream-2: #12161c;
+  --paper-cream-bright: #12161c;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Circuit component system — full visual language (not just color ramps).
+ * Scoped to html[data-product='youbox'] so Paper/origingame is untouched.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Sticky header: denser frosted glass */
+html[data-product='youbox'] [data-slot='app-header'] {
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  box-shadow: var(--shadow-xs);
+  border-bottom-color: var(--border);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+}
+
+/* Nav: pill active state */
+html[data-product='youbox'] nav a[data-active='true'],
+html[data-product='youbox'] nav a[aria-current='page'] {
+  background: var(--surface-2);
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+/* Buttons — primary uses brand violet on Circuit (tech CTA) */
+html[data-product='youbox'] [data-slot='button'][data-variant='default'],
+html[data-product='youbox'] button[data-slot='button']:not([data-variant]):not([class*='variant']) {
+  /* cva default is primary ink; elevate CTAs with brand when primary-looking */
+}
+html[data-product='youbox'] .group\/button.bg-primary,
+html[data-product='youbox'] [data-slot='button'].bg-primary {
+  background: linear-gradient(180deg, var(--brand-hover) 0%, var(--brand) 100%);
+  color: var(--brand-on);
+  border-color: transparent;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 1px 2px rgba(13, 17, 23, 0.12),
+    0 0 0 1px color-mix(in srgb, var(--brand) 35%, transparent);
+}
+html[data-product='youbox'] .group\/button.bg-primary:hover,
+html[data-product='youbox'] [data-slot='button'].bg-primary:hover {
+  background: linear-gradient(180deg, var(--brand) 0%, var(--brand-active) 100%);
+  filter: brightness(1.03);
+}
+html[data-product='youbox'].dark .group\/button.bg-primary,
+html[data-product='youbox'].dark [data-slot='button'].bg-primary {
+  color: #0b0e13;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 0 20px rgba(129, 140, 248, 0.2);
+}
+
+/* Cards / panels / model tiles */
+html[data-product='youbox'] [data-slot='card'],
+html[data-product='youbox'] [data-slot='youbox-stat-card'],
+html[data-product='youbox'] [data-slot='youbox-model-card'],
+html[data-product='youbox'] [data-slot='panel'] {
+  border-radius: var(--r-xl);
+  border-color: var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+html[data-product='youbox'] [data-slot='youbox-model-card']:hover,
+html[data-product='youbox'] [data-slot='card']:hover {
+  border-color: var(--brand-border);
+  box-shadow: var(--glow-brand), var(--shadow-md);
+}
+html[data-product='youbox'] [data-slot='youbox-stat-card'] {
+  position: relative;
+  overflow: hidden;
+}
+html[data-product='youbox'] [data-slot='youbox-stat-card']::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--brand) 55%, transparent),
+    transparent
+  );
+  opacity: 0.85;
+}
+
+/* Inputs / fields */
+html[data-product='youbox'] [data-slot='input'],
+html[data-product='youbox'] [data-slot='textarea'],
+html[data-product='youbox'] input:not([type='checkbox']):not([type='radio']),
+html[data-product='youbox'] textarea {
+  border-radius: var(--r-md);
+  background: var(--field-bg);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+html[data-product='youbox'] [data-slot='input']:focus-visible,
+html[data-product='youbox'] [data-slot='textarea']:focus-visible {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-subtle);
+}
+
+/* Badge / chip tech mono */
+html[data-product='youbox'] [data-slot='badge'] {
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+
+/* Tables */
+html[data-product='youbox'] [data-slot='table-container'],
+html[data-product='youbox'] table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+html[data-product='youbox'] thead th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+}
+html[data-product='youbox'] tbody tr {
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+html[data-product='youbox'] tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+/* Dialog / sheet / popover depth */
+html[data-product='youbox'] [data-slot='dialog-content'],
+html[data-product='youbox'] [data-slot='sheet-content'],
+html[data-product='youbox'] [data-slot='popover-content'],
+html[data-product='youbox'] [data-slot='dropdown-menu-content'] {
+  border-radius: var(--r-xl);
+  border-color: var(--border);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
+}
+
+/* Sidebar console */
+html[data-product='youbox'] [data-slot='sidebar'],
+html[data-product='youbox'] [data-sidebar='sidebar'] {
+  background: var(--sidebar);
+  border-color: var(--sidebar-border);
+}
+html[data-product='youbox'] [data-sidebar='menu-button'][data-active='true'] {
+  background: var(--brand-subtle);
+  color: var(--brand);
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+
+/* Empty state */
+html[data-product='youbox'] [data-slot='youbox-empty-state'] {
+  border: 1px dashed var(--border);
+  border-radius: var(--r-2xl);
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  padding-block: 3.5rem;
+}
+html[data-product='youbox'] [data-slot='youbox-empty-state'] > svg {
+  color: var(--brand);
+  opacity: 0.55;
+}
+
+/* Page header */
+html[data-product='youbox'] [data-slot='youbox-page-header'] h1 {
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  font-size: clamp(1.5rem, 2vw, 1.875rem);
+}
+html[data-product='youbox'] [data-slot='youbox-eyebrow'],
+html[data-product='youbox'] .yb-eyebrow {
+  letter-spacing: var(--eyebrow-tracking);
+  font-size: var(--eyebrow-size);
+  color: var(--brand);
+}
+
+/* Tabs pill track */
+html[data-product='youbox'] [data-slot='tabs-list'] {
+  background: var(--surface-inset, var(--surface-2));
+  border-radius: 999px;
+  padding: 3px;
+  border: 1px solid var(--border-faint);
+}
+html[data-product='youbox'] [data-slot='tabs-trigger'][data-active],
+html[data-product='youbox'] [data-slot='tabs-trigger'][data-state='active'] {
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border-radius: 999px;
+  color: var(--foreground);
+}
+
+/* Auth form headings */
+html[data-product='youbox'] [data-slot='auth-card'] {
+  border: 1px solid var(--border);
+  border-radius: var(--r-2xl);
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  box-shadow: var(--shadow-lg);
+  padding: 1.75rem 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+/* Home section rhythm */
+html[data-product='youbox'] [data-slot='home-section'] {
+  border-top: 1px solid var(--border);
+  padding-block: 4rem;
+}
+html[data-product='youbox'] [data-slot='home-section'] > .home-section-inner {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+@media (min-width: 768px) {
+  html[data-product='youbox'] [data-slot='home-section'] {
+    padding-block: 5.5rem;
+  }
+  html[data-product='youbox'] [data-slot='home-section'] > .home-section-inner {
+    padding-inline: 1.5rem;
+  }
+}
+html[data-product='youbox'] [data-slot='home-section'] h2 {
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+
+/* Provider / modality tiles (when using circuit layout class) */
+html[data-product='youbox'] [data-slot='circuit-tile'] {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--card);
+  padding: 0.85rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+html[data-product='youbox'] [data-slot='circuit-tile']:hover {
+  border-color: var(--brand-border);
+  color: var(--foreground);
+  box-shadow: var(--glow-brand);
+  transform: translateY(-1px);
+}
+
+/* Guide cards (how-it-works) */
+html[data-product='youbox'] [data-slot='circuit-guide'] {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  background: var(--card);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+html[data-product='youbox'] [data-slot='circuit-guide']:hover {
+  border-color: var(--brand-border);
+  box-shadow: var(--glow-brand), var(--shadow-md);
+  transform: translateY(-2px);
+}
+html[data-product='youbox'] [data-slot='circuit-guide'] .guide-icon {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  background: var(--brand-subtle);
+  color: var(--brand);
+  border: 1px solid var(--brand-border);
+}
+
+/* CTA panel */
+html[data-product='youbox'] [data-slot='circuit-cta'] {
+  border: 1px solid var(--brand-border);
+  border-radius: var(--r-2xl);
+  background:
+    radial-gradient(
+      120% 80% at 50% -20%,
+      color-mix(in srgb, var(--brand) 18%, transparent),
+      transparent 55%
+    ),
+    var(--card);
+  box-shadow: var(--glow-soft), var(--shadow-lg);
+}
+
+/* Footer */
+html[data-product='youbox'] footer {
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-2) 50%, var(--bg));
+}
+
+/* Scrollbar (webkit) */
+html[data-product='youbox'] *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html[data-product='youbox'] *::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-faint) 55%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+html[data-product='youbox'] *::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-secondary) 70%, transparent);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* Selection already uses brand-subtle via index.css */
+
+/* Theme switch control — always readable */
+html[data-product='youbox'] [data-slot='theme-switch'] {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+html[data-product='youbox'] [data-slot='theme-switch']:hover {
+  border-color: var(--brand-border);
+  background: var(--brand-subtle);
+  color: var(--brand);
+}

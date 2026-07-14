@@ -1,6 +1,7 @@
 import z from 'zod'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createLazyRouteComponent } from '@/lib/lazy-route-component'
+import { productHasFeature } from '@/products'
 
 const AgentAuthorize = createLazyRouteComponent(async () => ({
   default: (await import('@/features/agent')).AgentAuthorize,
@@ -16,6 +17,11 @@ const searchSchema = z.object({
 })
 
 export const Route = createFileRoute('/_authenticated/agent/authorize')({
+  beforeLoad: () => {
+    if (!productHasFeature('agent_desktop')) {
+      throw redirect({ to: '/' })
+    }
+  },
   validateSearch: searchSchema,
   component: AgentAuthorize,
 })

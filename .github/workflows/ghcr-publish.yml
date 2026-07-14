@@ -1,6 +1,6 @@
 name: Publish YouBox image (GHCR)
 
-# Publishes ghcr.io/fran0220/you-box for dual-host deploys (jpdata + bwg).
+# Publishes ghcr.io/fran0220/you-box for dual-host deploys (youbox + bwg).
 # Both production hosts are linux/amd64 today; keep the platform list explicit.
 
 on:

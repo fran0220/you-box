@@ -57,17 +57,18 @@ export function EmptyState(props: EmptyStateProps) {
       )}
       {...rest}
     >
-      <Icon
-        aria-hidden='true'
-        className='text-muted-foreground/60 size-7 opacity-80'
-      />
-      <p className='text-foreground mt-2.5 text-base font-medium'>{title}</p>
+      <div className='bg-brand-subtle text-brand border-brand-border flex size-12 items-center justify-center rounded-xl border'>
+        <Icon aria-hidden='true' className='size-6 opacity-90' />
+      </div>
+      <p className='text-foreground mt-4 text-base font-semibold tracking-[-0.01em]'>
+        {title}
+      </p>
       {description != null && (
-        <p className='text-muted-foreground mt-1 max-w-sm text-sm leading-relaxed'>
+        <p className='text-muted-foreground mt-1.5 max-w-sm text-sm leading-relaxed'>
           {description}
         </p>
       )}
-      {resolvedAction != null && <div className='mt-5'>{resolvedAction}</div>}
+      {resolvedAction != null && <div className='mt-6'>{resolvedAction}</div>}
     </div>
   )
 }

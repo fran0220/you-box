@@ -39,6 +39,7 @@ import {
 } from '@/lib/dom-utils'
 import { initializeFrontendCache } from '@/lib/frontend-cache'
 import { handleServerError } from '@/lib/handle-server-error'
+import { applyProductFromStatusData } from '@/products'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
@@ -130,11 +131,13 @@ declare module '@tanstack/react-router' {
 
 // Render the app
 const rootElement = document.getElementById('root')!
-// Set document.title and favicon from cached status, then refresh from network
+// Set document.title, product skin, and favicon from cached status, then refresh
 ;(function initSystemBranding() {
   try {
     if (typeof window === 'undefined' || typeof document === 'undefined') return
     const apply = (status: Record<string, unknown>) => {
+      applyProductFromStatusData(status)
+
       const systemName = String(status.system_name || DEFAULT_SYSTEM_NAME)
       const title = String(status.meta_title || systemName)
       const logo = String(status.logo || '')
@@ -162,7 +165,7 @@ const rootElement = document.getElementById('root')!
       const saved = localStorage.getItem('status')
       if (saved) {
         const s = JSON.parse(saved)
-        if (s?.system_name) apply(s)
+        if (s?.system_name || s?.product) apply(s)
       }
     } catch {
       /* empty */
@@ -170,7 +173,7 @@ const rootElement = document.getElementById('root')!
     // Background refresh
     getStatus()
       .then((s) => {
-        if (s?.system_name) {
+        if (s?.system_name || s?.product) {
           apply(s)
           try {
             localStorage.setItem('status', JSON.stringify(s))

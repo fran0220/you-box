@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/QuantumNous/new-api/constant"
+	"github.com/QuantumNous/new-api/product"
 )
 
 var (
@@ -84,6 +85,9 @@ func InitEnv() {
 	MemoryCacheEnabled = os.Getenv("MEMORY_CACHE_ENABLED") == "true"
 	IsMasterNode = os.Getenv("NODE_TYPE") != "slave"
 	initNodeNameIdentity()
+	// PRODUCT_ID selects runtime product profile (youbox | origingame). Same image, per-host env.
+	product.Init()
+	SysLog(fmt.Sprintf("product profile: id=%s public_base_url=%s", product.ID(), product.PublicBaseURL()))
 	TLSInsecureSkipVerify = GetEnvOrDefaultBool("TLS_INSECURE_SKIP_VERIFY", false)
 	if TLSInsecureSkipVerify {
 		if tr, ok := http.DefaultTransport.(*http.Transport); ok && tr != nil {

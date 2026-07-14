@@ -104,7 +104,7 @@ Overview(页标题,衬线)
 │ 订阅:Pro · 2026-08-01 到期(一行,无订阅则隐藏)   │
 └────────────────────────────────────────────────────┘
 ┌ API Keys ─────────────────────── [Create key] ─────┐
-│ endpoint https://api.you-box.com/v1  [copy]        │
+│ endpoint https://you-box.com/v1  [copy]        │
 │ sk-…abc1   default   最近使用 2h 前                │
 │ sk-…def2   team      最近使用 3d 前   (至多 3 行)  │
 │ 空状态:三步引导(创建 key → 复制 → 首次调用代码块)│

@@ -155,7 +155,7 @@ docker run --name you-box -d --restart always \
 > [!WARNING]
 > 將本專案作為面向公眾的生成式 AI 服務或 API 轉售服務運營時，使用者應先完成備案、內容安全、實名、日誌留存、稅務、支付和上游授權等合規義務。
 
-📖 更多部署方式請參考 [部署指南](https://api.you-box.com/api-docs/installation)
+📖 更多部署方式請參考 [部署指南](https://you-box.com/api-docs/installation)
 
 ---
 
@@ -163,7 +163,7 @@ docker run --name you-box -d --restart always \
 
 <div align="center">
 
-### 📖 [官方文件](https://api.you-box.com/api-docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fran0220/you-box)
+### 📖 [官方文件](https://you-box.com/api-docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/fran0220/you-box)
 
 </div>
 
@@ -171,17 +171,17 @@ docker run --name you-box -d --restart always \
 
 | 分類 | 連結 |
 |------|------|
-| 🚀 部署指南 | [安裝文件](https://api.you-box.com/api-docs/installation) |
-| ⚙️ 環境配置 | [環境變數](https://api.you-box.com/api-docs/installation/config-maintenance/environment-variables) |
-| 📡 接口文件 | [API 文件](https://api.you-box.com/api-docs/api) |
-| ❓ 常見問題 | [FAQ](https://api.you-box.com/api-docs/support/faq) |
-| 💬 社群交流 | [交流管道](https://api.you-box.com/api-docs/support/community-interaction) |
+| 🚀 部署指南 | [安裝文件](https://you-box.com/api-docs/installation) |
+| ⚙️ 環境配置 | [環境變數](https://you-box.com/api-docs/installation/config-maintenance/environment-variables) |
+| 📡 接口文件 | [API 文件](https://you-box.com/api-docs/api) |
+| ❓ 常見問題 | [FAQ](https://you-box.com/api-docs/support/faq) |
+| 💬 社群交流 | [交流管道](https://you-box.com/api-docs/support/community-interaction) |
 
 ---
 
 ## ✨ 主要特性
 
-> 詳細特性請參考 [特性說明](https://api.you-box.com/api-docs/guide/wiki/basic-concepts/features-introduction)
+> 詳細特性請參考 [特性說明](https://you-box.com/api-docs/guide/wiki/basic-concepts/features-introduction)
 
 ### 🎨 核心功能
 
@@ -211,11 +211,11 @@ docker run --name you-box -d --restart always \
 ### 🚀 高級功能
 
 **API 格式支援：**
-- ⚡ [OpenAI Responses](https://api.you-box.com/api-docs/api/ai-model/chat/openai/create-response)
-- ⚡ [OpenAI Realtime API](https://api.you-box.com/api-docs/api/ai-model/realtime/create-realtime-session)（含 Azure）
-- ⚡ [Claude Messages](https://api.you-box.com/api-docs/api/ai-model/chat/create-message)
-- ⚡ [Google Gemini](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
-- 🔄 [Rerank 模型](https://api.you-box.com/api-docs/api/ai-model/rerank/create-rerank)（Cohere、Jina）
+- ⚡ [OpenAI Responses](https://you-box.com/api-docs/api/ai-model/chat/openai/create-response)
+- ⚡ [OpenAI Realtime API](https://you-box.com/api-docs/api/ai-model/realtime/create-realtime-session)（含 Azure）
+- ⚡ [Claude Messages](https://you-box.com/api-docs/api/ai-model/chat/create-message)
+- ⚡ [Google Gemini](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
+- 🔄 [Rerank 模型](https://you-box.com/api-docs/api/ai-model/rerank/create-rerank)（Cohere、Jina）
 
 **智慧路由：**
 - ⚖️ 管道加權隨機
@@ -258,17 +258,17 @@ docker run --name you-box -d --restart always \
 
 ## 🤖 模型支援
 
-> 詳情請參考 [接口文件 - 閘道接口](https://api.you-box.com/api-docs/api)
+> 詳情請參考 [接口文件 - 閘道接口](https://you-box.com/api-docs/api)
 
 | 模型類型 | 說明 | 文件 |
 |---------|------|------|
-| 🤖 OpenAI-Compatible | OpenAI 兼容模型 | [文件](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion) |
-| 🤖 OpenAI Responses | OpenAI Responses 格式 | [文件](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createresponse) |
-| 🎨 Midjourney-Proxy | [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy) | [文件](https://api.you-box.com/api-docs/api) |
-| 🎵 Suno-API | [Suno API](https://github.com/Suno-API/Suno-API) | [文件](https://api.you-box.com/api-docs/api) |
-| 🔄 Rerank | Cohere、Jina | [文件](https://api.you-box.com/api-docs/api/ai-model/rerank/create-rerank) |
-| 💬 Claude | Messages 格式 | [文件](https://api.you-box.com/api-docs/api/ai-model/chat/createmessage) |
-| 🌐 Gemini | Google Gemini 格式 | [文件](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta) |
+| 🤖 OpenAI-Compatible | OpenAI 兼容模型 | [文件](https://you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion) |
+| 🤖 OpenAI Responses | OpenAI Responses 格式 | [文件](https://you-box.com/api-docs/api/ai-model/chat/openai/createresponse) |
+| 🎨 Midjourney-Proxy | [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy) | [文件](https://you-box.com/api-docs/api) |
+| 🎵 Suno-API | [Suno API](https://github.com/Suno-API/Suno-API) | [文件](https://you-box.com/api-docs/api) |
+| 🔄 Rerank | Cohere、Jina | [文件](https://you-box.com/api-docs/api/ai-model/rerank/create-rerank) |
+| 💬 Claude | Messages 格式 | [文件](https://you-box.com/api-docs/api/ai-model/chat/createmessage) |
+| 🌐 Gemini | Google Gemini 格式 | [文件](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta) |
 | 🔧 Dify | ChatFlow 模式 | - |
 | 🎯 自訂上游 | 支援配置合法授權的上游介面位址 | - |
 
@@ -277,16 +277,16 @@ docker run --name you-box -d --restart always \
 <details>
 <summary>查看完整接口列表</summary>
 
-- [聊天接口 (Chat Completions)](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion)
-- [響應接口 (Responses)](https://api.you-box.com/api-docs/api/ai-model/chat/openai/createresponse)
-- [圖像接口 (Image)](https://api.you-box.com/api-docs/api/ai-model/images/openai/post-v1-images-generations)
-- [音訊接口 (Audio)](https://api.you-box.com/api-docs/api/ai-model/audio/openai/create-transcription)
-- [影片接口 (Video)](https://api.you-box.com/api-docs/api/ai-model/audio/openai/createspeech)
-- [嵌入接口 (Embeddings)](https://api.you-box.com/api-docs/api/ai-model/embeddings/createembedding)
-- [重排序接口 (Rerank)](https://api.you-box.com/api-docs/api/ai-model/rerank/creatererank)
-- [即時對話 (Realtime)](https://api.you-box.com/api-docs/api/ai-model/realtime/createrealtimesession)
-- [Claude 聊天](https://api.you-box.com/api-docs/api/ai-model/chat/createmessage)
-- [Google Gemini 聊天](https://api.you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
+- [聊天接口 (Chat Completions)](https://you-box.com/api-docs/api/ai-model/chat/openai/createchatcompletion)
+- [響應接口 (Responses)](https://you-box.com/api-docs/api/ai-model/chat/openai/createresponse)
+- [圖像接口 (Image)](https://you-box.com/api-docs/api/ai-model/images/openai/post-v1-images-generations)
+- [音訊接口 (Audio)](https://you-box.com/api-docs/api/ai-model/audio/openai/create-transcription)
+- [影片接口 (Video)](https://you-box.com/api-docs/api/ai-model/audio/openai/createspeech)
+- [嵌入接口 (Embeddings)](https://you-box.com/api-docs/api/ai-model/embeddings/createembedding)
+- [重排序接口 (Rerank)](https://you-box.com/api-docs/api/ai-model/rerank/creatererank)
+- [即時對話 (Realtime)](https://you-box.com/api-docs/api/ai-model/realtime/createrealtimesession)
+- [Claude 聊天](https://you-box.com/api-docs/api/ai-model/chat/createmessage)
+- [Google Gemini 聊天](https://you-box.com/api-docs/api/ai-model/chat/gemini/geminirelayv1beta)
 
 </details>
 
@@ -329,7 +329,7 @@ docker run --name you-box -d --restart always \
 | `PYROSCOPE_BLOCK_RATE` | Pyroscope block 採樣率                               | `5` |
 | `HOSTNAME` | Pyroscope 標籤裡的主機名                                          | `you-box` |
 
-📖 **完整配置：** [環境變數文件](https://api.you-box.com/api-docs/installation/config-maintenance/environment-variables)
+📖 **完整配置：** [環境變數文件](https://you-box.com/api-docs/installation/config-maintenance/environment-variables)
 
 </details>
 
@@ -431,10 +431,10 @@ docker run --name you-box -d --restart always \
 
 | 資源 | 連結 |
 |------|------|
-| 📘 常見問題 | [FAQ](https://api.you-box.com/api-docs/support/faq) |
-| 💬 社群交流 | [交流管道](https://api.you-box.com/api-docs/support/community-interaction) |
-| 🐛 回饋問題 | [問題回饋](https://api.you-box.com/api-docs/support/feedback-issues) |
-| 📚 完整文件 | [官方文件](https://api.you-box.com/api-docs) |
+| 📘 常見問題 | [FAQ](https://you-box.com/api-docs/support/faq) |
+| 💬 社群交流 | [交流管道](https://you-box.com/api-docs/support/community-interaction) |
+| 🐛 回饋問題 | [問題回饋](https://you-box.com/api-docs/support/feedback-issues) |
+| 📚 完整文件 | [官方文件](https://you-box.com/api-docs) |
 
 ### 🤝 貢獻指南
 
@@ -473,7 +473,7 @@ docker run --name you-box -d --restart always \
 
 如果這個項目對你有幫助，歡迎給我們一個 ⭐️ Star！
 
-**[官方文件](https://api.you-box.com/api-docs)** • **[問題回饋](https://github.com/fran0220/you-box/issues)** • **[最新發布](https://github.com/fran0220/you-box/releases)**
+**[官方文件](https://you-box.com/api-docs)** • **[問題回饋](https://github.com/fran0220/you-box/issues)** • **[最新發布](https://github.com/fran0220/you-box/releases)**
 
 <sub>Built with ❤️ by BoxAI contributors</sub>
 
