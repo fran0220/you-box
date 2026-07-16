@@ -1,13 +1,15 @@
-# AGENTS.md — Project Conventions for new-api
+# AGENTS.md — Project Conventions for Origin Gateway
 
 ## Overview
 
 This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI providers (OpenAI, Claude, Gemini, Azure, AWS Bedrock, etc.) behind a unified API, with user management, billing, rate limiting, and an admin dashboard.
 
-This repository is **YouBox Core only** (API gateway + web console). The legacy Core `electron/` desktop shell has been removed and must not be reintroduced. This repo does not ship or document a desktop client.
+This repository is **Origin Gateway** (API gateway + web console). Brand name: **Origin Gateway**. Image: `ghcr.io/fran0220/origin-gateway`. The legacy Core `electron/` desktop shell has been removed and must not be reintroduced.
 
-**Production scope (2026-07 cutover):** this codebase is deployed **only on BWG** as Origin Gateway (`PRODUCT_ID=origingame`, `api.origingame.dev`).  
-**Do not deploy this image to `youbox` / `you-box.com` anymore.** That host is now the **BoxAI** product stack (`fran0220/boxAI`, image `ghcr.io/fran0220/boxai`). Dual-host “youbox + bwg both run you-box” is **retired**. Runtime product skins may still include `youbox` for local/dev demos; production ops target is **BWG only**.
+**Production scope:** deployed **only on BWG** as Origin Gateway (`PRODUCT_ID=origingame`, `api.origingame.dev`).  
+**Do not deploy this image to `youbox` / `you-box.com`.** That host is the **BoxAI** product stack (`fran0220/boxAI`). Dual-host “youbox + bwg both run this repo” is **retired**. `PRODUCT_ID=youbox` remains a **local/dev Circuit demo skin** only.
+
+**Primary production consumer:** OriginGame platform monorepo (portal / play / Studio). That repo must **not** vendor this AGPL source; it integrates over HTTP only. Contract: `docs/origingame-contract.md`. Boundary: `docs/origingame-platform.md`.
 
 ## Tech Stack
 
@@ -42,7 +44,7 @@ oauth/         — OAuth provider implementations
 pkg/           — Internal packages (cachex, ionet)
 web/             — Frontend themes container
  web/default/   — Default frontend (React 19, Rsbuild, Base UI, Tailwind)
-  web/default/src/products/ — runtime skins + features (youbox | origingame)
+  web/default/src/products/ — runtime skins + features (origingame | youbox demo)
   web/default/src/i18n/ — Frontend internationalization (i18next, zh/en/fr/ru/ja/vi)
 ```
 
@@ -56,117 +58,74 @@ web/             — Frontend themes container
 
 | Retired for this repo | Notes |
 | --- | --- |
-| `youbox` (`160.187.1.155`, `you-box.com`) | **No longer runs you-box.** Fully purged 2026-07-15 (no archive/volume). Site is **BoxAI**: `/opt/boxAI`, Postgres+Redis in compose, Nginx → `127.0.0.1:8080`. Ops: `fran0220/boxAI` → `docs/PRODUCTION.md`. |
-| `jpdata` | Previously retired; do not redeploy you-box there. |
+| `youbox` (`160.187.1.155`, `you-box.com`) | **Not this stack.** Site is **BoxAI**: `fran0220/boxAI`. |
+| `jpdata` | Previously retired; do not redeploy here. |
 
 Notes:
 
 - Production deploys of **this** repository target **BWG only**.
-- Do **not** deploy this product as the shared `api.xiaomao.chat` gateway unless the operator intentionally points that domain at this stack.
-- `bwg` is memory-constrained (~2GB). Prefer **pulling a prebuilt image** over building frontend+Go on the host.
+- `bwg` is memory-constrained (~2GB). Prefer **pulling a prebuilt image** over building on the host.
 
-### Image strategy (registry, not host-local-only)
-
-Publish immutable versioned images and deploy **BWG** from that image.
-
-Recommended naming:
+### Image strategy
 
 ```text
-ghcr.io/fran0220/you-box:<git-tag>     # immutable, e.g. v0.1.7
-ghcr.io/fran0220/you-box:main          # optional floating tag for staging experiments
+ghcr.io/fran0220/origin-gateway:<git-tag>   # preferred immutable
+ghcr.io/fran0220/origin-gateway:main
+ghcr.io/fran0220/you-box:<git-tag>          # legacy alias (same digest)
 ```
 
-CI publish workflow: `.github/workflows/ghcr-publish.yml`  
-Ops checklist: `docs/deploy-dual-host.md` (historical dual-host notes; **BWG-only** is the live path)
+CI: `.github/workflows/ghcr-publish.yml`  
+Ops: `docs/deploy.md`
 
-Local/dev still uses:
+Local/dev:
 
 ```text
-boxai:local                            # docker-compose.yml default via BOXAI_IMAGE
+origin-gateway:local                        # docker-compose.yml via GATEWAY_IMAGE
 ```
-
-Compose selects the image with:
 
 ```bash
-BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.7
+GATEWAY_IMAGE=ghcr.io/fran0220/origin-gateway:v0.1.17
+# one-release fallback if host .env still uses old name:
+# BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.17
 ```
-
-(or host `.env` equivalent). Do not rebuild different images per host for the same release; both hosts should pull the **same digest**.
 
 ### Build / publish (once per release)
 
-From a builder machine or CI (linux/amd64 is required for both current hosts):
-
 ```bash
-# 1) freeze version
-git checkout main
-git pull
-# set VERSION file / git tag, e.g. v0.1.7
-
-# 2) build and push
-docker buildx build \
-  --platform linux/amd64 \
-  -t ghcr.io/fran0220/you-box:v0.1.7 \
-  -t ghcr.io/fran0220/you-box:main \
-  --push \
-  .
+git checkout main && git pull
+docker buildx build   --platform linux/amd64   -t ghcr.io/fran0220/origin-gateway:v0.1.17   -t ghcr.io/fran0220/origin-gateway:main   -t ghcr.io/fran0220/you-box:v0.1.17   -t ghcr.io/fran0220/you-box:main   --push   .
 ```
-
-Until GHCR (or another private registry) credentials/workflows are wired, an interim fallback is:
-
-```bash
-# build once on a capable host (prefer youbox or local CI, not bwg)
-docker build -t boxai:v0.1.7 .
-docker save boxai:v0.1.7 | gzip > boxai-v0.1.7.tar.gz
-# copy archive to the other host, then:
-docker load < boxai-v0.1.7.tar.gz
-```
-
-Still tag the loaded image with the same version string on both hosts and set `BOXAI_IMAGE` accordingly.
 
 ### Deploy on BWG only
 
 ```bash
 ssh bwg
 cd /opt/origin-gateway
-# keep host-local docker-compose.yml + .env (container name origin-gateway, port 9320)
-# edit .env: BOXAI_IMAGE=… PRODUCT_ID=origingame NODE_NAME=bwg-origin-gateway-1
-docker compose pull new-api   # service key is still new-api in compose file
+# edit .env: GATEWAY_IMAGE=… PRODUCT_ID=origingame NODE_NAME=bwg-origin-gateway-1
+docker compose pull new-api
 docker compose up -d new-api
-docker compose ps
-curl -fsS http://127.0.0.1:9320/api/status   # expect data.product.id == "origingame"
+curl -fsS http://127.0.0.1:9320/api/status | jq .data.product
+# expect data.product.id == "origingame", display_name == "Origin Gateway"
 ```
 
 Hard rules:
 
-1. **Never** delete/recreate persistent volumes (`data/`, postgres volume) during routine deploys.
-2. Keep BWG `SESSION_SECRET`, DB password, Redis password, and `NODE_NAME` stable across rollouts.
-3. Set `NODE_NAME=bwg-origin-gateway-1` (or similar) so logs/audit identify the node.
-4. Production `PRODUCT_ID=origingame`. Optional: `PRODUCT_PUBLIC_BASE_URL=https://api.origingame.dev`.
-5. Do **not** deploy this image to `youbox` — that host is BoxAI (`fran0220/boxAI`).
-6. Upstream `calciumion/new-api` images are **not** production images for this product (missing frontend/extensions).
+1. **Never** delete/recreate persistent volumes during routine deploys.
+2. Keep BWG `SESSION_SECRET`, DB password, Redis password, and `NODE_NAME` stable.
+3. Production `PRODUCT_ID=origingame` (repo default is already origingame).
+4. Do **not** deploy this image to the BoxAI host.
+5. Upstream `calciumion/new-api` images are **not** production images for this product.
 
 ### Local development
 
 ```bash
-# repo root
 docker compose build new-api
 docker compose up -d
-# default image: boxai:local  (override with BOXAI_IMAGE)
+# default image: origin-gateway:local  (override with GATEWAY_IMAGE)
+# default PRODUCT_ID=origingame; set PRODUCT_ID=youbox only for Circuit demo
 ```
 
-### Temporary host-local rebuild (emergency only)
-
-If the registry is unavailable:
-
-```bash
-# on youbox (has more RAM) — last resort
-cd /opt/you-box
-docker compose build new-api
-docker compose up -d new-api
-```
-
-Avoid routine builds on `bwg`.
+Emergency rebuild: use a builder/CI machine with RAM — **not** BWG. Prefer registry pull.
 
 ## Internationalization (i18n)
 
@@ -296,49 +255,45 @@ For request structs that are parsed from client JSON and then re-marshaled to up
 
 When working on tiered/dynamic billing (expression-based pricing), you MUST read `pkg/billingexpr/expr.md` first. It documents the design philosophy, expression language (variables, functions, examples), full system architecture (editor → storage → pre-consume → settlement → log display), token normalization rules (`p`/`c` auto-exclusion), quota conversion, and expression versioning. All code changes to the billing expression system must follow the patterns described in that document.
 
-### Rule 8: Multi-product profile — Core + runtime skin
+### Rule 8: Product profile — Origin Gateway + optional demo skin
 
-This monorepo ships **one core** and **two runtime products** selected by env (not separate repos or full frontend trees).
+This monorepo ships **one core** and **one production product** (Origin Gateway), plus an optional local demo skin.
 
-| Product | `PRODUCT_ID` | Host | Public default |
+| Profile | `PRODUCT_ID` | Production? | Public default |
 | --- | --- | --- | --- |
-| YouBox | `youbox` | `youbox` | `https://you-box.com` |
-| Origin Gateway | `origingame` | `bwg` | `https://api.origingame.dev` |
+| **Origin Gateway** | `origingame` (default) | **Yes — BWG only** | `https://api.origingame.dev` |
+| YouBox Circuit (demo) | `youbox` | No — local/dev only | (override or demo) |
+
+`origingame` FeatureSet turns off retail/agent surfaces (`agent_desktop`, `rankings`, `playground_presets`, `public_marketing`, `model_plaza`) and keeps **`subscriptions` true** for OriginGame portal billing.
 
 **Source of truth**
 
 | Layer | Path | Responsibility |
 | --- | --- | --- |
 | Backend profile | `product/` | `PRODUCT_ID`, `FeatureSet`, `PublicBaseURL`, `/api/status` → `data.product` |
-| Extension seam | `router/youbox-router.go`, `service/youbox_runtime.go` | Product-only routes / init; gate with `product.Enabled` / `middleware.RequireFeature` |
-| Frontend profile | `web/default/src/products/` | Defaults, `useFeature` / `useProduct`, DOM `data-product`, token CSS |
-| Design tokens | `web/default/src/products/product-tokens.css` | Per-product CSS variable overrides only |
+| Extension seam | `router/youbox-router.go`, `service/youbox_runtime.go` | Feature-gated routes / init |
+| Frontend profile | `web/default/src/products/` | Defaults, `useFeature` / `useProduct`, DOM `data-product` |
+| Design tokens | `web/default/src/products/product-tokens.css` | Per-skin CSS variable overrides |
+| Consumer contract | `docs/origingame-contract.md` | Frozen OriginGame HTTP surface |
 
-**Day-to-day development**
+**Hard red lines**
 
-| Change type | Where to work | Extra steps |
-| --- | --- | --- |
-| Both products (shared) | `features/*`, `controller/`, `service/`, `relay/`, shared components | None — one PR, one image |
-| Design / brand only | `product-tokens.css`, optional copy defaults | No business forks |
-| A-only or B-only capability | Shared code + one `FeatureSet` key; gate FE with `useFeature` / `productHasFeature`; gate BE on **seams** with `product.Enabled` or `RequireFeature` | Keep keys ≤ ~15; delete when products converge |
-| Whole product-only domain (later) | New package under a product module pattern; private tables `og_*` / product-prefixed | Do **not** alter core table semantics |
-
-**Hard red lines (maintenance explosion)**
-
-1. **No dual git repos / no second full frontend** (`web/origingame` clone of `web/default`) while both remain AI-gateway products.
-2. **No `if productID == …` inside** `controller/`, `service/` (except thin product helpers), `relay/`, or shared `components/` / `features/*` business logic. Conditionals live in `product/`, seams, middleware, or `web/default/src/products/`.
-3. **No silent semantic fork** of the same API path per product. Different behavior → feature gate, new path, or config — not two meanings for one route.
-4. **No product-specific migrations on core tables.** Product-private data → prefixed tables + product-scoped migrate later.
-5. **No divergent image digests per host** for routine releases. Same tag/digest; `PRODUCT_ID` selects profile. (Dual image tags only if a later phase consciously requires them.)
-6. **Upstream Calcium-Ion sync** touches core only; do not put product skins into merge conflict surfaces. Preserve seams (`registerYouBoxRoutes`, YouBox runtime init).
+1. **No dual git repos / no second full frontend** for skins.
+2. **No `if productID == …` inside** `controller/`, `service/` (except thin product helpers), `relay/`, or shared business features. Conditionals live in `product/`, seams, middleware, or `web/default/src/products/`.
+3. **No silent semantic fork** of the same API path per product.
+4. **No product-specific migrations on core tables.**
+5. **No divergent digests for the same release** — same image; `PRODUCT_ID` selects profile. Dual registry names (`origin-gateway` + legacy `you-box`) may share one digest during migration.
+6. **Upstream Calcium-Ion sync** touches core only; preserve seams (`registerYouBoxRoutes`, YouBox runtime init).
+7. **Do not break** the OriginGame freeze list in `docs/origingame-contract.md` without coordinated checks.
 
 **Env**
 
 ```bash
-PRODUCT_ID=youbox|origingame          # required per host in production
+PRODUCT_ID=origingame                 # default; use youbox only for local Circuit demo
 PRODUCT_PUBLIC_BASE_URL=https://…     # optional override (OpenRouter referer, issuer fallback)
+GATEWAY_IMAGE=ghcr.io/fran0220/origin-gateway:<tag>
 ```
 
-**Status contract:** `GET /api/status` includes nested `data.product` `{ id, display_name, public_base_url, features }`. Frontend applies skin from this payload. Prefer the nested key when extending so upstream flat status merges stay clean.
+**Status contract:** `GET /api/status` includes nested `data.product` `{ id, display_name, public_base_url, features }`.
 
-**Details:** `docs/product-profile.md`, dual-host deploy: `docs/deploy-dual-host.md`.
+**Details:** `docs/product-profile.md`, deploy: `docs/deploy.md`.

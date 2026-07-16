@@ -39,7 +39,7 @@ function cloneProfile(base: ProductProfile): ProductProfile {
   }
 }
 
-/** Resolve a product profile from id, falling back to youbox. */
+/** Resolve a product profile from id, falling back to Origin Gateway. */
 export function resolveProduct(id?: string | null): ProductProfile {
   if (isProductId(id)) {
     return cloneProfile(PRODUCT_DEFAULTS[id])

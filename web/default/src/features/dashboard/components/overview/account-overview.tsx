@@ -42,17 +42,21 @@ import { getUserQuotaDates } from '@/features/dashboard/api'
 import type { AnnouncementItem } from '@/features/dashboard/types'
 import { getApiKeys } from '@/features/keys/api'
 import type { ApiKey } from '@/features/keys/types'
+import { useProduct } from '@/products'
 import { useAnnouncements, useApiInfo } from '../../hooks/use-status-data'
 import { AnnouncementDetailModal } from './announcement-detail-dialog'
 
 const OVERVIEW_RANGE_DAYS = 30
 const BANNER_DISMISSED_KEY = 'overview_announcement_dismissed'
 
-const FIRST_CALL_SNIPPET = [
-  'curl https://you-box.com/v1/chat/completions \\',
-  '  -H "Authorization: Bearer $YOUBOX_API_KEY" \\',
-  '  -d \'{"model": "gpt-4.1-mini", "messages": [{"role": "user", "content": "Hello"}]}\'',
-].join('\n')
+function firstCallSnippet(baseUrl: string): string {
+  const origin = (baseUrl || 'https://api.origingame.dev').replace(/\/$/, '')
+  return [
+    `curl ${origin}/v1/chat/completions \\`,
+    '  -H "Authorization: Bearer $OG_API_KEY" \\',
+    '  -d \'{"model": "gpt-4.1-mini", "messages": [{"role": "user", "content": "Hello"}]}\'',
+  ].join('\n')
+}
 
 function announcementKey(item: AnnouncementItem): string {
   if (item.id !== undefined && item.id !== null) return `id:${item.id}`
@@ -286,6 +290,7 @@ function KeyRow({ apiKey, t }: { apiKey: ApiKey; t: (k: string) => string }) {
 
 function ApiKeysCard() {
   const { t } = useTranslation()
+  const product = useProduct()
   const { items: apiInfoItems } = useApiInfo()
   const { copiedText, copyToClipboard } = useCopyToClipboard({
     successMessage: t('Copied to clipboard'),
@@ -302,9 +307,11 @@ function ApiKeysCard() {
 
   const endpoint =
     apiInfoItems[0]?.url ||
+    product.publicBaseUrl ||
     (typeof window !== 'undefined' ? window.location.origin : '')
 
   const keys = keysQuery.data ?? []
+  const snippet = firstCallSnippet(product.publicBaseUrl || endpoint)
 
   return (
     <Panel>
@@ -351,11 +358,7 @@ function ApiKeysCard() {
               <li>{t('Copy the key — it is shown only once')}</li>
               <li>{t('Make your first request')}</li>
             </ol>
-            <CodeBlock
-              code={FIRST_CALL_SNIPPET}
-              language='bash'
-              langLabel='BASH'
-            />
+            <CodeBlock code={snippet} language='bash' langLabel='BASH' />
             <Button size='sm' render={<Link to='/keys' />}>
               {t('Create key')}
             </Button>

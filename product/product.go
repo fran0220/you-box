@@ -6,8 +6,9 @@ import (
 	"sync"
 )
 
-// Product identity for dual-host / multi-skin deployments.
-// Selected at process start via PRODUCT_ID (runtime, single image).
+// Product identity for runtime skins / feature sets (single image).
+// Production default is Origin Gateway (origingame). PRODUCT_ID=youbox remains
+// a local/demo Circuit skin only — not a production host for this repo.
 const (
 	IDYouBox     = "youbox"
 	IDOriginGame = "origingame"
@@ -51,15 +52,15 @@ var (
 
 func init() {
 	// Safe default before Init(); production calls Init from common.InitEnv.
-	current = profileFor(IDYouBox, "")
+	current = profileFor(IDOriginGame, "")
 }
 
 // Init loads PRODUCT_ID and optional PRODUCT_PUBLIC_BASE_URL from the environment.
-// Unknown IDs fall back to youbox.
+// Empty or unknown IDs fall back to origingame (Origin Gateway).
 func Init() {
 	id := strings.ToLower(strings.TrimSpace(os.Getenv("PRODUCT_ID")))
 	if id == "" {
-		id = IDYouBox
+		id = IDOriginGame
 	}
 	override := strings.TrimSpace(os.Getenv("PRODUCT_PUBLIC_BASE_URL"))
 	p := profileFor(id, override)
@@ -119,30 +120,30 @@ func StatusPayload() map[string]any {
 
 func profileFor(id, publicBaseURLOverride string) Profile {
 	switch id {
-	case IDOriginGame:
+	case IDYouBox:
 		p := Profile{
-			ID:          IDOriginGame,
-			DisplayName: "Origin Gateway",
-			// Distinct public origin for OpenRouter referer / agent issuer fallback.
-			PublicBaseURL: "https://api.origingame.dev",
-			Features:      fullFeatures(),
+			ID:            IDYouBox,
+			DisplayName:   "YouBox",
+			PublicBaseURL: "https://you-box.com",
+			// Local/demo Circuit skin keeps full feature surface for redesign demos.
+			Features: fullFeatures(),
 		}
 		if publicBaseURLOverride != "" {
 			p.PublicBaseURL = strings.TrimRight(publicBaseURLOverride, "/")
 		}
 		return p
 	default:
-		// youbox and any unknown id
+		// origingame and any unknown id → Origin Gateway production profile
 		p := Profile{
-			ID:            IDYouBox,
-			DisplayName:   "YouBox",
-			PublicBaseURL: "https://you-box.com",
-			Features:      fullFeatures(),
+			ID:          IDOriginGame,
+			DisplayName: "Origin Gateway",
+			// Distinct public origin for OpenRouter referer / agent issuer fallback.
+			PublicBaseURL: "https://api.origingame.dev",
+			Features:      originGatewayFeatures(),
 		}
-		if id != IDYouBox && id != "" {
-			// Preserve explicit unknown ids in logs via ID, but keep youbox defaults.
-			// Callers should only set known PRODUCT_ID values.
-			p.ID = IDYouBox
+		if id != IDOriginGame && id != "" && id != IDYouBox {
+			// Unknown ids: keep origingame defaults but preserve safe production id.
+			p.ID = IDOriginGame
 		}
 		if publicBaseURLOverride != "" {
 			p.PublicBaseURL = strings.TrimRight(publicBaseURLOverride, "/")
@@ -151,8 +152,7 @@ func profileFor(id, publicBaseURLOverride string) Profile {
 	}
 }
 
-// fullFeatures is the Phase-0 default: both products expose the same capabilities
-// so deploy is behavior-preserving. Turn keys off per product as divergence appears.
+// fullFeatures: demo/youbox skin — all capability keys on.
 func fullFeatures() FeatureSet {
 	return FeatureSet{
 		AgentDesktop:      true,
@@ -160,6 +160,19 @@ func fullFeatures() FeatureSet {
 		Rankings:          true,
 		PlaygroundPresets: true,
 		PublicMarketing:   true,
+		Subscriptions:     true,
+	}
+}
+
+// originGatewayFeatures: production Origin Gateway for OriginGame consumers.
+// Retail / agent-desktop surfaces off; billing subscriptions stay on (portal).
+func originGatewayFeatures() FeatureSet {
+	return FeatureSet{
+		AgentDesktop:      false,
+		ModelPlaza:        false,
+		Rankings:          false,
+		PlaygroundPresets: false,
+		PublicMarketing:   false,
 		Subscriptions:     true,
 	}
 }

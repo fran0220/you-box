@@ -132,7 +132,7 @@ func agentIssuer() string {
 		if base := product.PublicBaseURL(); base != "" {
 			return base
 		}
-		return "https://you-box.com"
+		return "https://api.origingame.dev"
 	}
 	return strings.TrimRight(addr, "/")
 }

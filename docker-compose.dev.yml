@@ -31,6 +31,8 @@ services:
       - REDIS_CONN_STRING=redis://redis
       - TZ=Asia/Shanghai
       - BATCH_UPDATE_ENABLED=true
+      - PRODUCT_ID=origingame
+      - NODE_NAME=origin-gateway-dev
     depends_on:
       redis:
         condition: service_started

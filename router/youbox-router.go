@@ -9,8 +9,8 @@ import (
 )
 
 // registerYouBoxRoutes is the product extension seam for routes that are not
-// part of upstream Calcium-Ion/new-api. Gate with product.Feature* so dual-host
-// deployments can disable capabilities without forking core controllers.
+// part of upstream Calcium-Ion/new-api. Gate with product.Feature* so Origin
+// Gateway can disable retail/agent capabilities without forking core controllers.
 func registerYouBoxRoutes(apiRouter *gin.RouterGroup) {
 	if product.Enabled(product.FeatureAgentDesktop) {
 		registerAgentRoutes(apiRouter)

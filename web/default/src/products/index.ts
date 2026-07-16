@@ -24,7 +24,12 @@ export type {
   ProductStatusPayload,
   ProductUiFlags,
 } from './types'
-export { FULL_FEATURES, PRODUCT_DEFAULTS, DEFAULT_PRODUCT_ID } from './defaults'
+export {
+  FULL_FEATURES,
+  ORIGIN_GATEWAY_FEATURES,
+  PRODUCT_DEFAULTS,
+  DEFAULT_PRODUCT_ID,
+} from './defaults'
 export {
   applyProductToDom,
   isProductId,

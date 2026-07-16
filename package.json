@@ -1,5 +1,5 @@
 {
-  "name": "you-box",
+  "name": "origin-gateway",
   "private": true,
   "scripts": {
     "prepare": "husky"

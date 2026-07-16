@@ -24,6 +24,7 @@ import {
   parseHeaderNavModulesFromStatus,
 } from '@/lib/nav-modules'
 import { useStatus } from '@/hooks/use-status'
+import { useFeature } from '@/products'
 
 export type TopNavLink = {
   title: string
@@ -50,6 +51,8 @@ export function useTopNavLinks(): TopNavLink[] {
   const { t } = useTranslation()
   const { status } = useStatus()
   const { auth } = useAuthStore()
+  const rankingsFeature = useFeature('rankings')
+  const publicMarketing = useFeature('public_marketing')
 
   // Parse HeaderNavModules
   const modules = useMemo(() => {
@@ -66,7 +69,7 @@ export function useTopNavLinks(): TopNavLink[] {
 
   const links: TopNavLink[] = []
 
-  // Home
+  // Home (thin gateway landing when marketing is off still OK as entry)
   if (modules?.home !== false) {
     links.push({ title: t('Home'), href: '/' })
   }
@@ -80,7 +83,7 @@ export function useTopNavLinks(): TopNavLink[] {
     })
   }
 
-  // Product Chat (in-app Playground) — homepage product capability
+  // Product Chat (in-app Playground) — optional console DX
   if (isChatEntryEnabled(statusRecord)) {
     links.push({
       title: t('Chat'),
@@ -89,21 +92,26 @@ export function useTopNavLinks(): TopNavLink[] {
     })
   }
 
-  // Pricing
+  // Pricing / model catalog — ops self-serve; controlled by HeaderNavModules
   const pricing = modules?.pricing
   if (pricing && typeof pricing === 'object' && pricing.enabled) {
     const requiresAuth = pricing.requireAuth && !isAuthed
     links.push({ title: t('Model Square'), href: '/pricing', requiresAuth })
   }
 
-  // Rankings
+  // Rankings — product feature AND header module
   const rankings = modules?.rankings
-  if (rankings && typeof rankings === 'object' && rankings.enabled) {
+  if (
+    rankingsFeature &&
+    rankings &&
+    typeof rankings === 'object' &&
+    rankings.enabled
+  ) {
     const requiresAuth = rankings.requireAuth && !isAuthed
     links.push({ title: t('Rankings'), href: '/rankings', requiresAuth })
   }
 
-  if (modules?.apps !== false) {
+  if (rankingsFeature && modules?.apps !== false) {
     links.push({ title: t('Apps'), href: '/apps' })
   }
 
@@ -118,8 +126,8 @@ export function useTopNavLinks(): TopNavLink[] {
     }
   }
 
-  // About
-  if (modules?.about !== false) {
+  // About — marketing surface
+  if (publicMarketing && modules?.about !== false) {
     links.push({ title: t('About'), href: '/about' })
   }
 

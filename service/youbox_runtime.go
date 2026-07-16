@@ -15,7 +15,10 @@ func StartYouBoxBackgroundTasks() {
 }
 
 func InitYouBoxRuntimeResources() {
-	appusage.Init()
+	// Apps leaderboard attribution only when rankings feature is on.
+	if product.Enabled(product.FeatureRankings) {
+		appusage.Init()
+	}
 	if product.Enabled(product.FeatureAgentDesktop) {
 		if err := InitAgentAuthKeys(); err != nil {
 			common.SysLog("agent auth keys not initialized: " + err.Error())

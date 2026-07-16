@@ -1,7 +1,9 @@
-name: Publish YouBox image (GHCR)
+name: Publish Origin Gateway image (GHCR)
 
-# Publishes ghcr.io/fran0220/you-box for dual-host deploys (youbox + bwg).
-# Both production hosts are linux/amd64 today; keep the platform list explicit.
+# Publishes Origin Gateway images for BWG (api.origingame.dev).
+# Primary: ghcr.io/fran0220/origin-gateway
+# Legacy alias (BWG .env compatibility): ghcr.io/fran0220/you-box
+# Platform: linux/amd64 only.
 
 on:
   push:
@@ -25,7 +27,8 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: fran0220/you-box
+  IMAGE_NAME: fran0220/origin-gateway
+  LEGACY_IMAGE_NAME: fran0220/you-box
 
 jobs:
   build-and-push:
@@ -60,18 +63,19 @@ jobs:
           fi
 
           IMAGE="${REGISTRY}/${IMAGE_NAME}"
+          LEGACY="${REGISTRY}/${LEGACY_IMAGE_NAME}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
           echo "${VERSION}" > VERSION
-          echo "Building ${IMAGE}:${VERSION}"
+          echo "Building ${IMAGE}:${VERSION} (+ legacy ${LEGACY}:${VERSION})"
 
-          TAGS="${IMAGE}:${VERSION}"
-          # Always publish floating main when building from a version tag for dual-host convenience.
+          TAGS="${IMAGE}:${VERSION}"$'\n'"${LEGACY}:${VERSION}"
+          # Floating main on version tags for staging pull convenience.
           if [[ "${VERSION}" == v* ]]; then
-            TAGS="${TAGS}"$'\n'"${IMAGE}:main"
+            TAGS="${TAGS}"$'\n'"${IMAGE}:main"$'\n'"${LEGACY}:main"
           fi
           if [ -n "${{ github.event.inputs.floating_tag }}" ]; then
-            TAGS="${TAGS}"$'\n'"${IMAGE}:${{ github.event.inputs.floating_tag }}"
+            TAGS="${TAGS}"$'\n'"${IMAGE}:${{ github.event.inputs.floating_tag }}"$'\n'"${LEGACY}:${{ github.event.inputs.floating_tag }}"
           fi
           {
             echo "tags<<EOF"
@@ -105,15 +109,17 @@ jobs:
       - name: Summary
         run: |
           {
-            echo "### YouBox image published"
+            echo "### Origin Gateway image published"
             echo ""
             echo "- Image: \`${{ steps.meta.outputs.image }}\`"
+            echo "- Legacy alias: \`ghcr.io/fran0220/you-box\` (same digest)"
             echo "- Version: \`${{ steps.meta.outputs.version }}\`"
             echo "- Digest: \`${{ steps.build.outputs.digest }}\`"
             echo ""
-            echo "Deploy:"
+            echo "Deploy (BWG):"
             echo "\`\`\`bash"
-            echo "BOXAI_IMAGE=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}"
+            echo "GATEWAY_IMAGE=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}"
+            echo "PRODUCT_ID=origingame"
             echo "docker compose pull new-api && docker compose up -d new-api"
             echo "\`\`\`"
           } >> "$GITHUB_STEP_SUMMARY"

@@ -18,13 +18,23 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import type { FeatureSet, ProductId, ProductProfile } from './types'
 
-/** Default feature gates (both products; diverge via FeatureSet later). */
+/** Full feature surface (YouBox Circuit local/demo skin). */
 export const FULL_FEATURES: FeatureSet = {
   agent_desktop: true,
   model_plaza: true,
   rankings: true,
   playground_presets: true,
   public_marketing: true,
+  subscriptions: true,
+}
+
+/** Production Origin Gateway feature surface (matches Go originGatewayFeatures). */
+export const ORIGIN_GATEWAY_FEATURES: FeatureSet = {
+  agent_desktop: false,
+  model_plaza: false,
+  rankings: false,
+  playground_presets: false,
+  public_marketing: false,
   subscriptions: true,
 }
 
@@ -44,7 +54,7 @@ export const PRODUCT_DEFAULTS: Record<ProductId, ProductProfile> = {
     id: 'origingame',
     displayName: 'Origin Gateway',
     publicBaseUrl: 'https://api.origingame.dev',
-    features: { ...FULL_FEATURES },
+    features: { ...ORIGIN_GATEWAY_FEATURES },
     ui: {
       darkMode: false,
       paperMarketing: true,
@@ -53,4 +63,5 @@ export const PRODUCT_DEFAULTS: Record<ProductId, ProductProfile> = {
   },
 }
 
-export const DEFAULT_PRODUCT_ID: ProductId = 'youbox'
+/** Default product when status is missing — production Origin Gateway. */
+export const DEFAULT_PRODUCT_ID: ProductId = 'origingame'

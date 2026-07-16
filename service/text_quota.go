@@ -13,6 +13,7 @@ import (
 	"github.com/QuantumNous/new-api/pkg/appusage"
 	"github.com/QuantumNous/new-api/pkg/billingexpr"
 	perfmetrics "github.com/QuantumNous/new-api/pkg/perf_metrics"
+	"github.com/QuantumNous/new-api/product"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/setting/operation_setting"
 	"github.com/QuantumNous/new-api/types"
@@ -506,10 +507,12 @@ func PostTextConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, us
 	gopool.Go(func() {
 		perfmetrics.RecordRelaySample(relayInfo, true, int64(summary.CompletionTokens))
 		// App attribution (HTTP-Referer / X-Title) for the apps leaderboard.
-		appusage.RecordFromHeaders(
-			relayInfo.RequestHeaders,
-			relayInfo.OriginModelName,
-			int64(summary.PromptTokens+summary.CompletionTokens),
-		)
+		if product.Enabled(product.FeatureRankings) {
+			appusage.RecordFromHeaders(
+				relayInfo.RequestHeaders,
+				relayInfo.OriginModelName,
+				int64(summary.PromptTokens+summary.CompletionTokens),
+			)
+		}
 	})
 }

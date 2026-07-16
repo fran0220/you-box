@@ -159,43 +159,46 @@
 - 代码分割与懒加载策略见 [3.4 性能](#34-性能)；资源使用合适格式与压缩，环境变量用 `.env` 且以 `VITE_` 前缀，不在代码中硬编码。
 - **发布前**：执行 typecheck、lint、format 检查，完成生产构建并检查产物体积与环境变量配置。
 
-### 3.17 多产品（Product profile）
+### 3.17 产品 profile（Origin Gateway + 可选 demo 皮肤）
 
-双机部署对应两个**运行时产品**（同一镜像，`PRODUCT_ID` 选择），不是两套前端仓库：
+生产产品只有 **Origin Gateway**；同一镜像用 `PRODUCT_ID` 选择皮肤/能力，不是两套前端仓库：
 
 | `PRODUCT_ID` | 域名默认 | 用途 |
 | --- | --- | --- |
-| `youbox` | you-box.com | 主站 YouBox |
-| `origingame` | api.origingame.dev | Origin Gateway |
+| `origingame`（**默认**） | api.origingame.dev | **Origin Gateway 生产** |
+| `youbox` | 本地 demo | Circuit 皮肤演示（非生产） |
+
+`origingame` 默认关闭 `agent_desktop` / `rankings` / `playground_presets` / `public_marketing`；**保留 `subscriptions`**（OriginGame portal 计费）。
 
 **代码位置**
 
 - `src/products/` — 类型、默认 features、store、`useFeature` / `useProduct`
 - `src/products/product-tokens.css` — 仅覆盖语义 token 取值（`html[data-product=…]`）
 - 后端同源：`product/` 包 + `/api/status` 的 `data.product`
+- 消费者冻结契约：仓库根 `docs/origingame-contract.md`
 
 **开发约定**
 
-1. **两边都要的功能**：写在 `src/features/*` / 共享组件，不要复制目录。
-2. **仅一边要的功能**：共享实现 + `FeatureSet` 开关；菜单用 `useFeature('…')`，路由可用 `productHasFeature` + `redirect`；后端在 seam 上 `RequireFeature` / 条件注册。
+1. **共享功能**：写在 `src/features/*` / 共享组件，不要复制目录。
+2. **能力开关**：`FeatureSet`；菜单用 `useFeature('…')`，路由可用 `productHasFeature` + `redirect`；后端在 seam 上 `RequireFeature` / 条件注册。
 3. **禁止**在 `features/*` 业务逻辑里散落 `productId === 'origingame'`；禁止复制 `PageHeader` 等共享组件做产品分支。
 4. 设计差异只改 token / 少量 product copy，不发明第二套组件色板。
 5. 细节与红线见仓库根目录 `AGENTS.md` Rule 8、`docs/product-profile.md`。
 
-### 3.18 设计语言（双产品皮肤）
+### 3.18 设计语言（皮肤）
 
 同一套组件与外壳，**两套视觉语言**（`PRODUCT_ID` / `profile.ui.skin`）：
 
 | 产品 | skin | 特征 |
 | --- | --- | --- |
-| YouBox | `circuit` | 冷 slate、电光紫、无衬线标题、分层阴影、**明暗切换**；`skins/youbox.css` |
-| Origin | `paper` | Amp 纸面、奶油 `.paper`、衬线标题、发丝线、**仅浅色** |
+| Origin Gateway | `paper` | Amp 纸面、奶油 `.paper`、衬线标题、发丝线、**仅浅色**（生产默认） |
+| YouBox demo | `circuit` | 冷 slate、电光紫、无衬线标题、分层阴影、**明暗切换**；`skins/youbox.css` |
 
 **共用**
 
-- 单一 `AppShell`；目录页搜索+分面+虚拟化；认证页窄栏；优先 `components/youbox/`。
+- 单一 `AppShell`；目录页搜索+分面+虚拟化；认证页窄栏；优先 `components/youbox/`（命名历史，代码共享）。
 - 只改语义 token / product skin，禁止在 `features/*` 写死色值或散落 `productId ===`。
-- YouBox 明暗：`useTheme` + 顶栏 `ThemeSwitch`；Origin 隐藏切换并强制 light。
+- Circuit 明暗：`useTheme` + 顶栏 `ThemeSwitch`；Paper 隐藏切换并强制 light。
 
 细节见仓库根 `AGENTS.md` 设计语言节、`docs/product-profile.md`。
 

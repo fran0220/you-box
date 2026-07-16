@@ -3,22 +3,26 @@ package common
 import "github.com/QuantumNous/new-api/product"
 
 const (
-	defaultOpenRouterTitle = "AI Gateway"
-	DefaultMetaDescription = "Unified AI API gateway and admin dashboard."
+	defaultOpenRouterTitle = "Origin Gateway"
+	DefaultMetaDescription = "Origin Gateway — unified AI API gateway, accounts, quota, and admin console for OriginGame."
 )
 
-var SystemName = "AI Gateway"
+// SystemName is the operator-facing brand string (emails, page title, OpenRouter title).
+var SystemName = "Origin Gateway"
 
 // OpenRouterReferer returns the public product origin for upstream HTTP-Referer.
-// Driven by PRODUCT_ID (see product.Profile), not a hardcoded you-box.com URL.
+// Driven by PRODUCT_ID (see product.Profile).
 func OpenRouterReferer() string {
 	if url := product.PublicBaseURL(); url != "" {
 		return url
 	}
-	return "https://you-box.com"
+	return "https://api.origingame.dev"
 }
 
 func OpenRouterTitle() string {
+	if name := product.Current().DisplayName; name != "" {
+		return name
+	}
 	if SystemName != "" {
 		return SystemName
 	}

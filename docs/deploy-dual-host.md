@@ -1,87 +1,10 @@
-# Deploy checklist — BWG only (you-box codebase)
+# Moved: deploy checklist
 
-> **Cutover 2026-07-15:** Dual-host deploy of **this** repository is **retired**.  
-> - **BWG** (`api.origingame.dev`) remains the only production host for `fran0220/you-box`.  
-> - **youbox** (`you-box.com` / `160.187.1.155`) now runs **BoxAI** from `fran0220/boxAI` (`ghcr.io/fran0220/boxai`). Do not deploy you-box images there.
+Dual-host deploy of this repository is **retired**. The live ops path is **BWG only**.
 
-Image registry for this repo: `ghcr.io/fran0220/you-box`
+See **[docs/deploy.md](./deploy.md)** for Origin Gateway production deploy.
 
-| Host | SSH / IP | App dir | Container | Domain | Local port | Status |
-| --- | --- | --- | --- | --- | --- | --- |
-| `bwg` | `bwg` | `/opt/origin-gateway` | `origin-gateway` | `https://api.origingame.dev/` | `127.0.0.1:9320` | **Active (this repo)** |
-| `youbox` | `youbox` / `160.187.1.155` | `/opt/boxAI` (BoxAI) | `sub2api` | `https://you-box.com/` | `127.0.0.1:8080` | **BoxAI — not you-box** |
-| `youbox` (legacy) | — | purged | — | — | — | **Deleted** 2026-07-15 (no you-box archive/volume on host) |
-
-## BWG deploy (only production path for you-box)
-
-### 0. Registry login (if package is private)
-
-```bash
-echo "$GHCR_TOKEN" | docker login ghcr.io -u fran0220 --password-stdin
-```
-
-### 1. Publish a version image
-
-From a release commit on `main` (see `.github/workflows/ghcr-publish.yml`):
-
-```text
-ghcr.io/fran0220/you-box:<git-tag>
-ghcr.io/fran0220/you-box:main
-```
-
-### 2. Host `.env` on bwg `/opt/origin-gateway/.env`
-
-```bash
-BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.17   # pin a release tag
-PORT=9320
-NODE_NAME=bwg-origin-gateway-1
-PRODUCT_ID=origingame
-FRONTEND_BASE_URL=https://api.origingame.dev
-# host-local secrets: POSTGRES_*, REDIS_PASSWORD, SESSION_SECRET
-```
-
-### 3. Roll out
-
-```bash
-ssh bwg
-cd /opt/origin-gateway
-# set BOXAI_IMAGE to the new tag
-docker compose pull new-api
-docker compose up -d new-api
-docker compose ps
-curl -fsS http://127.0.0.1:9320/api/status
-# expect data.product.id == "origingame" when product profile is enabled
-curl -fsSI https://api.origingame.dev/api/status | head
-```
-
-### 4. Rollback
-
-```bash
-# set previous good BOXAI_IMAGE tag in .env
-docker compose pull new-api
-docker compose up -d new-api
-```
-
-Do **not** recreate postgres/redis volumes during rollback.
-
-## What not to do
-
-- Do **not** deploy `ghcr.io/fran0220/you-box` to `youbox` / `you-box.com` (BoxAI owns that host).
-- Do not use `calciumion/new-api` as the production image for this product.
-- Do not routinely `docker compose build` on `bwg` (low memory).
-- Do not delete named volumes / `./data` during routine deploys.
-
-## Historical: youbox fully purged of you-box (2026-07-15)
-
-On `youbox`:
-
-1. Stopped and removed you-box containers
-2. **Deleted** archive `/opt/you-box.offlined-*`, volume `you-box_pg_data`, images `you-box` / old postgres15 / redis:latest
-3. BoxAI runs under `/opt/boxAI` (`ghcr.io/fran0220/boxai`, Postgres 18 + Redis 8 in compose)
-4. Nginx `you-box.com` → `127.0.0.1:8080`
-
-BoxAI ops: `fran0220/boxAI` → **`docs/PRODUCTION.md`**.
-
-## Retired host: jpdata
-
-`jpdata` remains retired for YouBox product traffic. See previous archive notes if needed.
+| Retired idea | Reality |
+| --- | --- |
+| youbox + bwg both run this image | Only BWG runs Origin Gateway |
+| `you-box.com` for this stack | Host is BoxAI (`fran0220/boxAI`) |

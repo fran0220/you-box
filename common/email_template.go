@@ -297,7 +297,7 @@ func mergeEmailBrandConfig(base, draft EmailBrandConfig) EmailBrandConfig {
 }
 
 func buildEmailData(kind, systemName, code, resetLink string, validMinutes int, cfg EmailBrandConfig) EmailTemplateData {
-	brand := firstNonEmpty(cfg.BrandName, systemName, SystemName, "YouBox")
+	brand := firstNonEmpty(cfg.BrandName, systemName, SystemName, "Origin Gateway")
 	logo := strings.TrimSpace(cfg.LogoURL)
 	color := normalizePrimaryColor(firstNonEmpty(cfg.PrimaryColor, BrandColor, "#1f1b16"))
 	if color == "" {

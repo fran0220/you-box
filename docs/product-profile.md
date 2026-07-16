@@ -2,29 +2,33 @@
 
 ## Goal
 
-Run **YouBox** and **Origin Gateway** from one monorepo and one release image, with:
+Run **Origin Gateway** as the production product, with an optional **YouBox Circuit** local demo skin, from one monorepo and one release image (`ghcr.io/fran0220/origin-gateway`):
 
 - different design tokens / brand accents
-- optional different feature sets (frontend + backend)
+- different feature sets (gateway vs demo retail surfaces)
 - continued upstream Calcium-Ion/new-api backend merges into **shared core**
 
-without maintaining two apps or two git forks.
+without maintaining two gateway apps or two git forks of this core.
+
+**Production:** only **BWG** runs this image as Origin Gateway (`PRODUCT_ID=origingame`, `https://api.origingame.dev`).  
+`you-box.com` is **BoxAI**, not this stack. See `AGENTS.md` and `docs/deploy.md`.  
+OriginGame consumer boundary: `docs/origingame-platform.md`. Frozen HTTP: `docs/origingame-contract.md`.
 
 ## Model
 
 ```text
 upstream new-api  ──►  core (relay, model, billing, auth, shared UI)
                               │
-              PRODUCT_ID ─────┼── youbox skin + features
-                              └── origingame skin + features
+              PRODUCT_ID ─────┼── origingame (default, production Origin Gateway)
+                              └── youbox (local Circuit demo only)
 ```
 
-| Host | `PRODUCT_ID` | Domain (default public base) |
-| --- | --- | --- |
-| youbox | `youbox` | https://you-box.com |
-| bwg | `origingame` | https://api.origingame.dev |
+| Context | `PRODUCT_ID` | Domain (default public base) | Production? |
+| --- | --- | --- | --- |
+| BWG Origin Gateway | `origingame` (**default**) | https://api.origingame.dev | **Yes — only live deploy of this repo** |
+| Local / demo Circuit skin | `youbox` | demo / override | No — not `you-box.com` |
 
-Same image digest on both hosts. Differences are **runtime**.
+Differences are **runtime** (`PRODUCT_ID`), not separate images per host.
 
 ## Backend
 
@@ -40,22 +44,22 @@ Same image digest on both hosts. Differences are **runtime**.
 ### Env
 
 ```bash
-PRODUCT_ID=youbox          # or origingame
+PRODUCT_ID=origingame      # default; youbox = local Circuit demo only
 PRODUCT_PUBLIC_BASE_URL=   # optional absolute origin, no trailing slash required
 ```
 
 ### Feature keys (keep small)
 
-| Key | Meaning |
-| --- | --- |
-| `agent_desktop` | Agent auth/device APIs + console entry |
-| `model_plaza` | Model plaza surfaces (reserved for gates) |
-| `rankings` | App rankings `/api/apps` |
-| `playground_presets` | Preset + conversation playground APIs |
-| `public_marketing` | Marketing-oriented UI (reserved) |
-| `subscriptions` | Subscription surfaces (reserved) |
+| Key | Meaning | `origingame` default | `youbox` demo |
+| --- | --- | --- | --- |
+| `agent_desktop` | Agent auth/device APIs + console entry | **false** | true |
+| `model_plaza` | Model plaza reserved gate | **false** | true |
+| `rankings` | Rankings + apps APIs | **false** | true |
+| `playground_presets` | Preset + conversation playground APIs | **false** | true |
+| `public_marketing` | Marketing-oriented UI (About, etc.) | **false** | true |
+| `subscriptions` | Subscription surfaces (portal billing) | **true** | true |
 
-Phase-0 default: **all true** for both products (behavior-preserving). Turn off per product when divergence is real.
+Empty / unknown `PRODUCT_ID` → **origingame** (safe production default).
 
 ### Adding an A-only feature
 
@@ -126,4 +130,5 @@ Browser evidence: `docs/redesign-reviews/circuit-verify/README.md`.
 
 1. Product-private Go packages + `og_*` tables when a whole domain is product-only.
 2. Dual image tags / build-arg product bundles only if secrecy, bundle size, or incompatible design systems force it.
-3. Never split into two git repositories while both remain gateways on this core.
+3. Keep gateway core in this repo; do not merge OriginGame portal/Studio source here (HTTP consumer only — `docs/origingame-platform.md`).
+4. Never split this gateway core into two git repositories while both skins remain on the same release image.

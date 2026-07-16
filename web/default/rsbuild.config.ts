@@ -11,7 +11,7 @@ export default defineConfig(({ envMode }) => {
   const serverUrl =
     process.env.VITE_REACT_APP_SERVER_URL ||
     env.rawPublicVars.VITE_REACT_APP_SERVER_URL ||
-    'https://you-box.com'
+    'https://api.origingame.dev'
 
   const isProd = envMode === 'production'
   // Prefix keys like `/api` would also match SPA routes such as `/api-tools`; use

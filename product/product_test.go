@@ -5,8 +5,33 @@ import (
 	"testing"
 )
 
-func TestInitDefaultYouBox(t *testing.T) {
+func TestInitDefaultOriginGateway(t *testing.T) {
 	t.Setenv("PRODUCT_ID", "")
+	t.Setenv("PRODUCT_PUBLIC_BASE_URL", "")
+	Init()
+	p := Current()
+	if p.ID != IDOriginGame {
+		t.Fatalf("id: got %q want %q", p.ID, IDOriginGame)
+	}
+	if p.PublicBaseURL != "https://api.origingame.dev" {
+		t.Fatalf("public base: got %q", p.PublicBaseURL)
+	}
+	if p.DisplayName != "Origin Gateway" {
+		t.Fatalf("display name: got %q", p.DisplayName)
+	}
+	if Enabled(FeatureAgentDesktop) {
+		t.Fatal("agent_desktop should be disabled by default (origingame)")
+	}
+	if !Enabled(FeatureSubscriptions) {
+		t.Fatal("subscriptions must stay enabled for OriginGame portal")
+	}
+	if Enabled(FeatureRankings) {
+		t.Fatal("rankings should be off for origingame")
+	}
+}
+
+func TestInitYouBoxDemoSkin(t *testing.T) {
+	t.Setenv("PRODUCT_ID", "youbox")
 	t.Setenv("PRODUCT_PUBLIC_BASE_URL", "")
 	Init()
 	p := Current()
@@ -17,7 +42,7 @@ func TestInitDefaultYouBox(t *testing.T) {
 		t.Fatalf("public base: got %q", p.PublicBaseURL)
 	}
 	if !Enabled(FeatureAgentDesktop) {
-		t.Fatal("agent_desktop should be enabled by default")
+		t.Fatal("agent_desktop should be enabled for youbox demo")
 	}
 }
 
@@ -35,6 +60,9 @@ func TestInitOriginGame(t *testing.T) {
 	if p.DisplayName != "Origin Gateway" {
 		t.Fatalf("display name: got %q", p.DisplayName)
 	}
+	if Enabled(FeaturePlaygroundPresets) {
+		t.Fatal("playground_presets should be off for origingame")
+	}
 }
 
 func TestPublicBaseURLOverride(t *testing.T) {
@@ -46,12 +74,12 @@ func TestPublicBaseURLOverride(t *testing.T) {
 	}
 }
 
-func TestUnknownIDFallsBackToYouBox(t *testing.T) {
+func TestUnknownIDFallsBackToOriginGateway(t *testing.T) {
 	t.Setenv("PRODUCT_ID", "not-a-product")
 	t.Setenv("PRODUCT_PUBLIC_BASE_URL", "")
 	Init()
-	if Current().ID != IDYouBox {
-		t.Fatalf("unknown id should fall back to youbox, got %q", Current().ID)
+	if Current().ID != IDOriginGame {
+		t.Fatalf("unknown id should fall back to origingame, got %q", Current().ID)
 	}
 }
 
@@ -66,8 +94,11 @@ func TestStatusPayloadShape(t *testing.T) {
 	if !ok {
 		t.Fatalf("features type: %T", payload["features"])
 	}
-	if !features.ModelPlaza {
-		t.Fatal("expected model_plaza true")
+	if features.ModelPlaza {
+		t.Fatal("expected model_plaza false for origingame")
+	}
+	if !features.Subscriptions {
+		t.Fatal("expected subscriptions true for origingame")
 	}
 }
 
