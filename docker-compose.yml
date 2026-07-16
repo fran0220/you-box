@@ -42,6 +42,7 @@ services:
       - GLOBAL_WEB_RATE_LIMIT_DURATION=${GLOBAL_WEB_RATE_LIMIT_DURATION:-60}
       - NODE_NAME=${NODE_NAME:-origin-gateway-1}  # 节点名称，用于审计日志中标识节点身份
       - PRODUCT_ID=${PRODUCT_ID:-origingame}  # origingame (default) | youbox (local Circuit demo only)
+      - MESHY_WEBHOOK_SECRET=${MESHY_WEBHOOK_SECRET:-}  # enables POST /meshy-webhook/:secret when set
 #      - STREAMING_TIMEOUT=300
 #      - RELAY_IDLE_CONN_TIMEOUT=90
 #      - SESSION_SECRET=random_string

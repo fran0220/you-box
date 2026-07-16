@@ -5054,6 +5054,7 @@
     "Users must wait for a successful drawing before upscales or variations.": "Người dùng phải chờ vẽ thành công trước khi upscale hoặc biến thể.",
     "Users only see groups marked as user selectable. Non-selectable groups can still be assigned by administrators.": "Người dùng chỉ thấy các nhóm được đánh dấu là có thể chọn. Nhóm không thể chọn vẫn có thể do quản trị viên gán.",
     "uses": "sử dụng",
+    "UV unwrap workflow for generating clean non-overlapping UV layouts on existing 3D models.": "Quy trình trải UV để tạo bố cục UV sạch, không chồng lấn cho các mô hình 3D hiện có.",
     "Validity": "Hiệu lực",
     "Validity Period": "Thời hạn hiệu lực",
     "Value": "Giá trị",

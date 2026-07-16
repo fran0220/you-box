@@ -5054,6 +5054,7 @@
     "Users must wait for a successful drawing before upscales or variations.": "アップスケールやバリエーションを行う前に、ユーザーは成功した描画を待つ必要があります。",
     "Users only see groups marked as user selectable. Non-selectable groups can still be assigned by administrators.": "ユーザーにはユーザー選択可のグループだけが表示されます。選択不可グループも管理者は割り当てできます。",
     "uses": "使用回数",
+    "UV unwrap workflow for generating clean non-overlapping UV layouts on existing 3D models.": "既存の3DモデルにクリーンでオーバーラップのないUVレイアウトを生成するUV展開ワークフロー。",
     "Validity": "有効期間",
     "Validity Period": "有効期間",
     "Value": "値",

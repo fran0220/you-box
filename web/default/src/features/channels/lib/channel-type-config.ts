@@ -159,7 +159,7 @@ export const CHANNEL_TYPE_CONFIGS: Record<number, ChannelTypeConfig> = {
       baseUrl: 'Default: https://api.meshy.ai',
       key: 'Meshy Bearer API key (msy-...)',
       models:
-        'meshy-text-to-3d,meshy-image-to-3d,meshy-multi-image-to-3d,meshy-remesh,meshy-convert,meshy-resize,meshy-retexture,meshy-rigging,meshy-animation',
+        'meshy-text-to-3d,meshy-image-to-3d,meshy-multi-image-to-3d,meshy-remesh,meshy-convert,meshy-resize,meshy-retexture,meshy-rigging,meshy-animation,meshy-uv-unwrap',
     },
     validation: {
       keyFormat: /^msy-/,

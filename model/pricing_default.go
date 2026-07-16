@@ -148,6 +148,13 @@ var defaultModelCatalogMetadataByName = map[string]defaultModelCatalogMetadata{
 		Tags:           "3d,animation,character",
 		Icon:           "Meshy",
 	},
+	"meshy-uv-unwrap": {
+		Vendor:         "Meshy",
+		Description:    "UV unwrap workflow for generating clean non-overlapping UV layouts on existing 3D models.",
+		DescriptionKey: "UV unwrap workflow for generating clean non-overlapping UV layouts on existing 3D models.",
+		Tags:           "3d,uv,post-processing",
+		Icon:           "Meshy",
+	},
 	"grok-composer-2.5-fast": {
 		Vendor:         "xAI",
 		Description:    "Fast Grok Composer model for code generation, agentic editing, and text workflows.",

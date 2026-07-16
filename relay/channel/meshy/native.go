@@ -33,6 +33,7 @@ const (
 	ModelRetexture      = "meshy-retexture"
 	ModelRigging        = "meshy-rigging"
 	ModelAnimation      = "meshy-animation"
+	ModelUVUnwrap       = "meshy-uv-unwrap"
 )
 
 const (
@@ -42,9 +43,11 @@ const (
 
 type NativeEndpoint struct {
 	Name         string
+	Version      string
 	BillingKind  int
 	DefaultModel string
 	Stream       bool
+	TaskCreate   bool
 }
 
 type NativeUsage struct {
@@ -65,10 +68,25 @@ var DefaultModelList = []string{
 	ModelRetexture,
 	ModelRigging,
 	ModelAnimation,
+	ModelUVUnwrap,
 }
 
 func IsNativeProxyPath(path string) bool {
 	return strings.HasPrefix(path, "/meshy/")
+}
+
+// IsGatewayTaskPath 判断是否为网关本地任务查询路径 /meshy/tasks/:id（不透传上游）。
+func IsGatewayTaskPath(path string) bool {
+	return GatewayTaskIDFromPath(path) != ""
+}
+
+// GatewayTaskIDFromPath 从 /meshy/tasks/:id 提取任务 ID；不匹配时返回空串。
+func GatewayTaskIDFromPath(path string) string {
+	segments := splitPathSegments(normalizeNativePath(strings.TrimPrefix(path, "/meshy")))
+	if len(segments) == 2 && segments[0] == "tasks" {
+		return segments[1]
+	}
+	return ""
 }
 
 func UpstreamPathFromProxyPath(path string) string {
@@ -95,8 +113,8 @@ func MatchNativeEndpoint(method string, upstreamPath string) (*NativeEndpoint, b
 	version := segments[1]
 	resource := segments[2]
 
-	if method == http.MethodGet && version == "v2" && resource == "balance" && len(segments) == 3 {
-		return &NativeEndpoint{Name: "balance", BillingKind: billingNone, DefaultModel: ModelTextTo3D}, true
+	if method == http.MethodGet && version == "v1" && resource == "balance" && len(segments) == 3 {
+		return &NativeEndpoint{Name: "balance", Version: version, BillingKind: billingNone, DefaultModel: ModelTextTo3D}, true
 	}
 	endpointModel, ok := modelForResource(version, resource)
 	if !ok {
@@ -104,16 +122,16 @@ func MatchNativeEndpoint(method string, upstreamPath string) (*NativeEndpoint, b
 	}
 
 	if method == http.MethodPost && len(segments) == 3 {
-		return &NativeEndpoint{Name: resource, BillingKind: billingRequest, DefaultModel: endpointModel}, true
+		return &NativeEndpoint{Name: resource, Version: version, BillingKind: billingRequest, DefaultModel: endpointModel, TaskCreate: true}, true
 	}
 	if method == http.MethodGet && (len(segments) == 3 || len(segments) == 4) {
-		return &NativeEndpoint{Name: resource, BillingKind: billingNone, DefaultModel: endpointModel}, true
+		return &NativeEndpoint{Name: resource, Version: version, BillingKind: billingNone, DefaultModel: endpointModel}, true
 	}
 	if method == http.MethodDelete && len(segments) == 4 {
-		return &NativeEndpoint{Name: resource, BillingKind: billingNone, DefaultModel: endpointModel}, true
+		return &NativeEndpoint{Name: resource, Version: version, BillingKind: billingNone, DefaultModel: endpointModel}, true
 	}
 	if method == http.MethodGet && len(segments) == 5 && segments[4] == "stream" {
-		return &NativeEndpoint{Name: resource, BillingKind: billingNone, DefaultModel: endpointModel, Stream: true}, true
+		return &NativeEndpoint{Name: resource, Version: version, BillingKind: billingNone, DefaultModel: endpointModel, Stream: true}, true
 	}
 	return nil, false
 }
@@ -138,9 +156,43 @@ func modelForResource(version string, resource string) (string, bool) {
 		return ModelRigging, version == "v1"
 	case "animations":
 		return ModelAnimation, version == "v1"
+	case "uv-unwrap":
+		return ModelUVUnwrap, version == "v1"
 	default:
 		return "", false
 	}
+}
+
+// VersionForResource 返回任务资源对应的上游 API 版本（用于轮询查询 URL）。
+func VersionForResource(resource string) (string, bool) {
+	if resource == "text-to-3d" {
+		return "v2", true
+	}
+	if _, ok := modelForResource("v1", resource); ok {
+		return "v1", true
+	}
+	return "", false
+}
+
+// UpstreamTaskPath 构造上游任务查询路径 /openapi/{version}/{resource}/{taskID}。
+func UpstreamTaskPath(resource string, taskID string) (string, bool) {
+	version, ok := VersionForResource(resource)
+	if !ok || strings.TrimSpace(taskID) == "" {
+		return "", false
+	}
+	return fmt.Sprintf("/openapi/%s/%s/%s", version, resource, url.PathEscape(taskID)), true
+}
+
+// ParseCreateTaskID 从创建任务响应 {"result": "<id>"} 中提取上游任务 ID。
+func ParseCreateTaskID(body []byte) (string, bool) {
+	var payload struct {
+		Result string `json:"result"`
+	}
+	if err := common.Unmarshal(body, &payload); err != nil {
+		return "", false
+	}
+	id := strings.TrimSpace(payload.Result)
+	return id, id != ""
 }
 
 func NativeModelForRequest(_ *gin.Context, endpoint *NativeEndpoint) (string, error) {
@@ -229,13 +281,7 @@ func CopyNativeResponse(c *gin.Context, resp *http.Response) error {
 		return errors.New("nil Meshy response")
 	}
 	defer service.CloseResponseBodyGracefully(resp)
-	for k, v := range resp.Header {
-		if len(v) == 0 || !shouldCopyNativeResponseHeader(k) || !service.ShouldCopyUpstreamHeader(c, k, v) {
-			continue
-		}
-		c.Writer.Header().Set(k, v[0])
-	}
-	c.Writer.WriteHeader(resp.StatusCode)
+	writeNativeResponseHeaders(c, resp)
 	_, err := io.Copy(c.Writer, resp.Body)
 	if err != nil {
 		logger.LogError(c, "failed to copy Meshy response: "+err.Error())
@@ -243,6 +289,40 @@ func CopyNativeResponse(c *gin.Context, resp *http.Response) error {
 	}
 	c.Writer.Flush()
 	return nil
+}
+
+// maxCaptureResponseBytes 限制需要捕获的创建任务响应体大小（正常为几十字节的 JSON）。
+const maxCaptureResponseBytes = 64 * 1024
+
+// CopyNativeResponseCapture 与 CopyNativeResponse 相同，但同时缓存响应体
+// 并返回，用于解析创建任务响应中的上游任务 ID。
+func CopyNativeResponseCapture(c *gin.Context, resp *http.Response) ([]byte, error) {
+	if resp == nil {
+		return nil, errors.New("nil Meshy response")
+	}
+	defer service.CloseResponseBodyGracefully(resp)
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxCaptureResponseBytes))
+	if err != nil {
+		logger.LogError(c, "failed to read Meshy response: "+err.Error())
+		return nil, err
+	}
+	writeNativeResponseHeaders(c, resp)
+	if _, err := c.Writer.Write(body); err != nil {
+		logger.LogError(c, "failed to write Meshy response: "+err.Error())
+		return body, err
+	}
+	c.Writer.Flush()
+	return body, nil
+}
+
+func writeNativeResponseHeaders(c *gin.Context, resp *http.Response) {
+	for k, v := range resp.Header {
+		if len(v) == 0 || !shouldCopyNativeResponseHeader(k) || !service.ShouldCopyUpstreamHeader(c, k, v) {
+			continue
+		}
+		c.Writer.Header().Set(k, v[0])
+	}
+	c.Writer.WriteHeader(resp.StatusCode)
 }
 
 func RecordNativeConsume(c *gin.Context, info *relaycommon.RelayInfo, usage NativeUsage, quota int, priceData types.PriceData) {

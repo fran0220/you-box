@@ -5054,6 +5054,7 @@
     "Users must wait for a successful drawing before upscales or variations.": "Les utilisateurs doivent attendre une génération réussie avant les upscales ou variations.",
     "Users only see groups marked as user selectable. Non-selectable groups can still be assigned by administrators.": "Les utilisateurs ne voient que les groupes marqués comme sélectionnables. Les groupes non sélectionnables peuvent toujours être attribués par les administrateurs.",
     "uses": "utilisations",
+    "UV unwrap workflow for generating clean non-overlapping UV layouts on existing 3D models.": "Flux de dépliage UV pour générer des dispositions UV propres et sans chevauchement sur des modèles 3D existants.",
     "Validity": "Validité",
     "Validity Period": "Période de validité",
     "Value": "Valeur",

@@ -302,6 +302,7 @@ export const MESHY_DEFAULT_MODELS = [
   'meshy-retexture',
   'meshy-rigging',
   'meshy-animation',
+  'meshy-uv-unwrap',
 ] as const
 
 // ============================================================================

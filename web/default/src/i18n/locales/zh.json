@@ -5054,6 +5054,7 @@
     "Users must wait for a successful drawing before upscales or variations.": "用户必须等待成功的绘图完成，才能进行放大或变体。",
     "Users only see groups marked as user selectable. Non-selectable groups can still be assigned by administrators.": "用户只能看到标记为用户可选的分组。不可选分组仍可由管理员分配。",
     "uses": "使用次数",
+    "UV unwrap workflow for generating clean non-overlapping UV layouts on existing 3D models.": "UV 展开工作流，可为现有 3D 模型生成干净、无重叠的 UV 布局。",
     "Validity": "有效期",
     "Validity Period": "有效期",
     "Value": "值",

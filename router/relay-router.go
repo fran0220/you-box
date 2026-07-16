@@ -211,6 +211,10 @@ func SetRelayRouter(router *gin.Engine) {
 		relayElevenLabsRouter.Any("/*path", controller.RelayElevenLabs)
 	}
 
+	// Meshy 任务状态回调（Meshy 控制台配置，路径密钥鉴权，未配置 MESHY_WEBHOOK_SECRET 时返回 404）。
+	// 独立前缀：/meshy 组的通配路由与子路径注册冲突，且回调方无法携带网关 token。
+	router.POST("/meshy-webhook/:secret", controller.RelayMeshyWebhook)
+
 	relayMeshyRouter := router.Group("/meshy")
 	relayMeshyRouter.Use(middleware.RouteTag("relay"))
 	relayMeshyRouter.Use(middleware.SystemPerformanceCheck())

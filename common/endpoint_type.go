@@ -43,6 +43,8 @@ func meshyEndpointTypes(modelName string) []constant.EndpointType {
 		return []constant.EndpointType{constant.EndpointTypeModel3DRigging}
 	case "meshy-animation":
 		return []constant.EndpointType{constant.EndpointTypeModel3DCharacterAnim}
+	case "meshy-uv-unwrap":
+		return []constant.EndpointType{constant.EndpointTypeModel3DPostProcess}
 	default:
 		return nil
 	}

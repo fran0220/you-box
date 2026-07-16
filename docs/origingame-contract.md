@@ -51,6 +51,38 @@ Auth: session cookie + `New-Api-User` for browser; Studio uses password login th
 
 Studio long streams must use **direct** `api.origingame.dev` (or `OG_AI_GATEWAY`), not portal `/gw` as primary.
 
+## 3D generation (`/meshy/*`, Meshy native proxy)
+
+Auth: **Bearer sk-** (same relay token as `/v1/*`). Allowlisted upstream endpoints only
+(create POST is billed per request; GET / list / DELETE / SSE `stream` are free):
+
+| Workflow model | Upstream path | Purpose |
+| --- | --- | --- |
+| `meshy-text-to-3d` | `/meshy/openapi/v2/text-to-3d` | Text to 3D (preview/refine two-step) |
+| `meshy-image-to-3d` | `/meshy/openapi/v1/image-to-3d` | Image to 3D (`smart-topology` supported) |
+| `meshy-multi-image-to-3d` | `/meshy/openapi/v1/multi-image-to-3d` | Multi-view images to 3D |
+| `meshy-remesh` | `/meshy/openapi/v1/remesh` | Polycount / topology reduction |
+| `meshy-uv-unwrap` | `/meshy/openapi/v1/uv-unwrap` | Clean UV layout (max 40k faces) |
+| `meshy-convert` | `/meshy/openapi/v1/convert` | Format conversion (GLB/FBX/OBJ/USDZ/…) |
+| `meshy-resize` | `/meshy/openapi/v1/resize` | Physical size scaling |
+| `meshy-retexture` | `/meshy/openapi/v1/retexture` | Re-texture existing model |
+| `meshy-rigging` | `/meshy/openapi/v1/rigging` | Auto-rigging |
+| `meshy-animation` | `/meshy/openapi/v1/animations` | Preset character animation |
+| — | `GET /meshy/openapi/v1/balance` | Upstream credit balance |
+
+3D-print and Creative Lab upstream endpoints are intentionally **not** exposed.
+
+Task status (preferred over polling upstream through the proxy):
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/meshy/tasks/:id` | Gateway-local task status (`status`, `progress`, `result_url`, last payload) — served from DB, no upstream call |
+| POST | `/meshy-webhook/:secret` | Meshy dashboard webhook receiver (path secret = `MESHY_WEBHOOK_SECRET` env; 404 when unset) |
+
+Create responses (`{"result": "<task-id>"}`) are recorded as gateway tasks (`platform=meshy`).
+Status flows in via the Meshy webhook, with the async task poller as fallback; failed or
+canceled tasks are refunded automatically.
+
 ## Model readiness
 
 Studio expects **`grok-4.5`** present on `GET /v1/models` for Maker readiness (channel/metadata ops, not a code freeze).
