@@ -153,7 +153,7 @@ func (s *BillingSession) Reserve(targetQuota int) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.settled || s.refunded || s.trusted || targetQuota <= s.preConsumedQuota {
+	if s.settled || s.refunded || targetQuota <= s.preConsumedQuota {
 		return nil
 	}
 
@@ -173,6 +173,11 @@ func (s *BillingSession) Reserve(targetQuota int) error {
 	s.preConsumedQuota += delta
 	s.tokenConsumed += delta
 	s.extraReserved += delta
+	// Reserve is an explicit request to lock the target amount before an
+	// expensive upstream operation. It must override the normal wallet trust
+	// bypass; otherwise a trusted user could receive a multimodal response
+	// before the actual quota has been secured.
+	s.trusted = false
 	s.syncRelayInfo()
 	return nil
 }

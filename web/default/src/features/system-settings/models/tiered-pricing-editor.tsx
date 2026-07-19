@@ -185,6 +185,11 @@ const PRESET_GROUPS: PresetGroup[] = [
         expr: 'tier("base", p * 0.3 + c * 2.5 + cr * 0.03 + ai * 1.0)',
       },
       {
+        key: 'gemini-embedding-2',
+        label: 'Gemini Embedding 2',
+        expr: 'v2:tier("standard", p * 0.20 + img * 0.45 + doc * 0.45 + ai * 6.50 + vid * 12.00)',
+      },
+      {
         key: 'gemini-3-pro-image',
         label: 'Gemini 3 Pro Image',
         expr: 'tier("base", p * 2 + c * 12 + img_o * 120)',
@@ -899,7 +904,7 @@ function RawExprEditor({ exprString, onChange }: RawExprEditorProps) {
             {t('Variables')}: <code>len</code>, <code>p</code>, <code>c</code>,{' '}
             <code>cr</code>, <code>cc</code>, <code>cc1h</code>,{' '}
             <code>img</code>, <code>img_o</code>, <code>ai</code>,{' '}
-            <code>ao</code>
+            <code>doc</code>, <code>vid</code>, <code>ao</code>
           </div>
           <div>
             {t('Functions')}: <code>tier(name, value)</code>, <code>max</code>,{' '}
@@ -1378,6 +1383,8 @@ function CostEstimator({ effectiveExpr }: EstimatorProps) {
     imageTokens: 0,
     imageOutputTokens: 0,
     audioInputTokens: 0,
+    documentInputTokens: 0,
+    videoInputTokens: 0,
     audioOutputTokens: 0,
   })
 
@@ -1498,6 +1505,8 @@ Input side:
 - cc1h — cache-create token count (1-hour TTL, Claude-specific)
 - img — image input token count
 - ai — audio input token count
+- doc — document/PDF input token count (v2)
+- vid — video input token count (v2)
 
 Output side:
 - c — output token count. Also auto-excludes sub-categories priced separately

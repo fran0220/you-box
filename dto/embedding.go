@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/QuantumNous/new-api/types"
@@ -72,6 +73,30 @@ func (r *EmbeddingRequest) ParseInput() []string {
 		}
 	}
 	return input
+}
+
+// ParseTextInput parses the OpenAI embeddings input without discarding invalid
+// array members. The OpenAI-compatible endpoint is intentionally text-only.
+func (r *EmbeddingRequest) ParseTextInput() ([]string, error) {
+	if r.Input == nil {
+		return nil, fmt.Errorf("input is required")
+	}
+	switch input := r.Input.(type) {
+	case string:
+		return []string{input}, nil
+	case []any:
+		texts := make([]string, len(input))
+		for i, item := range input {
+			text, ok := item.(string)
+			if !ok {
+				return nil, fmt.Errorf("input[%d] must be a string", i)
+			}
+			texts[i] = text
+		}
+		return texts, nil
+	default:
+		return nil, fmt.Errorf("input must be a string or an array of strings")
+	}
 }
 
 type EmbeddingResponseItem struct {

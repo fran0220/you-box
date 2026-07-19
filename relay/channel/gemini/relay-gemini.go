@@ -407,7 +407,10 @@ func GeminiEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *h
 	// Google has not yet clarified how embedding models will be billed
 	// refer to openai billing method to use input tokens billing
 	// https://platform.openai.com/docs/guides/embeddings#what-are-embeddings
-	usage := service.ResponseText2Usage(c, "", info.UpstreamModelName, info.GetEstimatePromptTokens())
+	usage, usageErr := geminiEmbeddingUsage(geminiResponse.UsageMetadata, service.ResponseText2Usage(c, "", info.UpstreamModelName, info.GetEstimatePromptTokens()))
+	if usageErr != nil {
+		return nil, types.NewOpenAIError(usageErr, types.ErrorCodeBadResponseBody, http.StatusBadGateway)
+	}
 	openAIResponse.Usage = *usage
 
 	jsonResponse, jsonErr := common.Marshal(openAIResponse)

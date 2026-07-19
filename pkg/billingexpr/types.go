@@ -26,6 +26,8 @@ type TokenParams struct {
 	ImgO float64 // image output tokens
 	AI   float64 // audio input tokens
 	AO   float64 // audio output tokens
+	Doc  float64 // document/PDF input tokens (v2)
+	Vid  float64 // video input tokens (v2)
 }
 
 // TraceResult holds side-channel info captured by the tier() function

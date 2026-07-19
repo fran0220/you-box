@@ -172,6 +172,9 @@ type RelayInfo struct {
 	// captured at pre-consume time. Non-nil only when billing mode is "tiered_expr".
 	TieredBillingSnapshot *billingexpr.BillingSnapshot
 	BillingRequestInput   *billingexpr.RequestInput
+	// EmbeddingPreflightUsage is the selected Gemini channel's countTokens
+	// result, used both for quota reservation and response-metadata fallback.
+	EmbeddingPreflightUsage *dto.Usage
 
 	Request dto.Request
 

@@ -91,7 +91,9 @@ func HasOpenAIUsageTokens(usage *Usage) bool {
 		usage.PromptTokensDetails.CacheWriteTokens != 0 ||
 		usage.PromptTokensDetails.TextTokens != 0 ||
 		usage.PromptTokensDetails.ImageTokens != 0 ||
-		usage.PromptTokensDetails.AudioTokens != 0 {
+		usage.PromptTokensDetails.AudioTokens != 0 ||
+		usage.PromptTokensDetails.DocumentTokens != 0 ||
+		usage.PromptTokensDetails.VideoTokens != 0 {
 		return true
 	}
 	if usage.CompletionTokenDetails.ReasoningTokens != 0 ||

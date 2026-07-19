@@ -29,6 +29,11 @@ var defaultVendorDescriptionKeys = map[string]string{
 }
 
 var defaultModelCatalogMetadataByName = map[string]defaultModelCatalogMetadata{
+	"gemini-embedding-2": {
+		Vendor: "Google", Description: "Stable multimodal embedding model for text, images, documents, audio, and video.",
+		DescriptionKey: "Stable multimodal embedding model for text, images, documents, audio, and video.",
+		Tags:           "embedding,multimodal,text,image,audio,video,document", Icon: "Gemini.Color",
+	},
 	"gpt-image-2": {
 		Vendor:         "OpenAI",
 		Description:    "Image generation model for creating and editing high-quality images from text and visual prompts.",

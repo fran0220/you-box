@@ -32,6 +32,8 @@ func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVa
 
 	img := float64(usage.PromptTokensDetails.ImageTokens)
 	ai := float64(usage.PromptTokensDetails.AudioTokens)
+	doc := float64(usage.PromptTokensDetails.DocumentTokens)
+	vid := float64(usage.PromptTokensDetails.VideoTokens)
 	imgO := float64(usage.CompletionTokenDetails.ImageTokens)
 	ao := float64(usage.CompletionTokenDetails.AudioTokens)
 
@@ -58,6 +60,12 @@ func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVa
 		}
 		if usedVars["ai"] {
 			p -= ai
+		}
+		if usedVars["doc"] {
+			p -= doc
+		}
+		if usedVars["vid"] {
+			p -= vid
 		}
 		if usedVars["img_o"] {
 			c -= imgO
@@ -87,6 +95,8 @@ func BuildTieredTokenParams(usage *dto.Usage, isClaudeUsageSemantic bool, usedVa
 		ImgO: imgO,
 		AI:   ai,
 		AO:   ao,
+		Doc:  doc,
+		Vid:  vid,
 	}
 }
 

@@ -46,6 +46,17 @@ describe('deriveModelTypes', () => {
     ).toEqual([MODEL_TYPE_VALUES.EMBEDDING])
   })
 
+  it('maps Gemini native embeddings to Embedding', () => {
+    expect(
+      deriveModelTypes(
+        model({
+          model_name: 'gemini-embedding-2',
+          supported_endpoint_types: ['embeddings', 'gemini-embedding'],
+        })
+      )
+    ).toEqual([MODEL_TYPE_VALUES.EMBEDDING])
+  })
+
   it('maps jina-rerank to Rerank', () => {
     expect(
       deriveModelTypes(

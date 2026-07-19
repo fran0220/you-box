@@ -27,6 +27,14 @@ var billingSetting = BillingSetting{
 	BillingExpr: make(map[string]string),
 }
 
+var defaultBillingMode = map[string]string{
+	"gemini-embedding-2": BillingModeTieredExpr,
+}
+
+var defaultBillingExpr = map[string]string{
+	"gemini-embedding-2": `v2:tier("standard", p * 0.20 + img * 0.45 + doc * 0.45 + ai * 6.50 + vid * 12.00)`,
+}
+
 func init() {
 	config.GlobalConfig.Register("billing_setting", &billingSetting)
 }
@@ -39,20 +47,26 @@ func GetBillingMode(model string) string {
 	if mode, ok := billingSetting.BillingMode[model]; ok {
 		return mode
 	}
+	if mode, ok := defaultBillingMode[model]; ok {
+		return mode
+	}
 	return BillingModeRatio
 }
 
 func GetBillingExpr(model string) (string, bool) {
-	expr, ok := billingSetting.BillingExpr[model]
+	if expr, ok := billingSetting.BillingExpr[model]; ok {
+		return expr, true
+	}
+	expr, ok := defaultBillingExpr[model]
 	return expr, ok
 }
 
 func GetBillingModeCopy() map[string]string {
-	return lo.Assign(billingSetting.BillingMode)
+	return lo.Assign(defaultBillingMode, billingSetting.BillingMode)
 }
 
 func GetBillingExprCopy() map[string]string {
-	return lo.Assign(billingSetting.BillingExpr)
+	return lo.Assign(defaultBillingExpr, billingSetting.BillingExpr)
 }
 
 func GetPricingSyncData(base map[string]any) map[string]any {

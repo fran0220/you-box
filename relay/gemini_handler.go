@@ -10,6 +10,8 @@ import (
 	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/dto"
 	"github.com/QuantumNous/new-api/logger"
+	"github.com/QuantumNous/new-api/pkg/billingexpr"
+	geminichannel "github.com/QuantumNous/new-api/relay/channel/gemini"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/helper"
 	"github.com/QuantumNous/new-api/service"
@@ -212,7 +214,6 @@ func GeminiEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo) (newAPI
 
 	var req dto.Request
 	var err error
-	var inputTexts []string
 
 	if isBatch {
 		batchRequest := &dto.GeminiBatchEmbeddingRequest{}
@@ -222,10 +223,8 @@ func GeminiEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo) (newAPI
 		}
 		req = batchRequest
 		for _, r := range batchRequest.Requests {
-			for _, part := range r.Content.Parts {
-				if part.Text != "" {
-					inputTexts = append(inputTexts, part.Text)
-				}
+			if r == nil {
+				return types.NewError(fmt.Errorf("embedding batch contains a null request"), types.ErrorCodeInvalidRequest, types.ErrOptionWithSkipRetry())
 			}
 		}
 	} else {
@@ -235,11 +234,6 @@ func GeminiEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo) (newAPI
 			return types.NewError(err, types.ErrorCodeInvalidRequest, types.ErrOptionWithSkipRetry())
 		}
 		req = singleRequest
-		for _, part := range singleRequest.Content.Parts {
-			if part.Text != "" {
-				inputTexts = append(inputTexts, part.Text)
-			}
-		}
 	}
 
 	err = helper.ModelMappedHelper(c, info, req)
@@ -269,6 +263,64 @@ func GeminiEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo) (newAPI
 		}
 	}
 	logger.LogDebug(c, "Gemini embedding request body: %s", jsonData)
+
+	// Multimodal embedding prices differ by modality. Before sending the
+	// request, ask the selected Gemini channel for authoritative modality token
+	// counts and reserve the corresponding quota. This prevents a successful
+	// expensive media response from being returned before sufficient funds are
+	// secured.
+	var finalContents []dto.GeminiChatContent
+	hasMedia := false
+	if isBatch {
+		var finalRequest dto.GeminiBatchEmbeddingRequest
+		if err = common.Unmarshal(jsonData, &finalRequest); err != nil {
+			return types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
+		}
+		for _, item := range finalRequest.Requests {
+			if item == nil {
+				return types.NewError(fmt.Errorf("embedding batch contains a null request"), types.ErrorCodeInvalidRequest, types.ErrOptionWithSkipRetry())
+			}
+			finalContents = append(finalContents, item.Content)
+		}
+	} else {
+		var finalRequest dto.GeminiEmbeddingRequest
+		if err = common.Unmarshal(jsonData, &finalRequest); err != nil {
+			return types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
+		}
+		finalContents = []dto.GeminiChatContent{finalRequest.Content}
+	}
+	for _, content := range finalContents {
+		for _, part := range content.Parts {
+			if part.InlineData != nil || part.FileData != nil {
+				hasMedia = true
+				break
+			}
+		}
+	}
+	if hasMedia {
+		if info.TieredBillingSnapshot == nil || info.TieredBillingSnapshot.ExprVersion < 2 {
+			return types.NewErrorWithStatusCode(fmt.Errorf("multimodal Gemini embeddings require a v2 tiered billing expression"), types.ErrorCodeInvalidRequest, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
+		}
+		preflightUsage, countErr := geminichannel.CountEmbeddingTokens(c, info, finalContents)
+		if countErr != nil {
+			return types.NewOpenAIError(countErr, types.ErrorCodeDoRequestFailed, http.StatusBadGateway)
+		}
+		info.EmbeddingPreflightUsage = preflightUsage
+		usedVars := billingexpr.UsedVars(info.TieredBillingSnapshot.ExprString)
+		if billingErr := validateEmbeddingBillingModalities(preflightUsage, usedVars); billingErr != nil {
+			return types.NewErrorWithStatusCode(billingErr, types.ErrorCodeInvalidRequest, http.StatusInternalServerError, types.ErrOptionWithSkipRetry())
+		}
+		ok, targetQuota, result := service.TryTieredSettle(info, service.BuildTieredTokenParams(preflightUsage, false, usedVars))
+		if !ok || result == nil {
+			return types.NewErrorWithStatusCode(fmt.Errorf("failed to calculate multimodal embedding reservation"), types.ErrorCodeInvalidRequest, http.StatusInternalServerError, types.ErrOptionWithSkipRetry())
+		}
+		if info.Billing != nil {
+			if reserveErr := info.Billing.Reserve(targetQuota); reserveErr != nil {
+				return types.NewErrorWithStatusCode(reserveErr, types.ErrorCodeInsufficientUserQuota, http.StatusForbidden, types.ErrOptionWithSkipRetry(), types.ErrOptionWithNoRecordErrorLog())
+			}
+		}
+	}
+
 	body, size, closer, err := relaycommon.NewOutboundJSONBody(jsonData)
 	if err != nil {
 		return types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
@@ -302,5 +354,26 @@ func GeminiEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo) (newAPI
 	}
 
 	service.PostTextConsumeQuota(c, info, usage.(*dto.Usage), nil)
+	return nil
+}
+
+func validateEmbeddingBillingModalities(usage *dto.Usage, usedVars map[string]bool) error {
+	if usage == nil {
+		return fmt.Errorf("Gemini embedding preflight usage is missing")
+	}
+	required := []struct {
+		tokens int
+		name   string
+	}{
+		{usage.PromptTokensDetails.ImageTokens, "img"},
+		{usage.PromptTokensDetails.DocumentTokens, "doc"},
+		{usage.PromptTokensDetails.AudioTokens, "ai"},
+		{usage.PromptTokensDetails.VideoTokens, "vid"},
+	}
+	for _, modality := range required {
+		if modality.tokens > 0 && !usedVars[modality.name] {
+			return fmt.Errorf("Gemini embedding billing expression must price the %s modality", modality.name)
+		}
+	}
 	return nil
 }

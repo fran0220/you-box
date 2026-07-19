@@ -79,6 +79,16 @@ func pricingEndpointTypesByModel(t *testing.T) map[string][]constant.EndpointTyp
 	return pricingEndpointTypesFromPricing(GetPricing())
 }
 
+func TestGeminiEmbeddingEndpointTypes(t *testing.T) {
+	assert.ElementsMatch(t,
+		[]constant.EndpointType{constant.EndpointTypeEmbeddings, constant.EndpointTypeGeminiEmbedding},
+		common.GetEndpointTypesByChannelType(constant.ChannelTypeGemini, "gemini-embedding-2"),
+	)
+	info, ok := common.GetDefaultEndpointInfo(constant.EndpointTypeGeminiEmbedding)
+	require.True(t, ok)
+	assert.Equal(t, "/v1beta/models/{model}:embedContent", info.Path)
+}
+
 func pricingEndpointTypesFromPricing(pricings []Pricing) map[string][]constant.EndpointType {
 	byModel := make(map[string][]constant.EndpointType)
 	for _, pricing := range pricings {

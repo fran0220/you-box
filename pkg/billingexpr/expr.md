@@ -37,6 +37,8 @@ Powered by [expr-lang/expr](https://github.com/expr-lang/expr). Expressions are 
 | `cc1h` | 缓存创建 token 数 — 1小时 TTL（Claude 专用） |
 | `img` | 图片输入 token 数 |
 | `ai` | 音频输入 token 数 |
+| `doc` | 文档/PDF 输入 token 数（v2） |
+| `vid` | 视频输入 token 数（v2） |
 
 **输出侧变量：**
 

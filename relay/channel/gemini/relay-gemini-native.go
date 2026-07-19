@@ -1,9 +1,11 @@
 package gemini
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
@@ -12,6 +14,7 @@ import (
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/helper"
 	"github.com/QuantumNous/new-api/service"
+	"github.com/QuantumNous/new-api/setting/model_setting"
 	"github.com/QuantumNous/new-api/types"
 
 	"github.com/gin-gonic/gin"
@@ -57,7 +60,10 @@ func NativeGeminiEmbeddingHandler(c *gin.Context, resp *http.Response, info *rel
 
 	logger.LogDebug(c, "Gemini native embedding response body: %s", responseBody)
 
-	usage := service.ResponseText2Usage(c, "", info.UpstreamModelName, info.GetEstimatePromptTokens())
+	usage := info.EmbeddingPreflightUsage
+	if usage == nil {
+		usage = service.ResponseText2Usage(c, "", info.UpstreamModelName, info.GetEstimatePromptTokens())
+	}
 
 	if info.IsGeminiBatchEmbedding {
 		var geminiResponse dto.GeminiBatchEmbeddingResponse
@@ -65,17 +71,109 @@ func NativeGeminiEmbeddingHandler(c *gin.Context, resp *http.Response, info *rel
 		if err != nil {
 			return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
 		}
+		usage, err = geminiEmbeddingUsage(geminiResponse.UsageMetadata, usage)
 	} else {
 		var geminiResponse dto.GeminiEmbeddingResponse
 		err = common.Unmarshal(responseBody, &geminiResponse)
 		if err != nil {
 			return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
 		}
+		usage, err = geminiEmbeddingUsage(geminiResponse.UsageMetadata, usage)
+	}
+	if err != nil {
+		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusBadGateway)
 	}
 
 	service.IOCopyBytesGracefully(c, resp, responseBody)
 
 	return usage, nil
+}
+
+func geminiEmbeddingUsage(metadata *dto.GeminiEmbeddingUsageMetadata, fallback *dto.Usage) (*dto.Usage, error) {
+	if metadata == nil || (metadata.PromptTokenCount == 0 && len(metadata.PromptTokenDetails) == 0) {
+		return fallback, nil
+	}
+	if metadata.PromptTokenCount > 0 && len(metadata.PromptTokenDetails) == 0 && fallback != nil {
+		return fallback, nil
+	}
+	usage, err := geminiEmbeddingUsageFromDetails(metadata.PromptTokenCount, metadata.PromptTokenDetails)
+	if err != nil {
+		return nil, err
+	}
+	usage.TotalTokens = metadata.TotalTokenCount
+	if usage.TotalTokens == 0 {
+		usage.TotalTokens = usage.PromptTokens
+	}
+	usage.UsageSource = "provider"
+	return usage, nil
+}
+
+func geminiEmbeddingUsageFromDetails(total int, details []dto.GeminiPromptTokensDetails) (*dto.Usage, error) {
+	if total <= 0 || len(details) == 0 {
+		return nil, fmt.Errorf("Gemini embedding usage is missing modality token details")
+	}
+	usage := &dto.Usage{PromptTokens: total, TotalTokens: total}
+	for _, detail := range details {
+		if detail.TokenCount < 0 {
+			return nil, fmt.Errorf("Gemini embedding returned a negative %s token count", detail.Modality)
+		}
+		switch strings.ToUpper(detail.Modality) {
+		case "TEXT":
+			usage.PromptTokensDetails.TextTokens += detail.TokenCount
+		case "IMAGE":
+			usage.PromptTokensDetails.ImageTokens += detail.TokenCount
+		case "AUDIO":
+			usage.PromptTokensDetails.AudioTokens += detail.TokenCount
+		case "DOCUMENT", "PDF":
+			usage.PromptTokensDetails.DocumentTokens += detail.TokenCount
+		case "VIDEO":
+			usage.PromptTokensDetails.VideoTokens += detail.TokenCount
+		default:
+			return nil, fmt.Errorf("Gemini embedding returned unsupported usage modality %q", detail.Modality)
+		}
+	}
+	return usage, nil
+}
+
+// CountEmbeddingTokens obtains billing-grade modality counts from the same
+// selected Gemini channel that will serve the embedding request.
+func CountEmbeddingTokens(c *gin.Context, info *relaycommon.RelayInfo, contents []dto.GeminiChatContent) (*dto.Usage, error) {
+	payload, err := common.Marshal(dto.GeminiCountTokensRequest{Contents: contents})
+	if err != nil {
+		return nil, err
+	}
+	version := model_setting.GetGeminiVersionSetting(info.UpstreamModelName)
+	url := fmt.Sprintf("%s/%s/models/%s:countTokens", strings.TrimRight(info.ChannelBaseUrl, "/"), version, info.UpstreamModelName)
+	req, err := http.NewRequestWithContext(c.Request.Context(), http.MethodPost, url, bytes.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-goog-api-key", info.ApiKey)
+	client, err := service.GetHttpClientWithProxy(info.ChannelSetting.Proxy)
+	if err != nil {
+		return nil, err
+	}
+	if client == nil {
+		client = http.DefaultClient
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer service.CloseResponseBodyGracefully(resp)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Gemini countTokens returned %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+	}
+	var countResponse dto.GeminiCountTokensResponse
+	if err = common.Unmarshal(body, &countResponse); err != nil {
+		return nil, err
+	}
+	return geminiEmbeddingUsageFromDetails(countResponse.TotalTokens, countResponse.PromptTokensDetails)
 }
 
 func GeminiTextGenerationStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {

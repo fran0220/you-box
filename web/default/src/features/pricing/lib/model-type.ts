@@ -73,7 +73,7 @@ const MODEL_3D_ENDPOINT_TYPES = new Set<string>([
  *
  * Precedence (documentation only; all matching rules apply):
  * 1. `image-generation` -> Image
- * 2. `embeddings` -> Embedding
+ * 2. `embeddings` or `gemini-embedding` -> Embedding
  * 3. `jina-rerank` -> Rerank
  * 4. `openai-video` -> Video
  * 5. `audio*` endpoint, `audio_ratio`, or `audio_completion_ratio` > 0 -> Audio
@@ -111,7 +111,10 @@ export function deriveModelTypes(model: PricingModel): ModelTypeValue[] {
   if (endpointSet.has(ENDPOINT_TYPES.IMAGE_GENERATION)) {
     matched.add(MODEL_TYPE_VALUES.IMAGE)
   }
-  if (endpointSet.has(ENDPOINT_TYPES.EMBEDDINGS)) {
+  if (
+    endpointSet.has(ENDPOINT_TYPES.EMBEDDINGS) ||
+    endpointSet.has(ENDPOINT_TYPES.GEMINI_EMBEDDING)
+  ) {
     matched.add(MODEL_TYPE_VALUES.EMBEDDING)
   }
   if (endpointSet.has(ENDPOINT_TYPES.JINA_RERANK)) {

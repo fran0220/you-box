@@ -266,6 +266,26 @@ type GeminiFileData struct {
 	FileUri  string `json:"fileUri,omitempty"`
 }
 
+func (g *GeminiFileData) UnmarshalJSON(data []byte) error {
+	type Alias GeminiFileData
+	var aux struct {
+		Alias
+		MimeTypeSnake string `json:"mime_type"`
+		FileURISnake  string `json:"file_uri"`
+	}
+	if err := common.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	*g = GeminiFileData(aux.Alias)
+	if aux.MimeTypeSnake != "" {
+		g.MimeType = aux.MimeTypeSnake
+	}
+	if aux.FileURISnake != "" {
+		g.FileUri = aux.FileURISnake
+	}
+	return nil
+}
+
 type GeminiPart struct {
 	Text             string                  `json:"text,omitempty"`
 	Thought          bool                    `json:"thought,omitempty"`
@@ -288,6 +308,7 @@ func (p *GeminiPart) UnmarshalJSON(data []byte) error {
 	var aux struct {
 		Alias
 		InlineDataSnake *GeminiInlineData `json:"inline_data,omitempty"` // snake_case variant
+		FileDataSnake   *GeminiFileData   `json:"file_data,omitempty"`
 	}
 
 	if err := common.Unmarshal(data, &aux); err != nil {
@@ -302,6 +323,9 @@ func (p *GeminiPart) UnmarshalJSON(data []byte) error {
 		p.InlineData = aux.InlineDataSnake
 	} else if aux.InlineData != nil { // Fallback to camelCase from Alias
 		p.InlineData = aux.InlineData
+	}
+	if aux.FileDataSnake != nil {
+		p.FileData = aux.FileDataSnake
 	}
 	// Other fields like Text, FunctionCall etc. are already populated via aux.Alias
 
@@ -545,11 +569,21 @@ type GeminiImagePrediction struct {
 
 // Embedding related structs
 type GeminiEmbeddingRequest struct {
-	Model                string            `json:"model,omitempty"`
-	Content              GeminiChatContent `json:"content"`
-	TaskType             string            `json:"taskType,omitempty"`
-	Title                string            `json:"title,omitempty"`
-	OutputDimensionality int               `json:"outputDimensionality,omitempty"`
+	Model                string                    `json:"model,omitempty"`
+	Content              GeminiChatContent         `json:"content"`
+	TaskType             string                    `json:"taskType,omitempty"`
+	Title                string                    `json:"title,omitempty"`
+	OutputDimensionality *int                      `json:"outputDimensionality,omitempty"`
+	EmbedContentConfig   *GeminiEmbedContentConfig `json:"embedContentConfig,omitempty"`
+}
+
+type GeminiEmbedContentConfig struct {
+	Title                string `json:"title,omitempty"`
+	TaskType             string `json:"taskType,omitempty"`
+	AutoTruncate         *bool  `json:"autoTruncate,omitempty"`
+	OutputDimensionality *int   `json:"outputDimensionality,omitempty"`
+	DocumentOCR          *bool  `json:"documentOcr,omitempty"`
+	AudioTrackExtraction *bool  `json:"audioTrackExtraction,omitempty"`
 }
 
 func (r *GeminiEmbeddingRequest) IsStream(c *gin.Context) bool {
@@ -588,6 +622,9 @@ func (r *GeminiBatchEmbeddingRequest) IsStream(c *gin.Context) bool {
 func (r *GeminiBatchEmbeddingRequest) GetTokenCountMeta() *types.TokenCountMeta {
 	var inputTexts []string
 	for _, request := range r.Requests {
+		if request == nil {
+			continue
+		}
 		meta := request.GetTokenCountMeta()
 		if meta != nil && meta.CombineText != "" {
 			inputTexts = append(inputTexts, meta.CombineText)
@@ -602,17 +639,39 @@ func (r *GeminiBatchEmbeddingRequest) GetTokenCountMeta() *types.TokenCountMeta 
 func (r *GeminiBatchEmbeddingRequest) SetModelName(modelName string) {
 	if modelName != "" {
 		for _, req := range r.Requests {
+			if req == nil {
+				continue
+			}
 			req.SetModelName(modelName)
 		}
 	}
 }
 
 type GeminiEmbeddingResponse struct {
-	Embedding ContentEmbedding `json:"embedding"`
+	Embedding     ContentEmbedding              `json:"embedding"`
+	UsageMetadata *GeminiEmbeddingUsageMetadata `json:"usageMetadata,omitempty"`
 }
 
 type GeminiBatchEmbeddingResponse struct {
-	Embeddings []*ContentEmbedding `json:"embeddings"`
+	Embeddings    []*ContentEmbedding           `json:"embeddings"`
+	UsageMetadata *GeminiEmbeddingUsageMetadata `json:"usageMetadata,omitempty"`
+}
+
+// GeminiEmbeddingUsageMetadata follows the embedding API schema. Unlike
+// generateContent/countTokens, its details field is singular.
+type GeminiEmbeddingUsageMetadata struct {
+	PromptTokenCount   int                         `json:"promptTokenCount"`
+	TotalTokenCount    int                         `json:"totalTokenCount"`
+	PromptTokenDetails []GeminiPromptTokensDetails `json:"promptTokenDetails"`
+}
+
+type GeminiCountTokensRequest struct {
+	Contents []GeminiChatContent `json:"contents"`
+}
+
+type GeminiCountTokensResponse struct {
+	TotalTokens         int                         `json:"totalTokens"`
+	PromptTokensDetails []GeminiPromptTokensDetails `json:"promptTokensDetails"`
 }
 
 type ContentEmbedding struct {

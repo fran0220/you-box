@@ -41,10 +41,13 @@ export type VisualTier = {
   image_output_unit_cost?: number
   audio_input_unit_cost?: number
   audio_output_unit_cost?: number
+  document_input_unit_cost?: number
+  video_input_unit_cost?: number
   [field: string]: unknown
 }
 
 export type VisualConfig = {
+  version?: number
   tiers: VisualTier[]
 }
 
@@ -75,6 +78,8 @@ export function normalizeVisualTier(
     image_output_unit_cost: Number(tier.image_output_unit_cost) || 0,
     audio_input_unit_cost: Number(tier.audio_input_unit_cost) || 0,
     audio_output_unit_cost: Number(tier.audio_output_unit_cost) || 0,
+    document_input_unit_cost: Number(tier.document_input_unit_cost) || 0,
+    video_input_unit_cost: Number(tier.video_input_unit_cost) || 0,
   }
 }
 
@@ -125,6 +130,16 @@ function buildTierBodyExpr(tier: VisualTier): string {
   return parts.join(' + ')
 }
 
+function applyExprVersion(config: VisualConfig, body: string): string {
+  const requiresV2 = config.tiers.some(
+    (tier) =>
+      Number(tier.document_input_unit_cost) !== 0 ||
+      Number(tier.video_input_unit_cost) !== 0
+  )
+  const version = Math.max(config.version ?? 1, requiresV2 ? 2 : 1)
+  return version > 1 ? `v${version}:${body}` : body
+}
+
 export function generateExprFromVisualConfig(
   config: VisualConfig | null | undefined
 ): string {
@@ -139,9 +154,9 @@ export function generateExprFromVisualConfig(
     const body = `tier("${label}", ${buildTierBodyExpr(tier)})`
     const cond = buildConditionStr(tier.conditions)
     if (cond) {
-      return `${cond} ? ${body} : p * 0 + c * 0`
+      return applyExprVersion(config, `${cond} ? ${body} : p * 0 + c * 0`)
     }
-    return body
+    return applyExprVersion(config, body)
   }
 
   const parts: string[] = []
@@ -157,7 +172,7 @@ export function generateExprFromVisualConfig(
       parts.push(body)
     }
   }
-  return parts.join(' : ')
+  return applyExprVersion(config, parts.join(' : '))
 }
 
 export function tryParseVisualConfig(
@@ -166,8 +181,12 @@ export function tryParseVisualConfig(
   if (!exprStr) return null
   try {
     let body = exprStr
-    const versionMatch = body.match(/^v\d+:([\s\S]*)$/)
-    if (versionMatch) body = versionMatch[1]
+    let version = 1
+    const versionMatch = body.match(/^v(\d+):([\s\S]*)$/)
+    if (versionMatch) {
+      version = Number(versionMatch[1])
+      body = versionMatch[2]
+    }
     const cacheVarNames = BILLING_CACHE_VAR_MAP.map((cv) => cv.exprVar)
     const optCacheStr = cacheVarNames
       .map((v) => `(?:\\s*\\+\\s*${v}\\s*\\*\\s*([\\d.eE+-]+))?`)
@@ -189,6 +208,7 @@ export function tryParseVisualConfig(
         if (val != null) tier[cv.field] = Number(val)
       })
       return normalizeVisualConfig({
+        version,
         tiers: [normalizeVisualTier(tier as Partial<VisualTier>)],
       })
     }
@@ -232,9 +252,10 @@ export function tryParseVisualConfig(
     }
     if (tiers.length === 0) return null
 
-    const cfg = normalizeVisualConfig({ tiers })
+    const cfg = normalizeVisualConfig({ version, tiers })
     const regenerated = generateExprFromVisualConfig(cfg)
-    if (regenerated.replace(/\s+/g, '') !== body.replace(/\s+/g, '')) {
+    const regeneratedBody = regenerated.replace(/^v\d+:/, '')
+    if (regeneratedBody.replace(/\s+/g, '') !== body.replace(/\s+/g, '')) {
       return null
     }
     return cfg
@@ -254,6 +275,8 @@ const ESTIMATOR_VARS = [
   { var: 'img', stateKey: 'imageTokens' },
   { var: 'img_o', stateKey: 'imageOutputTokens' },
   { var: 'ai', stateKey: 'audioInputTokens' },
+  { var: 'doc', stateKey: 'documentInputTokens' },
+  { var: 'vid', stateKey: 'videoInputTokens' },
   { var: 'ao', stateKey: 'audioOutputTokens' },
 ] as const
 
@@ -277,6 +300,15 @@ export function evalExprLocally(
   try {
     if (!exprStr || !exprStr.trim()) {
       return { cost: 0, matchedTier: '', error: null }
+    }
+    let expressionBody = exprStr.trim()
+    const versionMatch = expressionBody.match(/^v(\d+):([\s\S]*)$/)
+    if (versionMatch) {
+      const version = Number(versionMatch[1])
+      if (version !== 1 && version !== 2) {
+        throw new Error(`unsupported billing expression version v${version}`)
+      }
+      expressionBody = versionMatch[2]
     }
     let matchedTier = ''
     const tierFn = (name: string, value: number) => {
@@ -304,7 +336,7 @@ export function evalExprLocally(
     }
     const fn = new Function(
       ...Object.keys(env),
-      `"use strict"; return (${exprStr});`
+      `"use strict"; return (${expressionBody});`
     )
     const cost = Number(fn(...Object.values(env))) || 0
     return { cost, matchedTier, error: null }

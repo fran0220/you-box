@@ -1,6 +1,10 @@
 package common
 
-import "github.com/QuantumNous/new-api/constant"
+import (
+	"strings"
+
+	"github.com/QuantumNous/new-api/constant"
+)
 
 func elevenLabsEndpointTypes(modelName string) []constant.EndpointType {
 	switch modelName {
@@ -57,6 +61,9 @@ func GetEndpointTypesByChannelType(channelType int, modelName string) []constant
 	var endpointTypes []constant.EndpointType
 	if IsImageGenerationModel(modelName) {
 		return []constant.EndpointType{constant.EndpointTypeImageGeneration}
+	}
+	if channelType == constant.ChannelTypeGemini && strings.Contains(strings.ToLower(modelName), "embedding") {
+		return []constant.EndpointType{constant.EndpointTypeEmbeddings, constant.EndpointTypeGeminiEmbedding}
 	}
 	if elevenLabsTypes := elevenLabsEndpointTypes(modelName); len(elevenLabsTypes) > 0 {
 		endpointTypes = elevenLabsTypes
