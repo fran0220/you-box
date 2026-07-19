@@ -439,6 +439,9 @@ func PostTextConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, us
 		other["image_ratio"] = summary.ImageRatio
 		other["image_output"] = summary.ImageTokens
 	}
+	if summary.AudioTokens != 0 {
+		other["audio_input"] = summary.AudioTokens
+	}
 	if summary.DocumentTokens != 0 {
 		other["document_input"] = summary.DocumentTokens
 	}
