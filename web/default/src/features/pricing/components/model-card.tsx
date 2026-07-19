@@ -29,6 +29,7 @@ import {
   getModelTypeLabels,
 } from '../constants'
 import { useFavorites } from '../hooks/use-favorites'
+import { getDynamicPricingSummary } from '../lib/dynamic-price'
 import { isTokenBasedModel } from '../lib/model-helpers'
 import { deriveModelTypes } from '../lib/model-type'
 import {
@@ -118,6 +119,12 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
         formatRequestPrice(model, showRechargePrice, priceRate, usdExchangeRate)
       )
     : null
+  const dynamicPricing = getDynamicPricingSummary(model, {
+    tokenUnit,
+    showRechargePrice,
+    priceRate,
+    usdExchangeRate,
+  })
 
   const handleCopy = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -181,7 +188,19 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
         </p>
 
         <div className='mt-3 flex flex-wrap items-center gap-1.5 font-mono text-[11px] tabular-nums'>
-          {isTokenBased ? (
+          {dynamicPricing ? (
+            dynamicPricing.primaryEntries.map((entry) => (
+              <span
+                key={entry.key}
+                className='bg-muted/60 text-foreground/80 rounded px-1.5 py-0.5'
+              >
+                {stripTrailingZeros(entry.formatted)}{' '}
+                <span className='text-muted-foreground/60'>
+                  {t(entry.shortLabel)} / {tokenUnitLabel}
+                </span>
+              </span>
+            ))
+          ) : isTokenBased ? (
             <>
               <span className='bg-muted/60 text-foreground/80 rounded px-1.5 py-0.5'>
                 {inputPrice}{' '}
