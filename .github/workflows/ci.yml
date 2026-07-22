@@ -14,47 +14,114 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  go-test:
-    name: Go test
+  verify-build-deploy:
+    name: Verify, build & deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
-          go-version-file: go.mod
+          go-version: 1.26.1
           cache: true
-      - name: Run tests
-        run: go test ./... -count=1
-
-  frontend:
-    name: Frontend check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: latest
-      - name: Install dependencies
-        run: |
-          cd web
-          bun install --frozen-lockfile
-      - name: Typecheck
-        run: cd web/default && bun run typecheck
-      - name: Lint
-        run: cd web/default && bun run lint
-      - name: Test
-        run: cd web/default && bun run test
 
-  golangci-lint:
-    name: Go lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
-        with:
-          go-version-file: go.mod
-          cache: true
-      - uses: golangci/golangci-lint-action@v6
+      - name: Verify frontend
+        working-directory: web
+        run: |
+          bun install --frozen-lockfile
+          cd default
+          bun run typecheck
+          bun run lint
+          bun run test
+          VITE_REACT_APP_VERSION="main-${GITHUB_SHA::12}" bun run build
+
+      - name: Test backend
+        run: go test ./... -count=1
+
+      - uses: golangci/golangci-lint-action@v7
         with:
           version: v2.1.6
           args: --timeout=5m
+
+      - name: Build production binary
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          CGO_ENABLED: '0'
+          GOOS: linux
+          GOARCH: amd64
+          GOEXPERIMENT: greenteagc
+        run: |
+          go build \
+            -ldflags "-s -w -X 'github.com/QuantumNous/new-api/common.Version=main-${GITHUB_SHA::12}'" \
+            -o origin-gateway
+
+      - name: Configure production SSH
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.BWG_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.BWG_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/origin-gateway-deploy
+          chmod 600 ~/.ssh/origin-gateway-deploy
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy directly to BWG
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          BWG_HOST: ${{ vars.BWG_HOST }}
+          BWG_USER: ${{ vars.BWG_USER }}
+        run: |
+          set -euo pipefail
+          SSH=(ssh -i ~/.ssh/origin-gateway-deploy -o IdentitiesOnly=yes)
+          SCP=(scp -i ~/.ssh/origin-gateway-deploy -o IdentitiesOnly=yes)
+          remote_binary="/tmp/origin-gateway-${GITHUB_SHA}"
+          "${SCP[@]}" origin-gateway "${BWG_USER}@${BWG_HOST}:${remote_binary}"
+          "${SSH[@]}" "${BWG_USER}@${BWG_HOST}" \
+            "bash -s -- '${GITHUB_SHA}' '${remote_binary}'" <<'REMOTE'
+          set -euo pipefail
+          sha="$1"
+          uploaded_binary="$2"
+          app_dir=/opt/origin-gateway
+          release_dir="${app_dir}/releases/${sha}"
+          previous_target=$(readlink -f "${app_dir}/current" 2>/dev/null || true)
+
+          install -d -m 755 "${release_dir}"
+          install -m 755 "${uploaded_binary}" "${release_dir}/origin-gateway"
+          rm -f "${uploaded_binary}"
+          ln -sfn "${release_dir}" "${app_dir}/current.next"
+          mv -Tf "${app_dir}/current.next" "${app_dir}/current"
+
+          systemctl restart origin-gateway
+          healthy=false
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:9320/api/status \
+              | grep -q '"id":"origingame"'; then
+              systemctl is-active --quiet origin-gateway
+              healthy=true
+              break
+            fi
+            sleep 2
+          done
+
+          if [ "${healthy}" = true ]; then
+            mapfile -t stale_releases < <(
+              ls -1dt "${app_dir}"/releases/* 2>/dev/null | tail -n +6
+            )
+            if [ "${#stale_releases[@]}" -gt 0 ]; then
+              rm -rf -- "${stale_releases[@]}"
+            fi
+            exit 0
+          fi
+
+          if [ -n "${previous_target}" ]; then
+            ln -sfn "${previous_target}" "${app_dir}/current.next"
+            mv -Tf "${app_dir}/current.next" "${app_dir}/current"
+            systemctl restart origin-gateway
+          fi
+          journalctl -u origin-gateway -n 100 --no-pager
+          exit 1
+          REMOTE

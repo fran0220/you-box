@@ -1,86 +1,82 @@
 # Deploy checklist — Origin Gateway (BWG only)
 
-> **Production product:** Origin Gateway (`PRODUCT_ID=origingame`)  
-> **Host:** BWG → `https://api.origingame.dev`  
-> **Do not** deploy this image to `you-box.com` (that host runs BoxAI from `fran0220/boxAI`).  
-> OriginGame platform (portal/play/Studio) is a separate monorepo; it consumes this gateway over HTTP. See `docs/origingame-platform.md` and `docs/origingame-contract.md`.
+> **Production product:** Origin Gateway (`PRODUCT_ID=origingame`)
+> **Host:** BWG → `https://api.origingame.dev`
+> **Do not** deploy this application to `you-box.com`; that host runs BoxAI.
+> OriginGame portal/play/Studio consume this gateway over HTTP. See
+> `docs/origingame-platform.md` and `docs/origingame-contract.md`.
 
-| Host | App dir | Container | Domain | Listen | Status |
-| --- | --- | --- | --- | --- | --- |
-| `bwg` | `/opt/origin-gateway` | `origin-gateway` | `https://api.origingame.dev/` | `127.0.0.1:9320` | **Active** |
+| Host | App dir | Service | Listen | Status |
+| --- | --- | --- | --- | --- |
+| `bwg` | `/opt/origin-gateway` | `origin-gateway.service` | `127.0.0.1:9320` | **Active** |
 
-## Image names
+## Production deployment
+
+Pushes to `main` use `.github/workflows/ci.yml`:
+
+1. Install frontend dependencies and run typecheck, lint, tests, and build.
+2. Run backend tests and golangci-lint.
+3. Cross-compile one static `linux/amd64` binary with the frontend embedded.
+4. Upload it directly to BWG over the dedicated GitHub Actions SSH key.
+5. Atomically switch `/opt/origin-gateway/current` and restart systemd.
+6. Require a healthy Origin Gateway status response or roll back the symlink.
+
+There are no production image builds, registry pushes, release tags, or builds
+on the memory-constrained BWG host.
+
+Required GitHub repository configuration:
+
+| Name | Type | Purpose |
+| --- | --- | --- |
+| `BWG_SSH_KEY` | Actions secret | Dedicated deployment private key |
+| `BWG_KNOWN_HOSTS` | Actions secret | Pinned BWG SSH host key |
+| `BWG_HOST` | Actions variable | BWG address |
+| `BWG_USER` | Actions variable | Deployment SSH user |
+
+## Host layout
 
 ```text
-ghcr.io/fran0220/origin-gateway:<git-tag>   # preferred
-ghcr.io/fran0220/origin-gateway:main
-ghcr.io/fran0220/you-box:<git-tag>          # legacy alias (same digest; migrate .env off this)
+/opt/origin-gateway/
+  current -> releases/<git-sha>/
+  releases/<git-sha>/origin-gateway
+  .env                 # stable production settings and secrets
+  native.env           # loopback PostgreSQL/Redis connection strings
+  data/
+  logs/
 ```
 
-Local default: `origin-gateway:local` via `GATEWAY_IMAGE`.
+PostgreSQL and Redis remain isolated containers with loopback-only host ports;
+the gateway application itself runs as a native systemd service.
 
-## BWG deploy
-
-### 0. Registry login (if package is private)
-
-```bash
-echo "$GHCR_TOKEN" | docker login ghcr.io -u fran0220 --password-stdin
-```
-
-### 1. Publish a version image
-
-```bash
-docker buildx build \
-  --platform linux/amd64 \
-  -t ghcr.io/fran0220/origin-gateway:v0.1.17 \
-  -t ghcr.io/fran0220/origin-gateway:main \
-  -t ghcr.io/fran0220/you-box:v0.1.17 \
-  -t ghcr.io/fran0220/you-box:main \
-  --push \
-  .
-```
-
-Or use `.github/workflows/ghcr-publish.yml` on tag `v*`.
-
-### 2. Host `.env` on bwg `/opt/origin-gateway/.env`
-
-```bash
-GATEWAY_IMAGE=ghcr.io/fran0220/origin-gateway:v0.1.17
-# Temporary fallback if host still uses old var name:
-# BOXAI_IMAGE=ghcr.io/fran0220/you-box:v0.1.17
-PORT=9320
-NODE_NAME=bwg-origin-gateway-1
-PRODUCT_ID=origingame
-FRONTEND_BASE_URL=https://api.origingame.dev
-# host-local secrets: POSTGRES_*, REDIS_PASSWORD, SESSION_SECRET
-```
-
-### 3. Roll out
+## Inspect or roll back
 
 ```bash
 ssh bwg
-cd /opt/origin-gateway
-docker compose pull new-api   # service key may still be new-api in host compose
-docker compose up -d new-api
-docker compose ps
+systemctl status origin-gateway
+readlink -f /opt/origin-gateway/current
 curl -fsS http://127.0.0.1:9320/api/status | jq .data.product
-# expect: id == "origingame", display_name == "Origin Gateway"
+
+# Manual rollback to an existing SHA:
+ln -sfn /opt/origin-gateway/releases/<git-sha> /opt/origin-gateway/current.next
+mv -Tf /opt/origin-gateway/current.next /opt/origin-gateway/current
+systemctl restart origin-gateway
 ```
 
-### Hard rules
+## Hard rules
 
-1. **Never** delete/recreate persistent volumes during routine deploys.
+1. **Never** delete or recreate persistent volumes during routine deploys.
 2. Keep `SESSION_SECRET`, DB password, Redis password, and `NODE_NAME` stable.
-3. Production `PRODUCT_ID=origingame` (repo default is already origingame).
-4. Do **not** deploy this image to the BoxAI host.
-5. Prefer **pulling** prebuilt images on BWG (memory-constrained).
+3. Production `PRODUCT_ID=origingame`.
+4. Do **not** deploy this application to the BoxAI host.
+5. Never install the frontend/Go build toolchain or build source on BWG.
 
 ## Local development
+
+Docker remains available for local development only:
 
 ```bash
 docker compose build new-api
 docker compose up -d
-# default image: origin-gateway:local
 ```
 
 Optional Circuit demo skin: `PRODUCT_ID=youbox` in `.env` (not production).
@@ -90,7 +86,4 @@ Optional Circuit demo skin: `PRODUCT_ID=youbox` in `.env` (not production).
 ```bash
 curl -fsS https://api.origingame.dev/api/status | jq .data.product
 curl -i https://api.origingame.dev/v1/models   # expect 401 without key
-# Plus one authenticated Studio chat completion when changing relay paths
 ```
-
-Historical dual-host notes lived in `docs/deploy-dual-host.md` (stub → this file).

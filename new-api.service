@@ -1,18 +1,21 @@
-# File path: /etc/systemd/system/new-api.service
-# sudo systemctl daemon-reload
-# sudo systemctl start new-api
-# sudo systemctl enable new-api
-# sudo systemctl status new-api
+# Production path: /etc/systemd/system/origin-gateway.service
 [Unit]
-Description=One API Service
-After=network.target
+Description=Origin Gateway
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
 
 [Service]
-User=ubuntu  # 注意修改用户名
-WorkingDirectory=/path/to/new-api  # 注意修改路径
-ExecStart=/path/to/new-api/new-api --port 3000 --log-dir /path/to/new-api/logs  # 注意修改路径和端口号
-Restart=always
-RestartSec=5
+Type=simple
+User=root
+WorkingDirectory=/opt/origin-gateway/data
+EnvironmentFile=/opt/origin-gateway/.env
+EnvironmentFile=/opt/origin-gateway/native.env
+ExecStart=/opt/origin-gateway/current/origin-gateway --port 9320 --log-dir /opt/origin-gateway/logs
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=30
+LimitNOFILE=1048576
 
 [Install]
 WantedBy=multi-user.target
