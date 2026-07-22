@@ -18,7 +18,10 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import type { FeatureSet, ProductId, ProductProfile } from './types'
 
-/** Full feature surface (YouBox Circuit local/demo skin). */
+/**
+ * Full capability surface (all feature keys on). Used as the merge base when
+ * reconciling server `/api/status` features and as the canonical key list.
+ */
 export const FULL_FEATURES: FeatureSet = {
   agent_desktop: true,
   model_plaza: true,
@@ -39,24 +42,13 @@ export const ORIGIN_GATEWAY_FEATURES: FeatureSet = {
 }
 
 export const PRODUCT_DEFAULTS: Record<ProductId, ProductProfile> = {
-  youbox: {
-    id: 'youbox',
-    displayName: 'YouBox',
-    publicBaseUrl: 'https://you-box.com',
-    features: { ...FULL_FEATURES },
-    ui: {
-      darkMode: true,
-      paperMarketing: false,
-      skin: 'circuit',
-    },
-  },
   origingame: {
     id: 'origingame',
     displayName: 'Origin Gateway',
     publicBaseUrl: 'https://api.origingame.dev',
     features: { ...ORIGIN_GATEWAY_FEATURES },
     ui: {
-      darkMode: false,
+      darkMode: true,
       paperMarketing: true,
       skin: 'paper',
     },

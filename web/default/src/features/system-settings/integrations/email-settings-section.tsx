@@ -564,7 +564,7 @@ export function EmailSettingsSection({
                           <Input
                             className='w-full'
                             autoComplete='off'
-                            placeholder={systemName || 'YouBox'}
+                            placeholder={systemName || 'Origin Gateway'}
                             {...field}
                           />
                         </FormControl>
@@ -658,7 +658,7 @@ export function EmailSettingsSection({
                           <Input
                             className='w-full'
                             autoComplete='off'
-                            placeholder={systemName || 'YouBox'}
+                            placeholder={systemName || 'Origin Gateway'}
                             {...field}
                           />
                         </FormControl>
@@ -668,7 +668,7 @@ export function EmailSettingsSection({
                   />
                 </div>
 
-                <div className='space-y-4 border-t border-border/70 pt-6'>
+                <div className='border-border/70 space-y-4 border-t pt-6'>
                   <p className='yb-eyebrow text-text-muted'>
                     {t('Verification email')}
                   </p>
@@ -732,7 +732,7 @@ export function EmailSettingsSection({
                   />
                 </div>
 
-                <div className='space-y-4 border-t border-border/70 pt-6'>
+                <div className='border-border/70 space-y-4 border-t pt-6'>
                   <p className='yb-eyebrow text-text-muted'>
                     {t('Password reset email')}
                   </p>

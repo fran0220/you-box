@@ -4,7 +4,7 @@
 
 This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI providers behind a unified API, with user management, billing, rate limiting, and an admin dashboard.
 
-**Product:** **Origin Gateway** — production only on BWG (`PRODUCT_ID=origingame`, `https://api.origingame.dev`). Primary consumer is the OriginGame monorepo (HTTP only; do not vendor AGPL source there). Optional local demo skin: `PRODUCT_ID=youbox` (Circuit). See root `AGENTS.md` Rule 8 and `docs/product-profile.md`. Do not fork the repo or duplicate `web/default` per skin.
+**Product:** **Origin Gateway** — production only on BWG (`PRODUCT_ID=origingame`, `https://api.origingame.dev`). Primary consumer / parent is the OriginGame monorepo (HTTP only; do not vendor AGPL source there). The frontend ships a single design language (OriginGame **Amp × Arcade**), with tokens mirrored one-way from `origingame/packages/tokens`. See root `AGENTS.md` Rule 8 and `docs/product-profile.md`. Do not fork the repo or duplicate `web/default`.
 
 ## Tech Stack
 
@@ -38,12 +38,12 @@ i18n/          — Backend internationalization (go-i18n, en/zh)
 oauth/         — OAuth provider implementations
 pkg/           — Internal packages (cachex, ionet, appusage)
 web/default/   — Frontend (React 19, Rsbuild)
-  web/default/src/products/ — skins + feature flags (origingame | youbox demo)
+  web/default/src/products/ — OriginGame skin + runtime feature resolution
 ```
 
 ## Product profile (summary)
 
-- Env: `PRODUCT_ID=origingame` (default) | `youbox` (local demo only), optional `PRODUCT_PUBLIC_BASE_URL`
+- Env: `PRODUCT_ID=origingame` (default) | `youbox` (local backend dev profile), optional `PRODUCT_PUBLIC_BASE_URL`
 - Status: nested `data.product` on `GET /api/status`
 - FE: `useFeature` / `useProduct` from `@/products`; tokens via `html[data-product]`
 - Gate product-only APIs on seams only; shared bugfixes stay in core
@@ -62,12 +62,13 @@ web/default/   — Frontend (React 19, Rsbuild)
 - Usage: `useTranslation()` hook, call `t('English key')` in components
 - CLI tools: `bun run i18n:sync` (from `web/default/`)
 
-## Frontend Design Languages
+## Frontend Design Language — Amp × Arcade (single skin)
 
-- **Origin Gateway Paper** (`PRODUCT_ID=origingame`, production): cream paper, serif display, light-only, teal accents
-- **YouBox Circuit** (`PRODUCT_ID=youbox`, local demo): modern slate + violet, sans display, light/dark
+- **Origin Gateway Paper** (`PRODUCT_ID=origingame`): warm parchment (`#f4efe4`), Archivo Black display, Newsreader serif, IBM Plex Mono, arcade-yellow `#ffb100` CTA, 10/6px radii, light + warm dark
+- Tokens mirrored one-way from `origingame/packages/tokens/tokens.json` → `web/default/src/products/og-tokens.css` (`bun run tokens:sync` / `tokens:check`); semantic map in `styles/theme.css`. Values only, no AGPL source vendoring.
+- Retired: YouBox "Circuit" demo skin (deleted). Non-`origingame` ids resolve to Paper.
 - Shared: one `AppShell`, semantic tokens, `components/youbox/*` primitives
-- Full rules: root `AGENTS.md` design languages + Rule 8
+- Full rules: root `AGENTS.md` design language + Rule 8
 
 ## Rules
 

@@ -7,7 +7,7 @@ This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI pro
 This repository is **Origin Gateway** (API gateway + web console). Brand name: **Origin Gateway**. Image: `ghcr.io/fran0220/origin-gateway`. The legacy Core `electron/` desktop shell has been removed and must not be reintroduced.
 
 **Production scope:** deployed **only on BWG** as Origin Gateway (`PRODUCT_ID=origingame`, `api.origingame.dev`).  
-**Do not deploy this image to `youbox` / `you-box.com`.** That host is the **BoxAI** product stack (`fran0220/boxAI`). Dual-host “youbox + bwg both run this repo” is **retired**. `PRODUCT_ID=youbox` remains a **local/dev Circuit demo skin** only.
+**Do not deploy this image to `youbox` / `you-box.com`.** That host is the **BoxAI** product stack (`fran0220/boxAI`). Dual-host “youbox + bwg both run this repo” is **retired**. `PRODUCT_ID=youbox` remains a **local/dev backend profile** only; the frontend Circuit skin is retired.
 
 **Primary production consumer:** OriginGame platform monorepo (portal / play / Studio). That repo must **not** vendor this AGPL source; it integrates over HTTP only. Contract: `docs/origingame-contract.md`. Boundary: `docs/origingame-platform.md`.
 
@@ -44,7 +44,7 @@ oauth/         — OAuth provider implementations
 pkg/           — Internal packages (cachex, ionet)
 web/             — Frontend themes container
  web/default/   — Default frontend (React 19, Rsbuild, Base UI, Tailwind)
-  web/default/src/products/ — runtime skins + features (origingame | youbox demo)
+  web/default/src/products/ — OriginGame skin + runtime feature resolution
   web/default/src/i18n/ — Frontend internationalization (i18next, zh/en/fr/ru/ja/vi)
 ```
 
@@ -74,7 +74,9 @@ ghcr.io/fran0220/origin-gateway:main
 ghcr.io/fran0220/you-box:<git-tag>          # legacy alias (same digest)
 ```
 
-CI: `.github/workflows/ghcr-publish.yml`  
+Optional image publish (not the current production deploy path): Buildkite —
+`.buildkite/pipeline.yml`, setup `docs/buildkite.md`.
+
 Ops: `docs/deploy.md`
 
 Local/dev:
@@ -122,7 +124,7 @@ Hard rules:
 docker compose build new-api
 docker compose up -d
 # default image: origin-gateway:local  (override with GATEWAY_IMAGE)
-# default PRODUCT_ID=origingame; set PRODUCT_ID=youbox only for Circuit demo
+# default PRODUCT_ID=origingame; youbox remains a local backend dev profile
 ```
 
 Emergency rebuild: use a builder/CI machine with RAM — **not** BWG. Prefer registry pull.
@@ -140,40 +142,37 @@ Emergency rebuild: use a builder/CI machine with RAM — **not** BWG. Prefer reg
 - Usage: `useTranslation()` hook, call `t('English key')` in components
 - CLI tools: `bun run i18n:sync` (from `web/default/`)
 
-## Frontend Design Languages (per product)
+## Frontend Design Language — Amp × Arcade (single skin)
 
-One shell and one component tree; **two skins** selected by `PRODUCT_ID` / `html[data-product]`.
+One shell, one component tree, **one design language**, shared with the parent
+OriginGame monorepo. The retired YouBox "Circuit" demo skin has been removed;
+non-`origingame` product ids resolve to the same Paper skin on the client.
 
-### Shared shell rules (both products)
+### Shared shell rules
 
 - **One shell**: marketing, docs, console, and admin share `AppShell` (document scroll, sticky header, footer). Public pages without sidebar; console mounts the sidebar slot; admin is a drill-in in the same shell.
 - **Catalog pattern**: Model Plaza-style pages use search + facet dropdowns, URL-driven filters, window-virtualized results — no pagination.
 - **Auth**: single centered narrow column with brand top-left — no split brand panels.
 - **Primitives first**: `web/default/src/components/youbox/` (PageHeader, StatCard, ModelCard, EmptyState, Eyebrow, …).
-- **Semantic tokens only**: names live in `styles/theme.css`; product values in skins. Do not hardcode product colors in features.
+- **Semantic tokens only**: names live in `styles/theme.css`; values map the mirrored `--og-*` tokens. Do not hardcode product colors in features.
 
-### YouBox — "Circuit" (`PRODUCT_ID=youbox`, `ui.skin=circuit`)
+### Origin Gateway — "Paper" / Amp × Arcade (`PRODUCT_ID=origingame`, `ui.skin=paper`)
 
-Modern tech skin: cool slate neutrals, electric violet accent, **sans display** (~620 weight), layered elevation, **light + dark + system**.
+Warm parchment arcade language, mirrored from OriginGame's token package:
 
-| | Light | Dark |
+| | Light | Warm dark |
 | --- | --- | --- |
-| Canvas | `#f6f8fa` | `#0b0e13` |
-| Brand | `#4f46e5` | `#818cf8` |
-| Display | Hanken Grotesk | same |
-| Elevation | soft shadows | border + deep shadow |
+| Canvas (paper) | `#f4efe4` | `#1b160f` |
+| Card / panel | `#faf6ec` / `#ece5d5` | `#201a13` / `#17130e` |
+| Ink | `#1a1613` | `#ece5d3` |
+| Accent / CTA | `#ffb100` (constant) | `#ffb100` (constant) |
+| Brand text | `#a86a00` | `#ffc633` |
 
-- Skin file: `web/default/src/products/skins/youbox.css`
-- No cream `.paper` class (`ui.paperMarketing=false`)
-- Theme toggle in header (`ThemeSwitch`); `ThemeProvider` respects `ui.darkMode`
-- Motion: violet/cyan hero washes; restrained CSS only
-
-### Origin Gateway — "Paper" (`PRODUCT_ID=origingame`, `ui.skin=paper`)
-
-Editorial Amp-style paper (unchanged baseline `:root`): cream marketing `.paper`, green-tinted ink, indigo accent, Instrument Serif display, **light-only**, flat hairlines.
-
-- Teal accent overrides: `web/default/src/products/product-tokens.css`
-- `ui.darkMode=false` — dark utilities scoped so Paper cannot activate dark mode
+- **Type**: Archivo Black (display), Newsreader (serif), IBM Plex Mono (mono/eyebrow), system-ui body.
+- **Radii**: 10px block / 6px control only. Separation via surface steps + gap, not structural borders or glow.
+- **Tokens (SSOT)**: `origingame/packages/tokens/tokens.json`, mirrored **one-way** into `web/default/src/products/og-tokens.css` via `bun run tokens:sync` (verify `tokens:check`). Only values cross the boundary — no AGPL source vendoring in either direction.
+- **Semantic mapping**: `web/default/src/styles/theme.css` maps `--og-*` (light + `html.dark` warm remap). Product seam: `web/default/src/products/product-tokens.css`.
+- **Dark**: portal-parity warm remap; `ThemeSwitch` gated by `ui.darkMode`; `.paper` desk canvas gated by `ui.paperMarketing`.
 
 ## Local validation (CI parity)
 
@@ -255,14 +254,14 @@ For request structs that are parsed from client JSON and then re-marshaled to up
 
 When working on tiered/dynamic billing (expression-based pricing), you MUST read `pkg/billingexpr/expr.md` first. It documents the design philosophy, expression language (variables, functions, examples), full system architecture (editor → storage → pre-consume → settlement → log display), token normalization rules (`p`/`c` auto-exclusion), quota conversion, and expression versioning. All code changes to the billing expression system must follow the patterns described in that document.
 
-### Rule 8: Product profile — Origin Gateway + optional demo skin
+### Rule 8: Product profile — Origin Gateway + backend dev profile
 
-This monorepo ships **one core** and **one production product** (Origin Gateway), plus an optional local demo skin.
+This monorepo ships **one core**, **one production product**, and one frontend skin. The legacy `youbox` id remains only as a local backend dev profile.
 
 | Profile | `PRODUCT_ID` | Production? | Public default |
 | --- | --- | --- | --- |
 | **Origin Gateway** | `origingame` (default) | **Yes — BWG only** | `https://api.origingame.dev` |
-| YouBox Circuit (demo) | `youbox` | No — local/dev only | (override or demo) |
+| Legacy YouBox dev profile | `youbox` | No — local/dev only | (override) |
 
 `origingame` FeatureSet turns off retail/agent surfaces (`agent_desktop`, `rankings`, `playground_presets`, `public_marketing`, `model_plaza`) and keeps **`subscriptions` true** for OriginGame portal billing.
 
@@ -273,7 +272,7 @@ This monorepo ships **one core** and **one production product** (Origin Gateway)
 | Backend profile | `product/` | `PRODUCT_ID`, `FeatureSet`, `PublicBaseURL`, `/api/status` → `data.product` |
 | Extension seam | `router/youbox-router.go`, `service/youbox_runtime.go` | Feature-gated routes / init |
 | Frontend profile | `web/default/src/products/` | Defaults, `useFeature` / `useProduct`, DOM `data-product` |
-| Design tokens | `web/default/src/products/product-tokens.css` | Per-skin CSS variable overrides |
+| Design tokens | `web/default/src/products/og-tokens.css` (mirror) → `web/default/src/styles/theme.css` (semantic map) | Amp × Arcade values from `origingame/packages/tokens`; sync via `bun run tokens:sync` |
 | Consumer contract | `docs/origingame-contract.md` | Frozen OriginGame HTTP surface |
 
 **Hard red lines**
@@ -289,7 +288,7 @@ This monorepo ships **one core** and **one production product** (Origin Gateway)
 **Env**
 
 ```bash
-PRODUCT_ID=origingame                 # default; use youbox only for local Circuit demo
+PRODUCT_ID=origingame                 # default; youbox is a backend-only local dev profile
 PRODUCT_PUBLIC_BASE_URL=https://…     # optional override (OpenRouter referer, issuer fallback)
 GATEWAY_IMAGE=ghcr.io/fran0220/origin-gateway:<tag>
 ```

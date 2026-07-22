@@ -18,8 +18,8 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { useTheme, type Theme } from '@/context/theme-provider'
 import { cn } from '@/lib/utils'
+import { useTheme, type Theme } from '@/context/theme-provider'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -36,7 +36,7 @@ const OPTIONS: Array<{ value: Theme; icon: typeof Sun; labelKey: string }> = [
 
 /**
  * Theme toggle (light / dark / system).
- * Shown for products with `ui.darkMode` (YouBox Circuit). Hidden for Paper/origingame.
+ * Shown when the active product enables `ui.darkMode`.
  */
 export function ThemeSwitch(props: { className?: string }) {
   const { t } = useTranslation()

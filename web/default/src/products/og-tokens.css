@@ -1,0 +1,69 @@
+/*
+ * AUTO-GENERATED — OriginGame Amp × Arcade token mirror. Do not edit by hand.
+ *
+ * Source of truth: origingame/packages/tokens/tokens.json
+ * Regenerate:      bun run tokens:sync   (web/default/)
+ * Verify:          bun run tokens:check
+ *
+ * Semantic tokens in styles/theme.css must reference these --og-* values
+ * instead of introducing a parallel palette.
+ */
+
+:root {
+  --og-desk: #e8dec6;
+  --og-paper: #f4efe4;
+  --og-panel: #ece5d5;
+  --og-card: #faf6ec;
+  --og-ink: #1a1613;
+  --og-ink-600: #5b554a;
+  --og-ink-400: #8f887a;
+  --og-line: #d6cdb9;
+  --og-accent: #ffb100;
+  --og-accent-600: #e09900;
+  --og-accent-ink: #a86a00;
+  --og-on-accent: #1a1613;
+  --og-on-ink: #f4efe4;
+  --og-danger: #d92d20;
+  --og-success: #2f9e57;
+  --og-warn: #b45309;
+  --og-screen: #14110c;
+  --og-screen-panel: #1e1a12;
+  --og-screen-card: #292219;
+  --og-screen-line: #3b332a;
+  --og-screen-ink: #e9e3d3;
+  --og-screen-muted: #8f887a;
+  --og-screen-danger: #ff8577;
+
+  --og-radius-block: 10px;
+  --og-radius-control: 6px;
+
+  --og-dur-instant: 90ms;
+  --og-dur-fast: 160ms;
+  --og-dur-base: 240ms;
+  --og-dur-slow: 360ms;
+  --og-dur-cinematic: 640ms;
+  --og-ease-snap: cubic-bezier(0.2, 0, 0, 1);
+  --og-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --og-font-display: "Archivo Black", "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+  --og-font-serif: "Newsreader", Georgia, "Songti SC", serif;
+  --og-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+}
+
+/* Warm dark remap (portal parity: only these keys change;
+ * accent + screen family stay constant). */
+html.dark {
+  --og-desk: #14110c;
+  --og-paper: #1b160f;
+  --og-panel: #17130e;
+  --og-card: #201a13;
+  --og-ink: #ece5d3;
+  --og-ink-600: #b1a78f;
+  --og-ink-400: #857c69;
+  --og-line: #3b332a;
+  --og-accent-ink: #ffc633;
+  --og-on-ink: #14110c;
+  --og-danger: #ff8577;
+  --og-success: #57c47f;
+  --og-warn: #e0a35a;
+}

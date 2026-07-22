@@ -29,7 +29,7 @@ describe('resolveProduct', () => {
     const p = resolveProduct('origingame')
     expect(p.id).toBe('origingame')
     expect(p.publicBaseUrl).toBe('https://api.origingame.dev')
-    expect(p.ui.darkMode).toBe(false)
+    expect(p.ui.darkMode).toBe(true)
     expect(p.ui.paperMarketing).toBe(true)
     expect(p.ui.skin).toBe('paper')
     expect(p.features.agent_desktop).toBe(false)
@@ -37,12 +37,9 @@ describe('resolveProduct', () => {
     expect(p.features.rankings).toBe(false)
   })
 
-  it('resolves youbox Circuit UI flags', () => {
-    const p = resolveProduct('youbox')
-    expect(p.ui.darkMode).toBe(true)
-    expect(p.ui.paperMarketing).toBe(false)
-    expect(p.ui.skin).toBe('circuit')
-    expect(p.features.agent_desktop).toBe(true)
+  it('falls back to origingame for retired/unknown product ids', () => {
+    expect(resolveProduct('youbox').id).toBe('origingame')
+    expect(resolveProduct(null).id).toBe('origingame')
   })
 })
 

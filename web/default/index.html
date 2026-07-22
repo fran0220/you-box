@@ -23,33 +23,32 @@
       content="Origin Gateway — unified AI API gateway, accounts, quota, and admin console."
     />
 
-    <meta name="theme-color" content="#f6f8fa" />
+    <meta name="theme-color" content="#f4efe4" />
     <!--umami-->
     <!--Google Analytics-->
-    <!-- FOUC: apply product + color scheme before paint (youbox Circuit may be dark). -->
+    <!-- FOUC: apply resolved light/dark color scheme before paint. -->
     <script>
       ;(function () {
         try {
           var root = document.documentElement
-          var product = root.getAttribute('data-product') || 'origingame'
-          if (product !== 'youbox' && product !== 'origingame') product = 'origingame'
-          root.setAttribute('data-product', product)
-          var allowDark = product === 'youbox'
+          root.setAttribute('data-product', 'origingame')
           var theme = 'system'
           try {
             var stored = localStorage.getItem('yb-ui-theme')
-            if (stored === 'light' || stored === 'dark' || stored === 'system') {
+            if (
+              stored === 'light' ||
+              stored === 'dark' ||
+              stored === 'system'
+            ) {
               theme = stored
             }
           } catch (e) {}
           var dark = false
-          if (allowDark) {
-            if (theme === 'dark') dark = true
-            else if (theme === 'system') {
-              dark =
-                window.matchMedia &&
-                window.matchMedia('(prefers-color-scheme: dark)').matches
-            }
+          if (theme === 'dark') dark = true
+          else if (theme === 'system') {
+            dark =
+              window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches
           }
           root.classList.remove('light', 'dark')
           root.classList.add(dark ? 'dark' : 'light')

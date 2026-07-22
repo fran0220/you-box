@@ -28,8 +28,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          /* Brand-forward CTA (Circuit violet / Paper indigo / Origin teal via tokens). */
-          'bg-brand text-brand-on hover:bg-brand-hover active:bg-brand-active shadow-[0_1px_2px_rgba(13,17,23,0.1)] focus-visible:shadow-[0_0_0_3px_var(--brand-subtle)]',
+          /* Arcade-yellow CTA signature (accent fill, ink text) — Amp × Arcade. */
+          'bg-cta text-cta-foreground hover:bg-cta-hover active:bg-cta-active shadow-[0_1px_2px_color-mix(in_srgb,var(--og-ink)_12%,transparent)] focus-visible:shadow-[0_0_0_3px_var(--brand-subtle)]',
         outline:
           'border-border-strong bg-transparent text-foreground hover:bg-surface-hover hover:border-brand-border aria-expanded:bg-surface-hover',
         secondary:

@@ -10,6 +10,6 @@ describe('Button', () => {
     render(<Button loading>Save</Button>)
     const btn = screen.getByRole('button', { name: /Save/ })
     expect(btn).toBeDisabled()
-    expect(btn).toHaveClass('bg-brand')
+    expect(btn).toHaveClass('bg-cta')
   })
 })

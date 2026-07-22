@@ -16,19 +16,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useProduct } from '@/products'
 import { getCookie } from '@/lib/cookies'
 import { cn } from '@/lib/utils'
 import { LayoutProvider } from '@/context/layout-provider'
 import { SearchProvider } from '@/context/search-provider'
-import { useProduct } from '@/products'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AnimatedOutlet } from '@/components/page-transition'
 import { SkipToMain } from '@/components/skip-to-main'
-import {
-  AppShellContent,
-  type AppShellContentMode,
-} from './app-shell-content'
 import { AppContentScrollRestoration } from './app-content-scroll-restoration'
+import { AppShellContent, type AppShellContentMode } from './app-shell-content'
 import { AppSidebar } from './app-sidebar'
 import { Footer } from './footer'
 import { Header } from './header'
@@ -42,10 +39,9 @@ export type AppShellProps = {
 }
 
 /**
- * The single site shell: sticky header, document scroll, optional cream
- * `.paper` canvas (origingame Paper only — youbox Circuit uses slate tokens
- * without .paper so product skins are not shadowed). Console sidebar is an
- * optional slot inside the same shell.
+ * The single site shell: sticky header, document scroll, and the parchment
+ * `.paper` marketing canvas (gated by `ui.paperMarketing`). Console sidebar is
+ * an optional slot inside the same shell.
  */
 export function AppShell(props: AppShellProps) {
   const contentMode = props.contentMode ?? 'standard'

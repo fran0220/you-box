@@ -60,7 +60,7 @@ export function UpdateCheckerSection({
         {
           headers: {
             Accept: 'application/vnd.github+json',
-            'User-Agent': 'boxai-dashboard',
+            'User-Agent': 'origin-gateway-dashboard',
           },
         }
       )

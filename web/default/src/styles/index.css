@@ -19,19 +19,21 @@ For commercial licensing, please contact support@quantumnous.com
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-/* YouBox type system — Instrument Serif (editorial display), Hanken Grotesk
- * (UI/body), JetBrains Mono (code, eyebrows, technical labels, numerics). */
-@import '@fontsource/instrument-serif';
-@import '@fontsource/instrument-serif/400-italic.css';
-@import '@fontsource-variable/hanken-grotesk';
-@import '@fontsource-variable/jetbrains-mono';
+/* OriginGame Amp × Arcade type system — Archivo Black (display), Newsreader
+ * (editorial serif), IBM Plex Mono (code, eyebrows, technical labels). */
+@import '@fontsource/archivo-black';
+@import '@fontsource-variable/newsreader';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
 
+/* OriginGame token mirror (SSOT: origingame/packages/tokens). Load before
+ * theme.css so semantic tokens can reference --og-* values. */
+@import '../products/og-tokens.css';
 @import './theme.css';
 @import './theme-presets.css';
-/* Runtime product skins (html[data-product]); must load after theme.css. */
+/* Product extension seam (html[data-product]); must load after theme.css. */
 @import '../products/product-tokens.css';
-/* YouBox Circuit full light+dark pack (origingame stays on :root Paper). */
-@import '../products/skins/youbox.css';
 
 /* Shiki dual themes: token colors follow dark theme (pre background stays `bg-background` on the block) */
 @layer components {
@@ -66,8 +68,8 @@ For commercial licensing, please contact support@quantumnous.com
     overflow: unset !important;
   }
 
-  /* Page headings use display face; weight/tracking are product-tokenized
-   * (Paper serif 400 / Circuit sans ~620). UI chrome titles stay grotesque. */
+  /* Page headings use the display face (Archivo Black). UI chrome titles
+   * (card/dialog/sheet titles) fall back to the sans body face below. */
   h1,
   h2,
   h3,
@@ -151,7 +153,7 @@ For commercial licensing, please contact support@quantumnous.com
   }
 }
 
-/* Mono eyebrow — product-tokenized tracking/size (Paper editorial vs Circuit tech). */
+/* Mono eyebrow — IBM Plex Mono, uppercase, editorial tracking. */
 @utility yb-eyebrow {
   font-family: var(--font-mono);
   font-size: var(--eyebrow-size, 11px);
@@ -161,7 +163,7 @@ For commercial licensing, please contact support@quantumnous.com
   color: var(--text-secondary);
 }
 
-/* Inline link — brand-colored; Circuit prefers underline-on-hover, Paper keeps always-on. */
+/* Inline link — brand-colored with an always-on hairline underline. */
 @utility yb-link {
   color: var(--text-link);
   text-decoration: underline;
@@ -172,12 +174,6 @@ For commercial licensing, please contact support@quantumnous.com
     color var(--dur-fast) var(--ease-out);
 }
 .yb-link:hover {
-  text-decoration-color: currentColor;
-}
-html[data-product='youbox'] .yb-link {
-  text-decoration-color: transparent;
-}
-html[data-product='youbox'] .yb-link:hover {
   text-decoration-color: currentColor;
 }
 
@@ -534,8 +530,8 @@ html[data-product='youbox'] .yb-link:hover {
   }
 }
 
-/* Home hero backdrop — product-tokenized washes (--hero-wash-a/b).
- * Paper: cream + indigo. Circuit (youbox): violet + cyan. Pure CSS. */
+/* Home hero backdrop — tokenized washes (--hero-wash-a/b): arcade accent
+ * over warm desk parchment. Pure CSS. */
 .hero-backdrop {
   position: absolute;
   inset: 0;
@@ -555,11 +551,7 @@ html[data-product='youbox'] .yb-link:hover {
     transparent 96px
   );
   opacity: 0.7;
-  mask-image: radial-gradient(
-    130% 100% at 50% 0%,
-    black 42%,
-    transparent 85%
-  );
+  mask-image: radial-gradient(130% 100% at 50% 0%, black 42%, transparent 85%);
 }
 
 .hero-wash {
@@ -790,5 +782,3 @@ html[data-product='youbox'] .yb-link:hover {
     animation: none !important;
   }
 }
-
-

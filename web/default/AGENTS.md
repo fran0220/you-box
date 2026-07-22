@@ -47,8 +47,8 @@
   - [3.14 测试](#314-测试)
   - [3.15 依赖管理](#315-依赖管理)
   - [3.16 构建与部署](#316-构建与部署)
-  - [3.17 多产品（Product profile）](#317-多产品product-profile)
-  - [3.18 设计语言（双产品皮肤）](#318-设计语言双产品皮肤)
+  - [3.17 产品 profile（Origin Gateway）](#317-产品-profileorigin-gateway)
+  - [3.18 设计语言（Amp × Arcade，单皮肤）](#318-设计语言amp--arcade单皮肤)
 - [四、协作与提交](#四协作与提交)
 - [更新日志](#更新日志)
 
@@ -159,21 +159,20 @@
 - 代码分割与懒加载策略见 [3.4 性能](#34-性能)；资源使用合适格式与压缩，环境变量用 `.env` 且以 `VITE_` 前缀，不在代码中硬编码。
 - **发布前**：执行 typecheck、lint、format 检查，完成生产构建并检查产物体积与环境变量配置。
 
-### 3.17 产品 profile（Origin Gateway + 可选 demo 皮肤）
+### 3.17 产品 profile（Origin Gateway）
 
-生产产品只有 **Origin Gateway**；同一镜像用 `PRODUCT_ID` 选择皮肤/能力，不是两套前端仓库：
+生产产品只有 **Origin Gateway**；同一镜像用 `PRODUCT_ID` 选择能力，不是两套前端仓库。前端只保留 `origingame` 一套皮肤，非 `origingame` 的 id 一律回退到该皮肤（退役的 `youbox` Circuit 演示皮肤已删除）。
 
 | `PRODUCT_ID` | 域名默认 | 用途 |
 | --- | --- | --- |
 | `origingame`（**默认**） | api.origingame.dev | **Origin Gateway 生产** |
-| `youbox` | 本地 demo | Circuit 皮肤演示（非生产） |
 
 `origingame` 默认关闭 `agent_desktop` / `rankings` / `playground_presets` / `public_marketing`；**保留 `subscriptions`**（OriginGame portal 计费）。
 
 **代码位置**
 
 - `src/products/` — 类型、默认 features、store、`useFeature` / `useProduct`
-- `src/products/product-tokens.css` — 仅覆盖语义 token 取值（`html[data-product=…]`）
+- `src/products/product-tokens.css` — `html[data-product]` 覆盖 seam（一般留空）
 - 后端同源：`product/` 包 + `/api/status` 的 `data.product`
 - 消费者冻结契约：仓库根 `docs/origingame-contract.md`
 
@@ -185,22 +184,21 @@
 4. 设计差异只改 token / 少量 product copy，不发明第二套组件色板。
 5. 细节与红线见仓库根目录 `AGENTS.md` Rule 8、`docs/product-profile.md`。
 
-### 3.18 设计语言（皮肤）
+### 3.18 设计语言（Amp × Arcade，单皮肤）
 
-同一套组件与外壳，**两套视觉语言**（`PRODUCT_ID` / `profile.ui.skin`）：
+同一套组件与外壳，**唯一视觉语言** = OriginGame **Amp × Arcade**（"Paper"）：暖羊皮纸色阶（desk → paper → card）、Archivo Black 标题、Newsreader 衬线、IBM Plex Mono 眉题、街机黄 `#ffb100` CTA、10/6px 双圆角、色阶+留白分层（非结构性边框/发光）、支持浅色 + 暖色暗色。
 
-| 产品 | skin | 特征 |
-| --- | --- | --- |
-| Origin Gateway | `paper` | Amp 纸面、奶油 `.paper`、衬线标题、发丝线、**仅浅色**（生产默认） |
-| YouBox demo | `circuit` | 冷 slate、电光紫、无衬线标题、分层阴影、**明暗切换**；`skins/youbox.css` |
+**Token 来源（仓库关联）**
 
-**共用**
+- SSOT 在附属母仓库 `origingame/packages/tokens/tokens.json`，**单向镜像**到本仓库 `src/products/og-tokens.css`。
+- 同步：`bun run tokens:sync`；校验：`bun run tokens:check`（存在相邻源仓库时漂移即失败；独立 clone 会明确跳过）。只拷 token **值**，两侧都不 vendor AGPL 源码。
+- 语义 token 在 `styles/theme.css` 里映射 `--og-*`（含 `html.dark` 暖色 remap）；**禁止**手改 `og-tokens.css` 或在 `features/*` 写死色值。
+
+**约定**
 
 - 单一 `AppShell`；目录页搜索+分面+虚拟化；认证页窄栏；优先 `components/youbox/`（命名历史，代码共享）。
-- 只改语义 token / product skin，禁止在 `features/*` 写死色值或散落 `productId ===`。
-- Circuit 明暗：`useTheme` + 顶栏 `ThemeSwitch`；Paper 隐藏切换并强制 light。
-
-细节见仓库根 `AGENTS.md` 设计语言节、`docs/product-profile.md`。
+- 明暗：`useTheme` + 顶栏 `ThemeSwitch`（`ui.darkMode` 门控）；`.paper` 由 `ui.paperMarketing` 门控。
+- 细节见仓库根 `AGENTS.md` 设计语言节、`docs/product-profile.md`。
 
 ---
 
@@ -221,3 +219,4 @@
 - **2026-07-03**：新增 3.17「设计语言（Paper · Amp 式）」：单一外壳、纸面底色、衬线标题 + 等宽眉题、发丝线分隔、目录页与认证页范式。
 - **2026-07-14**：新增 3.17「多产品（Product profile）」；原设计语言顺延为 3.18。与根目录 `PRODUCT_ID` / `src/products` 对齐。
 - **2026-07-14**：3.18 改为双产品皮肤：YouBox Circuit（明暗）+ Origin Paper；不再要求全局仅 Amp 纸面。
+- **2026-07-22**：收敛为单皮肤，对齐附属母仓库 origingame 的 **Amp × Arcade** 设计语言（token 经 `tokens:sync` 单向镜像自 `origingame/packages/tokens`）；删除 YouBox Circuit 皮肤与双产品前端机制；字体改 Archivo Black / Newsreader / IBM Plex Mono；接入暖色暗色。

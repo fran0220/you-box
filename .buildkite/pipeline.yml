@@ -1,0 +1,37 @@
+# Origin Gateway — Buildkite pipeline
+#
+# Triggers (configure in Buildkite UI or via API):
+#   - GitHub: push tags matching v*
+#   - Manual "New Build" with env VERSION=v0.1.19 (optional)
+#
+# Secrets (set on the Agent host or Buildkite cluster secrets — never commit):
+#   BUILDKITE_AGENT_TOKEN  — agent registration only (agent.cfg), not needed in steps
+#   GHCR_TOKEN             — GitHub PAT or fine-grained token with write:packages
+#   GHCR_USERNAME          — GitHub username (default: fran0220)
+#
+# Agent requirements:
+#   - Docker + buildx
+#   - Prefer linux/amd64 native host (BWG pulls amd64). On Apple Silicon use
+#     buildx with qemu (slower) or a remote amd64 agent.
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: fran0220/origin-gateway
+  LEGACY_IMAGE_NAME: fran0220/you-box
+  # Override at build time: VERSION=v0.1.19
+  # PLATFORM defaults to linux/amd64 for production BWG hosts.
+  PLATFORM: linux/amd64
+
+steps:
+  - label: ":docker: Build & push Origin Gateway"
+    key: publish-image
+    command: .buildkite/scripts/publish-image.sh
+    agents:
+      queue: default
+    timeout_in_minutes: 45
+    retry:
+      automatic:
+        - exit_status: -1
+          limit: 1
+        - exit_status: 255
+          limit: 1

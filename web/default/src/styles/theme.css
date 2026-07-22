@@ -17,33 +17,24 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 /*
- * Shared theme foundation.
+ * Shared theme foundation — OriginGame "Amp × Arcade" design language.
  *
- * :root defaults = Paper (origingame + baseline). YouBox "Circuit" overrides
- * live in products/skins/youbox.css under html[data-product='youbox'].
+ * Palette / radius / motion / type values come from the mirrored OriginGame
+ * token package (see products/og-tokens.css, regenerated via `bun run
+ * tokens:sync`). Semantic tokens below reference those `--og-*` variables so
+ * the warm dark remap (html.dark in og-tokens.css) flips automatically.
  *
- * Font/radius utilities must use CSS-variable indirection so product skins
- * can swap them at runtime (Tailwind @theme inline literals are not
- * overridable via data-product otherwise).
- *
- * Dark mode utilities are scoped to youbox only so origingame cannot go dark.
+ * Do NOT introduce a parallel palette here; map og tokens instead.
  */
-@custom-variant dark (
-  &:is(
-    html[data-product='youbox'].dark *,
-    html[data-product='youbox'] .dark *
-  )
-);
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-sans:
-    'Hanken Grotesk Variable', 'Hanken Grotesk', ui-sans-serif, system-ui,
-    -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  /* Runtime-swappable via --display-family / --serif-family on :root or product */
+    system-ui, -apple-system, 'Segoe UI', Roboto, ui-sans-serif, 'PingFang SC',
+    'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  /* Display = Archivo Black, mono = IBM Plex Mono (og token families). */
   --font-display: var(--display-family);
-  --font-mono:
-    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo,
-    Consolas, monospace;
+  --font-mono: var(--og-font-mono);
   --font-serif: var(--serif-family);
   --font-inter: var(--font-sans);
   --font-manrope: var(--font-sans);
@@ -98,6 +89,11 @@ For commercial licensing, please contact support@quantumnous.com
   --color-brand-foreground: var(--brand-on);
   --color-brand-subtle: var(--brand-subtle);
   --color-brand-border: var(--brand-border);
+  /* Arcade-yellow CTA (accent fill, ink text) — distinct from brand ink/amber */
+  --color-cta: var(--cta);
+  --color-cta-hover: var(--cta-hover);
+  --color-cta-active: var(--cta-active);
+  --color-cta-foreground: var(--cta-on);
   --color-link: var(--text-link);
   --color-teal: var(--teal);
   --color-teal-subtle: var(--teal-subtle);
@@ -133,80 +129,73 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 @theme {
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 :root {
-  /* -------- Typography / radius indirection (Paper defaults) -------- */
-  --display-family:
-    'Instrument Serif', Georgia, 'Times New Roman', 'Songti SC',
-    'Noto Serif SC', serif;
-  --serif-family:
-    'Instrument Serif', Georgia, 'Times New Roman', 'Songti SC',
-    'Noto Serif SC', serif;
+  /* -------- Typography / radius indirection (Amp × Arcade) -------- */
+  --display-family: var(--og-font-display);
+  --serif-family: 'Newsreader Variable', var(--og-font-serif);
   --display-weight: 400;
-  --display-tracking: 0;
+  --display-tracking: -0.01em;
   --eyebrow-tracking: 0.14em;
   --eyebrow-size: 11px;
 
-  --r-xs: 2px;
-  --r-sm: 4px;
-  --r-md: 6px;
-  --r-lg: 8px;
-  --r-xl: 12px;
-  --r-2xl: 16px;
-  --r-3xl: 20px;
-  --r-4xl: 24px;
+  /* Two radii only: control (6px) and block (10px). */
+  --r-xs: var(--og-radius-control);
+  --r-sm: var(--og-radius-control);
+  --r-md: var(--og-radius-control);
+  --r-lg: var(--og-radius-block);
+  --r-xl: var(--og-radius-block);
+  --r-2xl: var(--og-radius-block);
+  --r-3xl: var(--og-radius-block);
+  --r-4xl: var(--og-radius-block);
 
-  /* Hero washes (Paper cream secondary; youbox overrides in skin) */
-  --hero-wash-a: color-mix(in srgb, var(--brand) 26%, transparent);
-  --hero-wash-b: color-mix(
-    in srgb,
-    var(--paper-cream, #dfdfc1) 92%,
-    transparent
-  );
+  /* Hero washes: arcade accent + warm desk */
+  --hero-wash-a: color-mix(in srgb, var(--og-accent) 24%, transparent);
+  --hero-wash-b: color-mix(in srgb, var(--paper-cream) 92%, transparent);
 
-  /* -------- Raw ramps (theme-invariant) -------- */
-  /* Green-tinted ink, matching the paper aesthetic. */
-  --ink-950: #0b0d0b;
-  --ink-900: #111311;
-  --ink-850: #161816;
-  --ink-800: #1b1d1b;
-  --ink-750: #232523;
-  --ink-700: #2a2c2a;
-  --ink-600: #3b3d3b;
-  --ink-500: #565856;
-  --ink-400: #737572;
-  --ink-300: #999b97;
-  --ink-200: #c2c3bf;
-  --ink-150: #d8d9d4;
-  --ink-100: #e7e8e3;
-  --ink-50: #f2f2ee;
-  --ink-25: #fafaf8;
-  --white: #ffffff;
+  /* -------- Warm ink ramp (derived from og ink family) --------
+   * Anchored to --og-ink so the whole ramp flips under html.dark. */
+  --ink-950: var(--og-ink);
+  --ink-900: var(--og-ink);
+  --ink-850: color-mix(in srgb, var(--og-ink) 92%, var(--og-paper));
+  --ink-800: color-mix(in srgb, var(--og-ink) 85%, var(--og-paper));
+  --ink-750: color-mix(in srgb, var(--og-ink) 78%, var(--og-paper));
+  --ink-700: var(--og-ink-600);
+  --ink-600: var(--og-ink-600);
+  --ink-500: var(--og-ink-600);
+  --ink-400: var(--og-ink-400);
+  --ink-300: var(--og-ink-400);
+  --ink-200: var(--og-line);
+  --ink-150: color-mix(in srgb, var(--og-line) 70%, var(--og-paper));
+  --ink-100: var(--og-panel);
+  --ink-50: var(--og-card);
+  --ink-25: var(--og-paper);
+  --white: var(--og-card);
   --black: #000000;
 
-  /* Cream newsprint (marketing surfaces) */
-  --paper-cream: #dfdfc1;
-  --paper-cream-2: #d6d6b6;
-  --paper-cream-bright: #e9e9d3;
+  /* Marketing surfaces (warm parchment) */
+  --paper-cream: var(--og-desk);
+  --paper-cream-2: var(--og-panel);
+  --paper-cream-bright: var(--og-card);
 
-  /* Functional hues, tuned for paper backgrounds */
-  --indigo-500: #2b4c8c;
-  --indigo-600: #243f75;
-  --indigo-700: #1d3460;
-  --blue-link: #286bbd;
-  --green-600: #2f8052;
-  --amber-600: #a07013;
-  --red-600: #b42318;
-  --blue-600: #286bbd;
+  /* Functional hues from og token set (no Tailwind rainbow) */
+  --indigo-500: var(--og-accent-ink);
+  --indigo-600: var(--og-accent-ink);
+  --indigo-700: var(--og-accent-ink);
+  --blue-link: var(--og-accent-ink);
+  --green-600: var(--og-success);
+  --amber-600: var(--og-warn);
+  --red-600: var(--og-danger);
+  --blue-600: var(--og-accent-ink);
 
-  --dur-instant: 80ms;
-  --dur-fast: 140ms;
-  --dur-base: 220ms;
-  --dur-slow: 400ms;
+  --dur-instant: var(--og-dur-instant);
+  --dur-fast: var(--og-dur-fast);
+  --dur-base: var(--og-dur-base);
+  --dur-slow: var(--og-dur-slow);
 
   --z-overlay: 50;
   --z-sticky: 200;
@@ -231,87 +220,94 @@ For commercial licensing, please contact support@quantumnous.com
   --control-md: 40px;
   --control-lg: 48px;
 
-  /* -------- Semantic tokens (light-only) -------- */
-  --brand: var(--indigo-500);
-  --brand-hover: var(--indigo-600);
-  --brand-active: var(--indigo-700);
-  --brand-subtle: rgba(43, 76, 140, 0.08);
-  --brand-border: rgba(43, 76, 140, 0.28);
-  --brand-on: #ffffff;
-  --brand-ring: rgba(43, 76, 140, 0.35);
-  --teal: var(--indigo-500);
-  --teal-subtle: rgba(43, 76, 140, 0.06);
+  /* -------- Semantic tokens (og-mapped; auto-flip in dark) -------- */
+  /* Brand = amber ink (text-safe on parchment); not the solid arcade yellow. */
+  --brand: var(--og-accent-ink);
+  --brand-hover: color-mix(in srgb, var(--og-accent-ink) 82%, var(--og-ink));
+  --brand-active: color-mix(in srgb, var(--og-accent-ink) 66%, var(--og-ink));
+  --brand-subtle: color-mix(in srgb, var(--og-accent) 16%, transparent);
+  --brand-border: color-mix(in srgb, var(--og-accent-ink) 32%, transparent);
+  --brand-on: var(--og-on-ink);
+  --brand-ring: color-mix(in srgb, var(--og-accent-ink) 38%, transparent);
+  --teal: var(--og-accent-ink);
+  --teal-subtle: color-mix(in srgb, var(--og-accent) 12%, transparent);
 
-  --accent: rgba(11, 13, 11, 0.07);
-  --accent-subtle: rgba(11, 13, 11, 0.05);
+  /* Arcade-yellow CTA fill (constant across light/dark). */
+  --cta: var(--og-accent);
+  --cta-hover: var(--og-accent-600);
+  --cta-active: color-mix(in srgb, var(--og-accent-600) 85%, var(--og-ink));
+  --cta-on: var(--og-on-accent);
 
-  --background: var(--ink-25);
-  --foreground: var(--ink-900);
-  --bg: var(--ink-25);
-  --surface: var(--white);
-  --surface-2: var(--ink-50);
-  --surface-3: var(--ink-100);
-  --surface-hover: rgba(11, 13, 11, 0.045);
-  --surface-inset: var(--ink-50);
-  --surface-card: var(--white);
-  --overlay: rgba(15, 16, 15, 0.4);
-  --card: var(--white);
-  --card-foreground: var(--ink-900);
-  --popover: var(--white);
-  --popover-foreground: var(--ink-900);
+  --accent: color-mix(in srgb, var(--og-ink) 7%, transparent);
+  --accent-subtle: color-mix(in srgb, var(--og-ink) 5%, transparent);
 
-  --text: var(--ink-900);
-  --text-strong: var(--ink-950);
-  --text-secondary: var(--ink-500);
-  --text-muted: var(--ink-400);
-  --text-faint: var(--ink-300);
-  --text-on-brand: #ffffff;
-  --text-link: var(--blue-link);
+  --background: var(--og-paper);
+  --foreground: var(--og-ink);
+  --bg: var(--og-paper);
+  --surface: var(--og-card);
+  --surface-2: var(--og-panel);
+  --surface-3: var(--og-desk);
+  --surface-hover: color-mix(in srgb, var(--og-ink) 5%, transparent);
+  --surface-inset: var(--og-panel);
+  --surface-card: var(--og-card);
+  --overlay: color-mix(in srgb, var(--og-screen) 55%, transparent);
+  --card: var(--og-card);
+  --card-foreground: var(--og-ink);
+  --popover: var(--og-card);
+  --popover-foreground: var(--og-ink);
 
-  --primary: var(--ink-950);
-  --primary-foreground: var(--ink-25);
-  --primary-hover: var(--ink-800);
-  --primary-active: var(--ink-750);
-  --secondary: var(--ink-50);
-  --secondary-foreground: var(--ink-900);
-  --muted: var(--ink-50);
-  --muted-foreground: var(--ink-500);
-  --accent-foreground: var(--ink-900);
+  --text: var(--og-ink);
+  --text-strong: var(--og-ink);
+  --text-secondary: var(--og-ink-600);
+  --text-muted: var(--og-ink-400);
+  --text-faint: var(--og-ink-400);
+  --text-on-brand: var(--og-on-ink);
+  --text-link: var(--og-accent-ink);
 
-  --destructive: var(--red-600);
+  --primary: var(--og-ink);
+  --primary-foreground: var(--og-on-ink);
+  --primary-hover: color-mix(in srgb, var(--og-ink) 85%, var(--og-paper));
+  --primary-active: color-mix(in srgb, var(--og-ink) 74%, var(--og-paper));
+  --secondary: var(--og-panel);
+  --secondary-foreground: var(--og-ink);
+  --muted: var(--og-panel);
+  --muted-foreground: var(--og-ink-600);
+  --accent-foreground: var(--og-ink);
+
+  --destructive: var(--og-danger);
   --destructive-foreground: #ffffff;
-  --success: var(--green-600);
-  --success-foreground: var(--ink-950);
-  --warning: var(--amber-600);
-  --warning-foreground: var(--ink-950);
-  --info: var(--blue-600);
-  --info-foreground: var(--ink-950);
-  --neutral: var(--ink-400);
-  --neutral-foreground: var(--ink-900);
-  --success-subtle: rgba(47, 128, 82, 0.1);
-  --warning-subtle: rgba(160, 112, 19, 0.1);
-  --danger-subtle: rgba(180, 35, 24, 0.08);
-  --info-subtle: rgba(40, 107, 189, 0.08);
+  --success: var(--og-success);
+  --success-foreground: var(--og-on-accent);
+  --warning: var(--og-warn);
+  --warning-foreground: var(--og-on-accent);
+  --info: var(--og-accent-ink);
+  --info-foreground: var(--og-on-accent);
+  --neutral: var(--og-ink-400);
+  --neutral-foreground: var(--og-ink);
+  --success-subtle: color-mix(in srgb, var(--og-success) 12%, transparent);
+  --warning-subtle: color-mix(in srgb, var(--og-warn) 12%, transparent);
+  --danger-subtle: color-mix(in srgb, var(--og-danger) 10%, transparent);
+  --info-subtle: color-mix(in srgb, var(--og-accent) 12%, transparent);
 
-  --border: rgba(11, 13, 11, 0.12);
-  --border-strong: rgba(11, 13, 11, 0.22);
-  --border-faint: rgba(11, 13, 11, 0.06);
-  --divider: rgba(11, 13, 11, 0.1);
-  --input: rgba(11, 13, 11, 0.16);
+  --border: color-mix(in srgb, var(--og-ink) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--og-ink) 24%, transparent);
+  --border-faint: color-mix(in srgb, var(--og-ink) 7%, transparent);
+  --divider: color-mix(in srgb, var(--og-ink) 12%, transparent);
+  --input: color-mix(in srgb, var(--og-ink) 18%, transparent);
   --ring: var(--brand-ring);
-  --field-bg: var(--white);
-  --field-border: rgba(11, 13, 11, 0.18);
-  --field-placeholder: var(--ink-300);
-  --code-bg: #f4f4ef;
-  --code-border: rgba(11, 13, 11, 0.1);
+  --field-bg: var(--og-card);
+  --field-border: color-mix(in srgb, var(--og-ink) 18%, transparent);
+  --field-placeholder: var(--og-ink-400);
+  --code-bg: color-mix(in srgb, var(--og-ink) 5%, var(--og-card));
+  --code-border: color-mix(in srgb, var(--og-ink) 10%, transparent);
 
-  --chart-1: var(--indigo-500);
-  --chart-2: var(--ink-700);
-  --chart-3: var(--ink-400);
-  --chart-4: var(--amber-600);
-  --chart-5: var(--green-600);
+  --chart-1: var(--og-accent);
+  --chart-2: var(--og-ink-600);
+  --chart-3: var(--og-ink-400);
+  --chart-4: var(--og-warn);
+  --chart-5: var(--og-success);
 
-  --sidebar: var(--ink-25);
+  --sidebar: var(--og-paper);
   --sidebar-foreground: var(--text);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
@@ -320,18 +316,36 @@ For commercial licensing, please contact support@quantumnous.com
   --sidebar-border: var(--border);
   --sidebar-ring: var(--brand-ring);
 
-  --skeleton-base: var(--ink-100);
-  --skeleton-highlight: var(--ink-50);
+  --skeleton-base: var(--og-panel);
+  --skeleton-highlight: var(--og-card);
 
-  /* Flat, editorial: hairline borders do the work. Popovers keep a
-   * whisper of depth so layered surfaces still read as layered. */
-  --shadow-xs: 0 1px 2px rgba(11, 13, 11, 0.05);
-  --shadow-sm: 0 1px 3px rgba(11, 13, 11, 0.07);
-  --shadow-md: 0 4px 14px rgba(11, 13, 11, 0.09);
-  --shadow-lg: 0 8px 28px rgba(11, 13, 11, 0.11);
-  --shadow-xl: 0 16px 44px rgba(11, 13, 11, 0.13);
+  /* Flat, editorial: hairline borders do the work. */
+  --shadow-xs: 0 1px 2px color-mix(in srgb, var(--og-ink) 5%, transparent);
+  --shadow-sm: 0 1px 3px color-mix(in srgb, var(--og-ink) 7%, transparent);
+  --shadow-md: 0 4px 14px color-mix(in srgb, var(--og-ink) 9%, transparent);
+  --shadow-lg: 0 8px 28px color-mix(in srgb, var(--og-ink) 11%, transparent);
+  --shadow-xl: 0 16px 44px color-mix(in srgb, var(--og-ink) 13%, transparent);
   --glow-brand: 0 0 0 1px var(--brand-border);
   --glow-soft: none;
+}
+
+/* Warm dark surface polish (portal parity): og-tokens.css already remaps the
+ * --og-* palette under html.dark; here we only deepen elevation so layered
+ * surfaces still read on the dark parchment. */
+html.dark {
+  --shadow-xs: 0 0 0 1px color-mix(in srgb, var(--og-line) 40%, transparent);
+  --shadow-sm:
+    0 0 0 1px color-mix(in srgb, var(--og-line) 40%, transparent),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md:
+    0 0 0 1px color-mix(in srgb, var(--og-line) 45%, transparent),
+    0 8px 28px rgba(0, 0, 0, 0.5);
+  --shadow-lg:
+    0 0 0 1px color-mix(in srgb, var(--og-line) 45%, transparent),
+    0 16px 40px rgba(0, 0, 0, 0.55);
+  --shadow-xl:
+    0 0 0 1px color-mix(in srgb, var(--og-line) 50%, transparent),
+    0 24px 56px rgba(0, 0, 0, 0.6);
 }
 
 /* `.light` kept as a compatibility no-op scope: tokens live in `:root`. */
@@ -342,38 +356,38 @@ For commercial licensing, please contact support@quantumnous.com
  * assumes a near-white canvas is re-anchored to cream.
  */
 .paper {
-  --background: var(--paper-cream);
-  --bg: var(--paper-cream);
-  --surface: var(--paper-cream-bright);
-  --surface-2: rgba(11, 13, 11, 0.04);
-  --surface-3: rgba(11, 13, 11, 0.07);
-  --surface-hover: rgba(11, 13, 11, 0.05);
-  --surface-inset: rgba(11, 13, 11, 0.04);
-  --surface-card: rgba(11, 13, 11, 0.03);
-  --card: rgba(11, 13, 11, 0.03);
-  --card-foreground: var(--ink-900);
-  --popover: var(--ink-25);
-  --popover-foreground: var(--ink-900);
+  --background: var(--og-desk);
+  --bg: var(--og-desk);
+  --surface: var(--og-card);
+  --surface-2: var(--og-panel);
+  --surface-3: color-mix(in srgb, var(--og-ink) 7%, transparent);
+  --surface-hover: color-mix(in srgb, var(--og-ink) 5%, transparent);
+  --surface-inset: var(--og-panel);
+  --surface-card: var(--og-card);
+  --card: var(--og-card);
+  --card-foreground: var(--og-ink);
+  --popover: var(--og-card);
+  --popover-foreground: var(--og-ink);
 
-  --secondary: rgba(11, 13, 11, 0.05);
-  --muted: rgba(11, 13, 11, 0.05);
-  --accent: rgba(11, 13, 11, 0.08);
-  --accent-subtle: rgba(11, 13, 11, 0.05);
+  --secondary: var(--og-panel);
+  --muted: var(--og-panel);
+  --accent: color-mix(in srgb, var(--og-ink) 8%, transparent);
+  --accent-subtle: color-mix(in srgb, var(--og-ink) 5%, transparent);
 
-  --border: rgba(11, 13, 11, 0.14);
-  --border-strong: rgba(11, 13, 11, 0.26);
-  --border-faint: rgba(11, 13, 11, 0.07);
-  --divider: rgba(11, 13, 11, 0.12);
-  --input: rgba(11, 13, 11, 0.2);
-  --field-bg: var(--paper-cream-bright);
-  --field-border: rgba(11, 13, 11, 0.22);
-  --code-bg: rgba(11, 13, 11, 0.045);
-  --code-border: rgba(11, 13, 11, 0.12);
+  --border: color-mix(in srgb, var(--og-ink) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--og-ink) 26%, transparent);
+  --border-faint: color-mix(in srgb, var(--og-ink) 7%, transparent);
+  --divider: color-mix(in srgb, var(--og-ink) 12%, transparent);
+  --input: color-mix(in srgb, var(--og-ink) 20%, transparent);
+  --field-bg: var(--og-card);
+  --field-border: color-mix(in srgb, var(--og-ink) 22%, transparent);
+  --code-bg: color-mix(in srgb, var(--og-ink) 5%, transparent);
+  --code-border: color-mix(in srgb, var(--og-ink) 12%, transparent);
 
-  --sidebar: var(--paper-cream);
-  --sidebar-border: rgba(11, 13, 11, 0.14);
-  --sidebar-accent: rgba(11, 13, 11, 0.06);
+  --sidebar: var(--og-desk);
+  --sidebar-border: color-mix(in srgb, var(--og-ink) 14%, transparent);
+  --sidebar-accent: color-mix(in srgb, var(--og-ink) 6%, transparent);
 
-  --skeleton-base: rgba(11, 13, 11, 0.08);
-  --skeleton-highlight: rgba(11, 13, 11, 0.04);
+  --skeleton-base: color-mix(in srgb, var(--og-ink) 8%, transparent);
+  --skeleton-highlight: color-mix(in srgb, var(--og-ink) 4%, transparent);
 }

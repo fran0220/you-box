@@ -2,13 +2,16 @@
 
 ## Goal
 
-Run **Origin Gateway** as the production product, with an optional **YouBox Circuit** local demo skin, from one monorepo and one release image (`ghcr.io/fran0220/origin-gateway`):
+Run **Origin Gateway** as the production product from one monorepo and one release
+image (`ghcr.io/fran0220/origin-gateway`):
 
-- different design tokens / brand accents
-- different feature sets (gateway vs demo retail surfaces)
+- one design language: OriginGame **Amp × Arcade** (Paper), tokens mirrored from the OriginGame token package
+- feature sets that gate demo/retail surfaces off in production (`PRODUCT_ID`-driven)
 - continued upstream Calcium-Ion/new-api backend merges into **shared core**
 
-without maintaining two gateway apps or two git forks of this core.
+without maintaining two gateway apps or two git forks of this core. The legacy
+`youbox` id remains only as a backend dev profile; the frontend Circuit demo skin
+is retired.
 
 **Production:** only **BWG** runs this image as Origin Gateway (`PRODUCT_ID=origingame`, `https://api.origingame.dev`).  
 `you-box.com` is **BoxAI**, not this stack. See `AGENTS.md` and `docs/deploy.md`.  
@@ -20,13 +23,13 @@ OriginGame consumer boundary: `docs/origingame-platform.md`. Frozen HTTP: `docs/
 upstream new-api  ──►  core (relay, model, billing, auth, shared UI)
                               │
               PRODUCT_ID ─────┼── origingame (default, production Origin Gateway)
-                              └── youbox (local Circuit demo only)
+                              └── youbox (local backend dev profile only)
 ```
 
 | Context | `PRODUCT_ID` | Domain (default public base) | Production? |
 | --- | --- | --- | --- |
 | BWG Origin Gateway | `origingame` (**default**) | https://api.origingame.dev | **Yes — only live deploy of this repo** |
-| Local / demo Circuit skin | `youbox` | demo / override | No — not `you-box.com` |
+| Local backend dev profile | `youbox` | override | No — not `you-box.com` |
 
 Differences are **runtime** (`PRODUCT_ID`), not separate images per host.
 
@@ -44,7 +47,7 @@ Differences are **runtime** (`PRODUCT_ID`), not separate images per host.
 ### Env
 
 ```bash
-PRODUCT_ID=origingame      # default; youbox = local Circuit demo only
+PRODUCT_ID=origingame      # default; youbox = local backend dev profile only
 PRODUCT_PUBLIC_BASE_URL=   # optional absolute origin, no trailing slash required
 ```
 
@@ -71,28 +74,37 @@ Empty / unknown `PRODUCT_ID` → **origingame** (safe production default).
 
 ## Frontend
 
+The frontend ships **one design language**: OriginGame **Amp × Arcade** ("Paper"). The
+retired YouBox "Circuit" demo skin has been removed; any non-`origingame`
+`PRODUCT_ID` resolves to the same Paper skin on the client.
+
 | Piece | Location |
 | --- | --- |
 | Types / defaults | `web/default/src/products/` (`ui.darkMode`, `ui.paperMarketing`, `ui.skin`) |
-| YouBox Circuit skin | `web/default/src/products/skins/youbox.css` (full light+dark tokens) |
-| Origin accents | `web/default/src/products/product-tokens.css` (teal on Paper `:root`) |
+| OriginGame token mirror | `web/default/src/products/og-tokens.css` (AUTO-GENERATED `--og-*`) |
+| Token sync script | `web/default/scripts/sync-og-tokens.mjs` (`bun run tokens:sync` / `tokens:check`) |
+| Semantic tokens | `web/default/src/styles/theme.css` (maps `--og-*`, warm dark remap) |
+| Product seam | `web/default/src/products/product-tokens.css` (`html[data-product]` hook) |
 | Theme | `context/theme-provider.tsx` + `ThemeSwitch` (gated by `ui.darkMode`) |
 | Store + hooks | `useProduct`, `useFeature`, `useProductStore` |
 | Bootstrap | `main.tsx` + `index.html` FOUC script (`yb-ui-theme`, `data-product`) |
 
-`html[data-product="youbox"|"origingame"]` drives CSS. Shared semantic names stay in `styles/theme.css`.
+**Design tokens are mirrored from the OriginGame token package** (SSOT:
+`origingame/packages/tokens/tokens.json`). `bun run tokens:sync` regenerates
+`og-tokens.css`; `bun run tokens:check` verifies drift when the sibling source is
+available and reports a skip in standalone clones. Only token **values** cross
+the boundary — no AGPL source is vendored in either direction.
 
 | Product | Skin | Dark mode | Marketing canvas |
 | --- | --- | --- | --- |
-| youbox | Circuit (slate + violet, sans display) | yes (light/dark/system) | no `.paper` |
-| origingame | Paper (cream + serif, teal accent) | no (forced light) | `.paper` class |
+| origingame | Paper — Amp × Arcade (warm parchment, Archivo Black display, arcade-yellow `#ffb100` CTA) | yes (light / warm dark / system) | `.paper` desk canvas |
 
 ### Do not
 
 - Copy entire feature folders per product
 - Scatter `if (productId === 'origingame')` in shared feature code
-- Invent a second token vocabulary in components
-- Let `.paper` wrap youbox (it would shadow Circuit tokens)
+- Invent a second token vocabulary — map `--og-*` in `theme.css`, never hardcode product colors in features
+- Hand-edit `og-tokens.css` (regenerate via `tokens:sync`)
 
 ## Upstream sync
 
@@ -114,17 +126,15 @@ curl -fsS http://127.0.0.1:9320/api/status | jq .data.product
 
 Expect matching `id`, and OpenRouter referer / agent issuer fallbacks to use that product’s `public_base_url` when server address is unset.
 
-### Circuit UI smoke (youbox)
+### Design token smoke (Amp × Arcade)
 
 ```bash
+cd web/default && bun run tokens:check   # mirror in sync with origingame tokens.json
 cd web/default && bunx rsbuild dev --port 5199 --host 127.0.0.1
-# Browser: data-product=youbox, Theme menu light/dark/system
-# Computed: light --background #f6f8fa / --brand #4f46e5
-#           dark  --background #0b0e13 / --brand #818cf8
-# Isolation: data-product=origingame + .dark still Paper light tokens
+# Browser: data-product=origingame, Theme menu light/dark/system
+# Computed: light --background #f4efe4 (paper) / --cta #ffb100 (arcade yellow)
+#           dark  --background #1b160f (warm) / --cta #ffb100 (constant accent)
 ```
-
-Browser evidence: `docs/redesign-reviews/circuit-verify/README.md`.
 
 ## Later phases (do not start early)
 

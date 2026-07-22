@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 /** Runtime product id — must match Go product.ID* and PRODUCT_ID env. */
-export type ProductId = 'youbox' | 'origingame'
+export type ProductId = 'origingame'
 
 /** Capability flags — must match Go product.FeatureSet JSON keys. */
 export type FeatureKey =
@@ -36,12 +36,12 @@ export type FeatureSet = Record<FeatureKey, boolean>
  * in components so product identity stays declarative.
  */
 export interface ProductUiFlags {
-  /** Enable light/dark/system ThemeProvider (youbox Circuit). */
+  /** Enable light/dark/system ThemeProvider (Amp × Arcade warm dark). */
   darkMode: boolean
-  /** Apply cream `.paper` marketing canvas (origingame Paper). */
+  /** Apply parchment `.paper` marketing canvas. */
   paperMarketing: boolean
   /** Design language id for docs/debug. */
-  skin: 'circuit' | 'paper'
+  skin: 'paper'
 }
 
 export interface ProductProfile {

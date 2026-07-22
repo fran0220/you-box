@@ -60,7 +60,7 @@ export default function AiCodeDemos() {
       >
         <div className='flex w-full max-w-xl flex-col gap-4'>
           <CodeBlock code={SNIPPET} language='typescript' title='retry.ts' />
-          <CodeBlock code={'pip install youbox'} language='bash' />
+          <CodeBlock code={'pip install origin-gateway'} language='bash' />
         </div>
       </DemoBlock>
 

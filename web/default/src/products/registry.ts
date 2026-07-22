@@ -25,7 +25,7 @@ import type {
   ProductStatusPayload,
 } from './types'
 
-const KNOWN_IDS = new Set<ProductId>(['youbox', 'origingame'])
+const KNOWN_IDS = new Set<ProductId>(['origingame'])
 
 export function isProductId(value: unknown): value is ProductId {
   return typeof value === 'string' && KNOWN_IDS.has(value as ProductId)

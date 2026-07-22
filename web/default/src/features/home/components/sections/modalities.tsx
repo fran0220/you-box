@@ -18,8 +18,6 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
-import { cn } from '@/lib/utils'
-import { useProduct } from '@/products'
 
 const MODALITY_GROUPS: Array<{
   label: string
@@ -66,34 +64,15 @@ const MODALITY_GROUPS: Array<{
   },
 ]
 
-/**
- * Generative-media wall. Circuit: card rows with brand label chips.
- * Paper: hairline rows.
- */
+/** Generative-media wall — editorial hairline rows grouped by modality. */
 export function Modalities() {
   const { t } = useTranslation()
-  const product = useProduct()
-  const isCircuit = product.ui.skin === 'circuit'
 
   return (
-    <section
-      data-slot={isCircuit ? 'home-section' : undefined}
-      className={cn(!isCircuit && 'border-border/70 border-t py-14 md:py-20')}
-    >
-      <div
-        className={cn(
-          isCircuit
-            ? 'home-section-inner'
-            : 'mx-auto w-full max-w-6xl px-4 md:px-6'
-        )}
-      >
+    <section className='border-border/70 border-t py-14 md:py-20'>
+      <div className='mx-auto w-full max-w-6xl px-4 md:px-6'>
         <p className='yb-eyebrow mb-4'>{t('Beyond text')}</p>
-        <h2
-          className={cn(
-            'font-display max-w-[16em] text-3xl leading-[1.1] md:text-4xl',
-            isCircuit ? 'font-semibold tracking-[-0.03em]' : 'font-normal'
-          )}
-        >
+        <h2 className='font-display max-w-[16em] text-3xl leading-[1.1] font-normal md:text-4xl'>
           {t('Image, video, audio, and 3D')}
         </h2>
         <p className='text-muted-foreground mt-4 max-w-[36em] text-base leading-relaxed'>
@@ -102,56 +81,31 @@ export function Modalities() {
           )}
         </p>
 
-        {isCircuit ? (
-          <div className='mt-10 grid gap-3'>
-            {MODALITY_GROUPS.map((group) => (
-              <div
-                key={group.label}
-                className='border-border bg-card flex flex-col gap-3 rounded-xl border p-4 shadow-[var(--shadow-sm)] sm:flex-row sm:items-center sm:gap-6 sm:px-5'
-              >
-                <h3 className='text-brand shrink-0 font-mono text-[11px] font-semibold tracking-[0.08em] uppercase sm:w-20'>
-                  {t(group.label)}
-                </h3>
-                <ul className='flex flex-wrap gap-2'>
-                  {group.vendors.map((vendor) => (
-                    <li key={vendor.name} data-slot='circuit-tile'>
-                      <span className='shrink-0' aria-hidden='true'>
-                        {getLobeIcon(vendor.icon, 16)}
-                      </span>
-                      {vendor.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className='border-border/70 mt-10 border-t'>
-            {MODALITY_GROUPS.map((group) => (
-              <div
-                key={group.label}
-                className='border-border/70 flex flex-col gap-3 border-b py-5 sm:flex-row sm:items-baseline sm:gap-6'
-              >
-                <h3 className='text-muted-foreground w-24 shrink-0 font-mono text-[11px] font-semibold tracking-[0.08em] uppercase'>
-                  {t(group.label)}
-                </h3>
-                <ul className='flex flex-wrap gap-x-7 gap-y-3'>
-                  {group.vendors.map((vendor) => (
-                    <li
-                      key={vendor.name}
-                      className='text-muted-foreground hover:text-foreground flex items-center gap-2 text-[13px] font-medium transition-colors'
-                    >
-                      <span className='shrink-0' aria-hidden='true'>
-                        {getLobeIcon(vendor.icon, 18)}
-                      </span>
-                      {vendor.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className='border-border/70 mt-10 border-t'>
+          {MODALITY_GROUPS.map((group) => (
+            <div
+              key={group.label}
+              className='border-border/70 flex flex-col gap-3 border-b py-5 sm:flex-row sm:items-baseline sm:gap-6'
+            >
+              <h3 className='text-muted-foreground w-24 shrink-0 font-mono text-[11px] font-semibold tracking-[0.08em] uppercase'>
+                {t(group.label)}
+              </h3>
+              <ul className='flex flex-wrap gap-x-7 gap-y-3'>
+                {group.vendors.map((vendor) => (
+                  <li
+                    key={vendor.name}
+                    className='text-muted-foreground hover:text-foreground flex items-center gap-2 text-[13px] font-medium transition-colors'
+                  >
+                    <span className='shrink-0' aria-hidden='true'>
+                      {getLobeIcon(vendor.icon, 18)}
+                    </span>
+                    {vendor.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )

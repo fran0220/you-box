@@ -19,12 +19,11 @@ For commercial licensing, please contact support@quantumnous.com
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, CircleCheckBig } from 'lucide-react'
 import { Trans, useTranslation } from 'react-i18next'
-import { cn } from '@/lib/utils'
 import { getLobeIcon } from '@/lib/lobe-icon'
+import { cn } from '@/lib/utils'
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
-import { useProduct } from '@/products'
 import { useHeroStatusPill } from '../../hooks/use-hero-status-pill'
 
 /** Client apps and coding agents shown in the hero integrations strip.
@@ -54,8 +53,6 @@ export function Hero(props: HeroProps) {
   const { t } = useTranslation()
   const { status } = useStatus()
   const { systemName } = useSystemConfig()
-  const product = useProduct()
-  const isCircuit = product.ui.skin === 'circuit'
   const docsUrl = (status?.docs_link as string | undefined) || '/docs'
   const statusPill = useHeroStatusPill()
 
@@ -88,33 +85,16 @@ export function Hero(props: HeroProps) {
   }
 
   return (
-    <section
-      className={cn(
-        'relative z-10 overflow-hidden',
-        isCircuit
-          ? 'pt-14 pb-20 md:pt-20 md:pb-24 lg:pt-24'
-          : 'pt-16 pb-16 md:pt-24 md:pb-20 lg:pt-28'
-      )}
-    >
+    <section className='relative z-10 overflow-hidden pt-16 pb-16 md:pt-24 md:pb-20 lg:pt-28'>
       <div className='hero-backdrop' aria-hidden='true'>
         <div className='hero-wash hero-wash--brand' />
         <div className='hero-wash hero-wash--warm' />
       </div>
 
-      <div
-        className={cn(
-          'relative mx-auto w-full px-4 md:px-6',
-          isCircuit ? 'max-w-5xl' : 'max-w-6xl'
-        )}
-      >
+      <div className='relative mx-auto w-full max-w-6xl px-4 md:px-6'>
         <Link
           to='/status'
-          className={cn(
-            'landing-animate-fade-up border-border bg-surface-2 text-muted-foreground hover:border-brand-border mb-7 inline-flex items-center gap-2 border px-3 py-1.5 text-xs opacity-0 transition-colors',
-            isCircuit
-              ? 'rounded-md bg-card/80 shadow-sm backdrop-blur-sm'
-              : 'rounded-full'
-          )}
+          className='landing-animate-fade-up border-border bg-surface-2 text-muted-foreground hover:border-brand-border mb-7 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs opacity-0 transition-colors'
           style={{ animationDelay: '0ms' }}
         >
           <span
@@ -146,12 +126,7 @@ export function Hero(props: HeroProps) {
         </p>
 
         <h1
-          className={cn(
-            'font-display landing-animate-fade-up opacity-0',
-            isCircuit
-              ? 'max-w-[14em] text-[clamp(2.5rem,6.5vw,4.25rem)] leading-[1.05] font-semibold tracking-[-0.03em]'
-              : 'max-w-[13em] text-[clamp(2.875rem,7.5vw,5.25rem)] leading-[1.02] font-normal tracking-[-0.015em]'
-          )}
+          className='font-display landing-animate-fade-up max-w-[13em] text-[clamp(2.875rem,7.5vw,5.25rem)] leading-[1.02] font-normal tracking-[-0.015em] opacity-0'
           style={{ animationDelay: '60ms' }}
         >
           <Trans i18nKey='Hero headline' components={{ br: <br /> }} />
@@ -174,10 +149,7 @@ export function Hero(props: HeroProps) {
           {props.isAuthenticated ? (
             <>
               <Button
-                className={cn(
-                  'group h-11 px-5 text-sm font-medium',
-                  isCircuit ? 'rounded-md shadow-sm' : 'rounded-lg'
-                )}
+                className='group h-11 rounded-lg px-5 text-sm font-medium'
                 render={<Link to='/dashboard' />}
               >
                 {t('Go to Dashboard')}
@@ -188,10 +160,7 @@ export function Hero(props: HeroProps) {
           ) : (
             <>
               <Button
-                className={cn(
-                  'group h-11 px-5 text-sm font-medium',
-                  isCircuit ? 'rounded-md shadow-sm' : 'rounded-lg'
-                )}
+                className='group h-11 rounded-lg px-5 text-sm font-medium'
                 render={<Link to='/sign-up' />}
               >
                 {t('Get your API key')}
