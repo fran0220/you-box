@@ -127,7 +127,7 @@ func UploadMedia(c *gin.Context) {
 
 	var (
 		reader   io.Reader
-		size     int64 = -1
+		size     int64
 		mimeType string
 		filename string
 	)
@@ -151,6 +151,7 @@ func UploadMedia(c *gin.Context) {
 		mimeType = file.Header.Get("Content-Type")
 	} else {
 		reader = c.Request.Body
+		// ContentLength may be -1 when unknown; PersistFromReader treats <=0 as stream.
 		size = c.Request.ContentLength
 		mimeType = ct
 	}

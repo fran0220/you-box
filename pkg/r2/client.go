@@ -1,6 +1,7 @@
 package r2
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
@@ -18,10 +18,9 @@ import (
 
 // Client is a thin S3-compatible wrapper for Cloudflare R2.
 type Client struct {
-	cfg      Config
-	s3       *s3.Client
-	presign  *s3.PresignClient
-	uploader *manager.Uploader
+	cfg     Config
+	s3      *s3.Client
+	presign *s3.PresignClient
 }
 
 // NewClient builds an R2 client. Call Config.Validate first when enabling storage.
@@ -43,16 +42,10 @@ func NewClient(cfg Config) (*Client, error) {
 		ResponseChecksumValidation: aws.ResponseChecksumValidationWhenRequired,
 	})
 
-	uploader := manager.NewUploader(s3Client, func(u *manager.Uploader) {
-		u.PartSize = 8 * 1024 * 1024
-		u.Concurrency = 2
-	})
-
 	return &Client{
-		cfg:      cfg,
-		s3:       s3Client,
-		presign:  s3.NewPresignClient(s3Client),
-		uploader: uploader,
+		cfg:     cfg,
+		s3:      s3Client,
+		presign: s3.NewPresignClient(s3Client),
 	}, nil
 }
 
@@ -69,22 +62,44 @@ func (c *Client) Config() Config {
 	return c.cfg
 }
 
-// PutObject streams body to R2. size may be -1 if unknown (multipart upload).
+// PutObject streams body to R2.
+// When size >= 0 it is sent as Content-Length. When size < 0, the body is
+// buffered up to MaxObjectBytes so the SDK has a known length (gateway media
+// sizes are capped; avoids the deprecated s3/manager package).
 func (c *Client) PutObject(ctx context.Context, key, contentType string, body io.Reader, size int64) error {
 	if !c.Enabled() {
 		return fmt.Errorf("r2 client is not enabled")
 	}
-	input := &s3.PutObjectInput{
-		Bucket:      aws.String(c.cfg.Bucket),
-		Key:         aws.String(key),
-		Body:        body,
-		ContentType: aws.String(contentType),
-	}
+
+	var reader io.Reader = body
+	var contentLength int64
+
 	if size >= 0 {
-		input.ContentLength = aws.Int64(size)
+		contentLength = size
+	} else {
+		capBytes := c.cfg.MaxObjectBytes()
+		if capBytes <= 0 {
+			capBytes = 512 * 1024 * 1024
+		}
+		buf, err := io.ReadAll(io.LimitReader(body, capBytes+1))
+		if err != nil {
+			return fmt.Errorf("r2 read body %s: %w", key, err)
+		}
+		if int64(len(buf)) > capBytes {
+			return fmt.Errorf("r2 object %s exceeds max size %d bytes", key, capBytes)
+		}
+		reader = bytes.NewReader(buf)
+		contentLength = int64(len(buf))
 	}
-	// Use multipart uploader for bounded memory (large videos / unknown length).
-	_, err := c.uploader.Upload(ctx, input)
+
+	input := &s3.PutObjectInput{
+		Bucket:        aws.String(c.cfg.Bucket),
+		Key:           aws.String(key),
+		Body:          reader,
+		ContentType:   aws.String(contentType),
+		ContentLength: aws.Int64(contentLength),
+	}
+	_, err := c.s3.PutObject(ctx, input)
 	if err != nil {
 		return fmt.Errorf("r2 put object %s: %w", key, err)
 	}
