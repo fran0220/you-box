@@ -24,4 +24,6 @@ func InitYouBoxRuntimeResources() {
 			common.SysLog("agent auth keys not initialized: " + err.Error())
 		}
 	}
+	// Cloudflare R2 media plane (AI-generated + user uploads). Disabled unless R2_ENABLED=true.
+	InitMediaStorage()
 }

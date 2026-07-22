@@ -6,10 +6,10 @@
 
 ## Boundary
 
-| Role | Repository | License | Production host |
+| Role | Repository | Production host |
 |---|---|---|---|
-| **Origin Gateway** (this codebase) | `fran0220/you-box` (brand: Origin Gateway; image `origin-gateway`) | AGPL-3.0 | **bwg** `/opt/origin-gateway` → `https://api.origingame.dev` |
-| **OriginGame platform** (portal, play, assets, Studio) | `origingame` monorepo (local typical: `/Users/fan/origingame`) | Not this tree | **oracle** → portal family via edge proxy |
+| **Origin Gateway** (this codebase) | `fran0220/you-box` (brand: Origin Gateway; image `origin-gateway`) | **bwg** `/opt/origin-gateway` → `https://api.origingame.dev` |
+| **OriginGame platform** (portal, play, assets, Studio) | `origingame` monorepo (local typical: `/Users/fan/origingame`) | **oracle** → portal family via edge proxy |
 
 This repo does **not** ship portal, play, game deploy, Kenney assets, or Studio. Those stay in OriginGame and call this gateway over HTTP.
 
@@ -37,6 +37,7 @@ OriginGame server →  GATEWAY_ORIGIN  (same APIs; server-side)
 | Path on this process | Used for |
 |---|---|
 | `/v1/*` | OpenAI-compatible relay (models, chat, images, audio, …) |
+| `/v1/media/*` | Durable AI media (R2) — see `docs/r2-media-storage.md` (**not** Asset Worker catalog) |
 | `/api/*` | Account, tokens, dashboard, agent-auth seams |
 
 Breaking changes to auth headers, `sk-` validation, quota errors, or CORS for `origingame.dev` / Studio clients require coordinated checks against OriginGame:
@@ -50,7 +51,7 @@ curl -i https://origingame.dev/gw/v1/models           # portal proxy → this st
 ## Do not
 
 - Merge OriginGame app source into this repo as a substitute for HTTP contracts.
-- Expect OriginGame to vendor this AGPL tree; consumers integrate by URL only.
+- Expect OriginGame to vendor this tree; consumers integrate by URL only.
 - Deploy this image to `you-box.com` (retired for this codebase).
 - Point OriginGame long Studio SSE at portal `/gw` as the primary path (they use `api.origingame.dev`).
 

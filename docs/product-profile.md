@@ -93,7 +93,7 @@ retired YouBox "Circuit" demo skin has been removed; any non-`origingame`
 `origingame/packages/tokens/tokens.json`). `bun run tokens:sync` regenerates
 `og-tokens.css`; `bun run tokens:check` verifies drift when the sibling source is
 available and reports a skip in standalone clones. Only token **values** cross
-the boundary — no AGPL source is vendored in either direction.
+the boundary — no source is vendored in either direction.
 
 | Product | Skin | Dark mode | Marketing canvas |
 | --- | --- | --- | --- |

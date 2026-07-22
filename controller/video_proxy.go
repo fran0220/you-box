@@ -55,6 +55,23 @@ func VideoProxy(c *gin.Context) {
 		return
 	}
 
+	// Prefer durable R2 media when the task result was persisted.
+	if service.MediaStorageEnabled() {
+		if mediaObj, mErr := model.GetActiveMediaObjectByTaskId(task.TaskID); mErr == nil && mediaObj != nil {
+			if c.Query("stream") == "1" || c.Query("stream") == "true" {
+				if err := service.StreamMediaContent(c.Request.Context(), mediaObj, c.Writer); err != nil && !c.Writer.Written() {
+					videoProxyError(c, http.StatusBadGateway, "server_error", "Failed to stream media content")
+				}
+				return
+			}
+			if url, err := service.PresignMediaContent(c.Request.Context(), mediaObj); err == nil && url != "" {
+				c.Redirect(http.StatusFound, url)
+				return
+			}
+			// Fall through to legacy upstream proxy if presign fails.
+		}
+	}
+
 	channel, err := model.CacheGetChannel(task.ChannelId)
 	if err != nil {
 		logger.LogError(c.Request.Context(), fmt.Sprintf("Failed to get channel for task %s: %s", taskID, err.Error()))

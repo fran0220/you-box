@@ -48,6 +48,10 @@ Auth: session cookie + `New-Api-User` for browser; Studio uses password login th
 | POST | `/v1/sound-generation` | SFX (native alias) |
 | POST | `/v1/music` | Music (native alias) |
 | POST | `/v1/embeddings` | Embeddings |
+| GET | `/v1/media/:id/content` | Durable media download (R2; Bearer or signed `exp`/`sig`) |
+| GET | `/v1/media/:id` | Media metadata |
+| POST | `/v1/media/uploads` | User media upload → R2 |
+| DELETE | `/v1/media/:id` | Soft-delete media |
 
 Studio long streams must use **direct** `api.origingame.dev` (or `OG_AI_GATEWAY`), not portal `/gw` as primary.
 

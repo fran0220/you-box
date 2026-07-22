@@ -6,5 +6,6 @@ func youBoxMigrationModels() []interface{} {
 		&Conversation{},
 		&AppUsage{},
 		&UserAgentGrant{},
+		&MediaObject{},
 	}
 }

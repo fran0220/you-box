@@ -9,7 +9,7 @@ This repository is **Origin Gateway** (API gateway + web console). Brand name: *
 **Production scope:** deployed **only on BWG** as Origin Gateway (`PRODUCT_ID=origingame`, `api.origingame.dev`).  
 **Do not deploy this image to `youbox` / `you-box.com`.** That host is the **BoxAI** product stack (`fran0220/boxAI`). Dual-host “youbox + bwg both run this repo” is **retired**. `PRODUCT_ID=youbox` remains a **local/dev backend profile** only; the frontend Circuit skin is retired.
 
-**Primary production consumer:** OriginGame platform monorepo (portal / play / Studio). That repo must **not** vendor this AGPL source; it integrates over HTTP only. Contract: `docs/origingame-contract.md`. Boundary: `docs/origingame-platform.md`.
+**Primary production consumer:** OriginGame platform monorepo (portal / play / Studio). That repo must **not** vendor this source; it integrates over HTTP only. Contract: `docs/origingame-contract.md`. Boundary: `docs/origingame-platform.md`.
 
 ## Tech Stack
 
@@ -170,7 +170,7 @@ Warm parchment arcade language, mirrored from OriginGame's token package:
 
 - **Type**: Archivo Black (display), Newsreader (serif), IBM Plex Mono (mono/eyebrow), system-ui body.
 - **Radii**: 10px block / 6px control only. Separation via surface steps + gap, not structural borders or glow.
-- **Tokens (SSOT)**: `origingame/packages/tokens/tokens.json`, mirrored **one-way** into `web/default/src/products/og-tokens.css` via `bun run tokens:sync` (verify `tokens:check`). Only values cross the boundary — no AGPL source vendoring in either direction.
+- **Tokens (SSOT)**: `origingame/packages/tokens/tokens.json`, mirrored **one-way** into `web/default/src/products/og-tokens.css` via `bun run tokens:sync` (verify `tokens:check`). Only values cross the boundary — no source vendoring in either direction.
 - **Semantic mapping**: `web/default/src/styles/theme.css` maps `--og-*` (light + `html.dark` warm remap). Product seam: `web/default/src/products/product-tokens.css`.
 - **Dark**: portal-parity warm remap; `ThemeSwitch` gated by `ui.darkMode`; `.paper` desk canvas gated by `ui.paperMarketing`.
 

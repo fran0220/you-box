@@ -191,7 +191,7 @@
 **Token 来源（仓库关联）**
 
 - SSOT 在附属母仓库 `origingame/packages/tokens/tokens.json`，**单向镜像**到本仓库 `src/products/og-tokens.css`。
-- 同步：`bun run tokens:sync`；校验：`bun run tokens:check`（存在相邻源仓库时漂移即失败；独立 clone 会明确跳过）。只拷 token **值**，两侧都不 vendor AGPL 源码。
+- 同步：`bun run tokens:sync`；校验：`bun run tokens:check`（存在相邻源仓库时漂移即失败；独立 clone 会明确跳过）。只拷 token **值**，两侧都不 vendor 源码。
 - 语义 token 在 `styles/theme.css` 里映射 `--og-*`（含 `html.dark` 暖色 remap）；**禁止**手改 `og-tokens.css` 或在 `features/*` 写死色值。
 
 **约定**

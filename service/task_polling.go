@@ -536,6 +536,13 @@ func updateVideoSingleTask(ctx context.Context, adaptor TaskPollingAdaptor, ch *
 			// No URL from adaptor — construct proxy URL using public task ID
 			task.PrivateData.ResultURL = taskcommon.BuildProxyURL(task.TaskID)
 		}
+		// Best-effort durable R2 persist (async) when adaptor provided a direct URL.
+		// Auth'd proxy-only providers keep using VideoProxy until a later phase.
+		if MediaStorageEnabled() && taskResult.Url != "" &&
+			!strings.HasPrefix(taskResult.Url, "data:") &&
+			(strings.HasPrefix(taskResult.Url, "http://") || strings.HasPrefix(taskResult.Url, "https://")) {
+			TryPersistTaskVideoResult(task, taskResult.Url)
+		}
 		shouldSettle = true
 	case string(model.TaskStatusFailure):
 		logger.LogJson(ctx, fmt.Sprintf("Task %s failed", taskId), task)

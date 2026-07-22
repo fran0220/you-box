@@ -3,7 +3,7 @@
  * Mirror the OriginGame "Amp × Arcade" design tokens into this repo.
  *
  * SSOT: <origingame>/packages/tokens/tokens.json (sibling repo, not vendored —
- * only token VALUES are copied; no AGPL/source crossing in either direction).
+ * only token VALUES are copied; no source crossing in either direction).
  *
  * Usage:
  *   bun run tokens:sync            # regenerate src/products/og-tokens.css
