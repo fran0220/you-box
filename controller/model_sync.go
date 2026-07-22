@@ -20,12 +20,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// 上游地址
-const (
-	upstreamModelsURL  = "https://basellm.github.io/llm-metadata/api/newapi/models.json"
-	upstreamVendorsURL = "https://basellm.github.io/llm-metadata/api/newapi/vendors.json"
-)
-
 func normalizeLocale(locale string) (string, bool) {
 	l := strings.ToLower(strings.TrimSpace(locale))
 	switch l {
@@ -161,7 +155,7 @@ func fetchJSON[T any](ctx context.Context, url string, out *upstreamEnvelope[T])
 			continue
 		}
 		func() {
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 			switch resp.StatusCode {
 			case http.StatusOK:
 				// read body into buffer for caching and flexible decode

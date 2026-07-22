@@ -193,7 +193,7 @@ func sessionCompleted(ctx context.Context, event stripe.Event, callerIp string) 
 	customerId := event.GetObjectValue("customer")
 	referenceId := event.GetObjectValue("client_reference_id")
 	status := event.GetObjectValue("status")
-	if "complete" != status {
+	if status != "complete" {
 		logger.LogWarn(ctx, fmt.Sprintf("Stripe checkout.completed 状态异常，忽略处理 trade_no=%s status=%s client_ip=%s", referenceId, status, callerIp))
 		return
 	}
@@ -292,7 +292,7 @@ func fulfillOrder(ctx context.Context, event stripe.Event, referenceId string, c
 func sessionExpired(ctx context.Context, event stripe.Event) {
 	referenceId := event.GetObjectValue("client_reference_id")
 	status := event.GetObjectValue("status")
-	if "expired" != status {
+	if status != "expired" {
 		logger.LogWarn(ctx, fmt.Sprintf("Stripe checkout.expired 状态异常，忽略处理 trade_no=%s status=%s", referenceId, status))
 		return
 	}
@@ -367,8 +367,8 @@ func genStripeLink(referenceId string, customerId string, email string, amount i
 		AllowPromotionCodes: stripe.Bool(setting.StripePromotionCodesEnabled),
 	}
 
-	if "" == customerId {
-		if "" != email {
+	if customerId == "" {
+		if email != "" {
 			params.CustomerEmail = stripe.String(email)
 		}
 

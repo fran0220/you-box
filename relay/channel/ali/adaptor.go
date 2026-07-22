@@ -55,12 +55,6 @@ func aliAnthropicMessagesModelPatterns() []string {
 	})
 }
 
-var syncModels = []string{
-	"z-image",
-	"qwen-image",
-	"wan2.6",
-}
-
 func isSyncImageModel(modelName string) bool {
 	return model_setting.IsSyncImageModel(modelName)
 }
@@ -182,7 +176,8 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	if info.RelayMode == constant.RelayModeImagesGenerations {
+	switch info.RelayMode {
+	case constant.RelayModeImagesGenerations:
 		if isSyncImageModel(info.OriginModelName) {
 			a.IsSyncImageModel = true
 		}
@@ -191,7 +186,7 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 			return nil, fmt.Errorf("convert image request to async ali image request failed: %w", err)
 		}
 		return aliRequest, nil
-	} else if info.RelayMode == constant.RelayModeImagesEdits {
+	case constant.RelayModeImagesEdits:
 		if isOldWanModel(info.OriginModelName) {
 			return oaiFormEdit2WanxImageEdit(c, info, request)
 		}

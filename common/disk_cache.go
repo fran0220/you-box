@@ -66,13 +66,13 @@ func WriteDiskCacheFile(cacheType DiskCacheType, data []byte) (string, error) {
 
 	_, err = file.Write(data)
 	if err != nil {
-		file.Close()
-		os.Remove(filePath)
+		_ = file.Close()
+		_ = os.Remove(filePath)
 		return "", fmt.Errorf("failed to write cache file: %w", err)
 	}
 
 	if err := file.Close(); err != nil {
-		os.Remove(filePath)
+		_ = os.Remove(filePath)
 		return "", fmt.Errorf("failed to close cache file: %w", err)
 	}
 

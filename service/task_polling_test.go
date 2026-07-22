@@ -71,7 +71,7 @@ func (a *taskPollingFetchAdaptor) FetchTask(_ string, _ string, body map[string]
 }
 
 func (a *taskPollingFetchAdaptor) ParseTaskResult([]byte) (*relaycommon.TaskInfo, error) {
-	return &relaycommon.TaskInfo{Status: model.TaskStatusInProgress}, nil
+	return &relaycommon.TaskInfo{Status: string(model.TaskStatusInProgress)}, nil
 }
 
 func (a *taskPollingFetchAdaptor) AdjustBillingOnComplete(_ *model.Task, _ *relaycommon.TaskInfo) int {

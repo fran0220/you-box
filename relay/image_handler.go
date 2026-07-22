@@ -81,8 +81,7 @@ func ImageHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *type
 			if err != nil {
 				return types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
 			}
-			defer closer.Close()
-			jsonData = nil
+			defer func() { _ = closer.Close() /* cleanup only */ }()
 			info.UpstreamRequestBodySize = size
 			requestBody = body
 		}

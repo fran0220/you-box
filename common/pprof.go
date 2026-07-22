@@ -34,11 +34,14 @@ func Monitor() {
 			err = pprof.StartCPUProfile(f)
 			if err != nil {
 				SysLog("启动pprof失败 " + err.Error())
+				_ = f.Close()
 				continue
 			}
 			time.Sleep(10 * time.Second) // profile for 30 seconds
 			pprof.StopCPUProfile()
-			f.Close()
+			if err := f.Close(); err != nil {
+				SysLog("关闭pprof文件失败 " + err.Error())
+			}
 		}
 		time.Sleep(30 * time.Second)
 	}

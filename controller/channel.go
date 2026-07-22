@@ -190,7 +190,6 @@ func GetAllChannels(c *gin.Context) {
 		"page_size":   pageInfo.GetPageSize(),
 		"type_counts": typeCounts,
 	})
-	return
 }
 
 func buildFetchModelsHeaders(channel *model.Channel, key string) (http.Header, error) {
@@ -384,7 +383,6 @@ func SearchChannels(c *gin.Context) {
 			"type_counts": typeCounts,
 		},
 	})
-	return
 }
 
 func GetChannel(c *gin.Context) {
@@ -406,7 +404,6 @@ func GetChannel(c *gin.Context) {
 		"message": "",
 		"data":    channel,
 	})
-	return
 }
 
 // GetChannelKey 获取渠道密钥（需要通过安全验证中间件）
@@ -505,17 +502,17 @@ func validateChannel(channel *model.Channel, isAdd bool) error {
 		trimmedKey := strings.TrimSpace(channel.Key)
 		if isAdd || trimmedKey != "" {
 			if !strings.HasPrefix(trimmedKey, "{") {
-				return fmt.Errorf("Codex key must be a valid JSON object")
+				return fmt.Errorf("codex key must be a valid JSON object")
 			}
 			var keyMap map[string]any
 			if err := common.Unmarshal([]byte(trimmedKey), &keyMap); err != nil {
-				return fmt.Errorf("Codex key must be a valid JSON object")
+				return fmt.Errorf("codex key must be a valid JSON object")
 			}
 			if v, ok := keyMap["access_token"]; !ok || v == nil || strings.TrimSpace(fmt.Sprintf("%v", v)) == "" {
-				return fmt.Errorf("Codex key JSON must include access_token")
+				return fmt.Errorf("codex key JSON must include access_token")
 			}
 			if v, ok := keyMap["account_id"]; !ok || v == nil || strings.TrimSpace(fmt.Sprintf("%v", v)) == "" {
-				return fmt.Errorf("Codex key JSON must include account_id")
+				return fmt.Errorf("codex key JSON must include account_id")
 			}
 		}
 	}
@@ -580,7 +577,7 @@ func getVertexArrayKeys(keys string) ([]string, error) {
 		default:
 			bytes, err := json.Marshal(v)
 			if err != nil {
-				return nil, fmt.Errorf("Vertex AI key JSON 编码失败: %w", err)
+				return nil, fmt.Errorf("vertex AI key JSON 编码失败: %w", err)
 			}
 			keyStr = string(bytes)
 		}
@@ -612,7 +609,7 @@ func AddChannel(c *gin.Context) {
 	}
 
 	addChannelRequest.Channel.CreatedTime = common.GetTimestamp()
-	keys := make([]string, 0)
+	var keys []string
 	switch addChannelRequest.Mode {
 	case "multi_to_single":
 		addChannelRequest.Channel.ChannelInfo.IsMultiKey = true
@@ -696,7 +693,6 @@ func AddChannel(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func DeleteChannel(c *gin.Context) {
@@ -720,7 +716,6 @@ func DeleteChannel(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func DeleteDisabledChannel(c *gin.Context) {
@@ -738,7 +733,6 @@ func DeleteDisabledChannel(c *gin.Context) {
 		"message": "",
 		"data":    rows,
 	})
-	return
 }
 
 type ChannelTag struct {
@@ -776,7 +770,6 @@ func DisableTagChannels(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func EnableTagChannels(c *gin.Context) {
@@ -802,7 +795,6 @@ func EnableTagChannels(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 func EditTagChannels(c *gin.Context) {
@@ -862,7 +854,6 @@ func EditTagChannels(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }
 
 type ChannelBatch struct {
@@ -894,7 +885,6 @@ func DeleteChannelBatch(c *gin.Context) {
 		"message": "",
 		"data":    len(channelBatch.Ids),
 	})
-	return
 }
 
 type PatchChannel struct {
@@ -1082,7 +1072,6 @@ func UpdateChannel(c *gin.Context) {
 		"message": "",
 		"data":    channel,
 	})
-	return
 }
 
 func UpdateChannelStatus(c *gin.Context) {
@@ -1249,7 +1238,7 @@ func FetchModels(c *gin.Context) {
 		})
 		return
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	var result struct {
 		Data []struct {
@@ -1300,7 +1289,6 @@ func BatchSetChannelTag(c *gin.Context) {
 		"message": "",
 		"data":    len(channelBatch.Ids),
 	})
-	return
 }
 
 func GetTagModels(c *gin.Context) {
@@ -1341,7 +1329,6 @@ func GetTagModels(c *gin.Context) {
 		"message": "",
 		"data":    longestModels,
 	})
-	return
 }
 
 // CopyChannel handles cloning an existing channel with its key.
@@ -2029,29 +2016,42 @@ func OllamaPullModelStream(c *gin.Context) {
 	key := strings.Split(channel.Key, "\n")[0]
 
 	// 创建进度回调函数
+	var writeErr error
 	progressCallback := func(progress ollama.OllamaPullResponse) {
+		if writeErr != nil {
+			return
+		}
 		data, _ := json.Marshal(progress)
-		fmt.Fprintf(c.Writer, "data: %s\n\n", string(data))
+		_, writeErr = fmt.Fprintf(c.Writer, "data: %s\n\n", string(data))
 		c.Writer.Flush()
 	}
 
 	// 执行拉取
 	err = ollama.PullOllamaModelStream(baseURL, key, req.ModelName, progressCallback)
+	if writeErr != nil {
+		return
+	}
 
 	if err != nil {
 		errorData, _ := json.Marshal(gin.H{
 			"error": err.Error(),
 		})
-		fmt.Fprintf(c.Writer, "data: %s\n\n", string(errorData))
+		if _, writeErr = fmt.Fprintf(c.Writer, "data: %s\n\n", string(errorData)); writeErr != nil {
+			return
+		}
 	} else {
 		successData, _ := json.Marshal(gin.H{
 			"message": fmt.Sprintf("Model %s pulled successfully", req.ModelName),
 		})
-		fmt.Fprintf(c.Writer, "data: %s\n\n", string(successData))
+		if _, writeErr = fmt.Fprintf(c.Writer, "data: %s\n\n", string(successData)); writeErr != nil {
+			return
+		}
 	}
 
 	// 发送结束标志
-	fmt.Fprintf(c.Writer, "data: [DONE]\n\n")
+	if _, err := fmt.Fprintf(c.Writer, "data: [DONE]\n\n"); err != nil {
+		return
+	}
 	c.Writer.Flush()
 }
 

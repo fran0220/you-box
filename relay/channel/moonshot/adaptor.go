@@ -61,13 +61,14 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 	case types.RelayFormatClaude:
 		return fmt.Sprintf("%s/anthropic/v1/messages", info.ChannelBaseUrl), nil
 	default:
-		if info.RelayMode == constant.RelayModeRerank {
+		switch info.RelayMode {
+		case constant.RelayModeRerank:
 			return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
-		} else if info.RelayMode == constant.RelayModeEmbeddings {
+		case constant.RelayModeEmbeddings:
 			return fmt.Sprintf("%s/v1/embeddings", info.ChannelBaseUrl), nil
-		} else if info.RelayMode == constant.RelayModeChatCompletions {
+		case constant.RelayModeChatCompletions:
 			return fmt.Sprintf("%s/v1/chat/completions", info.ChannelBaseUrl), nil
-		} else if info.RelayMode == constant.RelayModeCompletions {
+		case constant.RelayModeCompletions:
 			return fmt.Sprintf("%s/v1/completions", info.ChannelBaseUrl), nil
 		}
 		return fmt.Sprintf("%s/v1/chat/completions", info.ChannelBaseUrl), nil

@@ -288,8 +288,8 @@ func TestConvertResponseProviderToOAIChatUsage(t *testing.T) {
 	assert.Equal(t, 5, toChat.Usage.BillingUsage.ClaudeUsage.OutputTokens)
 	chatValue := toChat.Value.(*dto.OpenAITextResponse)
 	require.Len(t, chatValue.Choices, 1)
-	require.Len(t, chatValue.Choices[0].Message.ParseToolCalls(), 1)
-	assert.JSONEq(t, `{"q":"x"}`, chatValue.Choices[0].Message.ParseToolCalls()[0].Function.Arguments)
+	require.Len(t, chatValue.Choices[0].ParseToolCalls(), 1)
+	assert.JSONEq(t, `{"q":"x"}`, chatValue.Choices[0].ParseToolCalls()[0].Function.Arguments)
 
 	gemini := &dto.GeminiChatResponse{
 		Candidates: []dto.GeminiChatCandidate{
@@ -347,7 +347,7 @@ func TestConvertResponseProviderToOAIChatUsage(t *testing.T) {
 
 func TestConvertResponsePreservesBillingUsageAcrossChatResponsesBridge(t *testing.T) {
 	chat := textRegistryChatResponse()
-	chat.Usage.BillingUsage = dto.NewClaudeMessagesBillingUsage(&dto.ClaudeUsage{
+	chat.BillingUsage = dto.NewClaudeMessagesBillingUsage(&dto.ClaudeUsage{
 		InputTokens:              10,
 		CacheReadInputTokens:     3,
 		CacheCreationInputTokens: 4,
@@ -370,7 +370,7 @@ func TestConvertResponsePreservesBillingUsageAcrossChatResponsesBridge(t *testin
 
 func TestConvertResponseUsesBillingUsageWhenRestoringNativeTargets(t *testing.T) {
 	chat := textRegistryChatResponse()
-	chat.Usage.BillingUsage = dto.NewClaudeMessagesBillingUsage(&dto.ClaudeUsage{
+	chat.BillingUsage = dto.NewClaudeMessagesBillingUsage(&dto.ClaudeUsage{
 		InputTokens:              10,
 		CacheReadInputTokens:     3,
 		CacheCreationInputTokens: 4,
@@ -386,7 +386,7 @@ func TestConvertResponseUsesBillingUsageWhenRestoringNativeTargets(t *testing.T)
 	assert.Equal(t, 4, claudeValue.Usage.CacheCreationInputTokens)
 	assert.Equal(t, 5, claudeValue.Usage.OutputTokens)
 
-	chat.Usage.BillingUsage = dto.NewGeminiChatBillingUsage(&dto.GeminiUsageMetadata{
+	chat.BillingUsage = dto.NewGeminiChatBillingUsage(&dto.GeminiUsageMetadata{
 		PromptTokenCount:        7,
 		ToolUsePromptTokenCount: 2,
 		CandidatesTokenCount:    5,

@@ -110,12 +110,12 @@ func geminiEmbeddingUsage(metadata *dto.GeminiEmbeddingUsageMetadata, fallback *
 
 func geminiEmbeddingUsageFromDetails(total int, details []dto.GeminiPromptTokensDetails) (*dto.Usage, error) {
 	if total <= 0 || len(details) == 0 {
-		return nil, fmt.Errorf("Gemini embedding usage is missing modality token details")
+		return nil, fmt.Errorf("gemini embedding usage is missing modality token details")
 	}
 	usage := &dto.Usage{PromptTokens: total, TotalTokens: total}
 	for _, detail := range details {
 		if detail.TokenCount < 0 {
-			return nil, fmt.Errorf("Gemini embedding returned a negative %s token count", detail.Modality)
+			return nil, fmt.Errorf("gemini embedding returned a negative %s token count", detail.Modality)
 		}
 		switch strings.ToUpper(detail.Modality) {
 		case "TEXT":
@@ -129,7 +129,7 @@ func geminiEmbeddingUsageFromDetails(total int, details []dto.GeminiPromptTokens
 		case "VIDEO":
 			usage.PromptTokensDetails.VideoTokens += detail.TokenCount
 		default:
-			return nil, fmt.Errorf("Gemini embedding returned unsupported usage modality %q", detail.Modality)
+			return nil, fmt.Errorf("gemini embedding returned unsupported usage modality %q", detail.Modality)
 		}
 	}
 	return usage, nil
@@ -167,7 +167,7 @@ func CountEmbeddingTokens(c *gin.Context, info *relaycommon.RelayInfo, contents 
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Gemini countTokens returned %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+		return nil, fmt.Errorf("gemini countTokens returned %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
 	}
 	var countResponse dto.GeminiCountTokensResponse
 	if err = common.Unmarshal(body, &countResponse); err != nil {

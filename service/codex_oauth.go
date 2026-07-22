@@ -112,7 +112,7 @@ func refreshCodexOAuthToken(
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var payload struct {
 		AccessToken  string `json:"access_token"`
@@ -174,7 +174,7 @@ func exchangeCodexAuthorizationCode(
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var payload struct {
 		AccessToken  string `json:"access_token"`

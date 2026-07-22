@@ -9,6 +9,7 @@ import (
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/dto"
+	"github.com/QuantumNous/new-api/logger"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/helper"
 	"github.com/QuantumNous/new-api/service"
@@ -37,11 +38,12 @@ func requestOpenAI2Cohere(textRequest dto.GeneralOpenAIRequest) *CohereRequest {
 			cohereReq.Message = msg.StringContent()
 		} else {
 			var role string
-			if msg.Role == "assistant" {
+			switch msg.Role {
+			case "assistant":
 				role = "CHATBOT"
-			} else if msg.Role == "system" {
+			case "system":
 				role = "SYSTEM"
-			} else {
+			default:
 				role = "USER"
 			}
 			cohereReq.ChatHistory = append(cohereReq.ChatHistory, ChatHistory{
@@ -248,6 +250,8 @@ func cohereRerankHandler(c *gin.Context, resp *http.Response, info *relaycommon.
 	}
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = c.Writer.Write(jsonResponse)
+	if _, err := c.Writer.Write(jsonResponse); err != nil {
+		logger.LogError(c, "downstream write failed after Cohere rerank completed: "+err.Error())
+	}
 	return &usage, nil
 }

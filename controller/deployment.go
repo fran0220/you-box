@@ -665,7 +665,7 @@ func GetDeploymentLogs(c *gin.Context) {
 	limitStr := c.Query("limit")
 	follow := c.Query("follow") == "true"
 
-	var limit int = 100
+	var limit = 100
 	if limitStr != "" {
 		if parsedLimit, err := strconv.Atoi(limitStr); err == nil && parsedLimit > 0 {
 			limit = parsedLimit

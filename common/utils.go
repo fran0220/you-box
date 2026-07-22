@@ -189,15 +189,15 @@ func Seconds2Time(num int) (time string) {
 }
 
 func Interface2String(inter interface{}) string {
-	switch inter.(type) {
+	switch inter := inter.(type) {
 	case string:
-		return inter.(string)
+		return inter
 	case int:
-		return fmt.Sprintf("%d", inter.(int))
+		return fmt.Sprintf("%d", inter)
 	case float64:
-		return strconv.FormatFloat(inter.(float64), 'f', -1, 64)
+		return strconv.FormatFloat(inter, 'f', -1, 64)
 	case bool:
-		if inter.(bool) {
+		if inter {
 			return "true"
 		} else {
 			return "false"
@@ -222,7 +222,7 @@ func IntMax(a int, b int) int {
 
 func GetUUID() string {
 	code := uuid.New().String()
-	code = strings.Replace(code, "-", "", -1)
+	code = strings.ReplaceAll(code, "-", "")
 	return code
 }
 
@@ -318,12 +318,17 @@ func Any2Type[T any](data any) (T, error) {
 }
 
 // SaveTmpFile saves data to a temporary file. The filename would be apppended with a random string.
-func SaveTmpFile(filename string, data io.Reader) (string, error) {
+func SaveTmpFile(filename string, data io.Reader) (path string, err error) {
 	f, err := os.CreateTemp(os.TempDir(), filename)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to create temporary file %s", filename)
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); err == nil && closeErr != nil {
+			err = errors.Wrapf(closeErr, "failed to close temporary file %s", filename)
+			path = ""
+		}
+	}()
 
 	_, err = io.Copy(f, data)
 	if err != nil {

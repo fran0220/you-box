@@ -6,20 +6,11 @@ import (
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/dto"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	relaymedia "github.com/QuantumNous/new-api/service/relayconvert/internal/media"
 	sharedclaude "github.com/QuantumNous/new-api/service/relayconvert/internal/shared/claude"
 	"github.com/QuantumNous/new-api/setting/model_setting"
 	"github.com/gin-gonic/gin"
 )
-
-func convertOpenAIResponsesRequestToClaudeMessages(c *gin.Context, _ *relaycommon.RelayInfo, request any) (any, error) {
-	responsesRequest, err := OpenAIResponsesRequestFromAny(request)
-	if err != nil {
-		return nil, err
-	}
-	return OpenAIResponsesRequestToClaudeMessages(c, responsesRequest)
-}
 
 func OpenAIResponsesRequestToClaudeMessages(c *gin.Context, req *dto.OpenAIResponsesRequest) (*dto.ClaudeRequest, error) {
 	if req == nil {

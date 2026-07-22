@@ -134,11 +134,12 @@ func (a *Adaptor) getRequestUrl(info *relaycommon.RelayInfo, modelName, suffix s
 		}
 		a.AccountCredentials = *adc
 
-		if a.RequestMode == RequestModeGemini {
+		switch a.RequestMode {
+		case RequestModeGemini:
 			return BuildGoogleModelURL(info.ChannelBaseUrl, DefaultAPIVersion, adc.ProjectID, region, modelName, suffix), nil
-		} else if a.RequestMode == RequestModeClaude {
+		case RequestModeClaude:
 			return BuildAnthropicModelURL(info.ChannelBaseUrl, DefaultAPIVersion, adc.ProjectID, region, modelName, suffix), nil
-		} else if a.RequestMode == RequestModeOpenSource {
+		case RequestModeOpenSource:
 			return BuildOpenSourceChatCompletionsURL(info.ChannelBaseUrl, adc.ProjectID, region), nil
 		}
 	} else {
@@ -148,14 +149,15 @@ func (a *Adaptor) getRequestUrl(info *relaycommon.RelayInfo, modelName, suffix s
 		} else {
 			keyPrefix = "?"
 		}
-		if a.RequestMode == RequestModeGemini {
+		switch a.RequestMode {
+		case RequestModeGemini:
 			return fmt.Sprintf(
 				"%s%skey=%s",
 				BuildGoogleModelURL(info.ChannelBaseUrl, DefaultAPIVersion, "", region, modelName, suffix),
 				keyPrefix,
 				info.ApiKey,
 			), nil
-		} else if a.RequestMode == RequestModeClaude {
+		case RequestModeClaude:
 			return fmt.Sprintf(
 				"%s%skey=%s",
 				BuildAnthropicModelURL(info.ChannelBaseUrl, DefaultAPIVersion, "", region, modelName, suffix),
@@ -169,7 +171,8 @@ func (a *Adaptor) getRequestUrl(info *relaycommon.RelayInfo, modelName, suffix s
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 	suffix := ""
-	if a.RequestMode == RequestModeGemini {
+	switch a.RequestMode {
+	case RequestModeGemini:
 		if model_setting.GetGeminiSettings().ThinkingAdapterEnabled &&
 			!model_setting.ShouldPreserveThinkingSuffix(info.OriginModelName) {
 			// 新增逻辑：处理 -thinking-<budget> 格式
@@ -195,7 +198,7 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 			suffix = "predict"
 		}
 		return a.getRequestUrl(info, info.UpstreamModelName, suffix)
-	} else if a.RequestMode == RequestModeClaude {
+	case RequestModeClaude:
 		if info.IsStream {
 			suffix = "streamRawPredict?alt=sse"
 		} else {
@@ -206,7 +209,7 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 			model = v
 		}
 		return a.getRequestUrl(info, model, suffix)
-	} else if a.RequestMode == RequestModeOpenSource {
+	case RequestModeOpenSource:
 		return a.getRequestUrl(info, "", "")
 	}
 	return "", errors.New("unsupported request mode")
@@ -288,7 +291,8 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 		c.Set("request_model", request.Model)
 		return a.ConvertImageRequest(c, info, imgReq)
 	}
-	if a.RequestMode == RequestModeClaude {
+	switch a.RequestMode {
+	case RequestModeClaude:
 		result, err := service.ConvertRequest(c, info, types.RelayFormatClaude, request)
 		if err != nil {
 			return nil, err
@@ -301,7 +305,7 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 		c.Set("request_model", claudeReq.Model)
 		info.UpstreamModelName = claudeReq.Model
 		return vertexClaudeReq, nil
-	} else if a.RequestMode == RequestModeGemini {
+	case RequestModeGemini:
 		result, err := service.ConvertRequest(c, info, types.RelayFormatGemini, request)
 		if err != nil {
 			return nil, err
@@ -312,7 +316,7 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 		}
 		c.Set("request_model", request.Model)
 		return geminiRequest, nil
-	} else if a.RequestMode == RequestModeOpenSource {
+	case RequestModeOpenSource:
 		return request, nil
 	}
 	return nil, errors.New("unsupported request mode")

@@ -80,7 +80,7 @@ func TestOllamaChatHandlerNonStreamToolCalls(t *testing.T) {
 			assert.Equal(t, constant.FinishReasonToolCalls, out.Choices[0].FinishReason)
 
 			var toolCalls []dto.ToolCallResponse
-			require.NoError(t, common.Unmarshal(out.Choices[0].Message.ToolCalls, &toolCalls))
+			require.NoError(t, common.Unmarshal(out.Choices[0].ToolCalls, &toolCalls))
 			require.Len(t, toolCalls, 1)
 			assert.NotEmpty(t, toolCalls[0].ID)
 			assert.Equal(t, "function", toolCalls[0].Type)

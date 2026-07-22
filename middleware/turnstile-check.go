@@ -46,7 +46,7 @@ func TurnstileCheck() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			defer rawRes.Body.Close()
+			defer func() { _ = rawRes.Body.Close() }()
 			var res turnstileCheckResponse
 			err = json.NewDecoder(rawRes.Body).Decode(&res)
 			if err != nil {

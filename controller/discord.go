@@ -59,7 +59,7 @@ func getDiscordUserInfoByCode(code string) (*DiscordUser, error) {
 		common.SysLog(err.Error())
 		return nil, errors.New("无法连接至 Discord 服务器，请稍后重试！")
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	var discordResponse DiscordResponse
 	err = json.NewDecoder(res.Body).Decode(&discordResponse)
 	if err != nil {
@@ -68,7 +68,7 @@ func getDiscordUserInfoByCode(code string) (*DiscordUser, error) {
 
 	if discordResponse.AccessToken == "" {
 		common.SysError("Discord 获取 Token 失败，请检查设置！")
-		return nil, errors.New("Discord 获取 Token 失败，请检查设置！")
+		return nil, errors.New("discord 获取 Token 失败，请检查设置！")
 	}
 
 	req, err = http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
@@ -81,10 +81,10 @@ func getDiscordUserInfoByCode(code string) (*DiscordUser, error) {
 		common.SysLog(err.Error())
 		return nil, errors.New("无法连接至 Discord 服务器，请稍后重试！")
 	}
-	defer res2.Body.Close()
+	defer func() { _ = res2.Body.Close() }()
 	if res2.StatusCode != http.StatusOK {
 		common.SysError("Discord 获取用户信息失败！请检查设置！")
-		return nil, errors.New("Discord 获取用户信息失败！请检查设置！")
+		return nil, errors.New("discord 获取用户信息失败！请检查设置！")
 	}
 
 	var discordUser DiscordUser
@@ -94,7 +94,7 @@ func getDiscordUserInfoByCode(code string) (*DiscordUser, error) {
 	}
 	if discordUser.UID == "" || discordUser.ID == "" {
 		common.SysError("Discord 获取用户信息为空！请检查设置！")
-		return nil, errors.New("Discord 获取用户信息为空！请检查设置！")
+		return nil, errors.New("discord 获取用户信息为空！请检查设置！")
 	}
 	return &discordUser, nil
 }

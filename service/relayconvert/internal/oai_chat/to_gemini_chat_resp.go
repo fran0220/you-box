@@ -54,7 +54,7 @@ func ResponseOpenAI2Gemini(openAIResponse *dto.OpenAITextResponse, info *relayco
 			Parts: make([]dto.GeminiPart, 0),
 		}
 
-		textContent := choice.Message.StringContent()
+		textContent := choice.StringContent()
 		if textContent != "" {
 			part := dto.GeminiPart{
 				Text: textContent,
@@ -62,7 +62,7 @@ func ResponseOpenAI2Gemini(openAIResponse *dto.OpenAITextResponse, info *relayco
 			content.Parts = append(content.Parts, part)
 		}
 
-		toolCalls := choice.Message.ParseToolCalls()
+		toolCalls := choice.ParseToolCalls()
 		for _, toolCall := range toolCalls {
 			var args map[string]interface{}
 			if toolCall.Function.Arguments != "" {
@@ -95,7 +95,7 @@ func StreamResponseOpenAI2Gemini(openAIResponse *dto.ChatCompletionsStreamRespon
 	hasContent := false
 	hasFinishReason := false
 	for _, choice := range openAIResponse.Choices {
-		if len(choice.Delta.GetContentString()) > 0 || (choice.Delta.ToolCalls != nil && len(choice.Delta.ToolCalls) > 0) {
+		if len(choice.Delta.GetContentString()) > 0 || len(choice.Delta.ToolCalls) > 0 {
 			hasContent = true
 		}
 		if choice.FinishReason != nil {

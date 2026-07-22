@@ -385,14 +385,14 @@ func getParamOverrideMap(info *RelayInfo) map[string]interface{} {
 	if info == nil || info.ChannelMeta == nil {
 		return nil
 	}
-	return info.ChannelMeta.ParamOverride
+	return info.ParamOverride
 }
 
 func getHeaderOverrideMap(info *RelayInfo) map[string]interface{} {
 	if info == nil || info.ChannelMeta == nil {
 		return nil
 	}
-	return info.ChannelMeta.HeadersOverride
+	return info.HeadersOverride
 }
 
 func sanitizeHeaderOverrideMap(source map[string]interface{}) map[string]interface{} {
@@ -572,10 +572,7 @@ func processNegativeIndex(data []byte, path string) string {
 		negIndex := match[1]
 		index, _ := strconv.Atoi(negIndex)
 
-		arrayPath := strings.Split(path, negIndex)[0]
-		if strings.HasSuffix(arrayPath, ".") {
-			arrayPath = arrayPath[:len(arrayPath)-1]
-		}
+		arrayPath := strings.TrimSuffix(strings.Split(path, negIndex)[0], ".")
 
 		array := gjson.GetBytes(data, arrayPath)
 		if array.IsArray() {
@@ -1060,7 +1057,7 @@ func ensureContextMap(conditionContext map[string]interface{}) map[string]interf
 }
 
 func marshalContextJSON(context map[string]interface{}) (string, error) {
-	if context == nil || len(context) == 0 {
+	if len(context) == 0 {
 		return "", nil
 	}
 	ctxBytes, err := common.Marshal(context)
@@ -2051,9 +2048,9 @@ func BuildParamOverrideContext(info *RelayInfo) map[string]interface{} {
 	}
 
 	ctx := make(map[string]interface{})
-	if info.ChannelMeta != nil && info.ChannelMeta.UpstreamModelName != "" {
-		ctx["model"] = info.ChannelMeta.UpstreamModelName
-		ctx["upstream_model"] = info.ChannelMeta.UpstreamModelName
+	if info.ChannelMeta != nil && info.UpstreamModelName != "" {
+		ctx["model"] = info.UpstreamModelName
+		ctx["upstream_model"] = info.UpstreamModelName
 	}
 	if info.OriginModelName != "" {
 		ctx["original_model"] = info.OriginModelName

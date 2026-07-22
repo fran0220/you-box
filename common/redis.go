@@ -125,7 +125,7 @@ func RedisHSetObj(key string, obj interface{}, expiration time.Duration) error {
 		}
 
 		// 处理指针类型
-		if value.Kind() == reflect.Ptr {
+		if value.Kind() == reflect.Pointer {
 			if value.IsNil() {
 				data[field.Name] = ""
 				continue
@@ -175,7 +175,7 @@ func RedisHGetObj(key string, obj interface{}) error {
 
 	// Handle both pointer and non-pointer values
 	val := reflect.ValueOf(obj)
-	if val.Kind() != reflect.Ptr {
+	if val.Kind() != reflect.Pointer {
 		return fmt.Errorf("obj must be a pointer to a struct, got %T", obj)
 	}
 
@@ -192,7 +192,7 @@ func RedisHGetObj(key string, obj interface{}) error {
 			fieldValue := v.Field(i)
 
 			// Handle pointer types
-			if fieldValue.Kind() == reflect.Ptr {
+			if fieldValue.Kind() == reflect.Pointer {
 				if value == "" {
 					continue
 				}

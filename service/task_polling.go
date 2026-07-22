@@ -245,9 +245,9 @@ func updateSunoTasks(ctx context.Context, channelId int, taskIds []string, taskM
 	}
 	if resp.StatusCode != http.StatusOK {
 		logger.LogError(ctx, fmt.Sprintf("Get Task status code: %d", resp.StatusCode))
-		return fmt.Errorf("Get Task status code: %d", resp.StatusCode)
+		return fmt.Errorf("get task status code: %d", resp.StatusCode)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		common.SysLog(fmt.Sprintf("Get Suno Task parse body error: %v", err))
@@ -287,7 +287,7 @@ func updateSunoTasks(ctx context.Context, channelId int, taskIds []string, taskM
 			task.Progress = "100%"
 			RefundTaskQuota(ctx, task, task.FailReason)
 		}
-		if responseItem.Status == model.TaskStatusSuccess {
+		if responseItem.Status == string(model.TaskStatusSuccess) {
 			task.Progress = "100%"
 		}
 		task.Data = responseItem.Data
@@ -332,10 +332,7 @@ func taskNeedsUpdate(oldTask *model.Task, newTask dto.SunoDataResponse) bool {
 		return newData[i] < newData[j]
 	})
 
-	if string(oldData) != string(newData) {
-		return true
-	}
-	return false
+	return string(oldData) != string(newData)
 }
 
 // UpdateVideoTasks 按渠道更新所有视频任务
@@ -456,7 +453,7 @@ func updateVideoSingleTask(ctx context.Context, adaptor TaskPollingAdaptor, ch *
 	if err != nil {
 		return fmt.Errorf("fetchTask failed for task %s: %w", taskId, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("readAll failed for task %s: %w", taskId, err)
@@ -515,16 +512,16 @@ func updateVideoSingleTask(ctx context.Context, adaptor TaskPollingAdaptor, ch *
 
 	task.Status = model.TaskStatus(taskResult.Status)
 	switch taskResult.Status {
-	case model.TaskStatusSubmitted:
+	case string(model.TaskStatusSubmitted):
 		task.Progress = taskcommon.ProgressSubmitted
-	case model.TaskStatusQueued:
+	case string(model.TaskStatusQueued):
 		task.Progress = taskcommon.ProgressQueued
-	case model.TaskStatusInProgress:
+	case string(model.TaskStatusInProgress):
 		task.Progress = taskcommon.ProgressInProgress
 		if task.StartTime == 0 {
 			task.StartTime = now
 		}
-	case model.TaskStatusSuccess:
+	case string(model.TaskStatusSuccess):
 		task.Progress = taskcommon.ProgressComplete
 		if task.FinishTime == 0 {
 			task.FinishTime = now
@@ -540,7 +537,7 @@ func updateVideoSingleTask(ctx context.Context, adaptor TaskPollingAdaptor, ch *
 			task.PrivateData.ResultURL = taskcommon.BuildProxyURL(task.TaskID)
 		}
 		shouldSettle = true
-	case model.TaskStatusFailure:
+	case string(model.TaskStatusFailure):
 		logger.LogJson(ctx, fmt.Sprintf("Task %s failed", taskId), task)
 		task.Status = model.TaskStatusFailure
 		task.Progress = taskcommon.ProgressComplete

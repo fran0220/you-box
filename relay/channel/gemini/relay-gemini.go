@@ -285,7 +285,7 @@ func GeminiChatStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *
 	}
 
 	response := helper.GenerateFinalUsageResponse(id, createAt, info.UpstreamModelName, *usage)
-	if info.RelayFormat == types.RelayFormatClaude && info.ClaudeConvertInfo != nil && !info.ClaudeConvertInfo.Done {
+	if info.RelayFormat == types.RelayFormatClaude && info.ClaudeConvertInfo != nil && !info.Done {
 		response = helper.GenerateStopResponse(id, createAt, info.UpstreamModelName, finishReason)
 		response.Usage = usage
 	}
@@ -513,17 +513,26 @@ func FetchGeminiModels(baseURL, apiKey, proxyURL string) ([]string, error) {
 		}
 
 		if response.StatusCode != http.StatusOK {
-			body, _ := io.ReadAll(response.Body)
-			response.Body.Close()
+			body, readErr := io.ReadAll(response.Body)
+			closeErr := response.Body.Close()
 			cancel()
+			if readErr != nil {
+				return nil, fmt.Errorf("读取错误响应失败: %w", readErr)
+			}
+			if closeErr != nil {
+				return nil, fmt.Errorf("关闭响应失败: %w", closeErr)
+			}
 			return nil, fmt.Errorf("服务器返回错误 %d: %s", response.StatusCode, string(body))
 		}
 
 		body, err := io.ReadAll(response.Body)
-		response.Body.Close()
+		closeErr := response.Body.Close()
 		cancel()
 		if err != nil {
 			return nil, fmt.Errorf("读取响应失败: %v", err)
+		}
+		if closeErr != nil {
+			return nil, fmt.Errorf("关闭响应失败: %w", closeErr)
 		}
 
 		var modelsResponse GeminiModelsResponse

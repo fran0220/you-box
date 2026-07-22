@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/QuantumNous/new-api/dto"
+	"github.com/QuantumNous/new-api/logger"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/service"
 	"github.com/QuantumNous/new-api/types"
@@ -70,6 +71,8 @@ func RerankHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayI
 	}
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(resp.StatusCode)
-	c.Writer.Write(jsonResponse)
+	if _, err := c.Writer.Write(jsonResponse); err != nil {
+		logger.LogError(c, "downstream write failed after Ali rerank completed: "+err.Error())
+	}
 	return nil, &usage
 }

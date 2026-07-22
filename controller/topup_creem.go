@@ -427,7 +427,7 @@ func genCreemLink(ctx context.Context, referenceId string, product *CreemProduct
 	if err != nil {
 		return "", fmt.Errorf("发送HTTP请求失败: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// 读取响应
 	body, err := io.ReadAll(resp.Body)
@@ -439,7 +439,7 @@ func genCreemLink(ctx context.Context, referenceId string, product *CreemProduct
 
 	// 检查响应状态
 	if resp.StatusCode/100 != 2 {
-		return "", fmt.Errorf("Creem API http status %d ", resp.StatusCode)
+		return "", fmt.Errorf("creem API http status %d ", resp.StatusCode)
 	}
 	// 解析响应
 	var checkoutResp CreemCheckoutResponse
@@ -449,7 +449,7 @@ func genCreemLink(ctx context.Context, referenceId string, product *CreemProduct
 	}
 
 	if checkoutResp.CheckoutUrl == "" {
-		return "", fmt.Errorf("Creem API resp no checkout url ")
+		return "", fmt.Errorf("creem API resp no checkout url ")
 	}
 
 	logger.LogInfo(ctx, fmt.Sprintf("Creem 支付链接创建成功 trade_no=%s response_id=%s checkout_url=%q", referenceId, checkoutResp.Id, checkoutResp.CheckoutUrl))

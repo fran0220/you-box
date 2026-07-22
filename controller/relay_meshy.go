@@ -42,7 +42,7 @@ func RelayMeshy(c *gin.Context) {
 	upstreamPath := meshy.UpstreamPathFromProxyPath(c.Request.URL.Path)
 	endpoint, ok := meshy.MatchNativeEndpoint(c.Request.Method, upstreamPath)
 	if !ok {
-		newAPIError = types.NewOpenAIError(fmt.Errorf("Meshy endpoint is not allowed: %s %s", c.Request.Method, upstreamPath), types.ErrorCodeInvalidRequest, http.StatusNotFound)
+		newAPIError = types.NewOpenAIError(fmt.Errorf("meshy endpoint is not allowed: %s %s", c.Request.Method, upstreamPath), types.ErrorCodeInvalidRequest, http.StatusNotFound)
 		return
 	}
 

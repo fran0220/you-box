@@ -245,14 +245,11 @@ func clampThinkingBudgetByEffort(modelName string, effort string) int {
 	isNew25Pro := isNew25ProModel(modelName)
 	is25FlashLite := is25FlashLiteModel(modelName)
 
-	maxBudget := 0
-	if is25FlashLite {
-		maxBudget = flash25LiteMaxBudget
-	}
+	maxBudget := flash25MaxBudget
 	if isNew25Pro {
 		maxBudget = pro25MaxBudget
-	} else {
-		maxBudget = flash25MaxBudget
+	} else if is25FlashLite {
+		maxBudget = flash25LiteMaxBudget
 	}
 	switch effort {
 	case "high":

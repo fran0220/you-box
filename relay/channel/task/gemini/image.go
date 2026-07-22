@@ -32,7 +32,7 @@ func ExtractMultipartImage(c *gin.Context, info *relaycommon.RelayInfo) *VeoImag
 	if err != nil {
 		return nil
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() /* cleanup only */ }()
 
 	fileBytes, err := io.ReadAll(file)
 	if err != nil {

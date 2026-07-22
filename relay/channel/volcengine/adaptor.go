@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	channelconstant "github.com/QuantumNous/new-api/constant"
@@ -158,7 +157,7 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 	//			if err != nil {
 	//				return nil, fmt.Errorf("failed to open image file %d: %w", i, err)
 	//			}
-	//			defer file.Close()
+	//			defer func() { _ = file.Close() /* cleanup only */ }()
 	//
 	//			fieldName := "image"
 	//			if len(imageFiles) > 1 {
@@ -186,7 +185,7 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 	//			if err != nil {
 	//				return nil, errors.New("failed to open mask file")
 	//			}
-	//			defer maskFile.Close()
+	//			defer func() { _ = maskFile.Close() /* cleanup only */ }()
 	//
 	//			mimeType := detectImageMimeType(maskFiles[0].Filename)
 	//
@@ -213,23 +212,6 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 
 	default:
 		return request, nil
-	}
-}
-
-func detectImageMimeType(filename string) string {
-	ext := strings.ToLower(filepath.Ext(filename))
-	switch ext {
-	case ".jpg", ".jpeg":
-		return "image/jpeg"
-	case ".png":
-		return "image/png"
-	case ".webp":
-		return "image/webp"
-	default:
-		if strings.HasPrefix(ext, ".jp") {
-			return "image/jpeg"
-		}
-		return "image/png"
 	}
 }
 
@@ -287,14 +269,15 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
 	channel.SetupApiRequestHeader(info, c, req)
 
-	if info.RelayMode == constant.RelayModeAudioSpeech {
+	switch info.RelayMode {
+	case constant.RelayModeAudioSpeech:
 		parts := strings.Split(info.ApiKey, "|")
 		if len(parts) == 2 {
 			req.Set("Authorization", "Bearer;"+parts[1])
 		}
 		req.Set("Content-Type", "application/json")
 		return nil
-	} else if info.RelayMode == constant.RelayModeImagesEdits {
+	case constant.RelayModeImagesEdits:
 		req.Set("Content-Type", gin.MIMEJSON)
 	}
 

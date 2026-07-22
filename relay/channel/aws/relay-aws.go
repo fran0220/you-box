@@ -106,7 +106,9 @@ func doAwsClientRequest(c *gin.Context, info *relaycommon.RelayInfo, a *Adaptor,
 
 	// init empty request.header
 	requestHeader := http.Header{}
-	a.SetupRequestHeader(c, &requestHeader, info)
+	if err := a.SetupRequestHeader(c, &requestHeader, info); err != nil {
+		return nil, err
+	}
 	headerOverride, err := channel.ResolveHeaderOverride(info, c)
 	if err != nil {
 		return nil, err
@@ -262,7 +264,7 @@ func awsStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, a *Adaptor) (
 		return types.NewOpenAIError(errors.Wrap(err, "InvokeModelWithResponseStream"), types.ErrorCodeAwsInvokeError, statusCode), nil
 	}
 	stream := awsResp.GetStream()
-	defer stream.Close()
+	defer func() { _ = stream.Close() /* cleanup only */ }()
 
 	claudeInfo := &claude.ClaudeResponseInfo{
 		ResponseId:   helper.GetResponseID(c),

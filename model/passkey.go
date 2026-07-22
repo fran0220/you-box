@@ -17,7 +17,7 @@ import (
 
 var (
 	ErrPasskeyNotFound         = errors.New("passkey credential not found")
-	ErrFriendlyPasskeyNotFound = errors.New("Passkey 验证失败，请重试或联系管理员")
+	ErrFriendlyPasskeyNotFound = errors.New("passkey 验证失败，请重试或联系管理员")
 )
 
 type PasskeyCredential struct {
@@ -180,17 +180,17 @@ func GetPasskeyByCredentialID(credentialID []byte) (*PasskeyCredential, error) {
 func UpsertPasskeyCredential(credential *PasskeyCredential) error {
 	if credential == nil {
 		common.SysLog("UpsertPasskeyCredential: nil credential provided")
-		return fmt.Errorf("Passkey 保存失败，请重试")
+		return fmt.Errorf("passkey 保存失败，请重试")
 	}
 	return DB.Transaction(func(tx *gorm.DB) error {
 		// 使用Unscoped()进行硬删除，避免唯一索引冲突
 		if err := tx.Unscoped().Where("user_id = ?", credential.UserID).Delete(&PasskeyCredential{}).Error; err != nil {
 			common.SysLog(fmt.Sprintf("UpsertPasskeyCredential: failed to delete existing credential for user %d: %v", credential.UserID, err))
-			return fmt.Errorf("Passkey 保存失败，请重试")
+			return fmt.Errorf("passkey 保存失败，请重试")
 		}
 		if err := tx.Create(credential).Error; err != nil {
 			common.SysLog(fmt.Sprintf("UpsertPasskeyCredential: failed to create credential for user %d: %v", credential.UserID, err))
-			return fmt.Errorf("Passkey 保存失败，请重试")
+			return fmt.Errorf("passkey 保存失败，请重试")
 		}
 		return nil
 	})

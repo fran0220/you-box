@@ -63,11 +63,12 @@ func (b *BoolValue) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &str); err != nil {
 		return err
 	}
-	if str == "true" {
+	switch str {
+	case "true":
 		*b = BoolValue(true)
-	} else if str == "false" {
+	case "false":
 		*b = BoolValue(false)
-	} else {
+	default:
 		return json.Unmarshal(data, &boolean)
 	}
 	return nil

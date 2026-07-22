@@ -28,7 +28,6 @@ func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dt
 func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
 	//TODO implement me
 	panic("implement me")
-	return nil, nil
 }
 
 func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
@@ -45,9 +44,10 @@ func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	if info.RelayMode == constant.RelayModeRerank {
+	switch info.RelayMode {
+	case constant.RelayModeRerank:
 		return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
-	} else if info.RelayMode == constant.RelayModeEmbeddings {
+	case constant.RelayModeEmbeddings:
 		return fmt.Sprintf("%s/v1/embeddings", info.ChannelBaseUrl), nil
 	}
 	return "", errors.New("invalid relay mode")
@@ -82,9 +82,10 @@ func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.Rela
 }
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
-	if info.RelayMode == constant.RelayModeRerank {
+	switch info.RelayMode {
+	case constant.RelayModeRerank:
 		usage, err = common_handler.RerankHandler(c, info, resp)
-	} else if info.RelayMode == constant.RelayModeEmbeddings {
+	case constant.RelayModeEmbeddings:
 		usage, err = openai.OpenaiHandler(c, info, resp)
 	}
 	return

@@ -134,8 +134,7 @@ func GetRedemptionById(id int) (*Redemption, error) {
 		return nil, errors.New("id 为空！")
 	}
 	redemption := Redemption{Id: id}
-	var err error = nil
-	err = DB.First(&redemption, "id = ?", id).Error
+	err := DB.First(&redemption, "id = ?", id).Error
 	return &redemption, err
 }
 
@@ -188,8 +187,7 @@ func Redeem(key string, userId int) (quota int, err error) {
 }
 
 func (redemption *Redemption) Insert() error {
-	var err error
-	err = DB.Create(redemption).Error
+	var err = DB.Create(redemption).Error
 	return err
 }
 
@@ -200,14 +198,12 @@ func (redemption *Redemption) SelectUpdate() error {
 
 // Update Make sure your token's fields is completed, because this will update non-zero values
 func (redemption *Redemption) Update() error {
-	var err error
-	err = DB.Model(redemption).Select("name", "status", "quota", "redeemed_time", "expired_time").Updates(redemption).Error
+	var err = DB.Model(redemption).Select("name", "status", "quota", "redeemed_time", "expired_time").Updates(redemption).Error
 	return err
 }
 
 func (redemption *Redemption) Delete() error {
-	var err error
-	err = DB.Delete(redemption).Error
+	var err = DB.Delete(redemption).Error
 	return err
 }
 

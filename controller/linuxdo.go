@@ -114,7 +114,7 @@ func getLinuxdoUserInfoByCode(code string, c *gin.Context) (*LinuxdoUser, error)
 	if err != nil {
 		return nil, errors.New("failed to connect to Linux DO server")
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 
 	var tokenRes struct {
 		AccessToken string `json:"access_token"`
@@ -141,7 +141,7 @@ func getLinuxdoUserInfoByCode(code string, c *gin.Context) (*LinuxdoUser, error)
 	if err != nil {
 		return nil, errors.New("failed to get user info from Linux DO")
 	}
-	defer res2.Body.Close()
+	defer func() { _ = res2.Body.Close() }()
 
 	var linuxdoUser LinuxdoUser
 	if err := json.NewDecoder(res2.Body).Decode(&linuxdoUser); err != nil {

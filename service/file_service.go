@@ -146,7 +146,9 @@ func CleanupFileSources(c *gin.Context) {
 	if sources, exists := c.Get(key); exists {
 		for _, source := range sources.([]types.FileSource) {
 			if cache := source.GetCache(); cache != nil {
-				cache.Close()
+				if err := cache.Close(); err != nil {
+					logger.LogError(c, "failed to close file cache: "+err.Error())
+				}
 			}
 		}
 		c.Set(key, nil)
@@ -165,7 +167,7 @@ func loadFromURL(c *gin.Context, url string, reason ...string) (*types.CachedFil
 	if err != nil {
 		return nil, fmt.Errorf("failed to download file from %s: %w", url, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("failed to download file, status code: %d", resp.StatusCode)
@@ -470,7 +472,9 @@ func decodeImageConfig(data []byte) (image.Config, string, error) {
 		return config, format, nil
 	}
 
-	reader.Seek(0, io.SeekStart)
+	if _, err := reader.Seek(0, io.SeekStart); err != nil {
+		return image.Config{}, "", fmt.Errorf("failed to rewind image data: %w", err)
+	}
 	config, err = webp.DecodeConfig(reader)
 	if err == nil {
 		return config, "webp", nil

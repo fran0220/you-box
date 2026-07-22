@@ -295,7 +295,7 @@ func FetchUpstreamRatios(c *gin.Context) {
 				ch <- upstreamResult{Name: uniqueName, Err: lastErr.Error()}
 				return
 			}
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 			if resp.StatusCode != http.StatusOK {
 				logger.LogWarn(c.Request.Context(), "non-200 from "+chItem.Name+": "+resp.Status)
 				ch <- upstreamResult{Name: uniqueName, Err: resp.Status}

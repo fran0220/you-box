@@ -61,7 +61,7 @@ func getOidcUserInfoByCode(code string) (*OidcUser, error) {
 		common.SysLog(err.Error())
 		return nil, errors.New("无法连接至 OIDC 服务器，请稍后重试！")
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	var oidcResponse OidcResponse
 	err = json.NewDecoder(res.Body).Decode(&oidcResponse)
 	if err != nil {
@@ -83,7 +83,7 @@ func getOidcUserInfoByCode(code string) (*OidcUser, error) {
 		common.SysLog(err.Error())
 		return nil, errors.New("无法连接至 OIDC 服务器，请稍后重试！")
 	}
-	defer res2.Body.Close()
+	defer func() { _ = res2.Body.Close() }()
 	if res2.StatusCode != http.StatusOK {
 		common.SysLog("OIDC 获取用户信息失败！请检查设置！")
 		return nil, errors.New("OIDC 获取用户信息失败！请检查设置！")
@@ -224,5 +224,4 @@ func OidcBind(c *gin.Context) {
 		"success": true,
 		"message": "bind",
 	})
-	return
 }

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/setting/console_setting"
 
 	"github.com/gin-gonic/gin"
@@ -105,7 +106,7 @@ func getAndDecode(ctx context.Context, client *http.Client, url string, dest int
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("non-200 status")
@@ -232,6 +233,9 @@ func GetUptimeKumaStatus(c *gin.Context) {
 		})
 	}
 
-	g.Wait()
+	if err := g.Wait(); err != nil {
+		common.ApiError(c, err)
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "", "data": results})
 }

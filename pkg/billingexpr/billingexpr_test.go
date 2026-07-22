@@ -1080,15 +1080,21 @@ const benchComplexExpr = `len <= 200000 ? tier("standard", p * 3 + c * 15 + cr *
 func BenchmarkExprCompile(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		billingexpr.InvalidateCache()
-		billingexpr.CompileFromCache(benchComplexExpr)
+		if _, err := billingexpr.CompileFromCache(benchComplexExpr); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
 func BenchmarkExprRunCached(b *testing.B) {
-	billingexpr.CompileFromCache(benchComplexExpr)
+	if _, err := billingexpr.CompileFromCache(benchComplexExpr); err != nil {
+		b.Fatal(err)
+	}
 	params := billingexpr.TokenParams{P: 150000, C: 10000, Len: 188000, CR: 30000, CC: 5000, Img: 2000, AI: 1000, AO: 500}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		billingexpr.RunExpr(benchComplexExpr, params)
+		if _, _, err := billingexpr.RunExpr(benchComplexExpr, params); err != nil {
+			b.Fatal(err)
+		}
 	}
 }

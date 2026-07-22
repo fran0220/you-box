@@ -104,7 +104,7 @@ func cfHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response)
 	response.Model = info.UpstreamModelName
 	var responseText string
 	for _, choice := range response.Choices {
-		responseText += choice.Message.StringContent()
+		responseText += choice.StringContent()
 	}
 	usage := service.ResponseText2Usage(c, responseText, info.UpstreamModelName, info.GetEstimatePromptTokens())
 	response.Usage = *usage

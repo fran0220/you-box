@@ -156,7 +156,7 @@ func validateCustomOAuthProvider(provider *CustomOAuthProvider) error {
 	// Slug must be lowercase and contain only alphanumeric characters and hyphens
 	slug := strings.ToLower(provider.Slug)
 	for _, c := range slug {
-		if !((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-') {
+		if (c < 'a' || c > 'z') && (c < '0' || c > '9') && c != '-' {
 			return errors.New("provider slug must contain only lowercase letters, numbers, and hyphens")
 		}
 	}

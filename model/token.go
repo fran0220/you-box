@@ -99,8 +99,7 @@ func (token *Token) GetIpLimits() []string {
 
 func GetAllUserTokens(userId int, startIdx int, num int) ([]*Token, error) {
 	var tokens []*Token
-	var err error
-	err = visibleUserTokensQuery(userId).Order("id desc").Limit(num).Offset(startIdx).Find(&tokens).Error
+	var err = visibleUserTokensQuery(userId).Order("id desc").Limit(num).Offset(startIdx).Find(&tokens).Error
 	return tokens, err
 }
 
@@ -256,8 +255,7 @@ func GetTokenByIds(id int, userId int) (*Token, error) {
 		return nil, errors.New("id 或 userId 为空！")
 	}
 	token := Token{Id: id, UserId: userId}
-	var err error = nil
-	err = DB.First(&token, "id = ? and user_id = ?", id, userId).Error
+	err := DB.First(&token, "id = ? and user_id = ?", id, userId).Error
 	return &token, err
 }
 
@@ -277,8 +275,7 @@ func GetTokenById(id int) (*Token, error) {
 		return nil, errors.New("id 为空！")
 	}
 	token := Token{Id: id}
-	var err error = nil
-	err = DB.First(&token, "id = ?", id).Error
+	err := DB.First(&token, "id = ?", id).Error
 	if shouldUpdateRedis(true, err) {
 		gopool.Go(func() {
 			if err := cacheSetToken(token); err != nil {
@@ -314,8 +311,7 @@ func GetTokenByKey(key string, fromDB bool) (token *Token, err error) {
 }
 
 func (token *Token) Insert() error {
-	var err error
-	err = DB.Create(token).Error
+	var err = DB.Create(token).Error
 	return err
 }
 

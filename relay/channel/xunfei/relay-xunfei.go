@@ -219,7 +219,9 @@ func xunfeiMakeRequest(textRequest dto.GeneralOpenAIRequest, domain, authUrl, ap
 	stopChan := make(chan bool)
 	go func() {
 		defer func() {
-			conn.Close()
+			if err := conn.Close(); err != nil {
+				common.SysLog("error closing websocket: " + err.Error())
+			}
 		}()
 		for {
 			_, msg, err := conn.ReadMessage()

@@ -153,8 +153,11 @@ func (a *TaskAdaptor) BuildRequestBody(c *gin.Context, info *relaycommon.RelayIn
 					continue
 				}
 				fileBytes, err := io.ReadAll(file)
-				file.Close()
+				closeErr := file.Close()
 				if err != nil {
+					continue
+				}
+				if closeErr != nil {
 					continue
 				}
 				// 将文件内容转换为base64

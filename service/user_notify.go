@@ -145,7 +145,7 @@ func sendBarkNotify(barkURL string, data dto.Notify) error {
 		if err != nil {
 			return fmt.Errorf("failed to send bark request through worker: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		// 检查响应状态
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
@@ -172,7 +172,7 @@ func sendBarkNotify(barkURL string, data dto.Notify) error {
 		if err != nil {
 			return fmt.Errorf("failed to send bark request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		// 检查响应状态
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
@@ -238,7 +238,7 @@ func sendGotifyNotify(gotifyUrl string, gotifyToken string, priority int, data d
 		if err != nil {
 			return fmt.Errorf("failed to send gotify request through worker: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		// 检查响应状态
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
@@ -266,7 +266,7 @@ func sendGotifyNotify(gotifyUrl string, gotifyToken string, priority int, data d
 		if err != nil {
 			return fmt.Errorf("failed to send gotify request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		// 检查响应状态
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {

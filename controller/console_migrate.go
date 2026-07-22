@@ -35,14 +35,26 @@ func MigrateConsoleSetting(c *gin.Context) {
 				arr = arr[:50]
 			}
 			bytes, _ := json.Marshal(arr)
-			model.UpdateOption("console_setting.api_info", string(bytes))
+			if err := model.UpdateOption("console_setting.api_info", string(bytes)); err != nil {
+				common.ApiError(c, err)
+				return
+			}
 		}
-		model.UpdateOption("ApiInfo", "")
+		if err := model.UpdateOption("ApiInfo", ""); err != nil {
+			common.ApiError(c, err)
+			return
+		}
 	}
 	// Announcements 直接搬
 	if v := valMap["Announcements"]; v != "" {
-		model.UpdateOption("console_setting.announcements", v)
-		model.UpdateOption("Announcements", "")
+		if err := model.UpdateOption("console_setting.announcements", v); err != nil {
+			common.ApiError(c, err)
+			return
+		}
+		if err := model.UpdateOption("Announcements", ""); err != nil {
+			common.ApiError(c, err)
+			return
+		}
 	}
 	// FAQ 转换
 	if v := valMap["FAQ"]; v != "" {
@@ -66,9 +78,15 @@ func MigrateConsoleSetting(c *gin.Context) {
 				out = out[:50]
 			}
 			bytes, _ := json.Marshal(out)
-			model.UpdateOption("console_setting.faq", string(bytes))
+			if err := model.UpdateOption("console_setting.faq", string(bytes)); err != nil {
+				common.ApiError(c, err)
+				return
+			}
 		}
-		model.UpdateOption("FAQ", "")
+		if err := model.UpdateOption("FAQ", ""); err != nil {
+			common.ApiError(c, err)
+			return
+		}
 	}
 	// Uptime Kuma 迁移到新的 groups 结构（console_setting.uptime_kuma_groups）
 	url := valMap["UptimeKumaUrl"]
@@ -85,14 +103,23 @@ func MigrateConsoleSetting(c *gin.Context) {
 			},
 		}
 		bytes, _ := json.Marshal(groups)
-		model.UpdateOption("console_setting.uptime_kuma_groups", string(bytes))
+		if err := model.UpdateOption("console_setting.uptime_kuma_groups", string(bytes)); err != nil {
+			common.ApiError(c, err)
+			return
+		}
 	}
 	// 清空旧键内容
 	if url != "" {
-		model.UpdateOption("UptimeKumaUrl", "")
+		if err := model.UpdateOption("UptimeKumaUrl", ""); err != nil {
+			common.ApiError(c, err)
+			return
+		}
 	}
 	if slug != "" {
-		model.UpdateOption("UptimeKumaSlug", "")
+		if err := model.UpdateOption("UptimeKumaSlug", ""); err != nil {
+			common.ApiError(c, err)
+			return
+		}
 	}
 
 	// 删除旧键记录

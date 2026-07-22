@@ -512,7 +512,9 @@ func ValidateAgentAccessTokenClaims(tokenString string) (*AgentAccessTokenClaims
 	}
 	sub, _ := claims["sub"].(string)
 	userId := 0
-	fmt.Sscanf(sub, "%d", &userId)
+	if _, err := fmt.Sscanf(sub, "%d", &userId); err != nil {
+		return nil, errors.New("invalid token subject")
+	}
 	if userId <= 0 {
 		return nil, errors.New("invalid token subject")
 	}
@@ -567,7 +569,9 @@ func intClaim(v any) int {
 		return int(n)
 	case string:
 		var i int
-		fmt.Sscanf(n, "%d", &i)
+		if _, err := fmt.Sscanf(n, "%d", &i); err != nil {
+			return 0
+		}
 		return i
 	default:
 		return 0

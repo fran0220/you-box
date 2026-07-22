@@ -51,7 +51,7 @@ func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
 		common.SysLog(err.Error())
 		return nil, errors.New("无法连接至 GitHub 服务器，请稍后重试！")
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	var oAuthResponse GitHubOAuthResponse
 	err = json.NewDecoder(res.Body).Decode(&oAuthResponse)
 	if err != nil {
@@ -67,7 +67,7 @@ func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
 		common.SysLog(err.Error())
 		return nil, errors.New("无法连接至 GitHub 服务器，请稍后重试！")
 	}
-	defer res2.Body.Close()
+	defer func() { _ = res2.Body.Close() }()
 	var githubUser GitHubUser
 	err = json.NewDecoder(res2.Body).Decode(&githubUser)
 	if err != nil {
@@ -216,5 +216,4 @@ func GitHubBind(c *gin.Context) {
 		"success": true,
 		"message": "bind",
 	})
-	return
 }

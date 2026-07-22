@@ -72,7 +72,9 @@ func getMP3Duration(r io.Reader) (float64, error) {
 // getWAVDuration 解析 WAV 文件头以获取时长。
 func getWAVDuration(r io.ReadSeeker) (float64, error) {
 	// 1. 强制复位指针
-	r.Seek(0, io.SeekStart)
+	if _, err := r.Seek(0, io.SeekStart); err != nil {
+		return 0, errors.Wrap(err, "failed to seek wav file")
+	}
 
 	dec := wav.NewDecoder(r)
 
@@ -91,12 +93,20 @@ func getWAVDuration(r io.ReadSeeker) (float64, error) {
 	// 如果读出来的 Size 是 0，尝试用文件大小反推
 	if pcmSize == 0 {
 		// 获取文件总大小
-		currentPos, _ := r.Seek(0, io.SeekCurrent) // 当前通常在 data chunk header 之后
-		endPos, _ := r.Seek(0, io.SeekEnd)
+		currentPos, err := r.Seek(0, io.SeekCurrent) // 当前通常在 data chunk header 之后
+		if err != nil {
+			return 0, errors.Wrap(err, "failed to get wav position")
+		}
+		endPos, err := r.Seek(0, io.SeekEnd)
+		if err != nil {
+			return 0, errors.Wrap(err, "failed to get wav size")
+		}
 		fileSize := endPos
 
 		// 恢复位置（虽然如果不继续读也没关系）
-		r.Seek(currentPos, io.SeekStart)
+		if _, err := r.Seek(currentPos, io.SeekStart); err != nil {
+			return 0, errors.Wrap(err, "failed to restore wav position")
+		}
 
 		// 数据区大小 ≈ 文件总大小 - 当前指针位置(即Header大小)
 		// 注意：FwdToPCM 成功后，CurrentPos 应该刚好指向 Data 区数据的开始
@@ -139,7 +149,7 @@ func getFLACDuration(r io.Reader) (float64, error) {
 	if err != nil {
 		return 0, errors.Wrap(err, "failed to parse flac stream")
 	}
-	defer stream.Close()
+	defer func() { _ = stream.Close() }()
 
 	// 时长 = 总采样数 / 采样率
 	duration := float64(stream.Info.NSamples) / float64(stream.Info.SampleRate)

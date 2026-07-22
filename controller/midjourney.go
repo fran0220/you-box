@@ -127,14 +127,14 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 		}
 		if resp.StatusCode != http.StatusOK {
 			logger.LogError(ctx, fmt.Sprintf("Get Task status code: %d", resp.StatusCode))
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			cancel()
 			continue
 		}
 		responseBody, err := io.ReadAll(resp.Body)
 		if err != nil {
 			logger.LogError(ctx, fmt.Sprintf("Get Mjp Task parse body error: %v", err))
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			cancel()
 			continue
 		}
@@ -142,12 +142,12 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 		err = common.Unmarshal(responseBody, &responseItems)
 		if err != nil {
 			logger.LogError(ctx, fmt.Sprintf("Get Mjp Task parse body error2: %v, body: %s", err, string(responseBody)))
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			cancel()
 			continue
 		}
-		resp.Body.Close()
-		req.Body.Close()
+		_ = resp.Body.Close()
+		_ = req.Body.Close()
 		cancel()
 
 		for _, responseItem := range responseItems {
@@ -189,7 +189,7 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 			task.VideoUrl = responseItem.VideoUrl
 
 			// 映射 VideoUrls - 将数组序列化为 JSON 字符串
-			if responseItem.VideoUrls != nil && len(responseItem.VideoUrls) > 0 {
+			if len(responseItem.VideoUrls) > 0 {
 				videoUrlsStr, err := common.Marshal(responseItem.VideoUrls)
 				if err != nil {
 					logger.LogError(ctx, fmt.Sprintf("序列化 VideoUrls 失败: %v", err))
@@ -280,7 +280,7 @@ func checkMjTaskNeedUpdate(oldTask *model.Midjourney, newTask dto.MidjourneyDto)
 		return true
 	}
 	// 检查 VideoUrls 是否需要更新
-	if newTask.VideoUrls != nil && len(newTask.VideoUrls) > 0 {
+	if len(newTask.VideoUrls) > 0 {
 		newVideoUrlsStr, _ := common.Marshal(newTask.VideoUrls)
 		if oldTask.VideoUrls != string(newVideoUrlsStr) {
 			return true

@@ -480,7 +480,10 @@ func Verify2FALogin(c *gin.Context) {
 	// 2FA验证成功，清理pending会话信息并完成登录
 	session.Delete("pending_username")
 	session.Delete("pending_user_id")
-	session.Save()
+	if err := session.Save(); err != nil {
+		common.ApiError(c, err)
+		return
+	}
 
 	setupLogin(user, c)
 }

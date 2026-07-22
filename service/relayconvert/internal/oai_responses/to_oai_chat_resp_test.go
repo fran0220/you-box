@@ -39,8 +39,8 @@ func TestResponsesResponseToChatCompletionsPreservesTextAndToolCalls(t *testing.
 
 	require.Len(t, chat.Choices, 1)
 	assert.Equal(t, "tool_calls", chat.Choices[0].FinishReason)
-	assert.Equal(t, "I will call a tool.", chat.Choices[0].Message.StringContent())
-	toolCalls := chat.Choices[0].Message.ParseToolCalls()
+	assert.Equal(t, "I will call a tool.", chat.Choices[0].StringContent())
+	toolCalls := chat.Choices[0].ParseToolCalls()
 	require.Len(t, toolCalls, 1)
 	assert.Equal(t, "call_1", toolCalls[0].ID)
 	assert.Equal(t, "lookup", toolCalls[0].Function.Name)
@@ -73,8 +73,8 @@ func TestResponsesResponseToChatCompletionsPreservesReasoningSummary(t *testing.
 
 	chat, _, err := ResponsesResponseToChatCompletionsResponse(resp, "chatcmpl_1")
 	require.NoError(t, err)
-	assert.Equal(t, "first summary\n\nsecond summary", chat.Choices[0].Message.GetReasoningContent())
-	assert.Equal(t, "final", chat.Choices[0].Message.StringContent())
+	assert.Equal(t, "first summary\n\nsecond summary", chat.Choices[0].GetReasoningContent())
+	assert.Equal(t, "final", chat.Choices[0].StringContent())
 }
 
 func TestResponsesFinishReasonFromIncompleteStatus(t *testing.T) {
@@ -333,8 +333,8 @@ func TestResponsesBufferedAccumulatorSupplementsEmptyTerminalOutput(t *testing.T
 
 	chat, _, err := ResponsesResponseToChatCompletionsResponse(resp, "chatcmpl_1")
 	require.NoError(t, err)
-	assert.Equal(t, "buffered text", chat.Choices[0].Message.StringContent())
-	toolCalls := chat.Choices[0].Message.ParseToolCalls()
+	assert.Equal(t, "buffered text", chat.Choices[0].StringContent())
+	toolCalls := chat.Choices[0].ParseToolCalls()
 	require.Len(t, toolCalls, 1)
 	assert.Equal(t, `{"q":"x"}`, toolCalls[0].Function.Arguments)
 }
@@ -368,7 +368,7 @@ func TestResponsesBufferedAccumulatorDoesNotDuplicatePendingArgsWithOutputIndexA
 
 	chat, _, err := ResponsesResponseToChatCompletionsResponse(resp, "chatcmpl_1")
 	require.NoError(t, err)
-	toolCalls := chat.Choices[0].Message.ParseToolCalls()
+	toolCalls := chat.Choices[0].ParseToolCalls()
 	require.Len(t, toolCalls, 1)
 	assert.Equal(t, `{"q":"x"}`, toolCalls[0].Function.Arguments)
 	assert.Empty(t, acc.pendingByOutputIndex)

@@ -37,20 +37,22 @@ func UsageFromGeminiMetadata(metadata *dto.GeminiUsageMetadata, fallbackPromptTo
 	usage.PromptTokensDetails.CachedTokens = metadata.CachedContentTokenCount
 
 	for _, detail := range metadata.PromptTokensDetails {
-		if detail.Modality == "AUDIO" {
+		switch detail.Modality {
+		case "AUDIO":
 			usage.PromptTokensDetails.AudioTokens += detail.TokenCount
-		} else if detail.Modality == "IMAGE" {
+		case "IMAGE":
 			usage.PromptTokensDetails.ImageTokens += detail.TokenCount
-		} else if detail.Modality == "TEXT" {
+		case "TEXT":
 			usage.PromptTokensDetails.TextTokens += detail.TokenCount
 		}
 	}
 	for _, detail := range metadata.ToolUsePromptTokensDetails {
-		if detail.Modality == "AUDIO" {
+		switch detail.Modality {
+		case "AUDIO":
 			usage.PromptTokensDetails.AudioTokens += detail.TokenCount
-		} else if detail.Modality == "IMAGE" {
+		case "IMAGE":
 			usage.PromptTokensDetails.ImageTokens += detail.TokenCount
-		} else if detail.Modality == "TEXT" {
+		case "TEXT":
 			usage.PromptTokensDetails.TextTokens += detail.TokenCount
 		}
 	}
@@ -135,7 +137,7 @@ func ResponseGeminiChat2OpenAI(id string, created int64, response *dto.GeminiCha
 						toolCalls = append(toolCalls, *call)
 					}
 				} else if part.Thought {
-					choice.Message.ReasoningContent = &part.Text
+					choice.ReasoningContent = &part.Text
 				} else {
 					if part.ExecutableCode != nil {
 						writeSep()
@@ -156,10 +158,10 @@ func ResponseGeminiChat2OpenAI(id string, created int64, response *dto.GeminiCha
 				}
 			}
 			if len(toolCalls) > 0 {
-				choice.Message.SetToolCalls(toolCalls)
+				choice.SetToolCalls(toolCalls)
 				isToolCall = true
 			}
-			choice.Message.SetStringContent(content.String())
+			choice.SetStringContent(content.String())
 		}
 		if candidate.FinishReason != nil {
 			switch *candidate.FinishReason {

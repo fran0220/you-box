@@ -32,7 +32,7 @@ func WssHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *types.
 
 	if resp != nil {
 		info.TargetWs = resp.(*websocket.Conn)
-		defer info.TargetWs.Close()
+		defer func() { _ = info.TargetWs.Close() /* cleanup only */ }()
 	}
 
 	usage, newAPIError := adaptor.DoResponse(c, nil, info)

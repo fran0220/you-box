@@ -166,7 +166,9 @@ func handleCozeEvent(c *gin.Context, event string, data string, responseText *st
 
 		finishReason := "stop"
 		stopResponse := helper.GenerateStopResponse(id, common.GetTimestamp(), info.UpstreamModelName, finishReason)
-		helper.ObjectData(c, stopResponse)
+		if err := helper.ObjectData(c, stopResponse); err != nil {
+			common.SysLog("error sending stream response: " + err.Error())
+		}
 
 	case "conversation.message.delta":
 		// 将 data 解析为 CozeChatV3MessageDetail
@@ -199,7 +201,9 @@ func handleCozeEvent(c *gin.Context, event string, data string, responseText *st
 		choice.Delta.SetContentString(content)
 		openaiResponse.Choices = append(openaiResponse.Choices, choice)
 
-		helper.ObjectData(c, openaiResponse)
+		if err := helper.ObjectData(c, openaiResponse); err != nil {
+			common.SysLog("error sending stream response: " + err.Error())
+		}
 
 	case "error":
 		var errorData CozeError
@@ -234,7 +238,7 @@ func checkIfChatComplete(a *Adaptor, c *gin.Context, info *relaycommon.RelayInfo
 	if resp == nil { // 确保在 doRequest 失败时 resp 不为 nil 导致 panic
 		return fmt.Errorf("resp is nil"), false
 	}
-	defer resp.Body.Close() // 确保响应体被关闭
+	defer func() { _ = resp.Body.Close() /* cleanup only */ }() // 确保响应体被关闭
 
 	// 解析 resp 到 CozeChatResponse
 	var cozeResponse CozeChatResponse
@@ -246,15 +250,16 @@ func checkIfChatComplete(a *Adaptor, c *gin.Context, info *relaycommon.RelayInfo
 	if err != nil {
 		return fmt.Errorf("unmarshal response body failed: %w", err), false
 	}
-	if cozeResponse.Data.Status == "completed" {
+	switch cozeResponse.Data.Status {
+	case "completed":
 		// 在上下文设置 usage
 		c.Set("coze_token_count", cozeResponse.Data.Usage.TokenCount)
 		c.Set("coze_output_count", cozeResponse.Data.Usage.OutputCount)
 		c.Set("coze_input_count", cozeResponse.Data.Usage.InputCount)
 		return nil, true
-	} else if cozeResponse.Data.Status == "failed" || cozeResponse.Data.Status == "canceled" || cozeResponse.Data.Status == "requires_action" {
+	case "failed", "canceled", "requires_action":
 		return fmt.Errorf("chat status: %s", cozeResponse.Data.Status), false
-	} else {
+	default:
 		return nil, false
 	}
 }

@@ -151,7 +151,7 @@ func handleTTSResponse(c *gin.Context, resp *http.Response, info *relaycommon.Re
 			http.StatusInternalServerError,
 		)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() /* cleanup only */ }()
 
 	var volcResp VolcengineTTSResponse
 	if unmarshalErr := json.Unmarshal(body, &volcResp); unmarshalErr != nil {
@@ -224,7 +224,7 @@ func handleTTSWebSocketResponse(c *gin.Context, requestURL string, volcRequest V
 			http.StatusBadGateway,
 		)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() /* cleanup only */ }()
 
 	payload, marshalErr := json.Marshal(volcRequest)
 	if marshalErr != nil {

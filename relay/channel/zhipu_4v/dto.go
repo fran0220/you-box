@@ -1,8 +1,6 @@
 package zhipu_4v
 
 import (
-	"time"
-
 	"github.com/QuantumNous/new-api/dto"
 	"github.com/QuantumNous/new-api/types"
 )
@@ -53,9 +51,4 @@ type ZhipuV4StreamResponse struct {
 	Created int64                                     `json:"created"`
 	Choices []dto.ChatCompletionsStreamResponseChoice `json:"choices"`
 	Usage   dto.Usage                                 `json:"usage"`
-}
-
-type tokenData struct {
-	Token      string
-	ExpiryTime time.Time
 }

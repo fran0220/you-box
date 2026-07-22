@@ -27,9 +27,10 @@ func openAIChatToOllamaChat(c *gin.Context, r *dto.GeneralOpenAIRequest) (*Ollam
 		Think:   r.Think,
 	}
 	if r.ResponseFormat != nil {
-		if r.ResponseFormat.Type == "json" {
+		switch r.ResponseFormat.Type {
+		case "json":
 			chatReq.Format = "json"
-		} else if r.ResponseFormat.Type == "json_schema" {
+		case "json_schema":
 			if len(r.ResponseFormat.JsonSchema) > 0 {
 				var schema any
 				_ = json.Unmarshal(r.ResponseFormat.JsonSchema, &schema)
@@ -97,7 +98,8 @@ func openAIChatToOllamaChat(c *gin.Context, r *dto.GeneralOpenAIRequest) (*Ollam
 		} else {
 			parts := m.ParseContent()
 			for _, part := range parts {
-				if part.Type == dto.ContentTypeImageURL {
+				switch part.Type {
+				case dto.ContentTypeImageURL:
 					source := part.ToFileSource()
 					if source != nil {
 						base64Data, _, err := service.GetBase64Data(c, source, "fetch image for ollama chat")
@@ -108,7 +110,7 @@ func openAIChatToOllamaChat(c *gin.Context, r *dto.GeneralOpenAIRequest) (*Ollam
 							images = append(images, base64Data)
 						}
 					}
-				} else if part.Type == dto.ContentTypeText {
+				case dto.ContentTypeText:
 					textBuilder.WriteString(part.Text)
 				}
 			}
@@ -120,7 +122,7 @@ func openAIChatToOllamaChat(c *gin.Context, r *dto.GeneralOpenAIRequest) (*Ollam
 		if m.Role == "tool" && m.Name != nil {
 			cm.ToolName = *m.Name
 		}
-		if m.ToolCalls != nil && len(m.ToolCalls) > 0 {
+		if len(m.ToolCalls) > 0 {
 			parsed := m.ParseToolCalls()
 			if len(parsed) > 0 {
 				calls := make([]OllamaToolCall, 0, len(parsed))
@@ -176,9 +178,10 @@ func openAIToGenerate(c *gin.Context, r *dto.GeneralOpenAIRequest) (*OllamaGener
 		}
 	}
 	if r.ResponseFormat != nil {
-		if r.ResponseFormat.Type == "json" {
+		switch r.ResponseFormat.Type {
+		case "json":
 			gen.Format = "json"
-		} else if r.ResponseFormat.Type == "json_schema" {
+		case "json_schema":
 			var schema any
 			_ = json.Unmarshal(r.ResponseFormat.JsonSchema, &schema)
 			gen.Format = schema
@@ -296,7 +299,7 @@ func FetchOllamaModels(baseURL, apiKey string) ([]OllamaModel, error) {
 	if err != nil {
 		return nil, fmt.Errorf("请求失败: %v", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() /* cleanup only */ }()
 
 	if response.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(response.Body)
@@ -348,7 +351,7 @@ func PullOllamaModel(baseURL, apiKey, modelName string) error {
 	if err != nil {
 		return fmt.Errorf("请求失败: %v", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() /* cleanup only */ }()
 
 	if response.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(response.Body)
@@ -389,7 +392,7 @@ func PullOllamaModelStream(baseURL, apiKey, modelName string, progressCallback f
 	if err != nil {
 		return fmt.Errorf("请求失败: %v", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() /* cleanup only */ }()
 
 	if response.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(response.Body)
@@ -463,7 +466,7 @@ func DeleteOllamaModel(baseURL, apiKey, modelName string) error {
 	if err != nil {
 		return fmt.Errorf("请求失败: %v", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() /* cleanup only */ }()
 
 	if response.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(response.Body)
@@ -495,7 +498,7 @@ func FetchOllamaVersion(baseURL, apiKey string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("请求失败: %v", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() /* cleanup only */ }()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {

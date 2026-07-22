@@ -22,7 +22,7 @@ type stringWrapper struct {
 }
 
 func (w stringWrapper) writeString(str string) (int, error) {
-	return w.Writer.Write([]byte(str))
+	return w.Write([]byte(str))
 }
 
 func checkWriter(writer io.Writer) stringWriter {
@@ -40,10 +40,6 @@ func checkWriter(writer io.Writer) stringWriter {
 var writeContentType = []string{"text/event-stream"}
 var noCache = []string{"no-cache"}
 
-var fieldReplacer = strings.NewReplacer(
-	"\n", "\\n",
-	"\r", "\\r")
-
 var dataReplacer = strings.NewReplacer(
 	"\n", "\n",
 	"\r", "\\r")
@@ -54,30 +50,35 @@ type CustomEvent struct {
 	Retry uint
 	Data  interface{}
 
-	Mutex sync.Mutex
+	Mutex *sync.Mutex
 }
 
-func encode(writer io.Writer, event CustomEvent) error {
+func encode(writer io.Writer, event *CustomEvent) error {
 	w := checkWriter(writer)
 	return writeData(w, event.Data)
 }
 
 func writeData(w stringWriter, data interface{}) error {
-	dataReplacer.WriteString(w, fmt.Sprint(data))
-	if strings.HasPrefix(data.(string), "data") {
-		w.writeString("\n\n")
+	if _, err := dataReplacer.WriteString(w, fmt.Sprint(data)); err != nil {
+		return err
+	}
+	if text, ok := data.(string); ok && strings.HasPrefix(text, "data") {
+		_, err := w.writeString("\n\n")
+		return err
 	}
 	return nil
 }
 
 func (r CustomEvent) Render(w http.ResponseWriter) error {
 	r.WriteContentType(w)
-	return encode(w, r)
+	return encode(w, &r)
 }
 
 func (r CustomEvent) WriteContentType(w http.ResponseWriter) {
-	r.Mutex.Lock()
-	defer r.Mutex.Unlock()
+	if r.Mutex != nil {
+		r.Mutex.Lock()
+		defer r.Mutex.Unlock()
+	}
 	header := w.Header()
 	header["Content-Type"] = writeContentType
 

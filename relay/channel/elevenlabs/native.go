@@ -97,10 +97,7 @@ func IsBareNativeAliasPath(path string) bool {
 		"/v1/forced-alignment":
 		return true
 	}
-	if strings.HasPrefix(clean, "/v1/speech-to-speech/") {
-		return true
-	}
-	return false
+	return strings.HasPrefix(clean, "/v1/speech-to-speech/")
 }
 
 func UpstreamPathFromProxyPath(path string) string {
@@ -523,7 +520,7 @@ func formField(c *gin.Context, names ...string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer form.RemoveAll()
+	defer func() { _ = form.RemoveAll() /* cleanup only */ }()
 	for _, name := range names {
 		values := form.Value[name]
 		if len(values) > 0 && strings.TrimSpace(values[0]) != "" {
@@ -596,7 +593,7 @@ func estimateAudioDuration(c *gin.Context) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer form.RemoveAll()
+	defer func() { _ = form.RemoveAll() /* cleanup only */ }()
 	for _, fileHeaders := range form.File {
 		for _, fileHeader := range fileHeaders {
 			if fileHeader == nil || fileHeader.Size <= 0 {
@@ -718,7 +715,7 @@ func multipartFileToBytes(fileHeader *multipart.FileHeader) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() /* cleanup only */ }()
 	return io.ReadAll(file)
 }
 
@@ -727,7 +724,7 @@ func BuildOpenAITranscriptionMultipart(c *gin.Context, upstreamModel string) (io
 	if err != nil {
 		return nil, 0, fmt.Errorf("error parsing multipart form: %w", err)
 	}
-	defer form.RemoveAll()
+	defer func() { _ = form.RemoveAll() /* cleanup only */ }()
 
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)

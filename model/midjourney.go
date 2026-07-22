@@ -92,9 +92,7 @@ func GetAllTasks(startIdx int, num int, queryParams TaskQueryParams) []*Midjourn
 
 func GetAllUnFinishTasks() []*Midjourney {
 	var tasks []*Midjourney
-	var err error
-	// get all tasks progress is not 100%
-	err = DB.Where("progress != ?", "100%").Find(&tasks).Error
+	var err = DB.Where("progress != ?", "100%").Find(&tasks).Error
 	if err != nil {
 		return nil
 	}
@@ -116,8 +114,7 @@ func HasUnfinishedMidjourneyTasks() bool {
 
 func GetByOnlyMJId(mjId string) *Midjourney {
 	var mj *Midjourney
-	var err error
-	err = DB.Where("mj_id = ?", mjId).First(&mj).Error
+	var err = DB.Where("mj_id = ?", mjId).First(&mj).Error
 	if err != nil {
 		return nil
 	}
@@ -126,8 +123,7 @@ func GetByOnlyMJId(mjId string) *Midjourney {
 
 func GetByMJId(userId int, mjId string) *Midjourney {
 	var mj *Midjourney
-	var err error
-	err = DB.Where("user_id = ? and mj_id = ?", userId, mjId).First(&mj).Error
+	var err = DB.Where("user_id = ? and mj_id = ?", userId, mjId).First(&mj).Error
 	if err != nil {
 		return nil
 	}
@@ -136,8 +132,7 @@ func GetByMJId(userId int, mjId string) *Midjourney {
 
 func GetByMJIds(userId int, mjIds []string) []*Midjourney {
 	var mj []*Midjourney
-	var err error
-	err = DB.Where("user_id = ? and mj_id in (?)", userId, mjIds).Find(&mj).Error
+	var err = DB.Where("user_id = ? and mj_id in (?)", userId, mjIds).Find(&mj).Error
 	if err != nil {
 		return nil
 	}
@@ -146,8 +141,7 @@ func GetByMJIds(userId int, mjIds []string) []*Midjourney {
 
 func GetMjByuId(id int) *Midjourney {
 	var mj *Midjourney
-	var err error
-	err = DB.Where("id = ?", id).First(&mj).Error
+	var err = DB.Where("id = ?", id).First(&mj).Error
 	if err != nil {
 		return nil
 	}
@@ -159,14 +153,12 @@ func UpdateProgress(id int, progress string) error {
 }
 
 func (midjourney *Midjourney) Insert() error {
-	var err error
-	err = DB.Create(midjourney).Error
+	var err = DB.Create(midjourney).Error
 	return err
 }
 
 func (midjourney *Midjourney) Update() error {
-	var err error
-	err = DB.Save(midjourney).Error
+	var err = DB.Save(midjourney).Error
 	return err
 }
 

@@ -49,7 +49,7 @@ func (b *baseFileSource) HasCache() bool {
 
 func (b *baseFileSource) ClearCache() {
 	if b.cachedData != nil {
-		b.cachedData.Close()
+		_ = b.cachedData.Close()
 	}
 	b.cachedData = nil
 	b.cacheLoaded = false

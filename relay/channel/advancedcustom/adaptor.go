@@ -428,9 +428,7 @@ func shouldUseGeminiStreamURL(converter string, info *relaycommon.RelayInfo) boo
 }
 
 func useGeminiStreamGenerateContentURL(parsedURL *url.URL) {
-	if strings.Contains(parsedURL.Path, ":generateContent") {
-		parsedURL.Path = strings.Replace(parsedURL.Path, ":generateContent", ":streamGenerateContent", 1)
-	}
+	parsedURL.Path = strings.Replace(parsedURL.Path, ":generateContent", ":streamGenerateContent", 1)
 	if strings.Contains(parsedURL.Path, ":streamGenerateContent") {
 		query := parsedURL.Query()
 		query.Set("alt", "sse")

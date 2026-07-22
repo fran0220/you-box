@@ -25,7 +25,7 @@ var VerificationValidMinutes = 10
 
 func GenerateVerificationCode(length int) string {
 	code := uuid.New().String()
-	code = strings.Replace(code, "-", "", -1)
+	code = strings.ReplaceAll(code, "-", "")
 	if length == 0 {
 		return code
 	}

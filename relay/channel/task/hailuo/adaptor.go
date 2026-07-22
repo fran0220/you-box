@@ -264,7 +264,7 @@ func (a *TaskAdaptor) buildVideoURL(_, fileID string) string {
 	if err != nil {
 		return ""
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() /* cleanup only */ }()
 
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -281,22 +281,4 @@ func (a *TaskAdaptor) buildVideoURL(_, fileID string) string {
 	}
 
 	return retrieveResp.File.DownloadURL
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
-}
-
-func containsInt(slice []int, item int) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }

@@ -26,7 +26,7 @@ func GetFileTypeFromUrl(c *gin.Context, url string, reason ...string) (string, e
 		common.SysLog(fmt.Sprintf("fail to get file type from url: %s, error: %s", url, err.Error()))
 		return "", err
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode != 200 {
 		logger.LogError(c, fmt.Sprintf("failed to download file from %s, status code: %d", url, response.StatusCode))

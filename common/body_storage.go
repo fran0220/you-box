@@ -2,6 +2,7 @@ package common
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -107,15 +108,15 @@ func newDiskStorage(data []byte, cachePath string) (*diskStorage, error) {
 	// 写入数据
 	n, err := file.Write(data)
 	if err != nil {
-		file.Close()
-		os.Remove(filePath)
+		_ = file.Close()
+		_ = os.Remove(filePath)
 		return nil, fmt.Errorf("failed to write to temp file: %w", err)
 	}
 
 	// 重置文件指针
 	if _, err := file.Seek(0, io.SeekStart); err != nil {
-		file.Close()
-		os.Remove(filePath)
+		_ = file.Close()
+		_ = os.Remove(filePath)
 		return nil, fmt.Errorf("failed to seek temp file: %w", err)
 	}
 
@@ -139,21 +140,21 @@ func newDiskStorageFromReader(reader io.Reader, maxBytes int64, cachePath string
 	// 从 reader 读取并写入文件
 	written, err := io.Copy(file, io.LimitReader(reader, maxBytes+1))
 	if err != nil {
-		file.Close()
-		os.Remove(filePath)
+		_ = file.Close()
+		_ = os.Remove(filePath)
 		return nil, fmt.Errorf("failed to write to temp file: %w", err)
 	}
 
 	if written > maxBytes {
-		file.Close()
-		os.Remove(filePath)
+		_ = file.Close()
+		_ = os.Remove(filePath)
 		return nil, ErrRequestBodyTooLarge
 	}
 
 	// 重置文件指针
 	if _, err := file.Seek(0, io.SeekStart); err != nil {
-		file.Close()
-		os.Remove(filePath)
+		_ = file.Close()
+		_ = os.Remove(filePath)
 		return nil, fmt.Errorf("failed to seek temp file: %w", err)
 	}
 
@@ -188,9 +189,10 @@ func (d *diskStorage) Close() error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if atomic.CompareAndSwapInt32(&d.closed, 0, 1) {
-		d.file.Close()
-		os.Remove(d.filePath)
+		closeErr := d.file.Close()
+		removeErr := os.Remove(d.filePath)
 		DecrementDiskFiles(d.size)
+		return errors.Join(closeErr, removeErr)
 	}
 	return nil
 }
@@ -311,5 +313,7 @@ func ReaderOnly(r io.Reader) io.Reader {
 // CleanupOldCacheFiles 清理旧的缓存文件（用于启动时清理残留）
 func CleanupOldCacheFiles() {
 	// 使用统一的缓存管理
-	CleanupOldDiskCacheFiles(5 * time.Minute)
+	if err := CleanupOldDiskCacheFiles(5 * time.Minute); err != nil {
+		SysError(fmt.Sprintf("failed to clean old disk cache files: %v", err))
+	}
 }

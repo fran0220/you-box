@@ -23,8 +23,7 @@ type Option struct {
 
 func AllOption() ([]*Option, error) {
 	var options []*Option
-	var err error
-	err = DB.Find(&options).Error
+	var err = DB.Find(&options).Error
 	return options, err
 }
 
@@ -695,14 +694,18 @@ func handleConfigUpdate(key, value string) bool {
 	configMap := map[string]string{
 		configKey: value,
 	}
-	config.UpdateConfigFromMap(cfg, configMap)
+	if err := config.UpdateConfigFromMap(cfg, configMap); err != nil {
+		common.SysError("failed to update config: " + err.Error())
+		return false
+	}
 
 	// 特定配置的后处理
-	if configName == "performance_setting" {
+	switch configName {
+	case "performance_setting":
 		performance_setting.UpdateAndSync()
-	} else if configName == "tool_price_setting" {
+	case "tool_price_setting":
 		operation_setting.RebuildToolPriceIndex()
-	} else if configName == "billing_setting" {
+	case "billing_setting":
 		InvalidatePricingCache()
 		ratio_setting.InvalidateExposedDataCache()
 	}

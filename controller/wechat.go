@@ -38,7 +38,7 @@ func getWeChatIdByCode(code string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer httpResponse.Body.Close()
+	defer func() { _ = httpResponse.Body.Close() }()
 	var res wechatLoginResponse
 	err = json.NewDecoder(httpResponse.Body).Decode(&res)
 	if err != nil {
@@ -178,5 +178,4 @@ func WeChatBind(c *gin.Context) {
 		"success": true,
 		"message": "",
 	})
-	return
 }

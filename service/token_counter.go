@@ -106,7 +106,7 @@ func getImageToken(c *gin.Context, fileMeta *types.FileMeta, model string, strea
 			// file type
 			return 3 * baseTokens, nil
 		}
-		return 0, errors.New(fmt.Sprintf("fail to decode image config: %s", fileMeta.GetIdentifier()))
+		return 0, fmt.Errorf("fail to decode image config: %s", fileMeta.GetIdentifier())
 	}
 
 	width := config.Width
@@ -201,7 +201,7 @@ func EstimateRequestToken(c *gin.Context, meta *types.TokenCountMeta, info *rela
 			if err != nil {
 				return 0, fmt.Errorf("error opening audio file: %v", err)
 			}
-			defer file.Close()
+			defer func() { _ = file.Close() }()
 			// get ext and io.seeker
 			ext := filepath.Ext(fileHeader.Filename)
 			duration, err := common.GetAudioDuration(c.Request.Context(), file, ext)
@@ -230,11 +230,7 @@ func EstimateRequestToken(c *gin.Context, meta *types.TokenCountMeta, info *rela
 		tkm += 3
 	}
 
-	shouldFetchFiles := true
-
-	if info.RelayFormat == types.RelayFormatGemini {
-		shouldFetchFiles = false
-	}
+	shouldFetchFiles := info.RelayFormat != types.RelayFormatGemini
 
 	// 是否本地计算媒体token数量
 	if !constant.GetMediaToken {
@@ -337,7 +333,7 @@ func CountTokenRealtime(info *relaycommon.RelayInfo, request dto.RealtimeEvent, 
 	case dto.RealtimeEventTypeResponseDone:
 		// count tools token
 		if !info.IsFirstRequest {
-			if info.RealtimeTools != nil && len(info.RealtimeTools) > 0 {
+			if len(info.RealtimeTools) > 0 {
 				for _, tool := range info.RealtimeTools {
 					toolTokens := CountTokenInput(tool, model)
 					textToken += 8

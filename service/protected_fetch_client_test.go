@@ -33,8 +33,8 @@ func testConn(t *testing.T) net.Conn {
 	t.Helper()
 	clientConn, serverConn := net.Pipe()
 	t.Cleanup(func() {
-		clientConn.Close()
-		serverConn.Close()
+		_ = clientConn.Close()
+		_ = serverConn.Close()
 	})
 	return clientConn
 }

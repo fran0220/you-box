@@ -99,7 +99,7 @@ func GetBodyStorage(c *gin.Context) (BodyStorage, error) {
 func CleanupBodyStorage(c *gin.Context) {
 	if storage, exists := c.Get(KeyBodyStorage); exists && storage != nil {
 		if bs, ok := storage.(BodyStorage); ok {
-			bs.Close()
+			_ = bs.Close()
 		}
 		c.Set(KeyBodyStorage, nil)
 	}
@@ -139,9 +139,6 @@ func UnmarshalBodyReusable(c *gin.Context, v any) error {
 		err = parseFormData(requestBody, v)
 	} else if strings.Contains(contentType, gin.MIMEMultipartPOSTForm) {
 		err = parseMultipartFormData(c, requestBody, v)
-	} else {
-		// skip for now
-		// TODO: someday non json request have variant model, we will need to implementation this
 	}
 	if err != nil {
 		return err
@@ -342,7 +339,7 @@ func parseMultipartFormData(c *gin.Context, data []byte, v any) error {
 	if err != nil {
 		return err
 	}
-	defer form.RemoveAll()
+	defer func() { _ = form.RemoveAll() }()
 	formMap := make(map[string]any)
 	for key, vals := range form.Value {
 		if len(vals) == 1 {

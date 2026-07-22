@@ -172,13 +172,17 @@ func (a *TaskAdaptor) BuildRequestBody(c *gin.Context, info *relaycommon.RelayIn
 		}
 		var buf bytes.Buffer
 		writer := multipart.NewWriter(&buf)
-		writer.WriteField("model", info.UpstreamModelName)
+		if err := writer.WriteField("model", info.UpstreamModelName); err != nil {
+			return nil, fmt.Errorf("write model field: %w", err)
+		}
 		for key, values := range formData.Value {
 			if key == "model" {
 				continue
 			}
 			for _, v := range values {
-				writer.WriteField(key, v)
+				if err := writer.WriteField(key, v); err != nil {
+					return nil, fmt.Errorf("write multipart field %q: %w", key, err)
+				}
 			}
 		}
 		for fieldName, fileHeaders := range formData.File {
@@ -193,7 +197,9 @@ func (a *TaskAdaptor) BuildRequestBody(c *gin.Context, info *relaycommon.RelayIn
 					n, _ := io.ReadFull(f, buf512)
 					ct = http.DetectContentType(buf512[:n])
 					// Re-open after sniffing so the full content is copied below
-					f.Close()
+					if err := f.Close(); err != nil {
+						return nil, fmt.Errorf("close upload file: %w", err)
+					}
 					f, err = fh.Open()
 					if err != nil {
 						continue
@@ -204,14 +210,21 @@ func (a *TaskAdaptor) BuildRequestBody(c *gin.Context, info *relaycommon.RelayIn
 				h.Set("Content-Type", ct)
 				part, err := writer.CreatePart(h)
 				if err != nil {
-					f.Close()
+					_ = f.Close()
 					continue
 				}
-				io.Copy(part, f)
-				f.Close()
+				if _, err := io.Copy(part, f); err != nil {
+					_ = f.Close()
+					return nil, fmt.Errorf("copy upload file: %w", err)
+				}
+				if err := f.Close(); err != nil {
+					return nil, fmt.Errorf("close upload file: %w", err)
+				}
 			}
 		}
-		writer.Close()
+		if err := writer.Close(); err != nil {
+			return nil, fmt.Errorf("finalize multipart form: %w", err)
+		}
 		c.Request.Header.Set("Content-Type", writer.FormDataContentType())
 		return &buf, nil
 	}

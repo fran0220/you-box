@@ -298,12 +298,14 @@ func TestStreamScannerHandler_PingSentDuringSlowUpstream(t *testing.T) {
 
 	pr, pw := io.Pipe()
 	go func() {
-		defer pw.Close()
+		defer func() { _ = pw.Close() /* cleanup only */ }()
 		for i := 0; i < 4; i++ {
-			fmt.Fprintf(pw, "data: chunk_%d\n", i)
+			if _, err := fmt.Fprintf(pw, "data: chunk_%d\n", i); err != nil {
+				return
+			}
 			time.Sleep(400 * time.Millisecond)
 		}
-		fmt.Fprint(pw, "data: [DONE]\n")
+		_, _ = fmt.Fprint(pw, "data: [DONE]\n")
 	}()
 
 	recorder := httptest.NewRecorder()
@@ -459,9 +461,11 @@ func TestStreamScannerHandler_StreamStatus_Timeout(t *testing.T) {
 
 	pr, pw := io.Pipe()
 	go func() {
-		fmt.Fprint(pw, "data: {\"id\":1}\n")
+		if _, err := fmt.Fprint(pw, "data: {\"id\":1}\n"); err != nil {
+			return
+		}
 		time.Sleep(2 * time.Second)
-		pw.Close()
+		_ = pw.Close()
 	}()
 
 	recorder := httptest.NewRecorder()

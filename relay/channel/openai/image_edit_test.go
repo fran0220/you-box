@@ -69,7 +69,7 @@ func TestConvertImageEditRequestMultipart(t *testing.T) {
 
 		file, err := replayedRequest.MultipartForm.File["image"][0].Open()
 		require.NoError(t, err)
-		defer file.Close()
+		defer func() { _ = file.Close() /* cleanup only */ }()
 		fileBytes, err := io.ReadAll(file)
 		require.NoError(t, err)
 		require.Equal(t, []byte("fake image"), fileBytes)

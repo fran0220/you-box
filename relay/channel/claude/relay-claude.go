@@ -19,10 +19,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func stopReasonClaude2OpenAI(reason string) string {
-	return relayconvert.StopReasonClaudeToOpenAI(reason)
-}
-
 func maybeMarkClaudeRefusal(c *gin.Context, stopReason string) {
 	if c == nil {
 		return
@@ -41,17 +37,6 @@ func ResponseClaude2OpenAI(claudeResponse *dto.ClaudeResponse) *dto.OpenAITextRe
 }
 
 type ClaudeResponseInfo = relayconvert.ClaudeResponseInfo
-
-func cacheCreationTokensForOpenAIUsage(usage *dto.Usage) int {
-	if usage == nil {
-		return 0
-	}
-	openAIUsage := relayconvert.UsageFromClaudeUsage(usage)
-	if openAIUsage == nil {
-		return 0
-	}
-	return openAIUsage.PromptTokens - usage.PromptTokens - usage.PromptTokensDetails.CachedTokens
-}
 
 func buildOpenAIStyleUsageFromClaudeUsage(usage *dto.Usage) dto.Usage {
 	mapped := relayconvert.UsageFromClaudeUsage(usage)
@@ -99,15 +84,17 @@ func HandleStreamResponseData(c *gin.Context, info *relaycommon.RelayInfo, claud
 	if claudeResponse.Delta != nil && claudeResponse.Delta.StopReason != nil {
 		maybeMarkClaudeRefusal(c, *claudeResponse.Delta.StopReason)
 	}
-	if info.RelayFormat == types.RelayFormatClaude {
+	switch info.RelayFormat {
+	case types.RelayFormatClaude:
 		FormatClaudeResponseInfo(&claudeResponse, nil, claudeInfo)
 
-		if claudeResponse.Type == "message_start" {
+		switch claudeResponse.Type {
+		case "message_start":
 			// message_start, 获取usage
 			if claudeResponse.Message != nil {
 				info.UpstreamModelName = claudeResponse.Message.Model
 			}
-		} else if claudeResponse.Type == "message_delta" {
+		case "message_delta":
 			// 确保 message_delta 的 usage 包含完整的 input_tokens 和 cache 相关字段
 			// 解决 AWS Bedrock 等上游返回的 message_delta 缺少这些字段的问题
 			if !shouldSkipClaudeMessageDeltaUsagePatch(info) {
@@ -115,7 +102,7 @@ func HandleStreamResponseData(c *gin.Context, info *relaycommon.RelayInfo, claud
 			}
 		}
 		helper.ClaudeChunkData(c, claudeResponse, data)
-	} else if info.RelayFormat == types.RelayFormatOpenAI {
+	case types.RelayFormatOpenAI:
 		response := StreamResponseClaude2OpenAI(&claudeResponse)
 
 		if !FormatClaudeResponseInfo(&claudeResponse, response, claudeInfo) {
@@ -131,9 +118,6 @@ func HandleStreamResponseData(c *gin.Context, info *relaycommon.RelayInfo, claud
 }
 
 func HandleStreamFinalResponse(c *gin.Context, info *relaycommon.RelayInfo, claudeInfo *ClaudeResponseInfo) {
-	if claudeInfo.Usage.PromptTokens == 0 {
-		//上游出错
-	}
 	if claudeInfo.Usage.CompletionTokens == 0 || !claudeInfo.Done {
 		if common.DebugEnabled {
 			common.SysLog("claude response usage is not complete, maybe upstream error")
@@ -156,9 +140,10 @@ func HandleStreamFinalResponse(c *gin.Context, info *relaycommon.RelayInfo, clau
 		claudeInfo.Usage.BillingUsage = dto.NewClaudeMessagesBillingUsage(buildMessageDeltaPatchUsage(nil, claudeInfo))
 	}
 
-	if info.RelayFormat == types.RelayFormatClaude {
+	switch info.RelayFormat {
+	case types.RelayFormatClaude:
 		//
-	} else if info.RelayFormat == types.RelayFormatOpenAI {
+	case types.RelayFormatOpenAI:
 		if info.ShouldIncludeUsage {
 			openAIUsage := buildOpenAIStyleUsageFromClaudeUsage(claudeInfo.Usage)
 			response := helper.GenerateFinalUsageResponse(claudeInfo.ResponseId, claudeInfo.Created, info.UpstreamModelName, openAIUsage)

@@ -788,7 +788,9 @@ func BenchmarkTieredBilling_ComplexExpr(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		usage := usages[i%len(usages)]
 		params := BuildTieredTokenParams(usage, false, usedVars)
-		billingexpr.RunExpr(complexTieredExpr, params)
+		if _, _, err := billingexpr.RunExpr(complexTieredExpr, params); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
@@ -814,7 +816,10 @@ func BenchmarkTieredBilling_Parallel(b *testing.B) {
 		for pb.Next() {
 			usage := randomUsage(rng)
 			params := BuildTieredTokenParams(usage, false, usedVars)
-			billingexpr.RunExpr(complexTieredExpr, params)
+			if _, _, err := billingexpr.RunExpr(complexTieredExpr, params); err != nil {
+				b.Error(err)
+				return
+			}
 		}
 	})
 }

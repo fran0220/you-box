@@ -144,7 +144,7 @@ func StreamScannerHandler(c *gin.Context, resp *http.Response, info *relaycommon
 	copyCodexSSEHeaders(c, resp)
 	SetEventStreamHeaders(c)
 
-	ctx = context.WithValue(ctx, "stop_chan", stopChan)
+	ctx = common.ContextWithRelayStopChan(ctx, stopChan)
 
 	// Handle ping data sending with improved error handling
 	if pingEnabled && pingTicker != nil {

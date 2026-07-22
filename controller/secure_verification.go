@@ -103,7 +103,7 @@ func UniversalVerify(c *gin.Context) {
 		// Passkey branch only trusts the short-lived marker written by PasskeyVerifyFinish.
 		verified, err = consumePasskeyReady(c)
 		if err != nil {
-			common.ApiError(c, fmt.Errorf("Passkey 验证状态异常: %v", err))
+			common.ApiError(c, fmt.Errorf("passkey 验证状态异常: %v", err))
 			return
 		}
 		if !verified {

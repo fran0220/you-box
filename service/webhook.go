@@ -80,7 +80,7 @@ func SendWebhookNotify(webhookURL string, secret string, data dto.Notify) error 
 		if err != nil {
 			return fmt.Errorf("failed to send webhook request through worker: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		// 检查响应状态
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
@@ -112,7 +112,7 @@ func SendWebhookNotify(webhookURL string, secret string, data dto.Notify) error 
 		if err != nil {
 			return fmt.Errorf("failed to send webhook request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		// 检查响应状态
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {

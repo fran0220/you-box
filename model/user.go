@@ -143,7 +143,8 @@ func generateDefaultSidebarConfigForRole(userRole int) string {
 	}
 
 	// 管理员区域 - 根据角色决定
-	if userRole == common.RoleAdminUser {
+	switch userRole {
+	case common.RoleAdminUser:
 		// 管理员可以访问管理员区域，但不能访问系统设置
 		defaultConfig["admin"] = map[string]interface{}{
 			"enabled":    true,
@@ -153,7 +154,7 @@ func generateDefaultSidebarConfigForRole(userRole int) string {
 			"user":       true,
 			"setting":    false, // 管理员不能访问系统设置
 		}
-	} else if userRole == common.RoleRootUser {
+	case common.RoleRootUser:
 		// 超级管理员可以访问所有功能
 		defaultConfig["admin"] = map[string]interface{}{
 			"enabled":    true,
@@ -393,7 +394,7 @@ func GetUserById(id int, selectAll bool) (*User, error) {
 		return nil, errors.New("id 为空！")
 	}
 	user := User{Id: id}
-	var err error = nil
+	var err error
 	if selectAll {
 		err = DB.First(&user, "id = ?", id).Error
 	} else {
@@ -567,7 +568,7 @@ func (user *User) finishInsert(inviterId int) {
 			currentSetting := createdUser.GetSetting()
 			currentSetting.SidebarModules = defaultSidebarConfig
 			createdUser.SetSetting(currentSetting)
-			createdUser.Update(false)
+			_ = createdUser.Update(false)
 			common.SysLog(fmt.Sprintf("为新用户 %s (角色: %d) 初始化边栏配置", createdUser.Username, createdUser.Role))
 		}
 	}
@@ -624,7 +625,7 @@ func (user *User) FinalizeOAuthUserCreation(inviterId int) {
 			currentSetting := createdUser.GetSetting()
 			currentSetting.SidebarModules = defaultSidebarConfig
 			createdUser.SetSetting(currentSetting)
-			createdUser.Update(false)
+			_ = createdUser.Update(false)
 			common.SysLog(fmt.Sprintf("为新用户 %s (角色: %d) 初始化边栏配置", createdUser.Username, createdUser.Role))
 		}
 	}
@@ -848,7 +849,7 @@ func (user *User) FillUserByWeChatId() error {
 
 func (user *User) FillUserByTelegramId() error {
 	if user.TelegramId == "" {
-		return errors.New("Telegram id 为空！")
+		return errors.New("telegram id 为空！")
 	}
 	err := DB.Where(User{TelegramId: user.TelegramId}).First(user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -1171,24 +1172,6 @@ func updateUserQuotaUsedQuotaAndRequestCount(id int, quota int, usedQuota int, r
 	}
 }
 
-func updateUserUsedQuota(id int, quota int) {
-	err := DB.Model(&User{}).Where("id = ?", id).Updates(
-		map[string]interface{}{
-			"used_quota": gorm.Expr("used_quota + ?", quota),
-		},
-	).Error
-	if err != nil {
-		common.SysLog("failed to update user used quota: " + err.Error())
-	}
-}
-
-func updateUserRequestCount(id int, count int) {
-	err := DB.Model(&User{}).Where("id = ?", id).Update("request_count", gorm.Expr("request_count + ?", count)).Error
-	if err != nil {
-		common.SysLog("failed to update user request count: " + err.Error())
-	}
-}
-
 // GetUsernameById gets username from Redis first, falls back to DB if needed
 func GetUsernameById(id int, fromDB bool) (username string, err error) {
 	defer func() {
@@ -1234,8 +1217,5 @@ func (user *User) FillUserByLinuxDOId() error {
 func RootUserExists() bool {
 	var user User
 	err := DB.Where("role = ?", common.RoleRootUser).First(&user).Error
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }

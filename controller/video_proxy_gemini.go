@@ -43,7 +43,7 @@ func getGeminiVideoURL(channel *model.Channel, task *model.Task, apiKey string) 
 	if err != nil {
 		return "", fmt.Errorf("fetch task failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -178,7 +178,7 @@ func getVertexVideoURL(channel *model.Channel, task *model.Task) (string, error)
 	if err != nil {
 		return "", fmt.Errorf("fetch task failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

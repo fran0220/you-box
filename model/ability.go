@@ -108,7 +108,6 @@ func getChannelQuery(group string, model string, retry int) (*gorm.DB, error) {
 func GetChannel(group string, model string, retry int, requestPath string) (*Channel, error) {
 	var abilities []Ability
 
-	var err error = nil
 	channelQuery, err := getChannelQuery(group, model, retry)
 	if err != nil {
 		return nil, err

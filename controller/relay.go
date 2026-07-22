@@ -83,7 +83,7 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 			helper.WssError(c, ws, types.NewError(err, types.ErrorCodeGetChannelFailed, types.ErrOptionWithSkipRetry()).ToOpenAIError())
 			return
 		}
-		defer ws.Close()
+		defer func() { _ = ws.Close() }()
 	}
 
 	defer func() {

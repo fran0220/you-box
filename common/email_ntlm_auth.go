@@ -21,7 +21,7 @@ func AutoSMTPAuth(username, password string) smtp.Auth {
 func (a *smtpAutoAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	useLoginAuth := SMTPForceAuthLogin
 	if !useLoginAuth && shouldUseSMTPLoginAuth() {
-		useLoginAuth = !(server != nil && len(server.Auth) == 1 && smtpServerSupportsAuth(server, "NTLM"))
+		useLoginAuth = server == nil || len(server.Auth) != 1 || !smtpServerSupportsAuth(server, "NTLM")
 	}
 	if useLoginAuth {
 		a.mech = "LOGIN"

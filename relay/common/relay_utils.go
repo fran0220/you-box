@@ -199,7 +199,6 @@ func validateMultipartTaskRequest(c *gin.Context, info *RelayInfo, action string
 func ValidateMultipartDirect(c *gin.Context, info *RelayInfo) *dto.TaskError {
 	var prompt string
 	var model string
-	var seconds int
 	var size string
 	var hasInputReference bool
 
@@ -211,10 +210,6 @@ func ValidateMultipartDirect(c *gin.Context, info *RelayInfo) *dto.TaskError {
 	prompt = req.Prompt
 	model = req.Model
 	size = req.Size
-	seconds, _ = strconv.Atoi(req.Seconds)
-	if seconds == 0 {
-		seconds = req.Duration
-	}
 	if req.InputReference != "" {
 		req.Images = []string{req.InputReference}
 	} else if len(req.Images) == 0 && strings.TrimSpace(req.Image) != "" {
@@ -246,10 +241,6 @@ func ValidateMultipartDirect(c *gin.Context, info *RelayInfo) *dto.TaskError {
 
 		if size == "" {
 			size = "720x1280"
-		}
-
-		if seconds <= 0 {
-			seconds = 4
 		}
 
 		if model == "sora-2" && !lo.Contains([]string{"720x1280", "1280x720"}, size) {

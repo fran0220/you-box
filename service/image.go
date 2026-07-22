@@ -71,7 +71,7 @@ func GetImageFromUrl(url string) (mimeType string, data string, err error) {
 	if err != nil {
 		return "", "", fmt.Errorf("failed to download image: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Check HTTP status code
 	if resp.StatusCode != http.StatusOK {
@@ -122,10 +122,10 @@ func DecodeUrlImageData(imageUrl string) (image.Config, string, error) {
 		common.SysLog(fmt.Sprintf("fail to get image from url: %s", err.Error()))
 		return image.Config{}, "", err
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode != 200 {
-		err = errors.New(fmt.Sprintf("fail to get image from url: %s", response.Status))
+		err = fmt.Errorf("fail to get image from url: %s", response.Status)
 		return image.Config{}, "", err
 	}
 

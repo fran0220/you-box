@@ -14,19 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func convertOpenAIResponsesRequestToGeminiChat(c *gin.Context, info *relaycommon.RelayInfo, request any) (any, error) {
-	responsesRequest, err := OpenAIResponsesRequestFromAny(request)
-	if err != nil {
-		return nil, err
-	}
-
-	prepared, err := PrepareOpenAIResponsesRequest(*responsesRequest)
-	if err != nil {
-		return nil, err
-	}
-	return OpenAIResponsesRequestToGeminiChat(c, &prepared, info)
-}
-
 func OpenAIResponsesRequestToGeminiChat(c *gin.Context, req *dto.OpenAIResponsesRequest, info *relaycommon.RelayInfo) (*dto.GeminiChatRequest, error) {
 	if req == nil {
 		return nil, fmt.Errorf("request is nil")

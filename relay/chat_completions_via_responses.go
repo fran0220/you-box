@@ -2,7 +2,6 @@ package relay
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
@@ -132,10 +131,9 @@ func chatCompletionsViaResponses(c *gin.Context, info *relaycommon.RelayInfo, ad
 	if err != nil {
 		return nil, types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
 	}
-	defer closer.Close()
-	jsonData = nil
+	defer func() { _ = closer.Close() /* cleanup only */ }()
 	info.UpstreamRequestBodySize = size
-	var requestBody io.Reader = body
+	var requestBody = body
 
 	var httpResp *http.Response
 	resp, err := adaptor.DoRequest(c, info, requestBody)

@@ -156,7 +156,7 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 		model_ := info.UpstreamModelName
 		// 2025年5月10日后创建的渠道不移除.
 		if info.ChannelCreateTime < constant.AzureNoRemoveDotTime {
-			model_ = strings.Replace(model_, ".", "", -1)
+			model_ = strings.ReplaceAll(model_, ".", "")
 		}
 		// https://github.com/songquanpeng/one-api/issues/67
 		requestURL = fmt.Sprintf("/openai/deployments/%s/%s", model_, task)
@@ -168,7 +168,7 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 	//	return minimax.GetRequestURL(info)
 	case constant.ChannelTypeCustom:
 		url := info.ChannelBaseUrl
-		url = strings.Replace(url, "{model}", info.UpstreamModelName, -1)
+		url = strings.ReplaceAll(url, "{model}", info.UpstreamModelName)
 		return url, nil
 	default:
 		if (info.RelayFormat == types.RelayFormatClaude || info.RelayFormat == types.RelayFormatGemini) &&
@@ -186,7 +186,7 @@ func (a *Adaptor) SetupRequestHeader(c *gin.Context, header *http.Header, info *
 		header.Set("api-key", info.ApiKey)
 		return nil
 	}
-	if info.ChannelType == constant.ChannelTypeOpenAI && "" != info.Organization {
+	if info.ChannelType == constant.ChannelTypeOpenAI && info.Organization != "" {
 		header.Set("OpenAI-Organization", info.Organization)
 	}
 	// 检查 Header Override 是否已设置 Authorization，如果已设置则跳过默认设置
@@ -379,7 +379,9 @@ func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInf
 		var requestBody bytes.Buffer
 		writer := multipart.NewWriter(&requestBody)
 
-		writer.WriteField("model", request.Model)
+		if err := writer.WriteField("model", request.Model); err != nil {
+			return nil, fmt.Errorf("write model field: %w", err)
+		}
 
 		formData, err2 := common.ParseMultipartFormReusable(c)
 		if err2 != nil {
@@ -395,7 +397,9 @@ func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInf
 				continue
 			}
 			for _, value := range values {
-				writer.WriteField(key, value)
+				if err := writer.WriteField(key, value); err != nil {
+					return nil, fmt.Errorf("write multipart field %q: %w", key, err)
+				}
 				logger.LogDebug(c.Request.Context(), "--form '%s=\"%s\"'", key, value)
 			}
 		}
@@ -415,7 +419,7 @@ func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInf
 		if err != nil {
 			return nil, fmt.Errorf("error opening audio file: %v", err)
 		}
-		defer file.Close()
+		defer func() { _ = file.Close() /* cleanup only */ }()
 
 		part, err := writer.CreateFormFile("file", fileHeader.Filename)
 		if err != nil {
@@ -426,7 +430,9 @@ func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInf
 		}
 
 		// 关闭 multipart 编写器以设置分界线
-		writer.Close()
+		if err := writer.Close(); err != nil {
+			return nil, fmt.Errorf("finalize multipart form: %w", err)
+		}
 		c.Request.Header.Set("Content-Type", writer.FormDataContentType())
 		logger.LogDebug(c.Request.Context(), "--header 'Content-Type: %s'", writer.FormDataContentType())
 		return &requestBody, nil
@@ -443,7 +449,9 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 		var requestBody bytes.Buffer
 		writer := multipart.NewWriter(&requestBody)
 
-		writer.WriteField("model", request.Model)
+		if err := writer.WriteField("model", request.Model); err != nil {
+			return nil, fmt.Errorf("write model field: %w", err)
+		}
 		// 使用已解析的 multipart 表单，避免重复解析
 		mf := c.Request.MultipartForm
 		if mf == nil {
@@ -463,7 +471,9 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 					continue
 				}
 				for _, value := range values {
-					writer.WriteField(key, value)
+					if err := writer.WriteField(key, value); err != nil {
+						return nil, fmt.Errorf("write multipart field %q: %w", key, err)
+					}
 				}
 			}
 		}
@@ -558,7 +568,9 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 		}
 
 		// 关闭 multipart 编写器以设置分界线
-		writer.Close()
+		if err := writer.Close(); err != nil {
+			return nil, fmt.Errorf("finalize multipart form: %w", err)
+		}
 		c.Request.Header.Set("Content-Type", writer.FormDataContentType())
 		return &requestBody, nil
 

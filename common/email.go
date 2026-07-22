@@ -102,7 +102,7 @@ func SendEmail(subject string, receiver string, content string) error {
 	if err != nil {
 		return err
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	if shouldAuthenticateSMTP() {
 		if err = client.Auth(auth); err != nil {
 			return err

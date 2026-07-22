@@ -32,13 +32,13 @@ func (t TaskStatus) ToVideoStatus() string {
 }
 
 const (
-	TaskStatusNotStart   TaskStatus = "NOT_START"
-	TaskStatusSubmitted             = "SUBMITTED"
-	TaskStatusQueued                = "QUEUED"
-	TaskStatusInProgress            = "IN_PROGRESS"
-	TaskStatusFailure               = "FAILURE"
-	TaskStatusSuccess               = "SUCCESS"
-	TaskStatusUnknown               = "UNKNOWN"
+	TaskStatusNotStart   = "NOT_START"
+	TaskStatusSubmitted  = "SUBMITTED"
+	TaskStatusQueued     = "QUEUED"
+	TaskStatusInProgress = "IN_PROGRESS"
+	TaskStatusFailure    = "FAILURE"
+	TaskStatusSuccess    = "SUCCESS"
+	TaskStatusUnknown    = "UNKNOWN"
 )
 
 type Task struct {
@@ -174,9 +174,9 @@ func InitTask(platform constant.TaskPlatform, relayInfo *commonRelay.RelayInfo) 
 	properties := Properties{}
 	privateData := TaskPrivateData{}
 	if relayInfo != nil && relayInfo.ChannelMeta != nil {
-		if relayInfo.ChannelMeta.ChannelType == constant.ChannelTypeGemini ||
-			relayInfo.ChannelMeta.ChannelType == constant.ChannelTypeVertexAi {
-			privateData.Key = relayInfo.ChannelMeta.ApiKey
+		if relayInfo.ChannelType == constant.ChannelTypeGemini ||
+			relayInfo.ChannelType == constant.ChannelTypeVertexAi {
+			privateData.Key = relayInfo.ApiKey
 		}
 		if relayInfo.UpstreamModelName != "" {
 			properties.UpstreamModelName = relayInfo.UpstreamModelName
@@ -188,8 +188,8 @@ func InitTask(platform constant.TaskPlatform, relayInfo *commonRelay.RelayInfo) 
 
 	// 使用预生成的公开 ID（如果有），否则新生成
 	taskID := ""
-	if relayInfo.TaskRelayInfo != nil && relayInfo.TaskRelayInfo.PublicTaskID != "" {
-		taskID = relayInfo.TaskRelayInfo.PublicTaskID
+	if relayInfo.TaskRelayInfo != nil && relayInfo.PublicTaskID != "" {
+		taskID = relayInfo.PublicTaskID
 	} else {
 		taskID = GenerateTaskID()
 	}
@@ -306,9 +306,7 @@ func GetTimedOutUnfinishedTasks(cutoffUnix int64, limit int) []*Task {
 
 func GetAllUnFinishSyncTasks(limit int) []*Task {
 	var tasks []*Task
-	var err error
-	// get all tasks progress is not 100%
-	err = DB.Where("progress != ?", "100%").Where("status != ?", TaskStatusFailure).Where("status != ?", TaskStatusSuccess).Limit(limit).Order("id").Find(&tasks).Error
+	var err = DB.Where("progress != ?", "100%").Where("status != ?", TaskStatusFailure).Where("status != ?", TaskStatusSuccess).Limit(limit).Order("id").Find(&tasks).Error
 	if err != nil {
 		return nil
 	}
@@ -364,8 +362,7 @@ func GetByTaskIds(userId int, taskIds []any) ([]*Task, error) {
 		return nil, nil
 	}
 	var task []*Task
-	var err error
-	err = DB.Where("user_id = ? and task_id in (?)", userId, taskIds).
+	var err = DB.Where("user_id = ? and task_id in (?)", userId, taskIds).
 		Find(&task).Error
 	if err != nil {
 		return nil, err
@@ -374,8 +371,7 @@ func GetByTaskIds(userId int, taskIds []any) ([]*Task, error) {
 }
 
 func (Task *Task) Insert() error {
-	var err error
-	err = DB.Create(Task).Error
+	var err = DB.Create(Task).Error
 	return err
 }
 
@@ -412,8 +408,7 @@ func (t *Task) Snapshot() taskSnapshot {
 }
 
 func (Task *Task) Update() error {
-	var err error
-	err = DB.Save(Task).Error
+	var err = DB.Save(Task).Error
 	return err
 }
 

@@ -90,7 +90,7 @@ func updateVideoSingleTask(ctx context.Context, adaptor channel.TaskAdaptor, cha
 	//if resp.StatusCode != http.StatusOK {
 	//return fmt.Errorf("get Video Task status code: %d", resp.StatusCode)
 	//}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("readAll failed for task %s: %w", taskId, err)
@@ -145,7 +145,7 @@ func updateVideoSingleTask(ctx context.Context, adaptor channel.TaskAdaptor, cha
 		if task.FinishTime == 0 {
 			task.FinishTime = now
 		}
-		if !(len(taskResult.Url) > 5 && taskResult.Url[:5] == "data:") {
+		if len(taskResult.Url) <= 5 || taskResult.Url[:5] != "data:" {
 			task.FailReason = taskResult.Url
 		}
 

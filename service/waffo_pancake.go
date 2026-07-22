@@ -133,7 +133,7 @@ func CreateWaffoPancakeCheckoutSession(ctx context.Context, params *WaffoPancake
 		return nil, err
 	}
 	if session == nil || strings.TrimSpace(session.CheckoutURL) == "" || strings.TrimSpace(session.SessionID) == "" {
-		return nil, fmt.Errorf("Waffo Pancake returned empty checkout session")
+		return nil, fmt.Errorf("waffo Pancake returned empty checkout session")
 	}
 	return &WaffoPancakeCheckoutSession{
 		SessionID:      session.SessionID,

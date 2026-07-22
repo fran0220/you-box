@@ -14,6 +14,7 @@ import (
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/dto"
+	"github.com/QuantumNous/new-api/logger"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/helper"
 	"github.com/QuantumNous/new-api/service"
@@ -48,8 +49,8 @@ func uploadDifyFile(c *gin.Context, info *relaycommon.RelayInfo, user string, me
 			common.SysLog("failed to create temp file: " + err.Error())
 			return nil
 		}
-		defer tempFile.Close()
-		defer os.Remove(tempFile.Name())
+		defer func() { _ = tempFile.Close() /* cleanup only */ }()
+		defer func() { _ = os.Remove(tempFile.Name()) /* cleanup only */ }()
 
 		// Write decoded data to temp file
 		if _, err := tempFile.Write(decodedData); err != nil {
@@ -85,7 +86,10 @@ func uploadDifyFile(c *gin.Context, info *relaycommon.RelayInfo, user string, me
 			common.SysLog("failed to copy file content: " + err.Error())
 			return nil
 		}
-		writer.Close()
+		if err := writer.Close(); err != nil {
+			common.SysLog("failed to finalize multipart form: " + err.Error())
+			return nil
+		}
 
 		// Create HTTP request
 		req, err := http.NewRequest("POST", uploadUrl, body)
@@ -104,7 +108,7 @@ func uploadDifyFile(c *gin.Context, info *relaycommon.RelayInfo, user string, me
 			common.SysLog("failed to send request: " + err.Error())
 			return nil
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() /* cleanup only */ }()
 
 		// Parse response
 		var result struct {
@@ -145,11 +149,12 @@ func requestOpenAI2Dify(c *gin.Context, info *relaycommon.RelayInfo, request dto
 	files := make([]DifyFile, 0)
 	var content strings.Builder
 	for _, message := range request.Messages {
-		if message.Role == "system" {
+		switch message.Role {
+		case "system":
 			content.WriteString("SYSTEM: \n" + message.StringContent() + "\n")
-		} else if message.Role == "assistant" {
+		case "assistant":
 			content.WriteString("ASSISTANT: \n" + message.StringContent() + "\n")
-		} else {
+		default:
 			parseContent := message.ParseContent()
 			for _, mediaContent := range parseContent {
 				switch mediaContent.Type {
@@ -211,9 +216,10 @@ func streamResponseDify2OpenAI(difyResponse DifyChunkChatCompletionResponse) *dt
 			choice.Delta.SetReasoningContent(text + "\n")
 		}
 	} else if difyResponse.Event == "message" || difyResponse.Event == "agent_message" {
-		if difyResponse.Answer == "<details style=\"color:gray;background-color: #f8f8f8;padding: 8px;border-radius: 4px;\" open> <summary> Thinking... </summary>\n" {
+		switch difyResponse.Answer {
+		case "<details style=\"color:gray;background-color: #f8f8f8;padding: 8px;border-radius: 4px;\" open> <summary> Thinking... </summary>\n":
 			difyResponse.Answer = "<think>"
-		} else if difyResponse.Answer == "</details>" {
+		case "</details>":
 			difyResponse.Answer = "</think>"
 		}
 
@@ -235,11 +241,12 @@ func difyStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.R
 			sr.Error(err)
 			return
 		}
-		if difyResponse.Event == "message_end" {
+		switch difyResponse.Event {
+		case "message_end":
 			usage = &difyResponse.MetaData.Usage
 			sr.Done()
 			return
-		} else if difyResponse.Event == "error" {
+		case "error":
 			sr.Stop(fmt.Errorf("dify error event"))
 			return
 		}
@@ -296,6 +303,8 @@ func difyHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Respons
 	}
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(resp.StatusCode)
-	c.Writer.Write(jsonResponse)
+	if _, err := c.Writer.Write(jsonResponse); err != nil {
+		logger.LogError(c, "downstream write failed after Dify completion: "+err.Error())
+	}
 	return &difyResponse.MetaData.Usage, nil
 }

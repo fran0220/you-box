@@ -12,6 +12,7 @@ import (
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/dto"
+	"github.com/QuantumNous/new-api/logger"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/helper"
 	"github.com/QuantumNous/new-api/service"
@@ -170,12 +171,13 @@ func zhipuStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.
 				if len(line) < 5 {
 					continue
 				}
-				if line[:5] == "data:" {
+				switch line[:5] {
+				case "data:":
 					dataChan <- line[5:]
 					if i != len(lines)-1 {
 						dataChan <- "\n"
 					}
-				} else if line[:5] == "meta:" {
+				case "meta:":
 					metaChan <- line[5:]
 				}
 			}
@@ -246,6 +248,8 @@ func zhipuHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Respon
 	}
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = c.Writer.Write(jsonResponse)
+	if _, err := c.Writer.Write(jsonResponse); err != nil {
+		logger.LogError(c, "downstream write failed after Zhipu completion: "+err.Error())
+	}
 	return &fullTextResponse.Usage, nil
 }

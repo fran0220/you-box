@@ -11,12 +11,6 @@ import (
 	relaymeta "github.com/QuantumNous/new-api/service/relayconvert/internal/meta"
 )
 
-const (
-	webSearchMaxUsesLow    = 1
-	webSearchMaxUsesMedium = 5
-	webSearchMaxUsesHigh   = 10
-)
-
 type openRouterRequestReasoning struct {
 	Enabled   bool   `json:"enabled"`
 	Effort    string `json:"effort,omitempty"`
@@ -50,12 +44,13 @@ func ClaudeMessagesRequestToOpenAIChat(claudeRequest dto.ClaudeRequest, info *re
 		}
 		if claudeRequest.Thinking != nil {
 			var reasoningConfig openRouterRequestReasoning
-			if claudeRequest.Thinking.Type == "enabled" {
+			switch claudeRequest.Thinking.Type {
+			case "enabled":
 				reasoningConfig = openRouterRequestReasoning{
 					Enabled:   true,
 					MaxTokens: claudeRequest.Thinking.GetBudgetTokens(),
 				}
-			} else if claudeRequest.Thinking.Type == "adaptive" {
+			case "adaptive":
 				reasoningConfig = openRouterRequestReasoning{
 					Enabled: true,
 				}

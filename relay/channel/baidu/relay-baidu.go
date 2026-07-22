@@ -13,6 +13,7 @@ import (
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/dto"
+	"github.com/QuantumNous/new-api/logger"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/helper"
 	"github.com/QuantumNous/new-api/service"
@@ -159,7 +160,9 @@ func baiduHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Respon
 	}
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = c.Writer.Write(jsonResponse)
+	if _, err := c.Writer.Write(jsonResponse); err != nil {
+		logger.LogError(c, "downstream write failed after Baidu completion: "+err.Error())
+	}
 	return nil, &fullTextResponse.Usage
 }
 
@@ -184,7 +187,9 @@ func baiduEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *ht
 	}
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = c.Writer.Write(jsonResponse)
+	if _, err := c.Writer.Write(jsonResponse); err != nil {
+		logger.LogError(c, "downstream write failed after Baidu embedding completed: "+err.Error())
+	}
 	return nil, &fullTextResponse.Usage
 }
 
@@ -227,7 +232,7 @@ func getBaiduAccessTokenHelper(apiKey string) (*BaiduAccessToken, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() /* cleanup only */ }()
 
 	var accessToken BaiduAccessToken
 	err = json.NewDecoder(res.Body).Decode(&accessToken)

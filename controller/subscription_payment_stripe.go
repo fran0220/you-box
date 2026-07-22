@@ -125,8 +125,8 @@ func genStripeSubscriptionLink(referenceId string, customerId string, email stri
 		Mode: stripe.String(string(stripe.CheckoutSessionModeSubscription)),
 	}
 
-	if "" == customerId {
-		if "" != email {
+	if customerId == "" {
+		if email != "" {
 			params.CustomerEmail = stripe.String(email)
 		}
 		params.CustomerCreation = stripe.String(string(stripe.CheckoutSessionCustomerCreationAlways))

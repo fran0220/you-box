@@ -28,7 +28,6 @@ func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dt
 func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
 	//TODO implement me
 	panic("implement me")
-	return nil, nil
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
@@ -87,7 +86,7 @@ func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInf
 	if err != nil {
 		return nil, errors.New("file is required")
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() /* cleanup only */ }()
 	// 打开临时文件用于保存上传的文件内容
 	requestBody := &bytes.Buffer{}
 

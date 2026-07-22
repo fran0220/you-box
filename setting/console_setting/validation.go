@@ -55,7 +55,9 @@ func getJSONList(jsonStr string) []map[string]interface{} {
 		return []map[string]interface{}{}
 	}
 	var list []map[string]interface{}
-	json.Unmarshal([]byte(jsonStr), &list)
+	if err := json.Unmarshal([]byte(jsonStr), &list); err != nil {
+		return []map[string]interface{}{}
+	}
 	return list
 }
 
@@ -241,7 +243,7 @@ func validateUptimeKumaGroups(groupsStr string) error {
 	}
 
 	if len(groups) > 20 {
-		return fmt.Errorf("Uptime Kuma分组数量不能超过20个")
+		return fmt.Errorf("uptime Kuma分组数量不能超过20个")
 	}
 
 	nameSet := make(map[string]bool)

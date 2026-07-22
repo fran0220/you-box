@@ -102,7 +102,7 @@ func (s *fakeSMTPServer) serve() {
 	if err != nil {
 		return
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
 
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
@@ -361,7 +361,7 @@ func TestNewSMTPClientHonorsExplicitStartTLSWhenPortIs465(t *testing.T) {
 
 	client, err := newSMTPClient(fmt.Sprintf("%s:%d", server.host, server.port))
 	require.NoError(t, err)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	select {
 	case command := <-server.startTLSCommands:
@@ -384,7 +384,7 @@ func TestNewSMTPClientKeepsImplicitTLSForLegacyPort465(t *testing.T) {
 
 	client, err := newSMTPClient(fmt.Sprintf("%s:%d", server.host, server.port))
 	require.NoError(t, err)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 }
 
 func TestSendEmailSkipsAuthWhenCredentialsAreEmpty(t *testing.T) {

@@ -518,10 +518,7 @@ func (m *Message) SetMediaContent(content []MediaContent) {
 
 func (m *Message) IsStringContent() bool {
 	_, ok := m.Content.(string)
-	if ok {
-		return true
-	}
-	return false
+	return ok
 }
 
 func (m *Message) ParseContent() []MediaContent {
@@ -892,7 +889,8 @@ func (r *OpenAIResponsesRequest) GetTokenCountMeta() *types.TokenCountMeta {
 	if r.Input != nil {
 		inputs := r.ParseInput()
 		for _, input := range inputs {
-			if input.Type == "input_image" {
+			switch input.Type {
+			case "input_image":
 				if input.ImageUrl != "" {
 					fileMeta = append(fileMeta, &types.FileMeta{
 						FileType: types.FileTypeImage,
@@ -900,14 +898,14 @@ func (r *OpenAIResponsesRequest) GetTokenCountMeta() *types.TokenCountMeta {
 						Detail:   input.Detail,
 					})
 				}
-			} else if input.Type == "input_file" {
+			case "input_file":
 				if input.FileUrl != "" {
 					fileMeta = append(fileMeta, &types.FileMeta{
 						FileType: types.FileTypeFile,
 						Source:   types.NewFileSourceFromData(input.FileUrl, ""),
 					})
 				}
-			} else {
+			default:
 				texts = append(texts, input.Text)
 			}
 		}

@@ -57,7 +57,7 @@ func ChatCompletionsResponseToResponsesResponse(resp *dto.OpenAITextResponse, id
 		out.IncompleteDetails = details
 	}
 
-	if text := choice.Message.StringContent(); text != "" {
+	if text := choice.StringContent(); text != "" {
 		out.Output = append(out.Output, dto.ResponsesOutput{
 			Type:   responsesOutputTypeMessage,
 			ID:     fmt.Sprintf("%s_msg_0", id),
@@ -72,7 +72,7 @@ func ChatCompletionsResponseToResponsesResponse(resp *dto.OpenAITextResponse, id
 			},
 		})
 	}
-	if reasoning := choice.Message.GetReasoningContent(); reasoning != "" {
+	if reasoning := choice.GetReasoningContent(); reasoning != "" {
 		out.Output = append(out.Output, dto.ResponsesOutput{
 			Type:   responsesOutputTypeReasoning,
 			ID:     fmt.Sprintf("%s_reasoning_0", id),
@@ -86,7 +86,7 @@ func ChatCompletionsResponseToResponsesResponse(resp *dto.OpenAITextResponse, id
 		})
 	}
 
-	for i, toolCall := range choice.Message.ParseToolCalls() {
+	for i, toolCall := range choice.ParseToolCalls() {
 		toolOutput, err := chatToolCallToResponsesOutput(toolCall, id, i, responseOutputStatus(out))
 		if err != nil {
 			return nil, nil, err

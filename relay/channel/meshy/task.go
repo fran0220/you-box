@@ -93,27 +93,27 @@ type TaskAdaptor struct {
 func (a *TaskAdaptor) Init(info *relaycommon.RelayInfo) {}
 
 func (a *TaskAdaptor) ValidateRequestAndSetAction(c *gin.Context, info *relaycommon.RelayInfo) *dto.TaskError {
-	return service.TaskErrorWrapperLocal(errors.New("Meshy uses the native /meshy/openapi proxy routes"), "invalid_request", http.StatusNotFound)
+	return service.TaskErrorWrapperLocal(errors.New("meshy uses the native /meshy/openapi proxy routes"), "invalid_request", http.StatusNotFound)
 }
 
 func (a *TaskAdaptor) BuildRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	return "", errors.New("Meshy uses the native /meshy/openapi proxy routes")
+	return "", errors.New("meshy uses the native /meshy/openapi proxy routes")
 }
 
 func (a *TaskAdaptor) BuildRequestHeader(c *gin.Context, req *http.Request, info *relaycommon.RelayInfo) error {
-	return errors.New("Meshy uses the native /meshy/openapi proxy routes")
+	return errors.New("meshy uses the native /meshy/openapi proxy routes")
 }
 
 func (a *TaskAdaptor) BuildRequestBody(c *gin.Context, info *relaycommon.RelayInfo) (io.Reader, error) {
-	return nil, errors.New("Meshy uses the native /meshy/openapi proxy routes")
+	return nil, errors.New("meshy uses the native /meshy/openapi proxy routes")
 }
 
 func (a *TaskAdaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (*http.Response, error) {
-	return nil, errors.New("Meshy uses the native /meshy/openapi proxy routes")
+	return nil, errors.New("meshy uses the native /meshy/openapi proxy routes")
 }
 
 func (a *TaskAdaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (string, []byte, *dto.TaskError) {
-	return "", nil, service.TaskErrorWrapperLocal(errors.New("Meshy uses the native /meshy/openapi proxy routes"), "invalid_request", http.StatusNotFound)
+	return "", nil, service.TaskErrorWrapperLocal(errors.New("meshy uses the native /meshy/openapi proxy routes"), "invalid_request", http.StatusNotFound)
 }
 
 func (a *TaskAdaptor) FetchTask(baseUrl, key string, body map[string]any, proxy string) (*http.Response, error) {

@@ -36,14 +36,15 @@ func StreamResponseClaude2OpenAI(claudeResponse *dto.ClaudeResponse) *dto.ChatCo
 		fcIdx = *claudeResponse.Index
 	}
 	var choice dto.ChatCompletionsStreamResponseChoice
-	if claudeResponse.Type == "message_start" {
+	switch claudeResponse.Type {
+	case "message_start":
 		if claudeResponse.Message != nil {
 			response.Id = claudeResponse.Message.Id
 			response.Model = claudeResponse.Message.Model
 		}
 		choice.Delta.SetContentString("")
 		choice.Delta.Role = "assistant"
-	} else if claudeResponse.Type == "content_block_start" {
+	case "content_block_start":
 		if claudeResponse.ContentBlock != nil {
 			if claudeResponse.ContentBlock.Type == "text" && claudeResponse.ContentBlock.Text != nil {
 				choice.Delta.SetContentString(*claudeResponse.ContentBlock.Text)
@@ -62,7 +63,7 @@ func StreamResponseClaude2OpenAI(claudeResponse *dto.ClaudeResponse) *dto.ChatCo
 		} else {
 			return nil
 		}
-	} else if claudeResponse.Type == "content_block_delta" {
+	case "content_block_delta":
 		if claudeResponse.Delta != nil {
 			choice.Delta.Content = claudeResponse.Delta.Text
 			switch claudeResponse.Delta.Type {
@@ -81,16 +82,16 @@ func StreamResponseClaude2OpenAI(claudeResponse *dto.ClaudeResponse) *dto.ChatCo
 				choice.Delta.ReasoningContent = claudeResponse.Delta.Thinking
 			}
 		}
-	} else if claudeResponse.Type == "message_delta" {
+	case "message_delta":
 		if claudeResponse.Delta != nil && claudeResponse.Delta.StopReason != nil {
 			finishReason := StopReasonClaudeToOpenAI(*claudeResponse.Delta.StopReason)
 			if finishReason != "null" {
 				choice.FinishReason = &finishReason
 			}
 		}
-	} else if claudeResponse.Type == "message_stop" {
+	case "message_stop":
 		return nil
-	} else {
+	default:
 		return nil
 	}
 	if len(tools) > 0 {
@@ -153,10 +154,10 @@ func ResponseClaude2OpenAI(claudeResponse *dto.ClaudeResponse) *dto.OpenAITextRe
 		choice.ReasoningContent = &responseThinking
 	}
 	if len(tools) > 0 {
-		choice.Message.SetToolCalls(tools)
+		choice.SetToolCalls(tools)
 	}
 	if thinkingContent != "" {
-		choice.Message.ReasoningContent = &thinkingContent
+		choice.ReasoningContent = &thinkingContent
 	}
 	fullTextResponse.Model = claudeResponse.Model
 	choices = append(choices, choice)
@@ -336,7 +337,8 @@ func FormatClaudeResponseInfo(claudeResponse *dto.ClaudeResponse, oaiResponse *d
 	if claudeInfo.Usage == nil {
 		claudeInfo.Usage = &dto.Usage{}
 	}
-	if claudeResponse.Type == "message_start" {
+	switch claudeResponse.Type {
+	case "message_start":
 		if claudeResponse.Message != nil {
 			claudeInfo.ResponseId = claudeResponse.Message.Id
 			claudeInfo.Model = claudeResponse.Message.Model
@@ -352,7 +354,7 @@ func FormatClaudeResponseInfo(claudeResponse *dto.ClaudeResponse, oaiResponse *d
 			claudeInfo.Usage.CompletionTokens = claudeResponse.Message.Usage.OutputTokens
 			claudeInfo.Usage.BillingUsage = claudeBillingUsageFromSemanticUsage(claudeInfo.Usage)
 		}
-	} else if claudeResponse.Type == "content_block_delta" {
+	case "content_block_delta":
 		if claudeResponse.Delta != nil {
 			if claudeResponse.Delta.Text != nil {
 				claudeInfo.ResponseText.WriteString(*claudeResponse.Delta.Text)
@@ -361,7 +363,7 @@ func FormatClaudeResponseInfo(claudeResponse *dto.ClaudeResponse, oaiResponse *d
 				claudeInfo.ResponseText.WriteString(*claudeResponse.Delta.Thinking)
 			}
 		}
-	} else if claudeResponse.Type == "message_delta" {
+	case "message_delta":
 		if claudeResponse.Usage != nil {
 			claudeInfo.Usage.UsageSemantic = "anthropic"
 			if claudeResponse.Usage.InputTokens > 0 {
@@ -387,8 +389,8 @@ func FormatClaudeResponseInfo(claudeResponse *dto.ClaudeResponse, oaiResponse *d
 		}
 
 		claudeInfo.Done = true
-	} else if claudeResponse.Type == "content_block_start" {
-	} else {
+	case "content_block_start":
+	default:
 		return false
 	}
 	if oaiResponse != nil {

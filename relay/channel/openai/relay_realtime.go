@@ -122,7 +122,8 @@ func OpenaiRealtimeHandler(c *gin.Context, info *relaycommon.RelayInfo) (*types.
 					return
 				}
 
-				if realtimeEvent.Type == dto.RealtimeEventTypeResponseDone {
+				switch realtimeEvent.Type {
+				case dto.RealtimeEventTypeResponseDone:
 					realtimeUsage := realtimeEvent.Response.Usage
 					if realtimeUsage != nil {
 						usage.TotalTokens += realtimeUsage.TotalTokens
@@ -167,14 +168,14 @@ func OpenaiRealtimeHandler(c *gin.Context, info *relaycommon.RelayInfo) (*types.
 					logger.LogInfo(c, fmt.Sprintf("realtime streaming localUsage: %v", localUsage))
 					logger.LogInfo(c, fmt.Sprintf("realtime streaming localUsage: %v", localUsage))
 
-				} else if realtimeEvent.Type == dto.RealtimeEventTypeSessionUpdated || realtimeEvent.Type == dto.RealtimeEventTypeSessionCreated {
+				case dto.RealtimeEventTypeSessionUpdated, dto.RealtimeEventTypeSessionCreated:
 					realtimeSession := realtimeEvent.Session
 					if realtimeSession != nil {
 						// update audio format
 						info.InputAudioFormat = common.GetStringIfEmpty(realtimeSession.InputAudioFormat, info.InputAudioFormat)
 						info.OutputAudioFormat = common.GetStringIfEmpty(realtimeSession.OutputAudioFormat, info.OutputAudioFormat)
 					}
-				} else {
+				default:
 					textToken, audioToken, err := service.CountTokenRealtime(info, *realtimeEvent, info.UpstreamModelName)
 					if err != nil {
 						errChan <- fmt.Errorf("error counting text token: %v", err)

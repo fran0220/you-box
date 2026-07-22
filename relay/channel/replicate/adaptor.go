@@ -440,7 +440,7 @@ func uploadFileFromForm(c *gin.Context, info *relaycommon.RelayInfo, fieldCandid
 	if err != nil {
 		return "", fmt.Errorf("replicate adaptor: failed to open image file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() /* cleanup only */ }()
 
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
@@ -455,15 +455,17 @@ func uploadFileFromForm(c *gin.Context, info *relaycommon.RelayInfo, fieldCandid
 
 	part, err := writer.CreatePart(hdr)
 	if err != nil {
-		writer.Close()
+		_ = writer.Close()
 		return "", fmt.Errorf("replicate adaptor: create upload form failed: %w", err)
 	}
 	if _, err := io.Copy(part, file); err != nil {
-		writer.Close()
+		_ = writer.Close()
 		return "", fmt.Errorf("replicate adaptor: copy image content failed: %w", err)
 	}
 	formContentType := writer.FormDataContentType()
-	writer.Close()
+	if err := writer.Close(); err != nil {
+		return "", fmt.Errorf("replicate adaptor: finalize upload form: %w", err)
+	}
 
 	baseURL := info.ChannelBaseUrl
 	if baseURL == "" {
@@ -482,7 +484,7 @@ func uploadFileFromForm(c *gin.Context, info *relaycommon.RelayInfo, fieldCandid
 	if err != nil {
 		return "", fmt.Errorf("replicate adaptor: upload image failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() /* cleanup only */ }()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {

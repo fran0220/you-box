@@ -44,7 +44,6 @@ jobs:
         with:
           version: v2.12.2
           args: --timeout=5m
-          only-new-issues: true
 
       - name: Build production binary
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

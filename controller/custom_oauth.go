@@ -182,7 +182,7 @@ func FetchCustomOAuthDiscovery(c *gin.Context) {
 		common.ApiErrorMsg(c, "获取 Discovery 配置失败: "+err.Error())
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))

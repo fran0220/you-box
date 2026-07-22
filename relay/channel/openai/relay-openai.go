@@ -52,7 +52,7 @@ func sendStreamData(c *gin.Context, info *relaycommon.RelayInfo, data string, fo
 	}
 
 	// Handle think to content conversion
-	if info.ThinkingContentInfo.IsFirstThinkingContent {
+	if info.IsFirstThinkingContent {
 		if hasThinkingContent {
 			response := lastStreamResponse.Copy()
 			for i := range response.Choices {
@@ -61,13 +61,13 @@ func sendStreamData(c *gin.Context, info *relaycommon.RelayInfo, data string, fo
 				response.Choices[i].Delta.ReasoningContent = nil
 				response.Choices[i].Delta.Reasoning = nil
 			}
-			info.ThinkingContentInfo.IsFirstThinkingContent = false
-			info.ThinkingContentInfo.HasSentThinkingContent = true
+			info.IsFirstThinkingContent = false
+			info.HasSentThinkingContent = true
 			return helper.ObjectData(c, response)
 		}
 	}
 
-	if lastStreamResponse.Choices == nil || len(lastStreamResponse.Choices) == 0 {
+	if len(lastStreamResponse.Choices) == 0 {
 		return helper.ObjectData(c, lastStreamResponse)
 	}
 
@@ -75,15 +75,17 @@ func sendStreamData(c *gin.Context, info *relaycommon.RelayInfo, data string, fo
 	for i, choice := range lastStreamResponse.Choices {
 		// Handle transition from thinking to content
 		// only send `</think>` tag when previous thinking content has been sent
-		if hasContent && !info.ThinkingContentInfo.SendLastThinkingContent && info.ThinkingContentInfo.HasSentThinkingContent {
+		if hasContent && !info.SendLastThinkingContent && info.HasSentThinkingContent {
 			response := lastStreamResponse.Copy()
 			for j := range response.Choices {
 				response.Choices[j].Delta.SetContentString("\n</think>\n")
 				response.Choices[j].Delta.ReasoningContent = nil
 				response.Choices[j].Delta.Reasoning = nil
 			}
-			info.ThinkingContentInfo.SendLastThinkingContent = true
-			helper.ObjectData(c, response)
+			info.SendLastThinkingContent = true
+			if err := helper.ObjectData(c, response); err != nil {
+				return err
+			}
 		}
 
 		// Convert reasoning content to regular content if any
@@ -228,17 +230,14 @@ func OpenaiHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Respo
 		}
 	}
 
-	forceFormat := false
-	if info.ChannelSetting.ForceFormat {
-		forceFormat = true
-	}
+	forceFormat := info.ChannelSetting.ForceFormat
 
 	usageModified := false
-	if simpleResponse.Usage.PromptTokens == 0 {
-		completionTokens := simpleResponse.Usage.CompletionTokens
+	if simpleResponse.PromptTokens == 0 {
+		completionTokens := simpleResponse.CompletionTokens
 		if completionTokens == 0 {
 			for _, choice := range simpleResponse.Choices {
-				ctkm := service.CountTextToken(choice.Message.StringContent()+choice.Message.GetReasoningContent(), info.UpstreamModelName)
+				ctkm := service.CountTextToken(choice.StringContent()+choice.GetReasoningContent(), info.UpstreamModelName)
 				completionTokens += ctkm
 			}
 		}

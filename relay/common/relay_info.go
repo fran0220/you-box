@@ -303,10 +303,10 @@ func (info *RelayInfo) ToString() string {
 	}
 
 	// Responses usage info (non-sensitive)
-	if info.ResponsesUsageInfo != nil && len(info.ResponsesUsageInfo.BuiltInTools) > 0 {
+	if info.ResponsesUsageInfo != nil && len(info.BuiltInTools) > 0 {
 		fmt.Fprintf(b, "ResponsesTools{ ")
 		first := true
-		for name, tool := range info.ResponsesUsageInfo.BuiltInTools {
+		for name, tool := range info.BuiltInTools {
 			if !first {
 				fmt.Fprintf(b, ", ")
 			}
@@ -402,7 +402,7 @@ func GenRelayInfoResponses(c *gin.Context, request *dto.OpenAIResponsesRequest) 
 	if len(request.Tools) > 0 {
 		for _, tool := range request.GetToolsMap() {
 			toolType := common.Interface2String(tool["type"])
-			info.ResponsesUsageInfo.BuiltInTools[toolType] = &BuildInToolInfo{
+			info.BuiltInTools[toolType] = &BuildInToolInfo{
 				ToolName:  toolType,
 				CallCount: 0,
 			}
@@ -814,46 +814,34 @@ func RemoveDisabledFields(jsonData []byte, channelOtherSettings dto.ChannelOther
 
 	// 默认移除 service_tier，除非明确允许（避免额外计费风险）
 	if !channelOtherSettings.AllowServiceTier {
-		if _, exists := data["service_tier"]; exists {
-			delete(data, "service_tier")
-		}
+		delete(data, "service_tier")
 	}
 
 	// 默认移除 inference_geo，除非明确允许（避免在未授权情况下透传数据驻留区域）
 	if !channelOtherSettings.AllowInferenceGeo {
-		if _, exists := data["inference_geo"]; exists {
-			delete(data, "inference_geo")
-		}
+		delete(data, "inference_geo")
 	}
 
 	// 默认移除 speed，除非明确允许（避免意外切换 Claude 推理速度模式）
 	if !channelOtherSettings.AllowSpeed {
-		if _, exists := data["speed"]; exists {
-			delete(data, "speed")
-		}
+		delete(data, "speed")
 	}
 
 	// 默认允许 store 透传，除非明确禁用（禁用可能影响 Codex 使用）
 	if channelOtherSettings.DisableStore {
-		if _, exists := data["store"]; exists {
-			delete(data, "store")
-		}
+		delete(data, "store")
 	}
 
 	// 默认移除 safety_identifier，除非明确允许（保护用户隐私，避免向 OpenAI 报告用户信息）
 	if !channelOtherSettings.AllowSafetyIdentifier {
-		if _, exists := data["safety_identifier"]; exists {
-			delete(data, "safety_identifier")
-		}
+		delete(data, "safety_identifier")
 	}
 
 	// 默认移除 stream_options.include_obfuscation，除非明确允许（避免关闭响应流混淆保护）
 	if !channelOtherSettings.AllowIncludeObfuscation {
 		if streamOptionsAny, exists := data["stream_options"]; exists {
 			if streamOptions, ok := streamOptionsAny.(map[string]interface{}); ok {
-				if _, includeExists := streamOptions["include_obfuscation"]; includeExists {
-					delete(streamOptions, "include_obfuscation")
-				}
+				delete(streamOptions, "include_obfuscation")
 				if len(streamOptions) == 0 {
 					delete(data, "stream_options")
 				} else {

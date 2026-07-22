@@ -64,7 +64,7 @@ func RelayMidjourneyImage(c *gin.Context) {
 		})
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() /* cleanup only */ }()
 	if resp.StatusCode != http.StatusOK {
 		responseBody, _ := io.ReadAll(resp.Body)
 		c.JSON(resp.StatusCode, gin.H{
@@ -85,7 +85,6 @@ func RelayMidjourneyImage(c *gin.Context) {
 	if err != nil {
 		log.Println("Failed to stream image:", err)
 	}
-	return
 }
 
 func RelayMidjourneyNotify(c *gin.Context) *dto.MidjourneyResponse {
@@ -419,7 +418,8 @@ func RelayMidjourneySubmit(c *gin.Context, relayInfo *relaycommon.RelayInfo) *dt
 		midjRequest.Action = constant.MjActionUpload
 	} else if midjRequest.TaskId != "" { //放大、变换任务，此类任务，如果重复且已有结果，远端api会直接返回最终结果
 		mjId := ""
-		if relayInfo.RelayMode == relayconstant.RelayModeMidjourneyChange {
+		switch relayInfo.RelayMode {
+		case relayconstant.RelayModeMidjourneyChange:
 			if midjRequest.TaskId == "" {
 				return service.MidjourneyErrorWrapper(constant.MjRequestError, "task_id_is_required")
 			} else if midjRequest.Action == "" {
@@ -429,7 +429,7 @@ func RelayMidjourneySubmit(c *gin.Context, relayInfo *relaycommon.RelayInfo) *dt
 			}
 			//action = midjRequest.Action
 			mjId = midjRequest.TaskId
-		} else if relayInfo.RelayMode == relayconstant.RelayModeMidjourneySimpleChange {
+		case relayconstant.RelayModeMidjourneySimpleChange:
 			if midjRequest.Content == "" {
 				return service.MidjourneyErrorWrapper(constant.MjRequestError, "content_is_required")
 			}
@@ -439,13 +439,13 @@ func RelayMidjourneySubmit(c *gin.Context, relayInfo *relaycommon.RelayInfo) *dt
 			}
 			mjId = params.TaskId
 			midjRequest.Action = params.Action
-		} else if relayInfo.RelayMode == relayconstant.RelayModeMidjourneyModal {
+		case relayconstant.RelayModeMidjourneyModal:
 			//if midjRequest.MaskBase64 == "" {
 			//	return service.MidjourneyErrorWrapper(constant.MjRequestError, "mask_base64_is_required")
 			//}
 			mjId = midjRequest.TaskId
 			midjRequest.Action = constant.MjActionModal
-		} else if relayInfo.RelayMode == relayconstant.RelayModeMidjourneyVideo {
+		case relayconstant.RelayModeMidjourneyVideo:
 			midjRequest.Action = constant.MjActionVideo
 			if midjRequest.TaskId == "" {
 				return service.MidjourneyErrorWrapper(constant.MjRequestError, "task_id_is_required")
@@ -615,7 +615,7 @@ func RelayMidjourneySubmit(c *gin.Context, relayInfo *relaycommon.RelayInfo) *dt
 		}
 		//修改返回值
 		if midjRequest.Action != constant.MjActionInPaint && midjRequest.Action != constant.MjActionCustomZoom {
-			newBody := strings.Replace(string(responseBody), `"code":21`, `"code":1`, -1)
+			newBody := strings.ReplaceAll(string(responseBody), `"code":21`, `"code":1`)
 			responseBody = []byte(newBody)
 		}
 	}
@@ -633,7 +633,7 @@ func RelayMidjourneySubmit(c *gin.Context, relayInfo *relaycommon.RelayInfo) *dt
 
 	if midjResponse.Code == 22 { //22-排队中，说明任务已存在
 		//修改返回值
-		newBody := strings.Replace(string(responseBody), `"code":22`, `"code":1`, -1)
+		newBody := strings.ReplaceAll(string(responseBody), `"code":22`, `"code":1`)
 		responseBody = []byte(newBody)
 	}
 	//resp.Body = io.NopCloser(bytes.NewBuffer(responseBody))
@@ -659,12 +659,6 @@ func RelayMidjourneySubmit(c *gin.Context, relayInfo *relaycommon.RelayInfo) *dt
 		}
 	}
 	return nil
-}
-
-type taskChangeParams struct {
-	ID     string
-	Action string
-	Index  int
 }
 
 func getMjRequestPath(path string) string {
